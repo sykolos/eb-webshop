@@ -12,7 +12,7 @@
                     <h5>Termék módosítás</h5>
                 </div>
                 <div class="card-body">
-                    <form action="{{route('adminpanel.products.edit',$product->id)}}" method="post" enctype="multipart/form-data">
+                    <form action="{{route('adminpanel.products.update',$product->id)}}" method="post" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
                         <div class="row mb-3">
