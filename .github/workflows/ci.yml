@@ -1,0 +1,47 @@
+name: Laravel Build Check
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_DATABASE: laravel
+          MYSQL_USER: root
+          MYSQL_PASSWORD: root
+        ports: [3306:3306]
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+    - name: Kód letöltése
+      uses: actions/checkout@v3
+
+    - name: PHP beállítása
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, bcmath, pdo_mysql
+
+    - name: Composer telepítés
+      run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+    - name: .env létrehozása
+      run: echo "${{ secrets.LARAVEL_ENV }}" > .env
+
+    - name: App kulcs generálás
+      run: php artisan key:generate
+
+    - name: Artisan cache parancsok
+      run: |
+        php artisan config:cache
+        php artisan route:cache
