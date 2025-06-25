@@ -47,7 +47,7 @@ Route::post('remove-from-cart/{id}',[CartController::class,'removefromcart'])->n
 Route::get('login/',[AuthController::class,'showlogin'])->name('login')->middleware('guest');
 Route::get('register/',[AuthController::class,'showregister'])->name('register')->middleware('admin');
 Route::post('register',[AuthController::class,'postregister'])->name('register.submit')->middleware('admin');
-Route::post('/login',[AuthController::class,'postlogin'])->name('login')->middleware('guest');
+Route::post('/login',[AuthController::class,'postlogin'])->name('login.submit')->middleware('guest');
 Route::post('logout/',[AuthController::class,'postlogout'])->name('logout')->middleware('auth');
 
 Route::group(['prefix'=>'account','middleware'=>'auth'],function(){

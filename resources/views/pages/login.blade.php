@@ -5,7 +5,7 @@
     <div class="login-form-box rounded-3 bg-dark text-light">
         <div class="login-title text-light">Bejelentkezés</div>
         <div class="login-form">
-            <form action="{{route('login')}}" method="post">
+            <form action="{{route('login.submit')}}" method="post">
                 @csrf
                 
                 <div class="field">
