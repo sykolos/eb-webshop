@@ -1,0 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap');
+@import '../../node_modules/bootstrap-icons/font/bootstrap-icons.css';
+
+
+
+$bg-img: url('/assets/blackbg.jpg');
+
+@import '_global.sass';
+@import '_variables';
+
+@import 'partials/_nav';
+//pages
+@import './pages/home';
+
+@import './pages/cart.sass';
+
+
+@import './pages/auth.sass';
+
+
+@import './pages/accounts.sass';
+
+@import './pages/contact.sass';
+
+@import './pages/checkout.sass';
+@import './pages/success.sass';
+
+@import './pages/product.sass';
+
+@import './pages/components/productBox.sass';
+@import './pages/components/popup.sass';

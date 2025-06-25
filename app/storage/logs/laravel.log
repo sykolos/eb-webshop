@@ -1,0 +1,23 @@
+[2024-07-29 04:22:20] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:210)
+[stacktrace]
+#0 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(135): Illuminate\\Log\\LogManager->resolve()
+#1 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(122): Illuminate\\Log\\LogManager->get()
+#2 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(645): Illuminate\\Log\\LogManager->driver()
+#3 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(274): Illuminate\\Log\\LogManager->error()
+#4 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(481): Illuminate\\Foundation\\Exceptions\\Handler->report()
+#5 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(136): Illuminate\\Foundation\\Http\\Kernel->reportException()
+#6 /home/electrob2/public_html/index.php(59): Illuminate\\Foundation\\Http\\Kernel->handle()
+#7 {main}
+"} 
+[2024-07-29 04:22:20] laravel.ERROR: The "" directory does not exist. {"exception":"[object] (Symfony\\Component\\Finder\\Exception\\DirectoryNotFoundException(code: 0): The \"\" directory does not exist. at /home/electrob2/myapp/vendor/symfony/finder/Finder.php:640)
+[stacktrace]
+#0 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(86): Symfony\\Component\\Finder\\Finder->in()
+#1 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(63): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->getConfigurationFiles()
+#2 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles()
+#3 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(242): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap()
+#4 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(176): Illuminate\\Foundation\\Application->bootstrapWith()
+#5 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(160): Illuminate\\Foundation\\Http\\Kernel->bootstrap()
+#6 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(134): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter()
+#7 /home/electrob2/public_html/index.php(59): Illuminate\\Foundation\\Http\\Kernel->handle()
+#8 {main}
+"} 

@@ -1,0 +1,50 @@
+.accounts-page
+    padding: 50px 15px
+    min-height: 100vh
+
+    .user-box
+        
+        display: flex
+        align-items: center
+        justify-content: space-between
+    .user-box, .orders-box, .order-details-box, .account-modify-box, .user-info-box
+        background: #fff
+        border-radius: 8px
+        box-shadow: 0 0 9px 0 rgba(0,0,0,0.04)
+        padding: 25px
+        margin-bottom: 40px
+        overflow: hidden
+
+        .user-info
+            .user-name
+                font-size: 25px
+                font-weight: 600
+                color: $primary-dark
+            .user-email
+                font-style: italic
+                font-size: 15px
+                font-weight: 300
+        .user-btn .logout-btn
+            background-color: darkred
+    .orders-box, .user-info-box, .account-modify-box
+        .orders-box-title, .user-info-box-title, .account-modify-box-title
+            font-size: 25px
+            color:  $primary-dark
+            text-align: center
+            font-weight: 600
+            margin-bottom: 20px
+        .account-modify-box-subtitle
+            font-size: 18px
+            font-weight: 500
+            padding-top: 15px
+    .account-modify-box
+        .user-information, .invoice-information
+            border-bottom: 1px #ddd solid
+            padding-top: 15px
+    .user-btn-box
+        display: flex
+        align-items: center
+        justify-content: center
+        gap: 20px
+
+

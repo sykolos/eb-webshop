@@ -1,0 +1,148 @@
+
+@import '_variables.sass'
+*
+    margin:0
+    padding:0
+    box-sizing: border-box
+
+body
+    font-family:'Poppins', sans-serif
+    font-size:16px
+    min-height: 100%
+    background-color: rgba(var(--bs-light-rgb),var(--bs-bg-opacity)) !important
+
+.btn
+    padding: 10px 35px
+    border-radius: var(--bs-border-radius-lg) !important
+    border: none
+    cursor: pointer
+    transition: all 0.3s ease
+    text-decoration: none
+
+.btn-primary
+    background: $primary-color
+    color:#fff
+    &:hover
+        background: #e60000
+
+.btn-outlined
+    color: $primary-dark
+    background:#fff
+    border: 1px solid $primary-dark
+    &:hover
+        background: #e60000
+        color: #fff
+
+.btn-block
+    width: 100%
+
+.container
+    width: 1200px
+    margin: 0 auto
+
+.page-header
+    background: linear-gradient(to bottom, $primary-color, $primary-dark)
+    padding: 100px 25px 120px
+    display: flex
+    justify-content: center
+    align-items: center
+    flex-direction: column
+    border-radius: 0 0 50% 50%
+    color: #fff
+
+    h1
+        font-size: 42px
+        font-weight: 600
+    h3
+        font-size: 24px
+        font-weight: 300
+
+.field
+    margin-bottom: 25px
+    input,select
+        width: 100%
+        padding: 10px 15px
+        border-radius: 200px
+        border: 1px solid #ddd
+    .has-error
+        border-color: $danger
+.field-error
+    color: $danger
+    font-size: 13px
+    margin-top: 2px
+    
+.section-header
+    text-transform: uppercase
+    font-size: 30px
+    font-weight: 500
+    letter-spacing: 1px
+    padding-top:2em !important
+.info-page
+    min-height: 100vh
+
+@media ( max-width: 410px)
+    .navbar
+        margin: 0 15px !important
+        padding: 5px 0px !important
+    .navbar-toggler-icon
+        width: 1.2em !important 
+        height: 1.2em
+    .logo
+        height: 35px
+    
+
+@media (max-width: 510px)
+    .product-box
+        width: 145px!important
+        .title
+            font-size: 12px !important
+        .serialnum
+            font-size: 10px!important
+
+@media (max-width: 575.98px) 
+    .homepage header,.homepage section, footer,.contact-page .contact,.accounts-page .container-fluid
+        padding: 0 30px
+
+@media (max-width: 767.98px) 
+    .homepage header,.homepage section, footer,.contact-page .contact,.accounts-page .container-fluid
+        padding: 0 100px
+    .navbar
+        margin: 0 45px !important
+
+@media (min-width: 991.98px) 
+    .homepage header,.homepage section, footer,.contact-page .contact,.accounts-page .container-fluid
+        padding: 0 120px
+    .navbar
+        padding: 0 75px !important
+        min-height: 70px
+
+
+@media (min-width: 1199.98px) 
+    .homepage header,.homepage section, footer,.contact-page .contact,.accounts-page .container-fluid
+        padding: 0 200px
+    .navbar
+        padding: 0 75px !important
+        min-height: 70px
+
+@media (max-width: 1399.98px) 
+    .product-box
+        width: 175px !important
+        .title
+            font-size: 16px !important
+        .serialnum
+            font-size: 10px!important
+
+
+
+
+.js-cookie-consent
+    width: 100%
+    max-height: 140px
+    position: absolute
+    top:0
+    padding: 10px
+    margin-top: 75px
+    text-align: center
+    z-index: 9999
+    background-color: #e6000091
+

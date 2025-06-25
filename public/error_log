@@ -1,0 +1,318 @@
+[05-Jul-2024 15:52:34 Europe/Budapest] PHP Warning:  require(/home/electrob2/public_html/test/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/electrob2/public_html/test/index.php on line 34
+[05-Jul-2024 15:52:34 Europe/Budapest] PHP Fatal error:  Uncaught Error: Failed opening required '/home/electrob2/public_html/test/../vendor/autoload.php' (include_path='.:/opt/alt/php81/usr/share/pear:/opt/alt/php81/usr/share/php:/usr/share/pear:/usr/share/php') in /home/electrob2/public_html/test/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home/electrob2/public_html/test/index.php on line 34
+[05-Jul-2024 15:55:00 Europe/Budapest] PHP Warning:  require(/home/electrob2/public_html/test/../myapp/vendor/autoload.php): Failed to open stream: No such file or directory in /home/electrob2/public_html/test/index.php on line 34
+[05-Jul-2024 15:55:00 Europe/Budapest] PHP Fatal error:  Uncaught Error: Failed opening required '/home/electrob2/public_html/test/../myapp/vendor/autoload.php' (include_path='.:/opt/alt/php81/usr/share/pear:/opt/alt/php81/usr/share/php:/usr/share/pear:/usr/share/php') in /home/electrob2/public_html/test/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home/electrob2/public_html/test/index.php on line 34
+[05-Jul-2024 15:56:42 Europe/Budapest] PHP Warning:  require(/home/electrob2/public_html/test/../myapp/vendor/autoload.php): Failed to open stream: No such file or directory in /home/electrob2/public_html/test/index.php on line 34
+[05-Jul-2024 15:56:42 Europe/Budapest] PHP Fatal error:  Uncaught Error: Failed opening required '/home/electrob2/public_html/test/../myapp/vendor/autoload.php' (include_path='.:/opt/alt/php81/usr/share/pear:/opt/alt/php81/usr/share/php:/usr/share/pear:/usr/share/php') in /home/electrob2/public_html/test/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home/electrob2/public_html/test/index.php on line 34
+[05-Jul-2024 15:57:23 Europe/Budapest] PHP Warning:  require(/home/electrob2/public_html/test/../myapp/vendor/autoload.php): Failed to open stream: No such file or directory in /home/electrob2/public_html/test/index.php on line 34
+[05-Jul-2024 15:57:23 Europe/Budapest] PHP Fatal error:  Uncaught Error: Failed opening required '/home/electrob2/public_html/test/../myapp/vendor/autoload.php' (include_path='.:/opt/alt/php81/usr/share/pear:/opt/alt/php81/usr/share/php:/usr/share/pear:/usr/share/php') in /home/electrob2/public_html/test/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home/electrob2/public_html/test/index.php on line 34
+[17-Jul-2024 11:08:35 UTC] PHP Fatal error:  Cannot use App\Http\Middleware\Artisan as Artisan because the name is already in use in /home/electrob2/myapp/routes/web.php on line 9
+[17-Jul-2024 11:09:02 UTC] PHP Fatal error:  Cannot use App\Http\Middleware\Artisan as Artisan because the name is already in use in /home/electrob2/myapp/routes/web.php on line 9
+[18-Jul-2024 16:45:22 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 2097152) (tried to allocate 32768 bytes) in /home/electrob2/myapp/vendor/composer/autoload_static.php on line 2114
+[29-Jul-2024 02:18:54 Europe/Budapest] PHP Warning:  require(/home/electrob2/public_html/../../myapp/vendor/autoload.php): Failed to open stream: No such file or directory in /home/electrob2/public_html/index.php on line 34
+[29-Jul-2024 02:18:54 Europe/Budapest] PHP Fatal error:  Uncaught Error: Failed opening required '/home/electrob2/public_html/../../myapp/vendor/autoload.php' (include_path='.:/opt/alt/php81/usr/share/pear:/opt/alt/php81/usr/share/php:/usr/share/pear:/usr/share/php') in /home/electrob2/public_html/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home/electrob2/public_html/index.php on line 34
+[29-Jul-2024 04:04:15 Europe/Budapest] PHP Warning:  require_once(/home/electrob2/public_html/../myapp/bootstrap/app.php): Failed to open stream: No such file or directory in /home/electrob2/public_html/index.php on line 47
+[29-Jul-2024 04:04:15 Europe/Budapest] PHP Fatal error:  Uncaught Error: Failed opening required '/home/electrob2/public_html/../myapp/bootstrap/app.php' (include_path='.:/opt/alt/php81/usr/share/pear:/opt/alt/php81/usr/share/php:/usr/share/pear:/usr/share/php') in /home/electrob2/public_html/index.php:47
+Stack trace:
+#0 {main}
+  thrown in /home/electrob2/public_html/index.php on line 47
+[29-Jul-2024 04:04:21 Europe/Budapest] PHP Warning:  require_once(/home/electrob2/public_html/../myapp/bootstrap/app.php): Failed to open stream: No such file or directory in /home/electrob2/public_html/index.php on line 47
+[29-Jul-2024 04:04:21 Europe/Budapest] PHP Fatal error:  Uncaught Error: Failed opening required '/home/electrob2/public_html/../myapp/bootstrap/app.php' (include_path='.:/opt/alt/php81/usr/share/pear:/opt/alt/php81/usr/share/php:/usr/share/pear:/usr/share/php') in /home/electrob2/public_html/index.php:47
+Stack trace:
+#0 {main}
+  thrown in /home/electrob2/public_html/index.php on line 47
+[29-Jul-2024 04:04:36 Europe/Budapest] PHP Warning:  require_once(/home/electrob2/public_html/../myapp/bootstrap/app.php): Failed to open stream: No such file or directory in /home/electrob2/public_html/index.php on line 47
+[29-Jul-2024 04:04:36 Europe/Budapest] PHP Fatal error:  Uncaught Error: Failed opening required '/home/electrob2/public_html/../myapp/bootstrap/app.php' (include_path='.:/opt/alt/php81/usr/share/pear:/opt/alt/php81/usr/share/php:/usr/share/pear:/usr/share/php') in /home/electrob2/public_html/index.php:47
+Stack trace:
+#0 {main}
+  thrown in /home/electrob2/public_html/index.php on line 47
+[29-Jul-2024 04:05:24 Europe/Budapest] PHP Warning:  require_once(/home/electrob2/public_html/../myapp/bootstrap/app.php): Failed to open stream: No such file or directory in /home/electrob2/public_html/index.php on line 47
+[29-Jul-2024 04:05:24 Europe/Budapest] PHP Fatal error:  Uncaught Error: Failed opening required '/home/electrob2/public_html/../myapp/bootstrap/app.php' (include_path='.:/opt/alt/php81/usr/share/pear:/opt/alt/php81/usr/share/php:/usr/share/pear:/usr/share/php') in /home/electrob2/public_html/index.php:47
+Stack trace:
+#0 {main}
+  thrown in /home/electrob2/public_html/index.php on line 47
+[29-Jul-2024 04:06:12 Europe/Budapest] PHP Warning:  require_once(/home/electrob2/public_html/../myapp/bootstrap/app.php): Failed to open stream: No such file or directory in /home/electrob2/public_html/index.php on line 47
+[29-Jul-2024 04:06:12 Europe/Budapest] PHP Fatal error:  Uncaught Error: Failed opening required '/home/electrob2/public_html/../myapp/bootstrap/app.php' (include_path='.:/opt/alt/php81/usr/share/pear:/opt/alt/php81/usr/share/php:/usr/share/pear:/usr/share/php') in /home/electrob2/public_html/index.php:47
+Stack trace:
+#0 {main}
+  thrown in /home/electrob2/public_html/index.php on line 47
+[29-Jul-2024 04:06:54 Europe/Budapest] PHP Warning:  require_once(/home/electrob2/public_html/../myapp/bootstrap/app.php): Failed to open stream: No such file or directory in /home/electrob2/public_html/index.php on line 47
+[29-Jul-2024 04:06:54 Europe/Budapest] PHP Fatal error:  Uncaught Error: Failed opening required '/home/electrob2/public_html/../myapp/bootstrap/app.php' (include_path='.:/opt/alt/php81/usr/share/pear:/opt/alt/php81/usr/share/php:/usr/share/pear:/usr/share/php') in /home/electrob2/public_html/index.php:47
+Stack trace:
+#0 {main}
+  thrown in /home/electrob2/public_html/index.php on line 47
+[29-Jul-2024 04:07:09 Europe/Budapest] PHP Warning:  require_once(/home/electrob2/public_html/../myapp/bootstrap/app.php): Failed to open stream: No such file or directory in /home/electrob2/public_html/index.php on line 47
+[29-Jul-2024 04:07:09 Europe/Budapest] PHP Fatal error:  Uncaught Error: Failed opening required '/home/electrob2/public_html/../myapp/bootstrap/app.php' (include_path='.:/opt/alt/php81/usr/share/pear:/opt/alt/php81/usr/share/php:/usr/share/pear:/usr/share/php') in /home/electrob2/public_html/index.php:47
+Stack trace:
+#0 {main}
+  thrown in /home/electrob2/public_html/index.php on line 47
+[29-Jul-2024 04:07:23 Europe/Budapest] PHP Warning:  require_once(/home/electrob2/public_html/../myapp/bootstrap/app.php): Failed to open stream: No such file or directory in /home/electrob2/public_html/index.php on line 47
+[29-Jul-2024 04:07:23 Europe/Budapest] PHP Fatal error:  Uncaught Error: Failed opening required '/home/electrob2/public_html/../myapp/bootstrap/app.php' (include_path='.:/opt/alt/php81/usr/share/pear:/opt/alt/php81/usr/share/php:/usr/share/pear:/usr/share/php') in /home/electrob2/public_html/index.php:47
+Stack trace:
+#0 {main}
+  thrown in /home/electrob2/public_html/index.php on line 47
+[29-Jul-2024 04:07:23 Europe/Budapest] PHP Warning:  require_once(/home/electrob2/public_html/../myapp/bootstrap/app.php): Failed to open stream: No such file or directory in /home/electrob2/public_html/index.php on line 47
+[29-Jul-2024 04:07:23 Europe/Budapest] PHP Fatal error:  Uncaught Error: Failed opening required '/home/electrob2/public_html/../myapp/bootstrap/app.php' (include_path='.:/opt/alt/php81/usr/share/pear:/opt/alt/php81/usr/share/php:/usr/share/pear:/usr/share/php') in /home/electrob2/public_html/index.php:47
+Stack trace:
+#0 {main}
+  thrown in /home/electrob2/public_html/index.php on line 47
+[29-Jul-2024 04:07:26 Europe/Budapest] PHP Warning:  require_once(/home/electrob2/public_html/../myapp/bootstrap/app.php): Failed to open stream: No such file or directory in /home/electrob2/public_html/index.php on line 47
+[29-Jul-2024 04:07:26 Europe/Budapest] PHP Fatal error:  Uncaught Error: Failed opening required '/home/electrob2/public_html/../myapp/bootstrap/app.php' (include_path='.:/opt/alt/php81/usr/share/pear:/opt/alt/php81/usr/share/php:/usr/share/pear:/usr/share/php') in /home/electrob2/public_html/index.php:47
+Stack trace:
+#0 {main}
+  thrown in /home/electrob2/public_html/index.php on line 47
+[29-Jul-2024 04:07:26 Europe/Budapest] PHP Warning:  require_once(/home/electrob2/public_html/../myapp/bootstrap/app.php): Failed to open stream: No such file or directory in /home/electrob2/public_html/index.php on line 47
+[29-Jul-2024 04:07:26 Europe/Budapest] PHP Fatal error:  Uncaught Error: Failed opening required '/home/electrob2/public_html/../myapp/bootstrap/app.php' (include_path='.:/opt/alt/php81/usr/share/pear:/opt/alt/php81/usr/share/php:/usr/share/pear:/usr/share/php') in /home/electrob2/public_html/index.php:47
+Stack trace:
+#0 {main}
+  thrown in /home/electrob2/public_html/index.php on line 47
+[29-Jul-2024 04:09:28 Europe/Budapest] PHP Warning:  require_once(/home/electrob2/public_html/../myapp/bootstrap/app.php): Failed to open stream: No such file or directory in /home/electrob2/public_html/index.php on line 47
+[29-Jul-2024 04:09:28 Europe/Budapest] PHP Fatal error:  Uncaught Error: Failed opening required '/home/electrob2/public_html/../myapp/bootstrap/app.php' (include_path='.:/opt/alt/php81/usr/share/pear:/opt/alt/php81/usr/share/php:/usr/share/pear:/usr/share/php') in /home/electrob2/public_html/index.php:47
+Stack trace:
+#0 {main}
+  thrown in /home/electrob2/public_html/index.php on line 47
+[29-Jul-2024 04:11:21 Europe/Budapest] PHP Warning:  require_once(/home/electrob2/public_html/../myapp/bootstrap/app.php): Failed to open stream: No such file or directory in /home/electrob2/public_html/index.php on line 47
+[29-Jul-2024 04:11:21 Europe/Budapest] PHP Fatal error:  Uncaught Error: Failed opening required '/home/electrob2/public_html/../myapp/bootstrap/app.php' (include_path='.:/opt/alt/php81/usr/share/pear:/opt/alt/php81/usr/share/php:/usr/share/pear:/usr/share/php') in /home/electrob2/public_html/index.php:47
+Stack trace:
+#0 {main}
+  thrown in /home/electrob2/public_html/index.php on line 47
+[29-Jul-2024 04:11:29 Europe/Budapest] PHP Warning:  require_once(/home/electrob2/public_html/../myapp/bootstrap/app.php): Failed to open stream: No such file or directory in /home/electrob2/public_html/index.php on line 47
+[29-Jul-2024 04:11:29 Europe/Budapest] PHP Fatal error:  Uncaught Error: Failed opening required '/home/electrob2/public_html/../myapp/bootstrap/app.php' (include_path='.:/opt/alt/php81/usr/share/pear:/opt/alt/php81/usr/share/php:/usr/share/pear:/usr/share/php') in /home/electrob2/public_html/index.php:47
+Stack trace:
+#0 {main}
+  thrown in /home/electrob2/public_html/index.php on line 47
+[29-Jul-2024 04:13:43 Europe/Budapest] PHP Warning:  require_once(/home/electrob2/public_html/../myapp/bootstrap/app.php): Failed to open stream: No such file or directory in /home/electrob2/public_html/index.php on line 47
+[29-Jul-2024 04:13:43 Europe/Budapest] PHP Fatal error:  Uncaught Error: Failed opening required '/home/electrob2/public_html/../myapp/bootstrap/app.php' (include_path='.:/opt/alt/php81/usr/share/pear:/opt/alt/php81/usr/share/php:/usr/share/pear:/usr/share/php') in /home/electrob2/public_html/index.php:47
+Stack trace:
+#0 {main}
+  thrown in /home/electrob2/public_html/index.php on line 47
+[29-Jul-2024 04:14:11 Europe/Budapest] PHP Warning:  require_once(/home/electrob2/public_html/../myapp/bootstrap/app.php): Failed to open stream: No such file or directory in /home/electrob2/public_html/index.php on line 50
+[29-Jul-2024 04:14:11 Europe/Budapest] PHP Fatal error:  Uncaught Error: Failed opening required '/home/electrob2/public_html/../myapp/bootstrap/app.php' (include_path='.:/opt/alt/php81/usr/share/pear:/opt/alt/php81/usr/share/php:/usr/share/pear:/usr/share/php') in /home/electrob2/public_html/index.php:50
+Stack trace:
+#0 {main}
+  thrown in /home/electrob2/public_html/index.php on line 50
+[29-Jul-2024 04:15:22 Europe/Budapest] PHP Warning:  Undefined variable $app in /home/electrob2/public_html/index.php on line 56
+[29-Jul-2024 04:15:22 Europe/Budapest] PHP Fatal error:  Uncaught Error: Call to a member function make() on null in /home/electrob2/public_html/index.php:56
+Stack trace:
+#0 {main}
+  thrown in /home/electrob2/public_html/index.php on line 56
+[29-Jul-2024 04:16:44 Europe/Budapest] PHP Warning:  require_once(/home/electrob2/public_html/../myapp/bootstrap/app.php): Failed to open stream: No such file or directory in /home/electrob2/public_html/index.php on line 50
+[29-Jul-2024 04:16:44 Europe/Budapest] PHP Fatal error:  Uncaught Error: Failed opening required '/home/electrob2/public_html/../myapp/bootstrap/app.php' (include_path='.:/opt/alt/php81/usr/share/pear:/opt/alt/php81/usr/share/php:/usr/share/pear:/usr/share/php') in /home/electrob2/public_html/index.php:50
+Stack trace:
+#0 {main}
+  thrown in /home/electrob2/public_html/index.php on line 50
+[29-Jul-2024 04:18:48 Europe/Budapest] PHP Warning:  require_once(/home/electrob2/public_html/../myapp/bootstrap/app.php): Failed to open stream: No such file or directory in /home/electrob2/public_html/index.php on line 50
+[29-Jul-2024 04:18:48 Europe/Budapest] PHP Fatal error:  Uncaught Error: Failed opening required '/home/electrob2/public_html/../myapp/bootstrap/app.php' (include_path='.:/opt/alt/php81/usr/share/pear:/opt/alt/php81/usr/share/php:/usr/share/pear:/usr/share/php') in /home/electrob2/public_html/index.php:50
+Stack trace:
+#0 {main}
+  thrown in /home/electrob2/public_html/index.php on line 50
+[29-Jul-2024 04:19:07 Europe/Budapest] PHP Warning:  require_once(/home/electrob2/public_html/../myapp/bootstrap/app.php): Failed to open stream: No such file or directory in /home/electrob2/public_html/index.php on line 50
+[29-Jul-2024 04:19:07 Europe/Budapest] PHP Fatal error:  Uncaught Error: Failed opening required '/home/electrob2/public_html/../myapp/bootstrap/app.php' (include_path='.:/opt/alt/php81/usr/share/pear:/opt/alt/php81/usr/share/php:/usr/share/pear:/usr/share/php') in /home/electrob2/public_html/index.php:50
+Stack trace:
+#0 {main}
+  thrown in /home/electrob2/public_html/index.php on line 50
+[29-Jul-2024 04:21:34 Europe/Budapest] PHP Warning:  require_once(/home/electrob2/public_html/../app/myapp/bootstrap/app.php): Failed to open stream: No such file or directory in /home/electrob2/public_html/index.php on line 50
+[29-Jul-2024 04:21:34 Europe/Budapest] PHP Fatal error:  Uncaught Error: Failed opening required '/home/electrob2/public_html/../app/myapp/bootstrap/app.php' (include_path='.:/opt/alt/php81/usr/share/pear:/opt/alt/php81/usr/share/php:/usr/share/pear:/usr/share/php') in /home/electrob2/public_html/index.php:50
+Stack trace:
+#0 {main}
+  thrown in /home/electrob2/public_html/index.php on line 50
+[29-Jul-2024 04:21:37 Europe/Budapest] PHP Warning:  require_once(/home/electrob2/public_html/../app/myapp/bootstrap/app.php): Failed to open stream: No such file or directory in /home/electrob2/public_html/index.php on line 50
+[29-Jul-2024 04:21:37 Europe/Budapest] PHP Fatal error:  Uncaught Error: Failed opening required '/home/electrob2/public_html/../app/myapp/bootstrap/app.php' (include_path='.:/opt/alt/php81/usr/share/pear:/opt/alt/php81/usr/share/php:/usr/share/pear:/usr/share/php') in /home/electrob2/public_html/index.php:50
+Stack trace:
+#0 {main}
+  thrown in /home/electrob2/public_html/index.php on line 50
+[29-Jul-2024 04:22:20 Europe/Budapest] PHP Fatal error:  Uncaught RuntimeException: A facade root has not been set. in /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:335
+Stack trace:
+#0 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(18): Illuminate\Support\Facades\Facade::__callStatic()
+#1 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(642): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#2 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(623): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#3 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(554): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#4 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(460): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#5 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(377): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#6 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(493): Illuminate\Foundation\Exceptions\Handler->render()
+#7 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(138): Illuminate\Foundation\Http\Kernel->renderException()
+#8 /home/electrob2/public_html/index.php(59): Illuminate\Foundation\Http\Kernel->handle()
+#9 {main}
+  thrown in /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php on line 335
+[14-Nov-2024 14:58:46 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 2097152) (tried to allocate 36864 bytes) in /home/electrob2/myapp/vendor/composer/autoload_static.php on line 2535
+[15-Nov-2024 07:48:36 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 2097152) (tried to allocate 36864 bytes) in /home/electrob2/myapp/vendor/composer/autoload_static.php on line 2535
+[15-Nov-2024 07:48:36 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 4194304) (tried to allocate 32768 bytes) in /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Support/Str.php on line 1306
+[15-Nov-2024 08:23:52 UTC] PHP Fatal error:  Out of memory (allocated 10485760) (tried to allocate 65536 bytes) in /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Pagination/AbstractCursorPaginator.php on line 22
+[15-Nov-2024 10:41:14 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.1.0". You are running 7.2.34. in /home/electrob2/myapp/vendor/composer/platform_check.php on line 24
+[15-Nov-2024 15:43:34 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.1.0". You are running 7.2.34. in /home/electrob2/myapp/vendor/composer/platform_check.php on line 24
+[06-Jan-2025 12:50:50 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 2097152) (tried to allocate 36864 bytes) in /home/electrob2/myapp/vendor/composer/autoload_static.php on line 2535
+[17-Feb-2025 12:07:46 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 8388608) (tried to allocate 163840 bytes) in /home/electrob2/myapp/vendor/voku/portable-ascii/src/voku/helper/ASCII.php on line 475
+[28-Mar-2025 18:41:31 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 4194304) (tried to allocate 32768 bytes) in /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Support/Str.php on line 1306
+[01-Apr-2025 09:43:37 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 2097152) (tried to allocate 36864 bytes) in /home/electrob2/myapp/vendor/composer/autoload_static.php on line 2535
+[01-Apr-2025 08:11:31 UTC] PHP Fatal error:  Out of memory (allocated 10485760) (tried to allocate 65536 bytes) in /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Pagination/AbstractCursorPaginator.php on line 22
+[02-Apr-2025 09:05:33 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 2097152) (tried to allocate 36864 bytes) in /home/electrob2/myapp/vendor/composer/autoload_static.php on line 2535
+[02-Apr-2025 09:05:33 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 2097152) (tried to allocate 36864 bytes) in /home/electrob2/myapp/vendor/composer/autoload_static.php on line 2535
+[03-Apr-2025 16:03:18 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 4194304) (tried to allocate 32768 bytes) in /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Support/Str.php on line 1306
+[08-Apr-2025 11:08:07 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 2097152) (tried to allocate 36864 bytes) in /home/electrob2/myapp/vendor/composer/autoload_static.php on line 2535
+[21-May-2025 09:23:54 UTC] PHP Fatal error:  Out of memory (allocated 14680064) (tried to allocate 65536 bytes) in /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/View.php on line 376
+[02-Jun-2025 10:09:58 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 2097152) (tried to allocate 36864 bytes) in /home/electrob2/myapp/vendor/composer/autoload_static.php on line 2535
+[04-Jun-2025 09:08:20 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 2097152) (tried to allocate 36864 bytes) in /home/electrob2/myapp/vendor/composer/autoload_static.php on line 2535
+[04-Jun-2025 10:45:22 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 6291456) (tried to allocate 32768 bytes) in /home/electrob2/myapp/vendor/nesbot/carbon/src/Carbon/CarbonInterface.php on line 3812
+[04-Jun-2025 10:45:59 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 6291456) (tried to allocate 32768 bytes) in /home/electrob2/myapp/vendor/nesbot/carbon/src/Carbon/CarbonInterface.php on line 3812
+[04-Jun-2025 14:31:22 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 2097152) (tried to allocate 36864 bytes) in /home/electrob2/myapp/vendor/composer/autoload_static.php on line 2535
+[06-Jun-2025 12:20:42 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 2097152) (tried to allocate 36864 bytes) in /home/electrob2/myapp/vendor/composer/autoload_static.php on line 2535
+[06-Jun-2025 16:05:12 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 4194304) (tried to allocate 32768 bytes) in /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Support/Str.php on line 1306
+[06-Jun-2025 16:20:20 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 2097152) (tried to allocate 36864 bytes) in /home/electrob2/myapp/vendor/composer/autoload_static.php on line 2535
+[10-Jun-2025 16:11:51 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 2097152) (tried to allocate 36864 bytes) in /home/electrob2/myapp/vendor/composer/autoload_static.php on line 2535
+[11-Jun-2025 09:09:56 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 2097152) (tried to allocate 36864 bytes) in /home/electrob2/myapp/vendor/composer/autoload_static.php on line 2535
+[11-Jun-2025 09:26:57 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 2097152) (tried to allocate 36864 bytes) in /home/electrob2/myapp/vendor/composer/autoload_static.php on line 2535
+[11-Jun-2025 09:50:22 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 2097152) (tried to allocate 36864 bytes) in /home/electrob2/myapp/vendor/composer/autoload_static.php on line 2535
+[11-Jun-2025 13:09:42 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 4194304) (tried to allocate 32768 bytes) in /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Support/Str.php on line 1306
+[11-Jun-2025 15:03:54 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 2097152) (tried to allocate 36864 bytes) in /home/electrob2/myapp/vendor/composer/autoload_static.php on line 2535
+[12-Jun-2025 11:20:03 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 2097152) (tried to allocate 36864 bytes) in /home/electrob2/myapp/vendor/composer/autoload_static.php on line 2535
+[12-Jun-2025 13:56:51 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 2097152) (tried to allocate 36864 bytes) in /home/electrob2/myapp/vendor/composer/autoload_static.php on line 2535
+[13-Jun-2025 12:04:57 UTC] PHP Fatal error:  Uncaught Symfony\Component\Routing\Exception\RouteNotFoundException: Route [home] not defined. in /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Routing/UrlGenerator.php:467
+Stack trace:
+#0 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/helpers.php(826): Illuminate\Routing\UrlGenerator->route()
+#1 /home/electrob2/myapp/storage/framework/views/56a154d945a83d47eb43ff0965b02fac73fa9202.php(6): route()
+#2 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Filesystem/Filesystem.php(109): require('/home/electrob2...')
+#3 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Filesystem/Filesystem.php(110): Illuminate\Filesystem\Filesystem::Illuminate\Filesystem\{closure}()
+#4 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/Engines/PhpEngine.php(58): Illuminate\Filesystem\Filesystem->getRequire()
+#5 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/Engines/CompilerEngine.php(70): Illuminate\View\Engines\PhpEngine->evaluatePath()
+#6 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/View.php(195): Illuminate\View\Engines\CompilerEngine->get()
+#7 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/View.php(178): Illuminate\View\View->getContents()
+#8 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/View.php(147): Illuminate\View\View->renderContents()
+#9 /home/electrob2/myapp/storage/framework/views/61f2efe281185caa7ddff3bf90549cc28c7ca29a.php(31): Illuminate\View\View->render()
+#10 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Filesystem/Filesystem.php(109): require('/home/electrob2...')
+#11 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Filesystem/Filesystem.php(110): Illuminate\Filesystem\Filesystem::Illuminate\Filesystem\{closure}()
+#12 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/Engines/PhpEngine.php(58): Illuminate\Filesystem\Filesystem->getRequire()
+#13 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/Engines/CompilerEngine.php(70): Illuminate\View\Engines\PhpEngine->evaluatePath()
+#14 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/View.php(195): Illuminate\View\Engines\CompilerEngine->get()
+#15 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/View.php(178): Illuminate\View\View->getContents()
+#16 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/View.php(147): Illuminate\View\View->renderContents()
+#17 /home/electrob2/myapp/storage/framework/views/051647a12af77e7bae05a368095ca16b5e07167e.php(16): Illuminate\View\View->render()
+#18 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Filesystem/Filesystem.php(109): require('/home/electrob2...')
+#19 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Filesystem/Filesystem.php(110): Illuminate\Filesystem\Filesystem::Illuminate\Filesystem\{closure}()
+#20 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/Engines/PhpEngine.php(58): Illuminate\Filesystem\Filesystem->getRequire()
+#21 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/Engines/CompilerEngine.php(70): Illuminate\View\Engines\PhpEngine->evaluatePath()
+#22 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/View.php(195): Illuminate\View\Engines\CompilerEngine->get()
+#23 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/View.php(178): Illuminate\View\View->getContents()
+#24 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/View.php(147): Illuminate\View\View->renderContents()
+#25 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Http/Response.php(69): Illuminate\View\View->render()
+#26 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Http/Response.php(35): Illuminate\Http\Response->setContent()
+#27 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Routing/ResponseFactory.php(57): Illuminate\Http\Response->__construct()
+#28 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Routing/ResponseFactory.php(87): Illuminate\Routing\ResponseFactory->make()
+#29 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(629): Illuminate\Routing\ResponseFactory->view()
+#30 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(554): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#31 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(460): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#32 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(377): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#33 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(233): Illuminate\Foundation\Exceptions\Handler->render()
+#34 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(210): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#35 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(270): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#36 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#37 {main}
+
+Next Illuminate\View\ViewException: Route [home] not defined. (View: /home/electrob2/myapp/resources/views/layouts/partials/nav.blade.php) in /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Routing/UrlGenerator.php:467
+Stack trace:
+#0 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/Engines/PhpEngine.php(60): Illuminate\View\Engines\CompilerEngine->handleViewException()
+#1 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/Engines/CompilerEngine.php(70): Illuminate\View\Engines\PhpEngine->evaluatePath()
+#2 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/View.php(195): Illuminate\View\Engines\CompilerEngine->get()
+#3 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/View.php(178): Illuminate\View\View->getContents()
+#4 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/View.php(147): Illuminate\View\View->renderContents()
+#5 /home/electrob2/myapp/storage/framework/views/61f2efe281185caa7ddff3bf90549cc28c7ca29a.php(31): Illuminate\View\View->render()
+#6 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Filesystem/Filesystem.php(109): require('/home/electrob2...')
+#7 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Filesystem/Filesystem.php(110): Illuminate\Filesystem\Filesystem::Illuminate\Filesystem\{closure}()
+#8 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/Engines/PhpEngine.php(58): Illuminate\Filesystem\Filesystem->getRequire()
+#9 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/Engines/CompilerEngine.php(70): Illuminate\View\Engines\PhpEngine->evaluatePath()
+#10 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/View.php(195): Illuminate\View\Engines\CompilerEngine->get()
+#11 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/View.php(178): Illuminate\View\View->getContents()
+#12 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/View.php(147): Illuminate\View\View->renderContents()
+#13 /home/electrob2/myapp/storage/framework/views/051647a12af77e7bae05a368095ca16b5e07167e.php(16): Illuminate\View\View->render()
+#14 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Filesystem/Filesystem.php(109): require('/home/electrob2...')
+#15 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Filesystem/Filesystem.php(110): Illuminate\Filesystem\Filesystem::Illuminate\Filesystem\{closure}()
+#16 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/Engines/PhpEngine.php(58): Illuminate\Filesystem\Filesystem->getRequire()
+#17 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/Engines/CompilerEngine.php(70): Illuminate\View\Engines\PhpEngine->evaluatePath()
+#18 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/View.php(195): Illuminate\View\Engines\CompilerEngine->get()
+#19 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/View.php(178): Illuminate\View\View->getContents()
+#20 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/View.php(147): Illuminate\View\View->renderContents()
+#21 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Http/Response.php(69): Illuminate\View\View->render()
+#22 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Http/Response.php(35): Illuminate\Http\Response->setContent()
+#23 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Routing/ResponseFactory.php(57): Illuminate\Http\Response->__construct()
+#24 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Routing/ResponseFactory.php(87): Illuminate\Routing\ResponseFactory->make()
+#25 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(629): Illuminate\Routing\ResponseFactory->view()
+#26 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(554): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#27 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(460): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#28 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(377): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#29 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(233): Illuminate\Foundation\Exceptions\Handler->render()
+#30 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(210): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#31 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(270): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#32 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#33 {main}
+
+Next Illuminate\View\ViewException: Route [home] not defined. (View: /home/electrob2/myapp/resources/views/layouts/partials/nav.blade.php) (View: /home/electrob2/myapp/resources/views/layouts/partials/nav.blade.php) in /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Routing/UrlGenerator.php:467
+Stack trace:
+#0 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/Engines/PhpEngine.php(60): Illuminate\View\Engines\CompilerEngine->handleViewException()
+#1 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/Engines/CompilerEngine.php(70): Illuminate\View\Engines\PhpEngine->evaluatePath()
+#2 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/View.php(195): Illuminate\View\Engines\CompilerEngine->get()
+#3 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/View.php(178): Illuminate\View\View->getContents()
+#4 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/View.php(147): Illuminate\View\View->renderContents()
+#5 /home/electrob2/myapp/storage/framework/views/051647a12af77e7bae05a368095ca16b5e07167e.php(16): Illuminate\View\View->render()
+#6 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Filesystem/Filesystem.php(109): require('/home/electrob2...')
+#7 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Filesystem/Filesystem.php(110): Illuminate\Filesystem\Filesystem::Illuminate\Filesystem\{closure}()
+#8 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/Engines/PhpEngine.php(58): Illuminate\Filesystem\Filesystem->getRequire()
+#9 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/Engines/CompilerEngine.php(70): Illuminate\View\Engines\PhpEngine->evaluatePath()
+#10 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/View.php(195): Illuminate\View\Engines\CompilerEngine->get()
+#11 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/View.php(178): Illuminate\View\View->getContents()
+#12 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/View.php(147): Illuminate\View\View->renderContents()
+#13 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Http/Response.php(69): Illuminate\View\View->render()
+#14 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Http/Response.php(35): Illuminate\Http\Response->setContent()
+#15 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Routing/ResponseFactory.php(57): Illuminate\Http\Response->__construct()
+#16 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Routing/ResponseFactory.php(87): Illuminate\Routing\ResponseFactory->make()
+#17 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(629): Illuminate\Routing\ResponseFactory->view()
+#18 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(554): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#19 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(460): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#20 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(377): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#21 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(233): Illuminate\Foundation\Exceptions\Handler->render()
+#22 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(210): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#23 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(270): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#24 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#25 {main}
+
+Next Illuminate\View\ViewException: Route [home] not defined. (View: /home/electrob2/myapp/resources/views/layouts/partials/nav.blade.php) (View: /home/electrob2/myapp/resources/views/layouts/partials/nav.blade.php) (View: /home/electrob2/myapp/resources/views/layouts/partials/nav.blade.php) in /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Routing/UrlGenerator.php:467
+Stack trace:
+#0 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/Engines/PhpEngine.php(60): Illuminate\View\Engines\CompilerEngine->handleViewException()
+#1 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/Engines/CompilerEngine.php(70): Illuminate\View\Engines\PhpEngine->evaluatePath()
+#2 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/View.php(195): Illuminate\View\Engines\CompilerEngine->get()
+#3 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/View.php(178): Illuminate\View\View->getContents()
+#4 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/View.php(147): Illuminate\View\View->renderContents()
+#5 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Http/Response.php(69): Illuminate\View\View->render()
+#6 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Http/Response.php(35): Illuminate\Http\Response->setContent()
+#7 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Routing/ResponseFactory.php(57): Illuminate\Http\Response->__construct()
+#8 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Routing/ResponseFactory.php(87): Illuminate\Routing\ResponseFactory->make()
+#9 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(629): Illuminate\Routing\ResponseFactory->view()
+#10 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(554): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#11 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(460): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#12 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(377): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#13 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(233): Illuminate\Foundation\Exceptions\Handler->render()
+#14 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(210): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#15 /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(270): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#16 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#17 {main}
+  thrown in /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/Routing/UrlGenerator.php on line 467
+[14-Jun-2025 08:20:47 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 8388608) (tried to allocate 163840 bytes) in /home/electrob2/myapp/vendor/voku/portable-ascii/src/voku/helper/ASCII.php on line 475
+[14-Jun-2025 10:43:13 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 2097152) (tried to allocate 36864 bytes) in /home/electrob2/myapp/vendor/composer/autoload_static.php on line 2535
+[14-Jun-2025 10:44:21 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 2097152) (tried to allocate 36864 bytes) in /home/electrob2/myapp/vendor/composer/autoload_static.php on line 2535
+[16-Jun-2025 14:26:55 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 2097152) (tried to allocate 36864 bytes) in /home/electrob2/myapp/vendor/composer/autoload_static.php on line 2535
+[16-Jun-2025 14:26:55 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 6291456) (tried to allocate 32768 bytes) in /home/electrob2/myapp/vendor/nesbot/carbon/src/Carbon/CarbonInterface.php on line 3812
+[23-Jun-2025 06:35:54 UTC] PHP Fatal error:  Out of memory (allocated 14680064) (tried to allocate 65536 bytes) in /home/electrob2/myapp/vendor/laravel/framework/src/Illuminate/View/View.php on line 376
+[23-Jun-2025 12:43:54 Europe/Budapest] PHP Fatal error:  Out of memory (allocated 2097152) (tried to allocate 36864 bytes) in /home/electrob2/myapp/vendor/composer/autoload_static.php on line 2535

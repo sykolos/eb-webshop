@@ -1,0 +1,49 @@
+# Laravel általános
+/vendor
+/node_modules
+/public/storage
+/storage/*.key
+.env
+.env.*
+.phpunit.result.cache
+Homestead.yaml
+Homestead.json
+
+# Docker
+docker-compose.override.yml
+.env.docker
+.DS_Store
+
+# Logok és cache
+/storage/logs
+/storage/framework/cache
+/storage/framework/sessions
+/storage/framework/views
+
+# Laravel Mix / Vite build output
+/public/js
+/public/css
+/public/mix-manifest.json
+/public/hot
+/public/build
+
+# IDE / Editor specifikus
+.idea
+.vscode
+*.sublime-project
+*.sublime-workspace
+
+# OS
+Thumbs.db
+Desktop.ini
+
+# tesztek
+/.phpunit.result.cache
+
+# Lokális adatbázismentés vagy dump fájlok
+*.sql
+*.sqlite
+localhost.sql
+
+# saját roadmap fájl
+laravel_webshop_roadmap_prioritized(1).md
