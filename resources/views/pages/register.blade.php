@@ -5,7 +5,7 @@
     <div class="login-form-box">
         <div class="login-title">Register</div>
         <div class="login-form">
-            <form action="{{route('register')}}" method="post">
+            <form action="{{route('register.submit')}}" method="post">
                 @csrf
                 <div class="field">
                     <label for="name">Felhasználónév</label>

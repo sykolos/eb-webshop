@@ -4,7 +4,7 @@
 <h1 class="page-title">Felhasználók</h1>
 <div class="container">
     <div class="text-end mb-3">
-        <a href="{{route('register')}}" class="btn btn-primary">Létrehozás</a>    
+        <a href="{{route('register.show')}}" class="btn btn-primary">Létrehozás</a>    
     </div>
     <div class="row">
         <div class="col-12"> 
