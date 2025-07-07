@@ -50,7 +50,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(User_invoce::class,'user_id','id');
     }
     public function user_shipping(){
-        return $this->hasOne(User_shipping::class,'user_id','id');
+        return $this->hasMany(User_shipping::class,'user_id','id');
     }
 
     public function special_prices(){

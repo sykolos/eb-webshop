@@ -16,4 +16,12 @@ class Order extends Model
     public function items(){
         return $this->hasMany(Item::class);
     }
+    public function user_shipping()
+    {
+        return $this->belongsTo(User_shipping::class, 'shipping_address_id');
+    }
+    public function user_invoice()
+    {
+        return $this->hasOne(User_invoce::class, 'user_id', 'user_id');
+    }
 }

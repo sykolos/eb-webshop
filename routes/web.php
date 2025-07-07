@@ -19,6 +19,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\AccountpageController;
 use App\Http\Controllers\MailController;
+use App\Http\Controllers\ShippingAddressController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 
@@ -60,7 +61,12 @@ Route::group(['prefix'=>'account','middleware'=>'auth'],function(){
     //pdf generálás
     Route::get('/getpdf/{id}',[AccountpageController::class,'getpdf'])->name('account.getpdf');
 
-
+    // 💡 Szállítási címek kezelése (csak új/létrehoz/szerkeszt/töröl)
+    Route::get('/shipping/create', [ShippingAddressController::class, 'create'])->name('shipping.create');
+    Route::post('/shipping', [ShippingAddressController::class, 'store'])->name('shipping.store');
+    Route::get('/shipping/{address}/edit', [ShippingAddressController::class, 'edit'])->name('shipping.edit');
+    Route::put('/shipping/{address}', [ShippingAddressController::class, 'update'])->name('shipping.update');
+    Route::delete('/shipping/{address}', [ShippingAddressController::class, 'destroy'])->name('shipping.destroy');
 });
 
 //adminpanel group

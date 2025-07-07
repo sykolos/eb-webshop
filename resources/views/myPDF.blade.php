@@ -12,43 +12,59 @@
 </head>
 <body>
     <header class="text-center">
-        <h1>Rendelés részletei</h1>
-        <table class="table">
-            <thead>
+    <h1>Rendelés részletei</h1>
+    <table class="table">
+        <thead>
+            <tr>
                 <th>Szállító:</th>
                 <th>Szállítási cím:</th>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>ElectroBusiness Kft.</td>
-                    <td>{{auth()->user()->user_invoice->company_name}}</td>
-                </tr>
-                <tr>
-                    <td>Adószám: 26160874-2-13</td>
-                    <td>Adószám: {{auth()->user()->user_invoice->vatnumber}}</td>
-                </tr>
-                <tr>
-                    <td>Cím: 2600 Vác, Zrínyi Miklós utca 41/b</td>
-                    <td>Cim: {{auth()->user()->user_shipping->zipcode}}&nbsp;{{auth()->user()->user_shipping->city}},&nbsp;{{auth()->user()->user_shipping->address}}</td>
-                </tr>
-                <tr>
-                    <td>Elérhetoség: +36 20 292 3769</td>
-                    <td>Elérhetoség: {{auth()->user()->user_shipping->phone}}</td>
-                </tr>
-            </tbody>
-        </table>
-        <table class="table">
-            <tbody>
-                <tr>
-                    <td>Rendelesszam:EBR-2024-{{$order->id}}</td>
-                    <td>Rednelesi datum:{{\Carbon\Carbon::parse($order->created_at)->format('d/m/Y')}}</td>
-                    <td>Varhato kiszállítás:</td>
-                </tr>
-            </tbody>
-        </table>
-            
-        
-    </header>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>ElectroBusiness Kft.</td>
+                <td>{{ $order->user_invoice->company_name ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td>Cím: 2600 Vác, Zrínyi Miklós utca 41/b</td>
+                <td>Átvevő neve: {{ $order->user_shipping->receiver ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td>Elérhetőség: +36 20 292 3769</td>
+                <td>
+                    Cím: {{ $order->user_shipping->zipcode }} 
+                    {{ $order->user_shipping->city }}, 
+                    {{ $order->user_shipping->address }}
+                </td>
+            </tr>
+            <tr>
+                
+                <td>Elérhetőség: {{ $order->user_shipping->phone }}</td>
+            </tr>
+            <tr>
+                <td></td>
+
+            </tr>
+        </tbody>
+    </table>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <td>Rendelésszám: EBR-2024-{{ $order->id }}</td>
+                <td>Rendelési dátum: {{ \Carbon\Carbon::parse($order->created_at)->format('d/m/Y') }}</td>
+                {{-- <td>Várható kiszállítás:</td> --}}
+            </tr>
+        </tbody>
+    </table>
+
+    @if($order->note)
+    <hr>
+    <h4>Vásárlói megjegyzés</h4>
+    <p>{!! nl2br(e($order->note)) !!}</p>
+    @endif
+</header>
+
     <main>
         <h2 class="text-center"> Rendelt termékek</h2>
         <table class="table tablestripped">

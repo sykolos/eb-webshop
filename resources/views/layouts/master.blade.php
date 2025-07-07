@@ -38,4 +38,5 @@
     </main>
     @include('layouts.partials.footer')
     </body>
+    @stack('scripts')
 </html>

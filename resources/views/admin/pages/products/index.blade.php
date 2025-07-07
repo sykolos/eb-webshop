@@ -11,6 +11,39 @@
                 <div class="card-header bg-dark text-white">
                     <h5>Termékek</h5>
                 </div>
+                <form method="GET" class="mb-4">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-3">
+                            <input type="text" name="search" class="form-control" placeholder="Keresés név alapján" value="{{ request('search') }}">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" name="min_price" class="form-control" placeholder="Min ár" value="{{ request('min_price') }}">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" name="max_price" class="form-control" placeholder="Max ár" value="{{ request('max_price') }}">
+                        </div>
+                        <div class="col-md-2">
+                            <select name="category_id" class="form-select">
+                                <option value="">-- Kategória --</option>
+                                @foreach ($categories as $category)
+                                    <option value="{{ $category->id }}" @if(request('category_id') == $category->id) selected @endif>
+                                        {{ $category->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="date" name="from_date" class="form-control" value="{{ request('from_date') }}">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="date" name="to_date" class="form-control" value="{{ request('to_date') }}">
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100">Szűrés</button>
+                        </div>
+                    </div>
+                </form>
+
                 <div class="card-body">
                     <table class="table table-stripped">
                         <thead>
@@ -49,7 +82,7 @@
                                         <span class="badge"style="background:{{$color->code}}">{{$color->name}}</span>
                                     @endforeach
                                 </td> --}}
-                                <td><img src="{{asset('storage/public/'.$product->image)}}" style="height:40px" alt=""></td>
+                                <td><img src="{{ Storage::url($product->image) }}" style="height:40px" alt="{{ $product->title }}" loading="lazy"></td>
                                 <td>{{\Carbon\Carbon::parse($product->created_at)}}</td>
                                 <td>
                                     <div class="d-flex" style="gap: 5px">
@@ -69,6 +102,9 @@
                     </table>
                 </div>
             </div>
+        </div>
+        <div class="d-flex justify-content-center mt-4">
+            {{ $products->appends(request()->query())->links() }}
         </div>
     </div>
 </div>

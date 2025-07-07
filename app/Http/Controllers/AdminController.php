@@ -28,13 +28,11 @@ class AdminController extends Controller
     public function user_store(){
         //létrehozni
     }
-    public function user_view($id)
-    {
+    public function user_view($id)    {
         $user=User::findOrFail($id);
         return view('admin.pages.users.view',['user'=>$user]);
     }
-    public function user_destroy($id)
-    {
+    public function user_destroy($id)    {
         User::findOrFail($id)->delete();
         return back()->with('success','Sikeresen törölve');
     }
@@ -42,8 +40,7 @@ class AdminController extends Controller
         $units = product_unit::all();
         return view('admin.pages.units.index',['units'=>$units]);
     }
-    public function unit_store(Request $request)
-    {        
+    public function unit_store(Request $request)    {        
         //validate
         $request->validate([
             'unit'=>'required||max:255',
@@ -77,8 +74,8 @@ class AdminController extends Controller
         $listaok=true;
 
 
-    //     $listaok=true; 
-         $cserevan=false;            
+        //     $listaok=true; 
+        $cserevan=false;            
         $users=User::all();
         // $products=Products::with('special_prices')->orderBy('created_at','desc')->get();
         $query="select p.id as id ,p.serial_number as serial, p.title as name, COALESCE(sp.price, p.price) AS price FROM products p LEFT JOIN special_prices sp ON p.ID = sp.product_id AND sp.user_id =$id order by p.id;";

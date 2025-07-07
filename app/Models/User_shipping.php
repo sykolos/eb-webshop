@@ -21,7 +21,11 @@ class User_shipping extends Model
     ];
     
     public function user(){
-        return $this->hasMany(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
+    }
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'shipping_address_id');
     }
 
     public function setGuarded($guarded): self {

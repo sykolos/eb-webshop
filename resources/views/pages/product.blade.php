@@ -44,7 +44,7 @@
     <div class="container">
         <div class="product-page-row">
             <section class="product-page-image">
-                <img src="{{asset('storage/public/'.$product->image)}}" alt="">
+                <img src="{{ Storage::url($product->image) }}" alt="{{ $product->title }}" loading="lazy">
             </section>
             <section class="product-page-details">
                 <p class="p-title">

@@ -105,7 +105,7 @@
                                         <strong>{{$message}}</strong>
                                     </span>
                                     @enderror
-                                    <img src="{{asset('storage/public/'.$product->image)}}" alt="" width="100px" height="100px" class=" my-3">
+                                    <img src="{{ Storage::url($product->image) }}" alt="" width="100px" height="100px" class="my-3">
                                 </div>
                             </div>
                        

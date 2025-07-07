@@ -37,7 +37,9 @@ jobs:
       run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
     - name: .env létrehozása
-      run: echo "${{ secrets.LARAVEL_ENV }}" > .env
+      shell: bash
+      run: |
+        echo "${{ secrets.LARAVEL_ENV }}" > .env
 
     - name: App kulcs generálás
       run: php artisan key:generate

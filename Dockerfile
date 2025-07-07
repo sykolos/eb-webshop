@@ -14,6 +14,14 @@ RUN git clone https://github.com/phpredis/phpredis.git /usr/src/phpredis && \
     make && make install && \
     docker-php-ext-enable redis
 
+# MySQL PDO driver telepítése
+RUN docker-php-ext-install pdo pdo_mysql
+# GD library telepítése
+RUN apt-get update && apt-get install -y libpng-dev libjpeg-dev libwebp-dev && \
+    docker-php-ext-configure gd --with-jpeg --with-webp && \
+    docker-php-ext-install gd
+
+
 # Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 

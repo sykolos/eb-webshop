@@ -168,7 +168,7 @@
                                     </div>
                                 </div>
                         </div>
-                        <div class="shipping-information">
+                        {{-- <div class="shipping-information">
                             <p class="account-modify-box-subtitle">Kiszállítási adatok:<p>
                                 <div class="row mb-1">
                                     <div class="col-md-6">
@@ -246,7 +246,30 @@
                                     </span>
                                     @enderror
                                         </div>
-                                    </div>
+                                    </div> --}}
+                    <div class="shipping-information">
+                        <p class="account-modify-box-subtitle">Kiszállítási címek:</p>
+
+                        @foreach(auth()->user()->user_shipping ?? collect() as $shipping)
+                            <div class="card mb-3 p-3 border">
+                                <p><strong>Átvevő:</strong> {{ $shipping->receiver }}</p>
+                                <p><strong>Telefon:</strong> {{ $shipping->phone }}</p>
+                                <p><strong>Cím:</strong> {{ $shipping->zipcode }} {{ $shipping->city }}, {{ $shipping->address }}</p>
+                                <p><strong>Megjegyzés:</strong> {{ $shipping->comment }}</p>
+                                
+                                <div class="d-flex gap-2 mt-2">
+                                    <a href="{{ route('shipping.edit', $shipping) }}" class="btn btn-sm btn-outline-primary">Szerkesztés</a>
+                                    <form action="{{ route('shipping.destroy', $shipping) }}" method="POST" onsubmit="return confirm('Biztosan törlöd ezt a címet?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Törlés</button>
+                                    </form>
+                                </div>
+                            </div>
+                        @endforeach
+
+                        <a href="{{ route('shipping.create') }}" class="btn btn-success mt-3">+ Új cím hozzáadása</a>
+                    </div>    
                                     <div class="col-md-12">
                                         <div class="form-group">
                                             <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" required>

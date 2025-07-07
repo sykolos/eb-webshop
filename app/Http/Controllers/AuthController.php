@@ -69,11 +69,15 @@ class AuthController extends Controller
     public function postlogin(Request $request){
         //validate
         $details = $request->validate([     
-            'email'=>'required|email|',            
+            'email'=>'required|email',            
             'password'=>'required',
         ]);
         //login
-        if(Auth::attempt($details)){
+        // login "remember me" opcióval
+        $remember = $request->has('remember');
+
+        if(Auth::attempt($details, $remember)){
+            $request->session()->regenerate();
             return redirect()->intended('/');
         }
         return back()->withErrors([
@@ -97,7 +101,7 @@ class AuthController extends Controller
 
         #Match The Old Password
         if(!Hash::check($request->old_password, auth()->user()->password)){
-            return back()->with("error", "Old Password Doesn't match!");
+            return back()->with("error", "A régi jelszó nem egyezik!");
         }
 
 
@@ -106,7 +110,7 @@ class AuthController extends Controller
             'password' => Hash::make($request->new_password)
         ]);
 
-        return back()->with("status", "Password changed successfully!");
+        return back()->with("status", "A jelszó sikeresen cserélve!");
 }
 
 

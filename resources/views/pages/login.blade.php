@@ -23,6 +23,10 @@
                         <span class="field-error">{{$message}}</span>
                     @enderror
                 </div>
+                    <input type="checkbox" name="remember"> Maradjak bejelentkezve
+                    @error('remember')
+                        <span class="field-error">{{$message}}</span>
+                    @enderror
                 
                 <div class="field">
                     <button type="submit" class="btn btn-primary bg-gradient btn-block">Bejelentkezés</button>

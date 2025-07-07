@@ -28,13 +28,23 @@
                         <!--<p>Cégjegyzékszám: {{auth()->user()->user_invoice->registrynumber ?? " "}}</p>-->
                         
                 </div>
+                @php
+                    $addresses = auth()->user()->user_shipping ?? collect();
+                @endphp
+
                 <div class="col-6 shipping-data">
-                        <p>Kiszállízási adatok:</p>
-                        <p>Átvevő: {{auth()->user()->user_shipping->receiver ?? " "}}</p>
-                        <p>Átvevő telefonszáma:{{auth()->user()->user_shipping->phone ?? " "}}</p>
-                        <p>Kiszállítási cím: {{auth()->user()->user_shipping->zipcode ?? " "}}, {{auth()->user()->user_shipping->city ?? " "}}&nbsp;{{auth()->user()->user_shipping->address ?? " "}}</p>
-                        <p>Megjegyzés a futárnak: {{auth()->user()->user_shipping->comment ?? " "}}</p>
-                    
+                    <p>Kiszállítási adatok:</p>
+
+                    @forelse($addresses as $shipping)
+                        <div class="mb-3 p-2 border rounded">
+                            <p><strong>Átvevő:</strong> {{ $shipping->receiver }}</p>
+                            <p><strong>Átvevő telefonszáma:</strong> {{ $shipping->phone }}</p>
+                            <p><strong>Kiszállítási cím:</strong> {{ $shipping->zipcode }}, {{ $shipping->city }} {{ $shipping->address }}</p>
+                            <p><strong>Megjegyzés a futárnak:</strong> {{ $shipping->comment }}</p>
+                        </div>
+                    @empty
+                        <p>Nincs megadott szállítási cím.</p>
+                    @endforelse
                 </div>
             </div>
             <a class="btn btn-primary my-2 bg-gradient" href="{{route('account.modify')}}">Adatok Szerekesztése</a>

@@ -67,6 +67,16 @@
                                 <td>{{$order->created_at}}</td>
                             </tr>
                             <tr>
+                                <td>Megjegyzés</td>
+                                <td>
+                                    @if($order->note)
+                                        {{ $order->note }}
+                                    @else
+                                        <em>Nincs megjegyzés</em>
+                                    @endif
+                                </td>
+                            </tr>
+                            <tr>
                                 <td>Rendelés részletező</td>
                                 <td><a href="{{route('adminpanel.orders.getpdf',$order->id)}}" class="btn btn-primary">Letöltés</a>
                                 </td>

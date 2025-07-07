@@ -1,7 +1,7 @@
 
     <a href="{{route('product',$product->id)}}" class="product-box bg-dark">
         <div class="image bg-light">
-            <img class="img-fluid w-100" src="{{asset('storage/public/'.$product->image)}}" alt="" width="100px" height="100px">
+            <img class="img-fluid w-100" src="{{ Storage::url($product->image) }}" alt="{{ $product->title }}" width="100" height="100" loading="lazy">
         </div>
         <div class="product-info">
             <div class="product-title">{{$product->title}}</div>

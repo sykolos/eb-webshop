@@ -4,3 +4,6 @@ vendor
 .env
 *.log
 npm-debug.log
+
+# Laravel storage link kizárása a buildből
+/public/storage

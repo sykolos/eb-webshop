@@ -8,6 +8,7 @@
         "php": "^8.0",
         "barryvdh/laravel-dompdf": "2.1",
         "guzzlehttp/guzzle": "^7.2",
+        "intervention/imagecache": "^2.6",
         "laravel/framework": "^9.0",
         "laravel/sanctum": "^2.14",
         "laravel/tinker": "^2.7",
