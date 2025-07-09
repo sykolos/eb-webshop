@@ -23,13 +23,8 @@ class AccountpageController extends Controller
     }
     public function details($id){
         $status=['függőben','feldolgozás','kiszállítva','törölve'];
-        $order=Order::with('user','items','items.product')->findOrFail($id);
-        // $ordered_products=Items::with
-        
-        
-        return view('pages.components.account.details',['order'=>$order,'states'=>$status,'id'=>$id]);
-   
-   
+        $order = Order::with('user','items','items.product','user_shipping')->findOrFail($id);
+        return view('pages.components.account.details',['order'=>$order,'states'=>$status,'id'=>$id]);   
     }
     public function modify(){
         return view('pages.components.account.modify');        

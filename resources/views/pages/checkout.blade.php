@@ -90,46 +90,55 @@
                 @csrf
                 <div class="col-md-12">
                     <div class="form-group mb-3">
+                        <label for="payment_method">Fizetési mód:</label>
+                        <select name="payment_method" id="payment_method" class="form-control" required>
+                            <option value="0">Átutalás</option>
+                            <option value="1">Készpénz</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group form-check mb-3">
+                        <input type="checkbox" class="form-check-input" id="is_direct_shipping" name="is_direct_shipping" value="1">
+                        <label class="form-check-label" for="is_direct_shipping">
+                            Árazatlan szállító (közvetlen partneri szállítás)
+                        </label>
+                    </div>
+
+                    <div class="form-group mb-3">
                         <label for="note">Megjegyzés a rendeléshez (opcionális):</label>
                         <textarea name="note" id="note" class="form-control" rows="3" placeholder="Ha bármit szeretnél jelezni a rendeléshez...">{{ old('note') }}</textarea>
                         @if(auth()->user()->user_shipping && auth()->user()->user_shipping->count())
-    <div class="form-group mb-3">
-        <label for="shipping_address_id">Válaszd ki a szállítási címet:</label>
-        <select name="shipping_address_id" id="shipping_address_id" class="form-control" required onchange="updateShippingPreview(this)">
-            @foreach(auth()->user()->user_shipping as $address)
-                <option 
-                    value="{{ $address->id }}"
-                    data-address="{{ $address->address }}"
-                    data-receiver="{{ $address->receiver }}"
-                    data-phone="{{ $address->phone }}"
-                >
-                    {{ $address->zipcode }} {{ $address->city }}, {{ $address->address }} ({{ $address->receiver }})
-                </option>
-            @endforeach
-        </select>
-    </div>
-@else
-    <div class="alert alert-warning">
-        Nincs megadott szállítási címed. <a href="{{ route('shipping.create') }}">Adj hozzá egyet itt.</a>
-    </div>
-@endif
-    
+                    <div class="form-group mb-3">
+                        <label for="shipping_address_id">Válaszd ki a szállítási címet:</label>
+                        <select name="shipping_address_id" id="shipping_address_id" class="form-control" required onchange="updateShippingPreview(this)">
+                            @foreach(auth()->user()->user_shipping as $address)
+                                <option 
+                                    value="{{ $address->id }}"
+                                    data-address="{{ $address->address }}"
+                                    data-receiver="{{ $address->receiver }}"
+                                    data-phone="{{ $address->phone }}"
+                                >
+                                    {{ $address->zipcode }} {{ $address->city }}, {{ $address->address }} ({{ $address->receiver }})
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
-
-                                        <div class="form-group text-center py-3">
-                                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" required>
-                                            <label class="form-check-label" for="flexCheckDefault">
-                                                Elolvastam és elfogadom az <a href="{{route('aszf')}}"> ÁSZF-et</a> és  az <a href="{{route('adatkezelesi-nyilatkozat')}}">Adatkezelési nyilatkozatot</a>.
-                                            </label>
-                                        </div>
-                                    </div>
-            <div class=" col-12 text-center">
-            
-                
+                    @else
+                        <div class="alert alert-warning">
+                            Nincs megadott szállítási címed. <a href="{{ route('shipping.create') }}">Adj hozzá egyet itt.</a>
+                        </div>
+                    @endif    
+                    </div>
+                        <div class="form-group text-center py-3">
+                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" required>
+                            <label class="form-check-label" for="flexCheckDefault">
+                                Elolvastam és elfogadom az <a href="{{route('aszf')}}"> ÁSZF-et</a> és  az <a href="{{route('adatkezelesi-nyilatkozat')}}">Adatkezelési nyilatkozatot</a>.
+                            </label>
+                        </div>
+                    </div>
+                <div class=" col-12 text-center">
                     <button type="submit" class="btn btn-primary px-5 py-3">Véglegesités</button>
-    
-                
-            </div>
+                </div>
             </form>
         </div>
     </div>

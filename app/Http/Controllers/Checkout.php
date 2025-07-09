@@ -60,6 +60,7 @@ class Checkout extends Controller
         $validated = $request->validate([
             'shipping_address_id' => 'required|exists:user_shippings,id',
             'note' => 'nullable|string|max:500',
+            'payment_method' => 'required|in:0,1',
         ]);
 
         // 2. Lekérjük a kiválasztott szállítási címet (csak ha tényleg az övé)
@@ -85,6 +86,8 @@ class Checkout extends Controller
             'total' => Cart::totalamount(),
             'status' => 'függőben',
             'note' => $validated['note'] ?? null,
+            'payment_method' => (bool)$request->payment_method,
+            'is_direct_shipping' => $request->has('is_direct_shipping')
         ]);
 
         // 5. Termékek rendeléshez csatolása

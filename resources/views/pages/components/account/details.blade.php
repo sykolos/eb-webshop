@@ -10,31 +10,56 @@
                 @include('pages.components.account.header')
             </div>
             <div class="col-lg-9 col-md-8 col-sm-12">
-                <section class="order-details-box">
-    
+                <section class="order-details-box">    
                     <table class="table tablestripped my-5">
                         <tbody>
                             <tr>
                                 <td>Státusz</td>
+                                <td>{{ $order->status }}</td>
+                            </tr>
+                            <tr>
+                                <td>Rendelési dátum</td>
+                                <td>{{ \Carbon\Carbon::parse($order->created_at)->format('Y. m. d. H:i') }}</td>
+                            </tr>
+                            <tr>
+                                <td>Fizetési mód</td>
+                                <td>{{ $order->payment_method ? 'Készpénz' : 'Átutalás' }}</td>
+                            </tr>
+                            <tr>
+                                <td>Közvetlen szállítás</td>
+                                <td>{{ $order->is_direct_shipping ? 'Igen (árazatlan szállító)' : 'Nem' }}</td>
+                            </tr>
+                            <tr>
+                                <td>Szállítási cím</td>
                                 <td>
-                                    {{$order->status  }} 
+                                    @if($order->user_shipping)
+                                        {{ $order->user_shipping->zipcode }}
+                                        {{ $order->user_shipping->city }},
+                                        {{ $order->user_shipping->address }}
+                                    @else
+                                        <span class="text-muted">Nem elérhető (korábbi rendelés)</span>
+                                    @endif
                                 </td>
                             </tr>
                             <tr>
-                                <td>Teljes összeg (nettó):</td>
-                                <td>{{$order->total }} Ft</td>
+                                <td>Megjegyzés</td>
+                                <td>{!! nl2br(e($order->note)) ?? '-' !!}</td>
                             </tr>
                             <tr>
-                                <td>Teljes összeg (bruttó):</td>
-                                <td>{{round($order->total *1.27)}} Ft</td>
+                                <td>Teljes összeg (nettó)</td>
+                                <td>{{ number_format($order->total, 0, ',', ' ') }} Ft</td>
                             </tr>
                             <tr>
-                                <td>Áfa:</td>
-                                <td>{{round($order->total*0.27) }} Ft</td>
+                                <td>Áfa (27%)</td>
+                                <td>{{ number_format($order->total * 0.27, 0, ',', ' ') }} Ft</td>
                             </tr>
-                            
+                            <tr>
+                                <td>Teljes összeg (bruttó)</td>
+                                <td>{{ number_format($order->total * 1.27, 0, ',', ' ') }} Ft</td>
+                            </tr>
                         </tbody>
                     </table>
+
                     <h3 class="order-details-box-title text-center mt-3 pt-2">
                         Rendelt Termékek
                     </h3>

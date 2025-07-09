@@ -55,6 +55,10 @@
                 <td>Rendelési dátum: {{ \Carbon\Carbon::parse($order->created_at)->format('d/m/Y') }}</td>
                 {{-- <td>Várható kiszállítás:</td> --}}
             </tr>
+            <tr>
+                <td>Fizetési mód: {{ $order->payment_method ? 'Készpénz' : 'Átutalás' }}</td>
+                <td>Közvetlen szállítás: {{ $order->is_direct_shipping ? 'Igen (árazatlan szállító)' : 'Nem' }}</td>
+            </tr>
         </tbody>
     </table>
 
