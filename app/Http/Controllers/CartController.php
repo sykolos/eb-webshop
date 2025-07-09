@@ -8,54 +8,34 @@ use Illuminate\Http\Request;
 
 class CartController extends Controller
 {
-    
-    public function addtocart(Request $request, $id, $q,$m){
-        //dd(session()->all());
-        // session()->forget('cart');
-        // return session()->get('cart');
-        //
-        $product=Products::findOrFail($id);
-        $s_price=Special_prices::where('product_id','=',$id,'and','user_id','=',auth()->user()->id)->first();
-        if(is_null($s_price) || empty($s_price))
-        {
-            $item=[
-                'product'=>$product,
-                'quantity'=>$request->quantity,
-                'q'=>$q,
-                'm'=>$m,
-            ];
-        }
-        else{
-            $item=[
-                'product'=>$product,
-                'quantity'=>$request->quantity,
-                'q'=>$q,
-                'm'=>$m,
-                's_price'=>$s_price->price,
-            ];
-        }
-        
+    public function addtocart(Request $request, $id, $q, $m)
+    {
+        $product = Products::with('special_prices')->findOrFail($id); // árak betöltése itt
 
-        if(session()->has('cart')){
+        $item = [
+            'product' => $product->toArray(),
+            'quantity' => $request->quantity,
+            'q' => $q,
+            'm' => $m,
+        ];
 
-            //already in cart plus quantity
-            $cart=session()->get('cart');
-            $key=$this->checkItemInCart($item);
+        if (session()->has('cart')) {
+            $cart = session()->get('cart');
+            $key = $this->checkItemInCart($item);
 
-            if($key!=-1){
-                $cart[$key]['quantity']+= $request->quantity;
-                session()->put('cart',$cart);
+            if ($key != -1) {
+                $cart[$key]['quantity'] += $request->quantity;
+                session()->put('cart', $cart);
+            } else {
+                session()->push('cart', $item);
             }
-            else{
-                session()->push('cart',$item);
-            }
+        } else {
+            session()->push('cart', $item);
         }
-        else{
-            session()->push('cart',$item);
-        }
-        return back()->with('addedtocart','Hozzáadva a kosárhoz');
 
+        return back()->with('addedtocart', 'Hozzáadva a kosárhoz');
     }
+
     public function checkItemInCart($item){
 
         foreach(session()->get('cart') as $key =>$val)

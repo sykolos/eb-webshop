@@ -56,11 +56,7 @@
                             @foreach ($orders as $order)
                             <tr>
                                 <td>{{$order->id}}</td>
-                                {{-- <td>@if($order && $order->name)
-                                    <div>{{ $order->name }}</div>
-                                @else
-                                    <div>Name is missing</div>  <!-- Ha null, itt jelenik meg -->
-                                @endif</td> --}}
+                                
                                 <td>
                                     @if($order->user && $order->user->user_invoice)
                                         {{ $order->user->user_invoice->company_name }}

@@ -15,20 +15,7 @@ class PagesController extends Controller
     public function home(){
         return view('pages.home');
     }
-    // régi cart
-    // public function cart(){
-    //     $id=auth()->user()->id;
-    //     $u_i_d=User_invoce::where('user_id','=',$id)->first();
-    //     $u_s_d=User_shipping::where('user_id','=',$id)->first();
-    //     if(is_null(auth()->user()->email_verified_at)||is_null($u_i_d->company_name)||is_null($u_i_d->address)||is_null($u_i_d->city)||is_null($u_i_d->state)||is_null($u_i_d->zipcode)||is_null($u_i_d->country)||is_null($u_i_d->vatnumber)||is_null($u_s_d->address)||is_null($u_s_d->city)||is_null($u_s_d->zipcode)||is_null($u_s_d->phone)||is_null($u_s_d->receiver)||is_null($u_s_d->comment))
-    //     {
-    //         echo view('pages/no-cart');
-    //     }
-    //     else{
-    //         echo view('pages/cart');
-    //     }
-    // }
-    // új cart
+    //cart
     public function cart() {
         
         $user = auth()->user();
@@ -215,16 +202,15 @@ class PagesController extends Controller
         return view('pages.orderpage', compact('products', 'categories'));
     }
 
-
-
     public function success(){
         return "Sikeres megrendelés!";
     }
     public function product($id){
-        $product=Products::with('category')->findOrFail($id);
-        $unit=product_unit::where('id',$product->unit_id)->first();
-        echo view('pages/product',['product'=>$product,'unit'=>$unit]);
+        $product = Products::with(['category', 'product_unit', 'special_prices'])->findOrFail($id);
+        return view('pages.product', ['product' => $product]);
     }
+
+
     public function search(Request $request){
         $request->validate(
             ['query'=>'required|min:3']

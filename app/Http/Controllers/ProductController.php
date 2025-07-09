@@ -16,20 +16,6 @@ class ProductController extends Controller
 {
     //adminpanel 
 
-    //display
-    // public function index()
-    // {
-    //     $products = Products::with('category', 'product_unit')
-    //         ->orderBy('created_at', 'desc')
-    //         ->paginate(20); // vagy amennyi neked kényelmes
-
-    //     $units = product_unit::all();
-
-    //     return view('admin.pages.products.index', [
-    //         'products' => $products,
-    //         'units' => $units
-    //     ]);
-    // }
     public function index(Request $request)
     {
         $query = Products::with(['category', 'product_unit']);
@@ -171,4 +157,11 @@ class ProductController extends Controller
         Products::findOrFail($id)->delete();
         return back()->with('success','Termék törölve'); 
     }
+    public function getPriceForUser($userId = null)
+    {
+        $userId = $userId ?? auth()->id();
+        $special = $this->special_prices->firstWhere('user_id', $userId);
+        return $special?->price ?? $this->price;
+    }
+
 }

@@ -77,11 +77,7 @@
                                 </td>
                                 <td>{{$product->category->name}}
                                 </td>
-                                {{-- <td>
-                                    @foreach($product->colors as $color)
-                                        <span class="badge"style="background:{{$color->code}}">{{$color->name}}</span>
-                                    @endforeach
-                                </td> --}}
+                                
                                 <td><img src="{{ Storage::url($product->image) }}" style="height:40px" alt="{{ $product->title }}" loading="lazy"></td>
                                 <td>{{\Carbon\Carbon::parse($product->created_at)}}</td>
                                 <td>

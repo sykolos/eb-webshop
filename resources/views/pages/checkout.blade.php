@@ -53,12 +53,9 @@
                                                 <td>
                                                     <p>{{$item['product']['title']}}</p>
                                                 </td>
-                                                <td>@if(!isset($item['s_price']))
-                                                    {{$item['product']['price']}} 
-                                                    @else
-                                                    {{$item['s_price']}}
-                                                    @endif
-                                                    Ft</td>                                
+                                                <td>
+                                                    {{ App\Models\Products::with('special_prices')->find($item['product']['id'])->getPriceForUser() }} Ft
+                                                </td>                                
                                                 <td>{{$item['quantity']*$item['q']}}</td>
                                                 <td>{{$item['m']}}</td>
                                                 <td>{{App\Models\Cart::unitprice($item)*$item['q']}} Ft</td>

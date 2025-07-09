@@ -113,12 +113,19 @@ Route::group(['prefix' =>'adminpanel','middleware'=>'admin'],function(){
         Route::delete('/{id}',[AdminController::class, 'unit_destroy'])->name('adminpanel.units.unit_destroy');
     });
     //special prices
-    Route::group(['prefix'=>'special_prices',], function(){
-        Route::get('/',[AdminController::class, 'special_prices_show'])->name('adminpanel.special_prices_show');
-        Route::get('/{id}',[AdminController::class, 'special_price_check'])->name('adminpanel.special_price_check');
-        Route::get('/{id}/product{pid}',[AdminController::class, 'special_price_change'])->name('adminpanel.special_price_change');
-        Route::post('/{id}/product{pid}',[AdminController::class, 'special_price_set'])->name('adminpanel.special_price_set');
-        Route::delete('/{id}/product{pid}',[AdminController::class, 'special_price_destroy'])->name('adminpanel.special_price_destroy');
+    // Route::group(['prefix'=>'special_prices',], function(){
+    //     Route::get('/',[AdminController::class, 'special_prices_show'])->name('adminpanel.special_prices_show');
+    //     Route::get('/{id}',[AdminController::class, 'special_price_check'])->name('adminpanel.special_price_check');
+    //     Route::get('/{id}/product{pid}',[AdminController::class, 'special_price_change'])->name('adminpanel.special_price_change');
+    //     Route::post('/{id}/product{pid}',[AdminController::class, 'special_price_set'])->name('adminpanel.special_price_set');
+    //     Route::delete('/{id}/product{pid}',[AdminController::class, 'special_price_destroy'])->name('adminpanel.special_price_destroy');
+    // });
+    // special prices – új AJAX-os változat
+    Route::group(['prefix' => 'special-prices'], function () {
+        Route::get('/', [AdminController::class, 'special_prices_show'])->name('adminpanel.special_prices');
+        Route::get('/ajax/{user}', [AdminController::class, 'ajaxProductList'])->name('adminpanel.special_prices.ajax');
+        Route::post('/set', [AdminController::class, 'ajaxSetPrice'])->name('adminpanel.special_prices.set');
+        Route::delete('/delete', [AdminController::class, 'ajaxDeletePrice'])->name('adminpanel.special_prices.delete');
     });
 
 });

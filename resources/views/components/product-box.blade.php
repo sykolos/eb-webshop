@@ -7,14 +7,16 @@
             <div class="product-title">{{$product->title}}</div>
             <div class="product-serialnum">{{$product->serial_number}} </div>
             {{-- <div class="product-category">{{$product->category->name}} </div> --}}
-            <div class="product-price">
+            {{-- <div class="product-price">
                 @if(substr($product->special_prices->where('user_id','=',auth()->user()->id)->pluck( 'price' ), 2, -2)!="" )
                 {{substr($product->special_prices->where('user_id','=',auth()->user()->id)->pluck( 'price' ), 2, -2)}}
                 @else
                 {{$product->price}}
                 @endif
-                Ft /{{$product->product_unit->measure}}</div>
-            
+                Ft /{{$product->product_unit->measure}}</div> --}}
+            <div class="product-price">
+                {{$product->getPriceForUser()}} Ft /{{$product->product_unit->measure}}
+            </div>
     
         </div>
         

@@ -11,9 +11,7 @@ class Products extends Model
 
     protected $guarded=[];
 
-
-
-//1 category
+    protected $with = ['special_prices'];
 
     public function category(){
         return $this->belongsTo(Category::class);
@@ -22,7 +20,7 @@ class Products extends Model
         return $this->belongsTo(Item::class);
     }
     public function product_unit(){
-        return $this->hasOne(product_unit::class,'id','unit_id');
+        return $this->belongsTo(product_unit::class,'unit_id');
     }
 
     public function special_prices(){
@@ -30,13 +28,15 @@ class Products extends Model
     }
     
 
-//sok colors
-    // public function colors(){
-    //     return $this->belongsToMany(Color::class);
-    // }
-    	
 	public function setGuarded($guarded): self {
 		$this->guarded = $guarded;
 		return $this;
 	}
+
+    public function getPriceForUser($userId = null)
+    {
+        $userId = $userId ?? auth()->id();
+        $special = $this->special_prices->firstWhere('user_id', $userId);
+        return $special?->price ?? $this->price;
+    }
 }

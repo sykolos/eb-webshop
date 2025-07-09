@@ -60,80 +60,85 @@ class AdminController extends Controller
     public function unit_destroy($id){
         product_unit::findOrFail($id)->delete();
         return back()->with('success','Sikeresen törölve');
-    }
-
+    }    
     
-    public function special_prices_show(){
-        $users=User::all();
-        
-        $listaok=false;
-        return view('admin.pages.prices.index',['listaok'=>$listaok,'users'=>$users]);
+    public function special_prices_show()
+    {
+        $users = \App\Models\User::all();
+        return view('admin.pages.prices.index', [
+            'users' => $users,
+            'listaok' => false
+        ]);
+    }
+    public function ajaxProductList(Request $request, $userId)
+    {
+        $perPage = 16;
+
+        $query = Products::with(['special_prices' => function($q) use ($userId) {
+            $q->where('user_id', $userId);
+        }]);
+
+        // Szűrés keresésre
+        if ($search = $request->input('search')) {
+            $search = strtolower($search);
+
+            if (strlen($search) >= 3) {
+                $query->where(function ($q) use ($search) {
+                    $q->whereRaw('LOWER(title) LIKE ?', ["%{$search}%"])
+                        ->orWhereRaw('LOWER(serial_number) LIKE ?', ["%{$search}%"]);
+                });
+            }
+        }
+
+        // Csak ahol van külön ár
+        if ($request->has('has_price') && $request->input('has_price')) {
+            $query->whereHas('special_prices', function ($q) use ($userId) {
+                $q->where('user_id', $userId);
+            });
+        }
+
+        // Csak ahol nincs külön ár
+        if ($request->has('no_price') && $request->input('no_price')) {
+            $query->whereDoesntHave('special_prices', function ($q) use ($userId) {
+                $q->where('user_id', $userId);
+            });
+        }
+
+        $products = $query->paginate($perPage);
+
+        return response()->json([
+            'products' => $products,
+            'user_id' => $userId
+        ]);
     }
 
-     public function special_price_check( $id){   
-        $listaok=true;
 
-
-        //     $listaok=true; 
-        $cserevan=false;            
-        $users=User::all();
-        // $products=Products::with('special_prices')->orderBy('created_at','desc')->get();
-        $query="select p.id as id ,p.serial_number as serial, p.title as name, COALESCE(sp.price, p.price) AS price FROM products p LEFT JOIN special_prices sp ON p.ID = sp.product_id AND sp.user_id =$id order by p.id;";
-        $products=DB::select($query);
-        
-        return view('admin.pages.prices.index',['listaok'=>$listaok,'cserevan'=>$cserevan,'users'=>$users,'products'=>$products,'id'=>$id]);
-     }
-
-     public function special_price_destroy($id,$pid){
-         Special_prices::where('user_id','=',$id)->where('product_id','=',$pid)->delete();
-         return back()->with('success','Sikeresen törölve');
-     }
-    public function special_price_change( $id,$pid){   
-        $listaok=true;     
-        $cserevan=true;
-        $users=User::all();
-        $query="select p.id as id ,p.serial_number as serial, p.title as name, COALESCE(sp.price, p.price) AS price FROM products p LEFT JOIN special_prices sp ON p.ID = sp.product_id AND sp.user_id =$id order by p.id;";
-        
-        $products=DB::select($query);
-        $query="select p.id as id ,p.serial_number as serial, p.title as name, COALESCE(sp.price, p.price) AS price FROM products p LEFT JOIN special_prices sp ON p.ID = sp.product_id AND sp.user_id =$id where p.id=$pid order by p.id; ";
-        $csereproduct=DB::select($query);
-        return view('admin.pages.prices.index',['listaok'=>$listaok,'cserevan'=>$cserevan,'users'=>$users,'products'=>$products,'id'=>$id,'pid'=>$pid,'csereproduct'=>$csereproduct]);
-    }
-
-    public function special_price_set($id,$pid,Request $request){
-        $listaok=true;  
-        $cserevan=false;
-        $users=User::all();
-        $query="select p.id as id ,p.serial_number as serial, p.title as name, COALESCE(sp.price, p.price) AS price FROM products p LEFT JOIN special_prices sp ON p.ID = sp.product_id AND sp.user_id =$id order by p.id;";
-        
-        $products=DB::select($query);
-        $query2="select products.id as id from products inner join special_prices on products.id = special_prices.product_id where special_prices.product_id=$pid and special_prices.user_id=$id; ";
-        $query3=DB::select($query2 );
-        
+    public function ajaxSetPrice(Request $request)
+    {
         $request->validate([
-            'price'=>'required',
-          ]);
+            'user_id' => 'required|integer|exists:users,id',
+            'product_id' => 'required|integer|exists:products,id',
+            'price' => 'required|numeric|min:0'
+        ]);
 
-        if(empty($query3)){
-            $specprice = Special_prices::create([
-                'user_id'=>$id,
-                'product_id'=>$pid,
-                'price'=>$request->price,
-            ]);
-            return view('admin.pages.prices.index',['listaok'=>$listaok,'cserevan'=>$cserevan,'users'=>$users,'products'=>$products,'id'=>$id,'pid'=>$pid])->with('succes',"Az ár cserélve.");
+        $price = Special_prices::updateOrCreate(
+            ['user_id' => $request->user_id, 'product_id' => $request->product_id],
+            ['price' => $request->price]
+        );
 
-        }
-        else{
-            $specprice=Special_prices::where('user_id',$id)->where('product_id',$pid)->first();
-            $specprice->update([
-                'price'=>$request->price
-            ]);
-            return back()->with('succes',"Az ár cserélve.");
-        }
-            
-            
-    
-        
+        return response()->json(['success' => true, 'message' => 'Ár elmentve.']);
+    }
+    public function ajaxDeletePrice(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|integer',
+            'product_id' => 'required|integer'
+        ]);
 
-     }
+        Special_prices::where('user_id', $request->user_id)
+            ->where('product_id', $request->product_id)
+            ->delete();
+
+        return response()->json(['success' => true, 'message' => 'Ár törölve.']);
+    }
 }

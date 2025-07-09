@@ -8,15 +8,6 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderController extends Controller
 {
-    //
-    // public function index()
-    // {
-    //     $orders = Order::with('user')
-    //         ->orderBy('created_at', 'desc')
-    //         ->paginate(15); // vagy 10, ahányat szeretnél
-
-    //     return view('admin.pages.orders.index', ['orders' => $orders]);
-    // }
     public function index(Request $request)
     {
         $query = Order::with(['user.user_invoice', 'items']);

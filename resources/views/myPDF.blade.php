@@ -79,27 +79,13 @@
                 @foreach ($order->items as $item)
                 <tr>
                     <td>{{$item->product->title}} 
-                        {{--@if(substr($item->product->special_prices->pluck( 'price' ), 2, -2)!="" && substr($item->product->special_prices->pluck( 'user_id' ), 2, -2)==auth()->user()->id)
-                                  <p><span style="font-size:8pt;">  Kezdvezmény: {{round((int)substr($item->product->special_prices->pluck( 'price' ), 2, -2)/$item->product->price,2)}}%</p> 
-                        @endif--}}
+                        
                                 </td>                                
                                 <td>{{$item->quantity}}</td>            
                                 <td>{{$item->product->product_unit->measure}}</td>                    
-                                <td>
-                                    @if(substr($item->product->special_prices->pluck( 'price' ), 2, -2)!="" && substr($item->product->special_prices->pluck( 'user_id' ), 2, -2)==auth()->user()->id)
-                                    {{substr($item->product->special_prices->pluck( 'price' ), 2, -2)}}
-                                    @else
-                                    {{$item->product->price}}
-                                    @endif
-                                </td>
-                                <td>
-                                    @if(substr($item->product->special_prices->pluck( 'price' ), 2, -2)!="" && substr($item->product->special_prices->pluck( 'user_id' ), 2, -2)==auth()->user()->id)
-                                    {{(int)substr($item->product->special_prices->pluck( 'price' ), 2, -2)*$item->quantity}}
-                                    @else
-                                    {{$item->product->price*$item->quantity}}
-                                    @endif
-                                     Ft
-                                </td>
+                                
+                                <td>{{ $item->unit_price }} Ft</td>
+                                <td>{{ $item->unit_price * $item->quantity }} Ft</td>
                 </tr>
                 @endforeach
             </tbody>

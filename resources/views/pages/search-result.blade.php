@@ -52,16 +52,6 @@
               </strong>
               <span class="mx-2">Összesen {{$products->count()}} találat </span>
               <div class="ms-auto">
-                {{-- <form action="{{route('orderpage')}}" method="get">
-                  @csrf
-                <select name="sort" onchange="this.form.submit()" class="form-select d-inline-block w-auto border pt-1">
-                  <option value="">Alapértelmezett</option>
-                  <option value="a_to_z">A-Z sorrend</option>
-                  <option value="z_to_a">Z-A sorrend</option>
-                  <option value="low_high">Ár szerint növekő</option>
-                  <option value="high_low">Ár szerint csökkenő</option>
-                </select>
-              </form>  --}}
               </div>
               </header>
                     <div class="products-row w-100">

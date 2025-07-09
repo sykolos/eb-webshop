@@ -16,7 +16,13 @@ class Item extends Model
     public function order(){
         return $this->belongsTo(Order::class, 'order_id');
     }
-    // public function color(){
-    //     return $this->belongsTo(Color::class);
-    // }
+    public function getUnitPriceAttribute($value)
+{
+    if (!is_null($value)) {
+        return $value;
+    }
+
+    // Fallback: ha nincs elmentve az ár, visszaadjuk a jelenlegi árlogika szerint
+    return $this->product->getPriceForUser(optional($this->order)->user_id ?? auth()->id());
+}
 }

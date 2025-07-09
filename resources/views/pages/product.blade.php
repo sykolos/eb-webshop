@@ -51,13 +51,8 @@
                     {{$product->title}}
                 </p>                
                 <p class="p-price">
-                    @if(substr($product->special_prices->pluck( 'price' ), 2, -2)!="" && substr($product->special_prices->pluck( 'user_id' ), 2, -2)==auth()->user()->id)
-                    {{substr($product->special_prices->pluck( 'price' ), 2, -2)}}
-                    @else
-                    {{$product->price}}
-                    @endif
-                    
-                    Ft <span class="p-unit"> + Áfa / {{$unit->measure}}</span>
+                    {{ $product->getPriceForUser() }} Ft 
+                    <span class="p-unit"> + Áfa / {{ $product->product_unit->measure }}</span>
                 </p>
                 <p class="item-number">
                     Cikkszám: {{$product->serial_number}}

@@ -8,16 +8,13 @@ class Cart
     public function centstoprice($cents){
         return $cents;
     }
-    public static function unitprice($item){
-        //price * quantitiy
-        $result=0;
-        if(!isset($item['s_price'])){
-            $result= (int)(new self)->centstoprice((int)$item['product']['price']) * (int)$item['quantity'];
-        }
-        else{
-            $result= (int)(new self)->centstoprice((int)$item['s_price']) * (int)$item['quantity'];
-        }
-        return $result;
+    
+    public static function unitprice($item)
+    {
+        $product = Products::with('special_prices')->find($item['product']['id']);
+        $price = $product->getPriceForUser();
+
+        return $price * (int) $item['quantity'];
     }
 
     public static function totalamount(){

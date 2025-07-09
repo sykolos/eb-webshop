@@ -47,11 +47,8 @@
                                     <p>{{$item['product']['title']}}</p>
                                     </a>                                    
                                 </td>
-                                <td>@if(!isset($item['s_price']))
-                                    {{$item['product']['price']}} 
-                                    @else
-                                    {{$item['s_price']}}
-                                    @endif
+                                <td>
+                                    {{ App\Models\Products::find($item['product']['id'])->getPriceForUser() }}
                                 </td>                                
                                 <td>{{$item['quantity']*$item['q']}}</td>                                
                                 <td>{{$item['m']}}</td>
