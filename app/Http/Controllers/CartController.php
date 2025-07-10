@@ -56,7 +56,51 @@ class CartController extends Controller
         }
         return back();
     }
-        
+    public function cartCount()
+    {
+        $count = collect(session('cart', []))->sum('quantity');
+        return response()->json(['count' => $count]);
+    }
+    public function previewcart()
+    {
+        $cart = session('cart', []);
+        $totalNet = 0;
 
-    
+        foreach ($cart as $item) {
+            $netUnitPrice = floatval($item['product']['price'] ?? 0);
+            $totalNet += $netUnitPrice * (int) $item['quantity'];
+        }
+
+
+        return view('pages.components.cart.cart-preview', [
+            'cart' => $cart,
+            'totalNet' => $totalNet,
+        ]);  
+    }  
+    public function updateQuantity(Request $request)
+    {
+        $key = $request->input('key');
+        $change = (int) $request->input('change'); // +1 vagy -1
+
+        $cart = session('cart', []);
+        if (isset($cart[$key])) {
+            $cart[$key]['quantity'] = max(1, $cart[$key]['quantity'] + $change);
+            session()->put('cart', $cart);
+        }
+
+        return response()->noContent();
+    }
+
+    public function removeItem(Request $request)
+    {
+        $key = $request->input('key');
+        $cart = session('cart', []);
+        if (isset($cart[$key])) {
+            unset($cart[$key]);
+            session()->put('cart', array_values($cart)); // újraindexelés
+        }
+
+        return response()->noContent();
+    }
+
 }

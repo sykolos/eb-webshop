@@ -14,6 +14,11 @@
               <li class="nav-item">
                 <a class="nav-link active" aria-current="page" href="{{route('home')}}">Főoldal</a>
               </li>
+              @auth
+                <li class="nav-item">
+                  <li><a class="nav-link" href="{{route('orderpage')}}">Webshop</a>
+                </li>
+              @endauth
               <li class="nav-item">
                 <a class="nav-link" href="{{route('contact')}}">Kapcsolat</a>
               </li>
@@ -23,14 +28,26 @@
               </li>
               @endguest
               @auth
+              {{-- <li class="nav-item">
+                <a class="nav-link" href="{{route('cart')}}">Kosár</a>
+              </li>               --}}
+              <li class="nav-item" id="cart-icon-container" style="position: relative;">
+                <a class="nav-link position-relative" href="{{ route('cart') }}">
+                  Kosár
+                  <span class="cart-badge badge-custom">
+                    {{ session('cart') ? collect(session('cart'))->sum('quantity') : 0 }}
+                  </span>
+                </a>
+                <div id="cart-preview" class="dropdown-menu p-2" style="display: none;">
+                  {{-- előnézet --}}
+                </div>
+              </li>
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   <i class="bi bi-person-fill"></i>
                 </a>
                 <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="{{route('account')}}">Fiók</a></li>
-                  <li><a class="dropdown-item" href="{{route('orderpage')}}">Rendelés</a></li>
-                  <li><a class="dropdown-item" href="{{route('cart')}}">Kosár</a></li>
+                  <li><a class="dropdown-item" href="{{route('account')}}">Fiók</a></li>                  
                   <li><hr class="dropdown-divider"></li>
                   <li>
                   <form action="{{route('logout')}}" method="post">

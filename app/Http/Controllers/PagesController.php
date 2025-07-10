@@ -205,10 +205,17 @@ class PagesController extends Controller
     public function success(){
         return "Sikeres megrendelés!";
     }
-    public function product($id){
+    public function product($id)
+    {
         $product = Products::with(['category', 'product_unit', 'special_prices'])->findOrFail($id);
-        return view('pages.product', ['product' => $product]);
+        $unit = $product->product_unit;
+
+        return view('pages.product', [
+            'product' => $product,
+            'unit' => $unit
+        ]);
     }
+
 
 
     public function search(Request $request){

@@ -43,6 +43,19 @@ Route::get('search/',[PagesController::class,'search'])->name('search')->middlew
 
 Route::post('add-to-cart/{id}/{q}/{m}',[CartController::class,'addtocart'])->name('addtocart');
 Route::post('remove-from-cart/{id}',[CartController::class,'removefromcart'])->name('removefromcart');
+//cart count
+Route::get('/cart/count', [CartController::class, 'cartCount'])->name('cart.count');
+//cart preview
+Route::get('/cart/preview', [CartController::class, 'previewcart'])->name('cart.preview');
+//cart preview gyorsgombok
+Route::post('/cart/update', [CartController::class, 'updateQuantity'])->name('cart.update');
+Route::delete('/cart/remove', [CartController::class, 'removeItem'])->name('cart.remove');
+//cart count AJAX esetén
+Route::get('/cart/count', function () {
+    return response()->json([
+        'count' => collect(session('cart', []))->sum('quantity')
+    ]);
+})->name('cart.count');
 
 //users
 Route::get('login/',[AuthController::class,'showlogin'])->name('login')->middleware('guest');

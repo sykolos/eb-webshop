@@ -23,11 +23,15 @@
                         <span class="field-error">{{$message}}</span>
                     @enderror
                 </div>
-                    <input type="checkbox" name="remember"> Maradjak bejelentkezve
+                <div class="form-check mb-3">
+                    <input type="checkbox" name="remember" class="form-check-input"> 
+                    <label class="form-check-label" for="remember">
+                    Maradjak bejelentkezve
+                    </label>
                     @error('remember')
                         <span class="field-error">{{$message}}</span>
                     @enderror
-                
+                </div>
                 <div class="field">
                     <button type="submit" class="btn btn-primary bg-gradient btn-block">Bejelentkezés</button>
                 </div>

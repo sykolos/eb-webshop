@@ -16,6 +16,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.0/font/bootstrap-icons.css">
     {{-- <link rel="stylesheet" href="{{asset('css/app.css?v=1')}}"> --}}
     @vite(['resources/sass/app.scss'])
+    @vite('resources/js/app.js')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
 
 </head>
 {{-- 
