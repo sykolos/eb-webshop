@@ -17,6 +17,8 @@
         <li> <a href="{{route('adminpanel.units')}}">Mennyiségi egységek</a>
         </li>               
         <li><a href="{{ route('adminpanel.special_prices') }}">Külön árak</a>
+        </li>               
+        <li><a href="{{ route('adminpanel.recommended.edit') }}">Kiemelt Termékek</a>
         </li>
     </ul>
 

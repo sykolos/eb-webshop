@@ -37,6 +37,8 @@ footer hr
     display: inline-block
     min-width: 18px
     text-align: center
+    z-index: 1
+    pointer-events: none
 
 #cart-preview 
     background-color: white
@@ -50,3 +52,7 @@ footer hr
     max-width: 90vw
     z-index: 1000
     overflow-x: hidden
+
+.navbar-nav .dropdown-menu 
+    position: absolute !important
+    z-index: 1050 !important

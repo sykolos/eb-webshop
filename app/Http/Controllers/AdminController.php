@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use App\Models\Special_prices;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
+use App\Models\RecommendedProduct;
+
 
 class AdminController extends Controller
 {
@@ -141,4 +143,55 @@ class AdminController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Ár törölve.']);
     }
+
+    public function recommendedEdit()
+    {
+        // első betöltésre üres keresés
+        $products = Products::orderBy('id')->paginate(15);
+        $recommendedIds = RecommendedProduct::pluck('product_id')->toArray();
+
+        return view('admin.pages.recommended.index', compact('products', 'recommendedIds'));
+    }
+
+    public function ajaxList(Request $request)
+{
+    try {
+        $query = Products::query();
+
+        if ($request->filled('q')) {
+            $q = $request->q;
+            $query->where(function ($subQuery) use ($q) {
+                if (is_numeric($q)) {
+                    $subQuery->where('serial_number', 'like', $q . '%');
+                } else {
+                    $subQuery->where('title', 'like', '%' . $q . '%');
+                }
+            });
+        }
+
+        $products = $query->orderBy('id')->paginate(15);
+        $recommendedIds = RecommendedProduct::pluck('product_id')->toArray();
+
+        $html = view('admin.pages.recommended.table', compact('products', 'recommendedIds'))->render();
+
+        return response()->json(['html' => $html]);
+    } catch (\Throwable $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+}
+
+
+
+    public function recommendedUpdate(Request $request)
+    {
+        RecommendedProduct::truncate(); // összes eddigit törli
+        if ($request->has('products')) {
+            foreach ($request->products as $productId) {
+                RecommendedProduct::create(['product_id' => $productId]);
+            }
+        }
+        return redirect()->back()->with('success', 'Ajánlott termékek frissítve!');
+    }
+    
+
 }
