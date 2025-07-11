@@ -8,6 +8,7 @@ use App\Models\product_unit;
 use App\Models\User_invoce;
 use App\Models\User_shipping;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PagesController extends Controller
 {
@@ -84,7 +85,21 @@ class PagesController extends Controller
     {
         $query = Products::with('category', 'product_unit', 'special_prices');
 
-        if ($request->filled('category')) {
+        // KIEMELT TERMÉKEK
+        if ($request->get('category') === 'highlighted') {
+            $highlightedIds = DB::table('recommended_products')
+                ->select('product_id')
+                ->distinct()
+                ->pluck('product_id');
+
+            if ($highlightedIds->isEmpty()) {
+                $query->whereRaw('0 = 1');
+            } else {
+                $query->whereIn('id', $highlightedIds);
+            }
+        }
+
+        elseif ($request->filled('category')) {
             $query->where('category_id', $request->category);
         }
 
@@ -205,14 +220,32 @@ class PagesController extends Controller
     public function success(){
         return "Sikeres megrendelés!";
     }
+    // public function product($id)
+    // {
+    //     $product = Products::with(['category', 'product_unit', 'special_prices'])->findOrFail($id);
+    //     $unit = $product->product_unit;
+
+    //     return view('pages.product', [
+    //         'product' => $product,
+    //         'unit' => $unit
+    //     ]);
+    // }
     public function product($id)
     {
         $product = Products::with(['category', 'product_unit', 'special_prices'])->findOrFail($id);
         $unit = $product->product_unit;
 
+        $similar = Products::where('category_id', $product->category_id)
+            ->where('id', '!=', $product->id)
+            ->with('product_unit')
+            ->inRandomOrder()
+            ->take(10)
+            ->get();
+
         return view('pages.product', [
             'product' => $product,
-            'unit' => $unit
+            'unit' => $unit,
+            'similar' => $similar,
         ]);
     }
 

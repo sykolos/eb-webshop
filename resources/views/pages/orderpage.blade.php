@@ -30,10 +30,24 @@
                         <div class="card-body mx-3">
                             <ul class="list-unstyled">
                                 <li><a href="{{ route('orderpage') }}" class="text-dark">Összes Termék</a></li>
+
+                                {{-- Kiemelt termékek link --}}
+                                <li>
+                                    <a href="{{ route('orderpage', ['category' => 'highlighted']) }}"
+                                    class="text-dark {{ request('category') === 'highlighted' ? 'text-danger' : '' }}">
+                                        ⭐ Kiemelt termékek
+                                    </a>
+                                </li>
+
+                                {{-- Normál kategóriák --}}
                                 @foreach($categories as $category)
-                                    <li><a href="{{ route('orderpage', ['category' => $category->id]) }}" class="text-dark">{{ $category->name }}</a></li>
+                                    <li><a href="{{ route('orderpage', ['category' => $category->id]) }}"
+                                        class="text-dark {{ request('category') == $category->id ? 'fw-bold text-danger' : '' }}">
+                                        {{ $category->name }}
+                                    </a></li>
                                 @endforeach
                             </ul>
+
                         </div>
                     </div>
                 </div>

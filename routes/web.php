@@ -21,6 +21,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\AccountpageController;
 use App\Http\Controllers\MailController;
 use App\Http\Controllers\ShippingAddressController;
+use App\Http\Controllers\ProductRecommend;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 
@@ -34,7 +35,6 @@ Route::get('elallasi-nyilatkozat/',[PagesController::class,'eny'])->name('elalla
 Route::get('adatkezelesi-nyilatkozat/',[PagesController::class,'any'])->name('adatkezelesi-nyilatkozat');
 Route::get('contact/',[PagesController::class,'contact'])->name('contact');
 Route::get('cart/',[PagesController::class,'cart'])->name('cart')->middleware('auth');
-// Route::get('account/',[PagesController::class,'account'])->name('account')->middleware('auth');
 Route::get('checkout/',[PagesController::class,'checkout'])->name('checkout')->middleware('auth');
 Route::post('validcheckout/',[Checkout::class,'checkout'])->name('validcheckout')->middleware('auth');
 Route::get('products/{id}',[PagesController::class,'product'])->name('product')->middleware('auth');
@@ -57,6 +57,12 @@ Route::get('/cart/count', function () {
         'count' => collect(session('cart', []))->sum('quantity')
     ]);
 })->name('cart.count');
+
+//recommended products
+Route::get('/recommendations', [ProductRecommend::class, 'recommended']);
+Route::get('/top-categories', [ProductRecommend::class, 'topCategories']);
+Route::get('/product/{id}/similar', [ProductRecommend::class, 'similarProducts']);
+
 
 //users
 Route::get('login/',[AuthController::class,'showlogin'])->name('login')->middleware('guest');

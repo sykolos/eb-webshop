@@ -80,5 +80,57 @@
             </section>
         </div>
     </div>
+@if($similar->count())
+<div class="container mt-5">
+    <h3 class="mb-4">Ajánlott termékek</h3>
+
+    <!-- Swiper -->
+    <div class="swiper recommended-swiper">
+        <div class="swiper-wrapper">
+            @foreach($similar as $product)
+                <div class="swiper-slide">
+                    <x-product-box :product="$product" />
+                </div>
+            @endforeach
+        </div>
+
+        <!-- Navigációs nyilak -->
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
+    </div>
 </div>
+@endif
+</div>
+
+<!-- Swiper styles -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+<!-- Swiper script -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        new Swiper('.recommended-swiper', {
+            slidesPerView: 4,
+            spaceBetween: 20,
+            loop: true,
+            autoplay: {
+                delay: 32500, // 3 másodpercenként lép
+                disableOnInteraction: false, // nem áll meg ha belenyúlnak
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            breakpoints: {
+                320: { slidesPerView: 1.2 },
+                576: { slidesPerView: 2.2 },
+                768: { slidesPerView: 3 },
+                992: { slidesPerView: 4 },
+                1200: { slidesPerView: 5 },
+            }
+        });
+    });
+
+</script>
+
 @endsection
