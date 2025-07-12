@@ -92,14 +92,41 @@
     .product-list
         width: 100%
 
-.swiper-button-next, .swiper-button-prev 
-    color: #111
 
 .swiper-slide 
-    display: flex
+    display: flex !important
+    height: auto !important
     justify-content: center
     
 .recommended-swiper 
-    padding-bottom: 40px
-    
-                
+    position: relative
+    padding-bottom: 0 40px
+    background-color: #f8f9fa
+.swiper-button-prev, .swiper-button-next 
+    position: absolute !important
+    top: 55% !important
+    transform: translateY(-50%)
+    z-index: 10 !important
+    width: 30px !important
+    border-radius: 3px
+    box-shadow: none !important
+    color: #e60000 !important
+
+    &::after 
+        font-size: 2rem !important
+        font-weight: 600
+
+.swiper-button-prev 
+    left: -40px !important
+.swiper-button-next 
+    right: -40px !important
+
+.quantity-input
+    max-width: 6em
+    min-width: 4em
+    text-align: center
+    padding-right: 0.5rem
+.calculated-price
+    font-size: 1.2em
+    font-weight: bold
+    color: $primary-color

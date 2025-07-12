@@ -9,13 +9,23 @@ use App\Models\User_invoce;
 use App\Models\User_shipping;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\RecommendedProduct;
 
 class PagesController extends Controller
 {
     //home
-    public function home(){
-        return view('pages.home');
+    public function home()
+    {
+        $highlighted = RecommendedProduct::with([
+            'product' => function ($query) {
+                $query->select('id', 'title', 'serial_number', 'price', 'unit_id','image');
+            },
+            'product.product_unit:id,id,measure'
+        ])->get();
+
+        return view('pages.home', compact('highlighted'));
     }
+
     //cart
     public function cart() {
         
@@ -235,12 +245,8 @@ class PagesController extends Controller
         $product = Products::with(['category', 'product_unit', 'special_prices'])->findOrFail($id);
         $unit = $product->product_unit;
 
-        $similar = Products::where('category_id', $product->category_id)
-            ->where('id', '!=', $product->id)
-            ->with('product_unit')
-            ->inRandomOrder()
-            ->take(10)
-            ->get();
+        $recommendController = new \App\Http\Controllers\ProductRecommend();
+        $similar = $recommendController->getSimilarProductsRaw($product->id);
 
         return view('pages.product', [
             'product' => $product,
@@ -248,6 +254,7 @@ class PagesController extends Controller
             'similar' => $similar,
         ]);
     }
+
 
 
 

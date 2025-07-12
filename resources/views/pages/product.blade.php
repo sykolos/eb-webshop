@@ -1,6 +1,8 @@
 @extends('layouts.master')
 @section('title', $product->title)
+
 @section('content')
+
 <script>
     $(document).ready(function(){
         let q = 1;
@@ -30,107 +32,120 @@
 </section>
 @endif
 
-<div class="product-page">
-    <div class="container">
-        <div class="product-page-row">
-            <section class="product-page-image">
-                <img src="{{ Storage::url($product->image) }}" alt="{{ $product->title }}" loading="lazy">
-            </section>
-            <section class="product-page-details">
-                <p class="p-title">
-                    {{ $product->title }}
-                </p>                
-                <p class="p-price">
+<div class="container py-5">
+    {{-- Breadcrumb + vissza gomb --}}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ route('home') }}">Főoldal</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('orderpage') }}">Termékek</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ $product->title }}</li>
+            </ol>
+        </nav>
+        <a href="{{ route('orderpage', ['category_id' => $product->category->id]) }}" class="btn btn-outline-secondary btn-sm">
+            &larr; Vissza a termékekhez
+        </a>
+    </div>
+
+    {{-- Termék kártya --}}
+    <div class="card shadow-sm p-4 mb-5">
+        <div class="row g-4">
+            <div class="col-md-5 d-flex align-items-center justify-content-center">
+                <img src="{{ Storage::url($product->image) }}" alt="{{ $product->title }}" class="img-fluid rounded" loading="lazy">
+            </div>
+            <div class="col-md-7">
+                <h2 class="mb-2">{{ $product->title }}</h2>
+                <p class="text-muted mb-1">Cikkszám: {{ $product->serial_number }}</p>
+                <p class="text-muted mb-1">Kategória: {{ $product->category->name }}</p>
+                <p class="lead fw-bold">
                     {{ $product->getPriceForUser() }} Ft 
-                    <span class="p-unit"> + Áfa / {{ $product->product_unit->measure }}</span>
+                    <span class="text-muted">+ Áfa / {{ $product->product_unit->measure }}</span>
                 </p>
-                <p class="item-number">
-                    Cikkszám: {{ $product->serial_number }}
+
+                <p class="mt-3 mb-4">
+                    <strong>Leírás:</strong><br>
+                    {{ $product->description }}
                 </p>
-                <p class="p-category">
-                    Kategória: {{ $product->category->name }}
-                </p>
-                <p class="p-description">
-                    Leírás: {{ $product->description }}
-                </p>
+
                 <hr>
+
                 <form action="{{ route('addtocart', ['id' => $product->id, 'q' => $unit->quantity, 'm' => $unit->measure]) }}" method="post">
                     @csrf
-                    <div class="p-form">
-                        <div class="p-color">
-                            <label for="color">Kiszerelés:</label>
-                            {{ $unit->unit }}
-                            ({{ $unit->quantity }}{{ $unit->measure }})
-                        </div>
-                        <div class="p-quantity">                                 
-                            <label for="quantity">Mennyiség:</label>
-                            <input id="quantity" type="number" name="quantity" min="1" max="100" value="1" required>
-                            <span> x {{ $unit->quantity }}{{ $unit->measure }}</span>
-
-                            <div class="p-calculate pt-3">
-                                <p>Összesen:
-                                    <span class="p-price" id="calc-price"></span><span class="p-unit"> Ft + Áfa</span>
-                                </p>
-                            </div>
+                    <div class="mb-3">
+                        <label class="form-label">Kiszerelés:</label>
+                            {{ $unit->unit }} ({{ $unit->quantity }}{{ $unit->measure }})
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="quantity" class="form-label">Mennyiség:</label>
+                        <div class="input-group">
+                            <input id="quantity" type="number" name="quantity" class="form-control quantity-input" min="1" max="100" value="1" required>
+                            <span class="input-group-text">x {{ $unit->quantity }}{{ $unit->measure }}</span>
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-cart">Kosárba</button>
+                    <div class="mb-3">
+                        <p class="fw-semibold">Összesen: 
+                            <span class="text-primary fw-bold calculated-price" id="calc-price"></span>
+                            <span class="text-muted">Ft + Áfa</span>
+                        </p>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        Kosárba
+                    </button>
                 </form>
-            </section>
+            </div>
         </div>
     </div>
-@if($similar->count())
-<div class="container mt-5">
-    <h3 class="mb-4">Ajánlott termékek</h3>
 
-    <!-- Swiper -->
-    <div class="swiper recommended-swiper">
-        <div class="swiper-wrapper">
-            @foreach($similar as $product)
-                <div class="swiper-slide">
-                    <x-product-box :product="$product" />
-                </div>
-            @endforeach
+    {{-- Ajánlott termékek --}}
+    @if($similar->count())
+    <div class="my-5 position-relative">
+        <h3 class="mb-4">Ajánlott termékek</h3>
+        <div class="swiper recommended-swiper">
+            <div class="swiper-wrapper">
+                @foreach($similar as $product)
+                    <div class="swiper-slide">
+                        <x-product-box :product="$product" />
+                    </div>
+                @endforeach
+            </div>
         </div>
 
-        <!-- Navigációs nyilak -->
-        <div class="swiper-button-prev"></div>
-        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev position-absolute"></div>
+        <div class="swiper-button-next position-absolute"></div>
     </div>
-</div>
-@endif
-</div>
+    @endif
 
-<!-- Swiper styles -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
-<!-- Swiper script -->
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+</div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        new Swiper('.recommended-swiper', {
-            slidesPerView: 4,
-            spaceBetween: 20,
-            loop: true,
-            autoplay: {
-                delay: 32500, // 3 másodpercenként lép
-                disableOnInteraction: false, // nem áll meg ha belenyúlnak
-            },
-            navigation: {
-                nextEl: '.swiper-button-next',
-                prevEl: '.swiper-button-prev',
-            },
-            breakpoints: {
-                320: { slidesPerView: 1.2 },
-                576: { slidesPerView: 2.2 },
-                768: { slidesPerView: 3 },
-                992: { slidesPerView: 4 },
-                1200: { slidesPerView: 5 },
-            }
-        });
-    });
+document.addEventListener('DOMContentLoaded', () => {
+	new Swiper('.recommended-swiper', {
+		slidesPerView: 4,
+		spaceBetween: 20,
+		loop: true,
+		autoplay: {
+			delay: 2500,
+			disableOnInteraction: false,
+		},
+		navigation: {
+			nextEl: '.swiper-button-next',
+			prevEl: '.swiper-button-prev',
+		},
+		breakpoints: {
+			320: { slidesPerView: 1.2 },
+			576: { slidesPerView: 2.2 },
+			768: { slidesPerView: 3 },
+			992: { slidesPerView: 4 },
+			1200: { slidesPerView: 5 },
+		}
+	});
+});
 
 </script>
+
 
 @endsection

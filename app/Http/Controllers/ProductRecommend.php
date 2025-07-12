@@ -19,10 +19,7 @@ class ProductRecommend extends Controller
             'recommended' => $recommended,
         ]);
     }
-
-    /**
-     * Visszaadja a top 5 legtöbbet vásárolt kategóriát.
-     */
+    //top 5 kategória
     public function getTopCategories()
     {
         $topCategories = DB::table('order_items')
@@ -38,16 +35,21 @@ class ProductRecommend extends Controller
             'top_categories' => $topCategories,
         ]);
     }
-    public function similarProducts($id)
+    public function getSimilarProductsRaw($id)
     {
         $product = \App\Models\Products::findOrFail($id);
 
-        $recommended = \App\Models\Products::where('category_id', $product->category_id)
+        return \App\Models\Products::where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
             ->with(['product_unit'])
             ->inRandomOrder()
-            ->take(10)
+            ->take(12)
             ->get();
+    }
+
+    public function similarProducts($id)
+    {
+        $recommended = $this->similarProductsRaw($id);
 
         return response()->json([
             'products' => $recommended

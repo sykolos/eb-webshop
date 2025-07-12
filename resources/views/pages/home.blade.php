@@ -7,6 +7,33 @@
     
     <!-- Header-->
     @include('pages.components.home.header')
+    <!-- Recommended Product section-->
+    <section class="py-5" id="recommended-products">
+        @if($highlighted->count())
+            @php
+                $validHighlighted = $highlighted->filter(fn($item) => $item->product !== null);
+            @endphp
+
+            @if($validHighlighted->count())
+            <div class="my-5 position-relative">
+                <h3 class="mb-4">Kiemelt termékeink</h3>
+                <div class="swiper highlighted-swiper">
+                    <div class="swiper-wrapper">
+                        @foreach($validHighlighted as $item)
+                            <div class="swiper-slide">
+                                <x-product-box :product="$item->product" />
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                <div class="swiper-button-prev position-absolute"></div>
+                <div class="swiper-button-next position-absolute"></div>
+            </div>
+            @endif
+        @endif
+    </section>  
+
     <!-- Features section-->
     <section class="py-5" id="features">
         <div class="container-fluid px-5 my-5">
@@ -70,4 +97,30 @@
     </section>
     
 </main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        new Swiper('.highlighted-swiper', {
+            slidesPerView: 4,
+            spaceBetween: 20,
+            loop: true,
+            autoplay: {
+                delay: 2000,
+                disableOnInteraction: false,
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            breakpoints: {
+                320: { slidesPerView: 1.2 },
+                576: { slidesPerView: 2.2 },
+                768: { slidesPerView: 3 },
+                992: { slidesPerView: 4 },
+                1200: { slidesPerView: 5 },
+            }
+        });
+    });
+</script>
+
 @endsection
