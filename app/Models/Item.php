@@ -17,12 +17,12 @@ class Item extends Model
         return $this->belongsTo(Order::class, 'order_id');
     }
     public function getUnitPriceAttribute($value)
-{
-    if (!is_null($value)) {
-        return $value;
-    }
+    {
+        if (!is_null($value)) {
+            return $value;
+        }
 
-    // Fallback: ha nincs elmentve az ár, visszaadjuk a jelenlegi árlogika szerint
-    return $this->product->getPriceForUser(optional($this->order)->user_id ?? auth()->id());
-}
+        // Fallback: ha nincs elmentve az ár, visszaadjuk a jelenlegi árlogika szerint
+        return $this->product->getPriceForUser(optional($this->order)->user_id ?? auth()->id());
+    }
 }

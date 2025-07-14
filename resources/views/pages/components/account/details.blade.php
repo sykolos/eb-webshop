@@ -18,6 +18,10 @@
                                 <td>{{ $order->status }}</td>
                             </tr>
                             <tr>
+                                <td>Rendelésazonosító</td>
+                                <td>EBR-2025-{{ $order->id }}</td>
+                            </tr>
+                            <tr>
                                 <td>Rendelési dátum</td>
                                 <td>{{ \Carbon\Carbon::parse($order->created_at)->format('Y. m. d. H:i') }}</td>
                             </tr>

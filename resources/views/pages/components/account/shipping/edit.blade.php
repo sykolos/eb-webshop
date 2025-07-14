@@ -100,7 +100,7 @@
                         </div>
 
                         <div class="form-group mt-3">
-                            <button type="submit" class="btn btn-primary">Mentés</button>
+                            <button type="submit" class="btn btn-primary bg-gradient mt-3">Mentés</button>
                             <a href="{{ route('account.modify') }}" class="btn btn-outline-secondary">Mégse</a>
                         </div>
                     </form>

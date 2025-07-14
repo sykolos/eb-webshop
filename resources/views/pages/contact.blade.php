@@ -57,9 +57,9 @@
                 </div>
                 
             </div>
-            <div class="row justify-content-center align-items-center">
+            <div class="row justify-content-center align-items-center py-5">
                 <div class="col-md-12">
-                    <div class="wrapper bg-dark rounded-3">
+                    <div class="wrapper bg-dark contact-wrapper">
                         <div class="row no-gutters mb-5">
                             <div class="col-md-7">
                                 <div class="contact-leftside-wrap w-100 p-md-5 p-4">

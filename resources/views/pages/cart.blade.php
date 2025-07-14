@@ -36,30 +36,32 @@
                         <th>Törlés</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="cart-body">
+                    
                     @if(session()->has('cart')&&count(session()->get('cart'))>0)
                         
                             @foreach (session()->get('cart') as $key => $item)
-                            <tr>
-                                <td class="px-2">
-                                    <a href="{{route('product',$item['product']['id'])}}" class="cart-item-title">
-                                    <img src="{{asset('storage/public/'.$item['product']['image'])}}" alt="">
-                                    <p>{{$item['product']['title']}}</p>
-                                    </a>                                    
-                                </td>
-                                <td>
-                                    {{ App\Models\Products::find($item['product']['id'])->getPriceForUser() }}
-                                </td>                                
-                                <td>{{$item['quantity']*$item['q']}}</td>                                
-                                <td>{{$item['m']}}</td>
-                                <td>{{App\Models\Cart::unitprice($item)*$item['q']}} Ft</td>
-                                <td>
-                                    <form action="{{route('removefromcart',$key)}}" method="post">
-                                    @csrf
-                                    <button type="submit" class="btn btn-primary">X</button>
-                                    </form>
-                                </td>
-                            </tr>
+                            <tr data-key="{{$key}}" class="cart-row">
+                            <td class="px-2">
+                                <a href="{{route('product',$item['product']['id'])}}" class="cart-item-title d-flex align-items-center gap-2">
+                                    <img src="{{ asset('storage/' . $item['product']['image']) }}" alt="" style="width:60px; height:auto">
+                                    <p class="m-0">{{$item['product']['title']}}</p>
+                                </a>
+                            </td>
+                            <td>{{ App\Models\Products::find($item['product']['id'])->getPriceForUser() }} Ft</td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-sm btn-outline-secondary quantity-decrease" data-key="{{ $key }}" data-change="-1">−</button>
+                                    <span class="cart-quantity">{{ $item['quantity'] }}</span>
+                                    <button class="btn btn-sm btn-outline-secondary quantity-increase" data-key="{{ $key }}" data-change="1">+</button>
+                                </div>
+                            </td>
+                            <td>{{$item['q'] }}{{ $item['m']}}</td>
+                            <td class="cart-subtotal">{{ App\Models\Cart::unitprice($item) * $item['q'] }} Ft</td>
+                            <td>
+                                <button class="btn btn-danger btn-sm cart-remove" data-key="{{ $key }}">x</button>
+                            </td>
+                        </tr>
                             @endforeach
                         <tr class="cart-total">
                             <td colspan="4" style="text-align:right">Összesen:</td>
@@ -71,6 +73,9 @@
                     @endif
                 </tbody>
             </table>
+            <div id="ajax-spinner" style="display:none; position: fixed; top: 30%; left: 50%; z-index: 9999; transform: translate(-50%, -50%);">
+                <div class="spinner-border text-danger" role="status" style="width: 3rem; height: 3rem;"></div>
+            </div>
         </div>
             <div class="cart-actions">
                 <a href="{{route('checkout')}}" class="btn btn-primary">Tovább a véglegesítéshez</a>

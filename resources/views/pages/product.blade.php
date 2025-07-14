@@ -32,8 +32,7 @@
 </section>
 @endif
 
-<div class="container py-5">
-    {{-- Breadcrumb + vissza gomb --}}
+<div class="container py-5 product-page">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0">
@@ -47,19 +46,25 @@
         </a>
     </div>
 
-    {{-- Termék kártya --}}
-    <div class="card shadow-sm p-4 mb-5">
+    <div class="card mb-5 bg-dark product-card">
         <div class="row g-4">
-            <div class="col-md-5 d-flex align-items-center justify-content-center">
-                <img src="{{ Storage::url($product->image) }}" alt="{{ $product->title }}" class="img-fluid rounded" loading="lazy">
+            <div class="col-md-5 img-col d-flex align-items-center justify-content-center">
+                @php
+                    $imagePath = $product->image;
+                @endphp
+
+                <img src="{{ Storage::exists($imagePath) ? Storage::url($imagePath) : asset('img/landscape-placeholder.svg') }}" 
+                    alt="{{ $product->title }}" 
+                    class="img-fluid" 
+                    loading="lazy">
             </div>
-            <div class="col-md-7">
+            <div class="col-md-7 p-4">
                 <h2 class="mb-2">{{ $product->title }}</h2>
-                <p class="text-muted mb-1">Cikkszám: {{ $product->serial_number }}</p>
-                <p class="text-muted mb-1">Kategória: {{ $product->category->name }}</p>
+                <p class="text-light mb-1">Cikkszám: {{ $product->serial_number }}</p>
+                <p class="text-light mb-1">Kategória: {{ $product->category->name }}</p>
                 <p class="lead fw-bold">
                     {{ $product->getPriceForUser() }} Ft 
-                    <span class="text-muted">+ Áfa / {{ $product->product_unit->measure }}</span>
+                    <span class="text-light">+ Áfa / {{ $product->product_unit->measure }}</span>
                 </p>
 
                 <p class="mt-3 mb-4">
@@ -86,12 +91,12 @@
 
                     <div class="mb-3">
                         <p class="fw-semibold">Összesen: 
-                            <span class="text-primary fw-bold calculated-price" id="calc-price"></span>
-                            <span class="text-muted">Ft + Áfa</span>
+                            <span class="fw-bold calculated-price" id="calc-price"></span>
+                            <span class="text-light">Ft + Áfa</span>
                         </p>
                     </div>
 
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-cart">
                         Kosárba
                     </button>
                 </form>

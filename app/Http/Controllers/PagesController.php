@@ -18,13 +18,24 @@ class PagesController extends Controller
     {
         $highlighted = RecommendedProduct::with([
             'product' => function ($query) {
-                $query->select('id', 'title', 'serial_number', 'price', 'unit_id','image');
+                $query->select('id', 'title', 'serial_number', 'price', 'unit_id', 'image');
             },
             'product.product_unit:id,id,measure'
         ])->get();
 
-        return view('pages.home', compact('highlighted'));
+        $recommend = new ProductRecommend();
+
+        $latestProducts = $recommend->latestProductsRaw();
+
+        $topCategories = $recommend->topCategoriesRaw(); // ezt is hozzuk létre
+        foreach ($latestProducts as $i => $product) {
+            if (!$product->id) {
+                dd("❌ HIBA: $i. terméknek nincs ID-je", $product->toArray());
+            }
+        }
+        return view('pages.home', compact('highlighted', 'latestProducts', 'topCategories'));
     }
+
 
     //cart
     public function cart() {
@@ -230,16 +241,7 @@ class PagesController extends Controller
     public function success(){
         return "Sikeres megrendelés!";
     }
-    // public function product($id)
-    // {
-    //     $product = Products::with(['category', 'product_unit', 'special_prices'])->findOrFail($id);
-    //     $unit = $product->product_unit;
-
-    //     return view('pages.product', [
-    //         'product' => $product,
-    //         'unit' => $unit
-    //     ]);
-    // }
+    
     public function product($id)
     {
         $product = Products::with(['category', 'product_unit', 'special_prices'])->findOrFail($id);
@@ -254,9 +256,6 @@ class PagesController extends Controller
             'similar' => $similar,
         ]);
     }
-
-
-
 
     public function search(Request $request){
         $request->validate(

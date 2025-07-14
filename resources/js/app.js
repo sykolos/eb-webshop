@@ -33,6 +33,7 @@ window._ = _;
 
 // Saját JS
 import './cart-preview';
+import './cart';
 
 // Stílusok
 import '../sass/app.scss';

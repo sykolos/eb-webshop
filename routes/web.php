@@ -48,7 +48,7 @@ Route::post('remove-from-cart/{id}',[CartController::class,'removefromcart'])->n
 Route::get('/cart/count', [CartController::class, 'cartCount'])->name('cart.count');
 //cart preview
 Route::get('/cart/preview', [CartController::class, 'previewcart'])->name('cart.preview');
-//cart preview gyorsgombok
+//-cart preview gyorsgombok
 Route::post('/cart/update', [CartController::class, 'updateQuantity'])->name('cart.update');
 Route::delete('/cart/remove', [CartController::class, 'removeItem'])->name('cart.remove');
 //cart count AJAX esetén

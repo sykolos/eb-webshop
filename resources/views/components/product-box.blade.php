@@ -1,7 +1,11 @@
+
 <a href="{{ route('product', $product->id) }}" class="product-box bg-dark">
 	<div class="image bg-light">
+		@php
+            $imagePath = $product->image;
+        @endphp
 		<img class="img-fluid w-100"
-			src="{{ Storage::url($product->image) }}"
+			src="{{ Storage::exists($imagePath) ? Storage::url($imagePath) : asset('img/landscape-placeholder.svg') }}"
 			alt="{{ $product->title }}"
 			width="100" height="100"
 			loading="lazy">

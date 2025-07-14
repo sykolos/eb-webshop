@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
 
 class ProductRecommend extends Controller
 {
@@ -19,22 +21,7 @@ class ProductRecommend extends Controller
             'recommended' => $recommended,
         ]);
     }
-    //top 5 kategória
-    public function getTopCategories()
-    {
-        $topCategories = DB::table('order_items')
-            ->join('products', 'order_items.product_id', '=', 'products.id')
-            ->join('categories', 'products.category_id', '=', 'categories.id')
-            ->select('categories.id', 'categories.name', DB::raw('COUNT(*) as total'))
-            ->groupBy('categories.id', 'categories.name')
-            ->orderByDesc('total')
-            ->limit(5)
-            ->get();
-
-        return response()->json([
-            'top_categories' => $topCategories,
-        ]);
-    }
+    
     public function getSimilarProductsRaw($id)
     {
         $product = \App\Models\Products::findOrFail($id);
@@ -55,5 +42,40 @@ class ProductRecommend extends Controller
             'products' => $recommended
         ]);
     }
+
+    
+    public function latestProductsRaw()
+    {
+        return \App\Models\Products::with('product_unit:id,id,measure')
+            ->select('id', 'title', 'serial_number', 'price', 'unit_id', 'image', 'created_at')
+            ->orderByDesc('created_at')
+            ->take(10)
+            ->get();
+    }
+
+    public function getLatestProducts()
+    {
+        return response()->json([
+            'latest_products' => $this->latestProductsRaw(),
+        ]);
+    }
+    public function topCategoriesRaw()
+    {
+        return \App\Models\Item::select('categories.id', 'categories.name', DB::raw('SUM(items.quantity) as total'))
+        ->join('products', 'items.product_id', '=', 'products.id')
+        ->join('categories', 'products.category_id', '=', 'categories.id')
+        ->groupBy('categories.id', 'categories.name')
+        ->orderByDesc('total')
+        ->limit(8)
+        ->get();
+    }
+
+    public function getTopCategories()
+    {
+        return response()->json([
+            'top_categories' => $this->topCategoriesRaw(),
+        ]);
+    }
+
 
 }

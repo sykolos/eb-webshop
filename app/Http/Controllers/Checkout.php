@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\SuccesOrder;
 use App\Models\Cart;
 use App\Models\Order;
+use App\Models\Products;
 use App\Models\User_invoce;
 use Illuminate\Http\Request;
 use App\Models\User_shipping;
