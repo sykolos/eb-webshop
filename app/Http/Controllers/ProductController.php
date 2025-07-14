@@ -29,14 +29,7 @@ class ProductController extends Controller
             });
         }
 
-
-        // Ár szűrés
-        if ($request->filled('min_price')) {
-            $query->where('price', '>=', $request->min_price);
-        }
-        if ($request->filled('max_price')) {
-            $query->where('price', '<=', $request->max_price);
-        }
+        
 
         // Kategória szűrés
         if ($request->filled('category_id')) {
@@ -53,8 +46,14 @@ class ProductController extends Controller
 
         $products = $query->orderBy('created_at', 'desc')->paginate(20)->appends($request->query());
         $units = product_unit::all();
-        $categories = Category::all(); // kategória dropdownhoz
+        $categories = Category::all();
 
+        // AJAX válasz: résznézet visszaadása
+        if ($request->ajax()) {
+            return view('admin.pages.products.partials.list', compact('products', 'units'))->render();
+        }
+
+        // Teljes oldal render
         return view('admin.pages.products.index', compact('products', 'units', 'categories'));
     }
 

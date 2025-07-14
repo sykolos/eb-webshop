@@ -4,8 +4,10 @@
 <h1 class="page-title">Termék feltöltés</h1>
 <div class="container">
     <div class="row mb-5">
-        <div class="col-12
-        ">
+        <div class="col-12">
+            <a href="{{ route('adminpanel.products') }}" class="btn btn-secondary mb-3">
+                ← Vissza a termékekhez
+            </a>
             <div class="card">
                 <div class="card-header bg-dark text-white">
                     <h5>Termék feltöltés</h5>

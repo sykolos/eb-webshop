@@ -78,7 +78,7 @@
             </div>
         </div>
             <div class="cart-actions">
-                <a href="{{route('checkout')}}" class="btn btn-primary">Tovább a véglegesítéshez</a>
+                <a href="{{route('checkout')}}" class="btn btn-primary btn-lg px-4 me-sm-3 bg-gradient">Tovább a véglegesítéshez</a>
             </div>
     </div>
 </main>

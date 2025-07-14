@@ -11,17 +11,20 @@ use Illuminate\Http\Request;
 use App\Models\User_shipping;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\View;
+use App\Mail\SuccesOrderCustomerMail;
+use App\Mail\SuccesOrderAdminMail;
 
 class Checkout extends Controller
 {
     
-    function succesCheckoutEmail($id)
+    public function succesCheckoutEmail($id)
     {
         $order = Order::with([
             'user',
             'items',
             'items.product',
-            'items.product.product_unit', // <-- betöltjük, mert PDF-ben használod
+            'items.product.product_unit',
             'user_shipping',
             'user_invoice'
         ])->findOrFail($id);
@@ -29,24 +32,22 @@ class Checkout extends Controller
         $status = ['függőben', 'feldolgozás', 'kiszállítva', 'törölve'];
         $data = ['order' => $order, 'states' => $status, 'id' => $id];
 
+        // PDF generálás
         $pdf = Pdf::loadView('myPDF', $data);
+
+        // Egyedi fájlnév
+        $filename = 'EBR-2025-' . $order->id . '.pdf';
 
         $email = $order->user->email;
 
-        // Első email a vásárlónak
-        Mail::send('vendor.notifications.SuccesOrder', $data, function ($message) use ($data, $pdf, $email) {
-            $message->to($email)
-                    ->cc('sykolos6@gmail.com')
-                    ->subject('Sikeres Rendelés')
-                    ->attachData($pdf->output(), 'document.pdf');
-        });
+        // 1. Email a vásárlónak
+        Mail::to($order->user->email)
+            ->cc('sykolos6@gmail.com')
+            ->send(new SuccesOrderCustomerMail($order, $status, $id));
 
-        // Második email neked/adminnak
-        Mail::send('vendor.notifications.SuccesOrder', $data, function ($message) use ($data, $pdf) {
-            $message->to('sykolos6@gmail.com')
-                    ->subject('Rendelés érkezett a webshopon keresztül!')
-                    ->attachData($pdf->output(), 'document.pdf');
-        });
+        // 2. Email neked/adminnak
+            Mail::to('sykolos6@gmail.com')
+        ->send(new SuccesOrderAdminMail($order, $status, $id));
     }
 
     public function checkout(Request $request)

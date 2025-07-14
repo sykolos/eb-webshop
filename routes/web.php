@@ -115,6 +115,7 @@ Route::group(['prefix' =>'adminpanel','middleware'=>'admin'],function(){
         Route::get('/',[OrderController::class, 'index'])->name('adminpanel.orders');
         Route::get('/view/{id}',[OrderController::class, 'view'])->name('adminpanel.orders.view');
         Route::post('/{id}',[OrderController::class, 'updateStatus'])->name('adminpanel.orders.status.update');
+        Route::post('/store-filter-url', [OrderController::class, 'storeFilterUrl'])->name('adminpanel.orders.storeFilterUrl');
         //pdf generálás
         Route::get('/{id}',[OrderController::class,'getpdf'])->name('adminpanel.orders.getpdf');
     });

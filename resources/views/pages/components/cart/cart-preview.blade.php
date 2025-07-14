@@ -58,7 +58,7 @@
     </ul>
 
     <div class="p-2 border-top">
-        <a href="{{ route('cart') }}" class="btn btn-primary w-100">
+        <a href="{{ route('cart') }}" class="btn btn-primary btn-lg px-4 me-sm-3 bg-gradient text-white">
             Irány a kosárhoz
         </a>
     </div>

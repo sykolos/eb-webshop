@@ -96,7 +96,7 @@
                         </p>
                     </div>
 
-                    <button type="submit" class="btn btn-cart">
+                    <button type="submit" class="btn btn-primary btn-lg px-4 me-sm-3 bg-gradient">
                         Kosárba
                     </button>
                 </form>

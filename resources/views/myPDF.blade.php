@@ -1,101 +1,132 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hu">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <title>Document</title>
+    <title>Szállítólevél</title>
     <style>
-        
+        body { font-family: DejaVu Sans, sans-serif; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid #444; padding: 6px; text-align: left; }
+        .no-border td, .no-border th { border: none; }
+        .section-title { background-color: #f2f2f2; font-weight: bold; padding: 6px; }
+        .text-right { text-align: right; }
+        .meta-table td { padding: 4px 8px; border: 1px solid #444; }
+        .meta-table td:first-child { font-weight: bold; }
+
+        .logo-table td {
+            border: none;
+            vertical-align: top;
+        }
+
+        .box-table td {
+            vertical-align: top;
+            padding: 10px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 24px;
+        }
     </style>
 </head>
 <body>
-    <header class="text-center">
-    <h1>Rendelés részletei</h1>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Szállító:</th>
-                <th>Szállítási cím:</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>ElectroBusiness Kft.</td>
-                <td>{{ $order->user_invoice->company_name ?? '-' }}</td>
-            </tr>
-            <tr>
-                <td>Cím: 2600 Vác, Zrínyi Miklós utca 41/b</td>
-                <td>Átvevő neve: {{ $order->user_shipping->receiver ?? '-' }}</td>
-            </tr>
-            <tr>
-                <td>Elérhetőség: +36 20 292 3769</td>
-                <td>
-                    Cím: {{ $order->user_shipping->zipcode }} 
-                    {{ $order->user_shipping->city }}, 
-                    {{ $order->user_shipping->address }}
-                </td>
-            </tr>
-            <tr>
-                
-                <td>Elérhetőség: {{ $order->user_shipping->phone }}</td>
-            </tr>
-            <tr>
-                <td></td>
 
-            </tr>
-        </tbody>
-    </table>
+<table class="logo-table">
+    <tr>
+        <td>
+            <h1>Rendelés részletező</h1>
+            <p><em>Ez a dokumentum nem minősül számlának</em></p>
+        </td>
+        <td style="text-align: right;">
+            <img src="{{ public_path('img/logo.svg') }}" alt="Logo" style="height: 60px;">
+        </td>
+    </tr>
+</table>
 
-    <table class="table">
-        <tbody>
+<table class="box-table" style="width: 100%; border: 1px solid #444;">
+    <tr>
+        <td style="width: 50%; border-right: 1px solid #444;">
+            <strong>Szállító:</strong><br>
+            ElectroBusiness Kft.<br>
+            2600 Vác, Zrínyi Miklós utca 41/b<br>
+            Tel: +36 20 292 3769
+        </td>
+        <td style="width: 50%;">
+            <strong>Szállítási cím:</strong><br>
+            {{ $order->user_shipping->receiver ?? '-' }}<br>
+            {{ $order->user_shipping->zipcode }} {{ $order->user_shipping->city }} {{ $order->user_shipping->address }}<br>
+            Tel: {{ $order->user_shipping->phone ?? '-' }}
+        </td>
+    </tr>
+</table>
+
+<table class="meta-table">
+    <tr>
+        <td>Rendelésszám:</td>
+        <td>EBR-2024-{{ $order->id }}</td>
+        <td>Rendelési dátum:</td>
+        <td>{{ \Carbon\Carbon::parse($order->created_at)->format('Y.m.d') }}</td>
+    </tr>
+    <tr>
+        <td>Fizetési mód:</td>
+        <td>{{ $order->payment_method ? 'Készpénz' : 'Átutalás' }}</td>
+        <td>Közvetlen szállítás:</td>
+        <td>{{ $order->is_direct_shipping ? 'Igen' : 'Nem' }}</td>
+    </tr>
+</table>
+
+<div class="section-title">Termékek</div>
+<table>
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Termék neve</th>
+            <th>Mennyiség</th>
+            <th>Egység</th>
+            <th>Egységár</th>
+            <th>Összeg</th>
+        </tr>
+    </thead>
+    <tbody>
+        @php $netTotal = 0; @endphp
+        @foreach ($order->items as $index => $item)
+            @php
+                $lineTotal = $item->unit_price * $item->quantity;
+                $netTotal += $lineTotal;
+            @endphp
             <tr>
-                <td>Rendelésszám: EBR-2024-{{ $order->id }}</td>
-                <td>Rendelési dátum: {{ \Carbon\Carbon::parse($order->created_at)->format('d/m/Y') }}</td>
-                {{-- <td>Várható kiszállítás:</td> --}}
+                <td>{{ $index + 1 }}</td>
+                <td>{{ $item->product->title }}</td>
+                <td>{{ $item->quantity }}</td>
+                <td>{{ $item->product->product_unit->measure }}</td>
+                <td>{{ number_format($item->unit_price, 0, ',', ' ') }} Ft</td>
+                <td>{{ number_format($lineTotal, 0, ',', ' ') }} Ft</td>
             </tr>
-            <tr>
-                <td>Fizetési mód: {{ $order->payment_method ? 'Készpénz' : 'Átutalás' }}</td>
-                <td>Közvetlen szállítás: {{ $order->is_direct_shipping ? 'Igen (árazatlan szállító)' : 'Nem' }}</td>
-            </tr>
-        </tbody>
-    </table>
+        @endforeach
+    </tbody>
+</table>
 
-    @if($order->note)
-    <hr>
-    <h4>Vásárlói megjegyzés</h4>
-    <p>{!! nl2br(e($order->note)) !!}</p>
-    @endif
-</header>
+@php
+    $vat = $netTotal * 0.27;
+    $grossTotal = $netTotal + $vat;
+@endphp
 
-    <main>
-        <h2 class="text-center"> Rendelt termékek</h2>
-        <table class="table tablestripped">
-            <thead>
-                <th>Termék neve</th>
-                <th>Mennyiség</th>
-                <th>Menny.egység</th>
-                <th>Egység ár</th>
-                <th>Ár</th>
-            </thead>
-            <tbody>
-                @foreach ($order->items as $item)
-                <tr>
-                    <td>{{$item->product->title}} 
-                        
-                                </td>                                
-                                <td>{{$item->quantity}}</td>            
-                                <td>{{$item->product->product_unit->measure}}</td>                    
-                                
-                                <td>{{ $item->unit_price }} Ft</td>
-                                <td>{{ $item->unit_price * $item->quantity }} Ft</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-</main>
+<table>
+    <tbody>
+        <tr>
+            <td colspan="5" class="text-right"><strong>Nettó végösszeg:</strong></td>
+            <td>{{ number_format($netTotal, 0, ',', ' ') }} Ft</td>
+        </tr>
+        <tr>
+            <td colspan="5" class="text-right"><strong>Áfa tartalom (27%):</strong></td>
+            <td>{{ number_format($vat, 0, ',', ' ') }} Ft</td>
+        </tr>
+        <tr>
+            <td colspan="5" class="text-right"><strong>Bruttó végösszeg:</strong></td>
+            <td><strong>{{ number_format($grossTotal, 0, ',', ' ') }} Ft</strong></td>
+        </tr>
+    </tbody>
+</table>
+
 </body>
 </html>
-
-

@@ -5,10 +5,14 @@
 <div class="container">
     <div class="row">
         <div class="col-12">
+            <a href="{{ session('orders_filter_url', route('adminpanel.orders')) }}" class="btn btn-secondary mb-3">
+    ← Vissza a szűrt listához
+</a>
             <div class="card">
                 <div class="card-header bg-dark text-white">
                     <h5>Rendelés részletei</h5>
                 </div>
+
                 <div class="card-body">
                     <table class="table tablestripped">
                         <tbody>

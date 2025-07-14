@@ -11,7 +11,6 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         $query = Order::with(['user.user_invoice', 'items']);
-
         // Cégnév szűrés
         if ($request->filled('company_name')) {
             $query->whereHas('user.user_invoice', function ($q) use ($request) {
@@ -41,9 +40,26 @@ class OrderController extends Controller
         }
 
         $orders = $query->orderBy('created_at', 'desc')->paginate(15)->appends($request->query());
-
+        
+        if ($request->ajax()) {
+            return response()->view('admin.pages.orders.partials.list', compact('orders'));
+        }
         return view('admin.pages.orders.index', compact('orders'));
     }
+    public function storeFilterUrl(Request $request)
+    {
+        try {
+            $url = url('/adminpanel/orders') . '?' . http_build_query($request->all());
+        } catch (\Exception $e) {
+            \Log::error('Hiba a route generálásnál a storeFilterUrl-ben: ' . $e->getMessage());
+            return response()->json(['error' => 'URL generation failed'], 500);
+        }
+
+        session(['orders_filter_url' => $url]);
+        \Log::info('Mentett URL: ' . $url);
+        return response()->noContent();
+    }
+
 
     public function view($id){
         $status=['függőben','feldolgozás','kiszállítva','törölve'];
