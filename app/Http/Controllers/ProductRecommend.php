@@ -61,13 +61,42 @@ class ProductRecommend extends Controller
     }
     public function topCategoriesRaw()
     {
-        return \App\Models\Item::select('categories.id', 'categories.name', DB::raw('SUM(items.quantity) as total'))
-        ->join('products', 'items.product_id', '=', 'products.id')
-        ->join('categories', 'products.category_id', '=', 'categories.id')
-        ->groupBy('categories.id', 'categories.name')
-        ->orderByDesc('total')
-        ->limit(8)
-        ->get();
+        $categories = \App\Models\Item::select('categories.id', 'categories.name', DB::raw('SUM(items.quantity) as total'))
+            ->join('products', 'items.product_id', '=', 'products.id')
+            ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->groupBy('categories.id', 'categories.name')
+            ->orderByDesc('total')
+            ->limit(8)
+            ->get();
+
+        foreach ($categories as $category) {
+            $attempts = 0;
+            $maxAttempts = 5;
+            $image = null;
+
+            while ($attempts < $maxAttempts) {
+                $randomProduct = \App\Models\Products::where('category_id', $category->id)
+                    ->whereNotNull('image')
+                    ->inRandomOrder()
+                    ->first();
+
+                if (!$randomProduct) {
+                    break; // nincs ilyen termék, lépjünk tovább
+                }
+
+                $path = storage_path('app/public/' . $randomProduct->image);
+                if (file_exists($path)) {
+                    $image = $randomProduct->image;
+                    break;
+                }
+
+                $attempts++;
+            }
+
+            $category->image = $image; // ha nem talált, marad null
+        }
+
+        return $categories;
     }
 
     public function getTopCategories()

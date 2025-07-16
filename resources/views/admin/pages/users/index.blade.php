@@ -4,7 +4,28 @@
 <h1 class="page-title">Felhasználók</h1>
 <div class="container">
     <div class="text-end mb-3">
-        <a href="{{route('register.show')}}" class="btn btn-primary">Létrehozás</a>    
+        <a href="{{route('register')}}" class="btn btn-primary">Létrehozás</a>    
+    </div>
+    {{-- Szűrő card --}}
+    <div class="card mb-3">
+        <div class="card-header bg-dark text-white">
+            <h5>Szűrés</h5>
+        </div>
+        
+        <div class="card-body">
+            <div class="mb-3">
+                <form id="user-search-form">
+                    <div class="input-group">
+                        <input type="text" name="search" class="form-control" placeholder="Keresés név vagy email szerint">
+                        <button type="submit" class="btn btn-dark">Keresés</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="spinner" class="text-center d-none">
+                <div class="spinner-border" role="status"></div>
+            </div>
+        </div>
     </div>
     <div class="row">
         <div class="col-12"> 
@@ -13,42 +34,56 @@
                     <h5>Felhasználók</h5>
                 </div>
                 <div class="card-body">
-                    <table class="table table-stripped">
-                        <thead>
-                            <tr>
-                                <th>Id</th>
-                                <th>Felhasználó név</th>
-                                <th>Email</th>                   
-                                <th>Létrehozva</th>                          
-                                <th>Műveletek</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($users as $user)
-                            <tr>
-                                <td>{{$user->id}}</td>
-                                <td>{{$user->name}}</td>
-                                <td>{{$user->email}}</td>
-                                <td>{{\Carbon\Carbon::parse($user->created_at)}}</td>
-                                <td>
-                                    <div class="d-flex" style="gap: 5px">
-                                    <a href="{{route('adminpanel.users.user_view',$user->id)}}" class="btn btn-secondary">Részletek</a>
-                                    
-                                    <form action="{{route('adminpanel.users.user_destroy',$user->id)}}" method="post">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger">Törlés</button>
-                                    </form>  
-                                </div>
-                                </td>
-                            </tr>
-                            @endforeach
+                    
+                            <div id="users-list">
+                                @include('admin.pages.users.partials.list')
+                            </div>
                             
-                        </tbody>
-                    </table>
+                        
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('user-search-form');
+    const listContainer = document.getElementById('users-list');
+    const spinner = document.getElementById('spinner');
+
+    function fetchUsers(url = '{{ route("adminpanel.users") }}') {
+        spinner.classList.remove('d-none');
+
+        const formData = new FormData(form);
+        const params = new URLSearchParams(formData);
+
+        fetch(url + '?' + params.toString(), {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(res => res.text())
+        .then(html => {
+            listContainer.innerHTML = html;
+        })
+        .finally(() => {
+            spinner.classList.add('d-none');
+        });
+    }
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        fetchUsers();
+    });
+
+    // // Lapozás kezelése
+    // listContainer.addEventListener('click', function(e) {
+    //     if (e.target.tagName === 'A' && e.target.closest('.pagination')) {
+    //         e.preventDefault();
+    //         fetchUsers(e.target.href);
+    //     }
+    // });
+});
+</script>
 @endsection

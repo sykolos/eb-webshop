@@ -1,10 +1,10 @@
-<section class="whyus-cta-section my-5 pb-5 bg-dark text-white" id="whyus-cta">
+<section class="whyus-cta-section my-5 py-5 bg-dark text-white" id="whyus-cta">
         <div class="container-fluid ">
             <div class="row justify-content-center align-items-center text-light">
                 <div class="col-lg-12">
                     <h2 class="section-header text-center">Miért válasszon minket?</h2>
-                    <p class=" text-light mt-3 mb-0 text-center">Az Electro Business egy megbízható és dinamikusan fejlődő nagykereskedelmi cég, amely a villanyszerelési alapanyagok egyre szélesebb választékát kínálja. Célunk, hogy partnereink számára a legjobb árakat és szolgáltatásokat nyújtsuk.</p>
-                    <div class="row p-5 row-cols-1 row-cols-md-2">
+                    <p class=" text-light my-3 text-center">Az Electro Business egy megbízható és dinamikusan fejlődő nagykereskedelmi cég, amely a villanyszerelési alapanyagok egyre szélesebb választékát kínálja. Célunk, hogy partnereink számára a legjobb árakat és szolgáltatásokat nyújtsuk.</p>
+                    <div class="row p-5 row-cols-1 row-cols-md-2 text-center">
                         <div class="col mb-5 h-100">
                             <div class="feature bg-primary bg-gradient text-white rounded-3 mb-3"><i class="bi bi-collection"></i></div>
                             <h3>Gyors Szállítás</h3>
@@ -18,7 +18,7 @@
                         <div class="col mb-5 mb-md-0 h-100">
                             <div class="feature bg-primary bg-gradient text-white rounded-3 mb-3"><i class="bi bi-toggles2"></i></div>
                             <h3>Dinamikus</h3>
-                            <p class="mb-0">Raktárkészletünk folyamatosan frissül és bővül, hogy mindig a legújabb termékeket kínálhassuk Önnek.</p>
+                            <p class="mb-0">Raktárkészletünk folyamatosan frissül és bővül, hogy mindig a naprakészek legyünk.</p>
                         </div>
                         <div class="col h-100">
                             <div class="feature bg-primary bg-gradient text-white rounded-3 mb-3"><i class="bi bi-arrows-move"></i></div>

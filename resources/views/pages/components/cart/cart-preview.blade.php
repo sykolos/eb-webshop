@@ -57,10 +57,12 @@
         </li>
     </ul>
 
-    <div class="p-2 border-top">
-        <a href="{{ route('cart') }}" class="btn btn-primary btn-lg px-4 me-sm-3 bg-gradient text-white">
-            Irány a kosárhoz
-        </a>
+    <div class="p-2 border-top text-center">
+        <form action="{{ route('cart') }}" method="GET">
+            <button type="submit" class="btn btn-primary btn-lg px-4 me-sm-3 bg-gradient text-white">
+                Irány a kosárhoz
+            </button>
+        </form>
     </div>
 @else
     <p class="text-muted px-3">A kosár üres.</p>

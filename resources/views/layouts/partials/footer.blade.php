@@ -1,5 +1,4 @@
 
-    <!-- Footer -->
     <footer
             class="text-center text-lg-start text-white bg-dark"
             >
@@ -59,23 +58,15 @@
               <hr
                   class="mb-4 mt-0 d-inline-block mx-auto"
                   />
-              <p><i class="fas fa-home mr-3"></i> 2600 Vác Zrínyi Miklós u. 41/b</p>
-              <p><i class="fas fa-envelope mr-3"></i> info@electrobusiness.hu</p>
-              <p><i class="fas fa-phone mr-3"></i> +36 20 292 3769</p>
-              <p><i class="fas fa-phone mr-3"></i> +36 30 350 8644</p>
+              <p><i class="fas fa-home mr-3"></i> 2600 Vác Naszály út 18.</p>
+              <p><i class="fas fa-envelope mr-3"></i><a href="mailto:info@electrobusiness.hu" class="text-white text-decoration-none">info@electrobusiness.hu</a></p>
+              <p><i class="fas fa-phone mr-3"></i><a href="tel:+36202923769" class="text-white text-decoration-none">+36 20 292 3769</a></p>
+              <p><i class="fas fa-phone mr-3"></i><a href="tel:+36303508644" class="text-white text-decoration-none">+36 30 350 8644</a></p>
             </div>
           </div>
         </div>
       </section>
   
       
-      {{-- <div
-           class="text-center p-3"
-           style="background-color: rgba(0, 0, 0, 0.2)"
-           >
-        © 2024 Copyright:
-        <p class="text-white">Electrobusiness</p
-          >
-      </div> --}}
+     
     </footer>
-    <!-- Footer -->

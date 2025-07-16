@@ -23,9 +23,24 @@ class AdminController extends Controller
         $orders_2=Order::where('status','=','törölve');                
         return view('admin.pages.dashboard',['products'=>$products,'orders_0'=>$orders_0,'orders_1'=>$orders_1,'orders_2'=>$orders_2]);
     }
-    public function users(){
-        $users= User::all();
-        return view('admin.pages.users.index',['users'=>$users]);
+    public function users(Request $request){
+        $query = User::query();
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $users = $query->orderBy('created_at', 'desc')->paginate(15);
+
+        if ($request->ajax()) {
+            return view('admin.pages.users.partials.list', compact('users'))->render();
+        }
+
+        return view('admin.pages.users.index', compact('users'));
     }
     public function user_store(){
         //létrehozni

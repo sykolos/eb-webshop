@@ -59,7 +59,7 @@
         </div>
     </section>
     <!-- Latest Products section-->
-    <section class="latest-products-section" id="latest-products">
+    <section class="latest-products-section pb-5" id="latest-products">
         <div class="my-3 position-relative">
             <h3 class="mb-4 section-header">Új termékeink</h3>
             <div class="swiper latest-products-swiper">

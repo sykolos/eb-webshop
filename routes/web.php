@@ -39,6 +39,12 @@ Route::get('checkout/',[PagesController::class,'checkout'])->name('checkout')->m
 Route::post('validcheckout/',[Checkout::class,'checkout'])->name('validcheckout')->middleware('auth');
 Route::get('products/{id}',[PagesController::class,'product'])->name('product')->middleware('auth');
 Route::get('shop/',[PagesController::class,'orderpage'])->name('orderpage')->middleware('auth');
+Route::post('/shop/view-mode', function (\Illuminate\Http\Request $request) {
+    $request->validate(['view' => 'required|in:quick,normal']);
+    session(['shop_view' => $request->view]);
+    return back();
+})->name('shop.setViewMode');
+Route::get('/shop/quick-products', [PagesController::class, 'quickProductsAjax'])->name('shop.quick.products');
 Route::get('search/',[PagesController::class,'search'])->name('search')->middleware('auth');
 //cart
 
@@ -222,7 +228,7 @@ Route::get('/change-password', [AuthController::class, 'changePassword'])->name(
 Route::post('/change-password', [AuthController::class, 'updatePassword'])->name('update-password')->middleware('auth');;
 
 //-------------sending emails
-Route::post('/send-contact',[MailController::class,'sendContact'])->name('sendContact');
+Route::post('/send-contact',[PagesController::class,'sendContact'])->name('sendContact');
 
 
 

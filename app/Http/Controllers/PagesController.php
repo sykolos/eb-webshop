@@ -10,6 +10,9 @@ use App\Models\User_shipping;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\RecommendedProduct;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ContactFormMail;
+use App\Http\Controllers\ProductRecommend;
 
 class PagesController extends Controller
 {
@@ -30,7 +33,7 @@ class PagesController extends Controller
         $topCategories = $recommend->topCategoriesRaw(); // ezt is hozzuk létre
         foreach ($latestProducts as $i => $product) {
             if (!$product->id) {
-                dd("❌ HIBA: $i. terméknek nincs ID-je", $product->toArray());
+                dd("HIBA: $i. terméknek nincs ID-je", $product->toArray());
             }
         }
         return view('pages.home', compact('highlighted', 'latestProducts', 'topCategories'));
@@ -73,6 +76,20 @@ class PagesController extends Controller
 
     public function contact(){
         return view('pages.contact');
+    }
+    public function sendContact(Request $request)
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email',
+            'phone' => 'nullable|string|max:50',
+            'message' => 'required|string',
+        ]);
+
+        Mail::to('sykolos6@gmail.com')
+            ->send(new ContactFormMail($data));
+
+        return back()->with('success', 'Üzenetedet sikeresen elküldtük!');
     }
     public function wishlist(){
         echo view('pages/wishlist');
@@ -117,6 +134,15 @@ class PagesController extends Controller
                 $query->whereRaw('0 = 1');
             } else {
                 $query->whereIn('id', $highlightedIds);
+            }
+        }
+        elseif ($request->get('category') === 'latest') {
+            $latestProducts = app(ProductRecommend::class)->latestProductsRaw();
+            
+            if ($latestProducts->isEmpty()) {
+                $query->whereRaw('0 = 1');
+            } else {
+                $query->whereIn('id', $latestProducts->pluck('id'));
             }
         }
 
@@ -237,6 +263,73 @@ class PagesController extends Controller
 
         return view('pages.orderpage', compact('products', 'categories'));
     }
+    public function quickProductsAjax(Request $request)
+    {
+        $query = Products::with('product_unit');
+
+        // Kiemelt termékek
+        if ($request->get('category') === 'highlighted') {
+            $highlightedIds = DB::table('recommended_products')
+                ->select('product_id')
+                ->distinct()
+                ->pluck('product_id');
+
+            $query->whereIn('id', $highlightedIds->isEmpty() ? [0] : $highlightedIds);
+        }
+
+        // Új termékek
+        elseif ($request->get('category') === 'latest') {
+            $latestProducts = app(ProductRecommend::class)->latestProductsRaw();
+            $query->whereIn('id', $latestProducts->isEmpty() ? [0] : $latestProducts->pluck('id'));
+        }
+
+        // Normál kategória ID
+        elseif ($request->filled('category')) {
+            $query->where('category_id', $request->category);
+        }
+
+        // Keresés
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('title', 'like', "%{$request->search}%")
+                ->orWhere('description', 'like', "%{$request->search}%");
+            });
+        }
+
+        // Lapozás + szűrés megtartása
+        $products = $query->orderBy('created_at', 'desc')
+                        ->paginate(12)
+                        ->onEachSide(0)
+                        ->appends($request->all());
+
+        // HTML + lapozás
+        $html = view('pages.components.shop.partials.quick-product-boxes', compact('products'))->render();
+
+        // Infószöveg összeállítás
+        $info = $products->total() . ' db termék';
+
+        if ($request->filled('search')) {
+            $info .= ' a következőre: „' . e($request->search) . '”';
+        }
+
+        if ($request->filled('category')) {
+            $categoryText = match ($request->category) {
+                'latest' => 'Új termékeink',
+                'highlighted' => 'Kiemelt termékeink',
+                default => optional(Category::find($request->category))->name
+            };
+
+            if ($categoryText) {
+                $info .= ' kategóriában: „' . $categoryText . '”';
+            }
+        }
+
+        return response()->json([
+            'html' => $html,
+            'info' => $info
+        ]);
+    }
+
 
     public function success(){
         return "Sikeres megrendelés!";

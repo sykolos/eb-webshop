@@ -21,10 +21,14 @@
 				{{ $product->serial_number }}
 			</div>
 			<div class="product-price">
-				{{ $product->getPriceForUser() }} Ft
-				@if($product->product_unit)
-					/ {{ $product->product_unit->measure }}
-				@endif
+				@auth
+					{{ $product->getPriceForUser() }} Ft
+					@if($product->product_unit)
+						/ {{ $product->product_unit->measure }}
+					@endif
+				@else
+					<span class="text-light small fw-light">Jelentkezz be az ár megtekintéséhez</span>
+				@endauth
 			</div>
 		</div>
 	</div>

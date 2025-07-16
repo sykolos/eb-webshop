@@ -70,8 +70,9 @@ function reloadCartPreview() {
 }
 
 // Kosár badge frissítés
-function updateCartCount() {
+window.updateCartCount = function updateCartCount() {
     $.get('/cart/count', function (data) {
         $('.cart-badge').text(data.count);
     });
 }
+

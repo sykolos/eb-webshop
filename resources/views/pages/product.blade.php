@@ -19,13 +19,13 @@
 </script>
 
 @if (session()->has('addedtocart'))
-<section class="pop-up">
+<section class="pop-up-overlay" id="popupOverlay">
     <div class="pop-up-box">
         <div class="pop-up-title">
             {{ session()->get('addedtocart') }}
         </div>
         <div class="pop-up-actions">
-            <a href="{{ route('orderpage') }}" class="btn btn-outlined">Tovább vásárlok</a>
+            <button type="button" class="btn btn-outlined" id="closePopup">Tovább vásárlok</button>
             <a href="{{ route('cart') }}" class="btn btn-primary">Irány a kosár</a>
         </div>
     </div>
@@ -148,6 +148,8 @@ document.addEventListener('DOMContentLoaded', () => {
 			1200: { slidesPerView: 5 },
 		}
 	});
+    
+    
 });
 
 </script>

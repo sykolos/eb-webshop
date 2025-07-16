@@ -1,4 +1,4 @@
-<section class="catalog-section pb-5" id="catalog">
+<section class="catalog-section py-5" id="catalog">
         <div class="container-fluid px-5 my-3">
             <div class="row gx-5 align-items-center">
                 <div class="col-lg-6"><img class="img-fluid rounded mb-5 mb-lg-0" src="{{asset('img/cataloglogo.png')}}" loading="lazy" alt="..." /></div>

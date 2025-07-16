@@ -50,3 +50,27 @@ document.querySelectorAll('.dropdown-toggle').forEach((el) => {
         bootstrap.Dropdown.getOrCreateInstance(el).toggle();
     });
 });
+
+function closePopup() {
+    const overlay = document.getElementById('popupOverlay');
+    if (overlay) {
+        overlay.style.display = 'none';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const overlay = document.getElementById('popupOverlay');
+    const closeBtn = document.getElementById('closePopup');
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closePopup);
+    }
+
+    if (overlay) {
+        overlay.addEventListener('click', function (e) {
+            if (e.target === overlay) {
+                closePopup();
+            }
+        });
+    }
+});

@@ -63,7 +63,7 @@
                                                     {{ $item['m'] }}
                                                 </td>
                                                 <td>
-                                                    {{ number_format(App\Models\Cart::unitprice($item) * $item['q']) }} Ft
+                                                    {{ number_format(App\Models\Cart::unitprice($item) * $item['q'], 0, '', ' ') }} Ft
                                                 </td>
                                             </tr>
                                         @endforeach

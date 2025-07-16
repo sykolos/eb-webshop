@@ -1,5 +1,5 @@
-  <nav class="navbar navbar-light sticky-top navbar-expand-lg bg-opacity-75 fixed-top">
-        <div class="container-fluid lead text-uppercase">
+  <nav class="navbar navbar-light sticky-top navbar-expand-lg bg-opacity-75 fixed-top lead text-uppercase">
+        <div class="container-fluid px-3">
           <a class="navbar-brand" href="{{route('home')}}">
             <img class="logo img-fluid" src="{{asset('img/logo.svg')}}" alt="ElectroBusiness" ></a>
           </a>
@@ -31,7 +31,7 @@
                 <li class="nav-item" id="cart-icon-container" style="position: relative; z-index: 1050;">
                   <a class="nav-link position-relative" href="{{ route('cart') }}">
                     Kosár
-                    <span class="cart-badge badge-custom">
+                    <span id="cart-count" class="cart-badge badge-custom">
                       {{ session('cart') ? collect(session('cart'))->sum('quantity') : 0 }}
                     </span>
                   </a>

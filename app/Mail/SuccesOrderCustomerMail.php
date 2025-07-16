@@ -41,7 +41,7 @@ class SuccesOrderCustomerMail extends Mailable
             $logoCid = $message->embed($logoPath);
         });
 
-        return $this->view('vendor.notifications.SuccesOrderCustomer')
+        return $this->view('emails.SuccesOrderCustomer')
             ->subject('Sikeres Rendelés')
             ->with([
                 'order' => $this->order,
