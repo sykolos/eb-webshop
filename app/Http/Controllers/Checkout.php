@@ -42,11 +42,11 @@ class Checkout extends Controller
 
         // 1. Email a vásárlónak
         Mail::to($order->user->email)
-            ->cc('sykolos6@gmail.com')
+            ->cc('noreply@electrobusiness.hu')
             ->send(new SuccesOrderCustomerMail($order, $status, $id));
 
         // 2. Email neked/adminnak
-            Mail::to('sykolos6@gmail.com')
+            Mail::to('info@electrobusiness.hu')
         ->send(new SuccesOrderAdminMail($order, $status, $id));
     }
 

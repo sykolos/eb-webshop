@@ -86,7 +86,7 @@ class PagesController extends Controller
             'message' => 'required|string',
         ]);
 
-        Mail::to('sykolos6@gmail.com')
+        Mail::to('info@electrobusiness.hu')
             ->send(new ContactFormMail($data));
 
         return back()->with('success', 'Üzenetedet sikeresen elküldtük!');
