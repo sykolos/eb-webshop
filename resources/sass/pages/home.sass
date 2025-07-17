@@ -1,38 +1,96 @@
 @import './components/home/header.sass'
 
 .products
-    padding: 70px 0
+  padding: 70px 0
 
-    .section-title
-        font-size: 30px
-        font-weight: 600
-        text-align: center
-        color: $primary-dark
-        margin-bottom: 30px
+  .section-title
+    font-size: 30px
+    font-weight: 600
+    text-align: center
+    color: $primary-dark
+    margin-bottom: 30px
+
+  .container
+    display: flex
+    gap: 30px
+    justify-content: space-between
+
+    .sidebar .order-box
+      background: #fff
+      padding: 25px
+      border-radius: 8px
+      box-shadow: 0 0 9px 0 rgba(0, 0, 0, 0.04)
+      margin-bottom: 40px
+      overflow: hidden
 
 .products-row
+  display: flex
+  gap: 8px
+  flex-wrap: wrap
+
+.feature
+  display: inline-flex
+  align-items: center
+  justify-content: center
+  height: 4rem
+  width: 4rem
+  font-size: 1.75rem
+  background-color: $primary-color !important
+
+.swiper
+  width: 100%
+  padding: 1rem 0
+
+  .swiper-wrapper
     display: flex
-    gap: 8px
-    flex-wrap: wrap
+    align-items: stretch
 
-.products
-    .container
-        display: flex
-        gap: 30px
-        justify-content: space-between
-
-        .sidebar .order-box
-            background: #fff
-            padding: 25px
-            border-radius: 8px
-            box-shadow: 0 0 9px 0 rgba(0,0,0,0.04)
-            margin-bottom: 40px
-            overflow: hidden
-.feature 
-    display: inline-flex
-    align-items: center
+  .swiper-slide
+    display: flex
     justify-content: center
-    height: 4rem
-    width: 4rem
-    font-size: 1.75rem
-    background-color: $primary-color !important
+    align-items: stretch
+    height: auto
+    width: auto
+    flex: 0 0 auto
+    max-width: 100%
+    padding: 0 0.5rem
+
+    @media (max-width: 768px)
+      width: 50%
+
+    @media (max-width: 576px)
+      width: 100%
+
+.highlighted-swiper,
+.top-categories-swiper,
+.latest-products-swiper
+  .swiper-slide
+    padding: 0 0.5rem
+
+.swiper-button-prev,
+.swiper-button-next
+  color: #333
+  background: rgba(255, 255, 255, 0.7)
+  padding: 0.75rem
+  border-radius: 50%
+  top: 40%
+
+  @media (max-width: 576px)
+    display: none
+
+.section-header
+  font-size: 1.75rem
+  font-weight: 600
+  text-align: center
+  margin: 2rem auto 1rem
+  padding: 0 1rem
+
+  @media (max-width: 576px)
+    font-size: 1.4rem
+    margin-top: 1.5rem
+    padding: 0 0.75rem
+
+  @media (max-width: 400px)
+    font-size: 1.25rem
+    margin-top: 1.25rem
+    padding: 0 0.5rem

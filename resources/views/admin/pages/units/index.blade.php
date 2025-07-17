@@ -56,37 +56,68 @@
                     <h5>Létrehozott egységek</h5>
                 </div>
                 <div class="card-body">
-                    <table class="table table-stripped">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Neve</th>
-                                <th>Mennyiség</th>                                
-                                <th>Mértékegység</th>
-                                <th>Létrehozva</th>                         
-                                <th>Műveletek</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                    {{--  Asztali nézet – táblázat --}}
+                    <div class="d-none d-lg-block table-responsive">
+                        <table class="table table-striped align-middle">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Neve</th>
+                                    <th>Mennyiség</th>                                
+                                    <th>Mértékegység</th>
+                                    <th>Létrehozva</th>                         
+                                    <th>Műveletek</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($units as $unit)
+                                <tr>
+                                    <td>{{ $unit->id }}</td>
+                                    <td>{{ $unit->unit }}</td>
+                                    <td>{{ $unit->quantity }}</td>
+                                    <td>{{ $unit->measure }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($unit->created_at)->format('Y-m-d') }}</td>
+                                    <td>
+                                        <form action="{{ route('adminpanel.units.unit_destroy', $unit->id) }}" method="post" onsubmit="return confirm('Biztosan törlöd?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                <i class="bi bi-trash"></i> Törlés
+                                            </button>
+                                        </form>         
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {{--  Mobil nézet – kártyák --}}
+                    <div class="d-block d-lg-none">
+                        <div class="row row-cols-1 g-3">
                             @foreach ($units as $unit)
-                            <tr>
-                                <td>{{$unit->id}}</td>
-                                <td>{{$unit->unit}}</td>
-                                <td>{{$unit->quantity}}</td>
-                                <td>{{$unit->measure}}</td>
-                                <td>{{\Carbon\Carbon::parse($unit->created_at)}}</td>
-                                <td>
-                                    <form action="{{route('adminpanel.units.unit_destroy',$unit->id)}}" method="post">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger">Delete</button>
-                                    </form>          
-                                </td>
-                            </tr>
+                            <div class="col">
+                                <div class="card shadow-sm">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ $unit->unit }}</h5>
+                                        <p class="mb-1"><strong>Mennyiség:</strong> {{ $unit->quantity }}</p>
+                                        <p class="mb-1"><strong>Mértékegység:</strong> {{ $unit->measure }}</p>
+                                        <p class="mb-1"><strong>Létrehozva:</strong> {{ \Carbon\Carbon::parse($unit->created_at)->format('Y-m-d') }}</p>
+
+                                        <form action="{{ route('adminpanel.units.unit_destroy', $unit->id) }}" method="post" onsubmit="return confirm('Biztosan törlöd?');" class="mt-3">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger w-100">
+                                                <i class="bi bi-trash"></i> Törlés
+                                            </button>
+                                        </form>  
+                                    </div>
+                                </div>
+                            </div>
                             @endforeach
-                            
-                        </tbody>
-                    </table>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>

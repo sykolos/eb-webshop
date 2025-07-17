@@ -60,7 +60,7 @@
             <div class="row justify-content-center align-items-center py-5">
                 <div class="col-md-12">
                     <div class="wrapper bg-dark contact-wrapper">
-                        <div class="row no-gutters mb-5">
+                        <div class="row no-gutters ">
                             <div class="col-md-7">
                                 <div class="contact-leftside-wrap w-100 p-md-5 p-4">
                                         <h3 class="mb-4 text-light">írj nekünk üzenetet</h3>

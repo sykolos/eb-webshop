@@ -44,7 +44,7 @@ class ProductController extends Controller
             $query->whereDate('created_at', '<=', $request->to_date);
         }
 
-        $products = $query->orderBy('created_at', 'desc')->paginate(20)->appends($request->query());
+        $products = $query->orderBy('created_at', 'desc')->paginate(20)->onEachSide(0)->appends($request->query());
         $units = product_unit::all();
         $categories = Category::all();
 

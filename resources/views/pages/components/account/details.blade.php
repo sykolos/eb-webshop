@@ -71,7 +71,9 @@
                     <a href="{{route('account.getpdf',$id)}}" class="btn btn-primary">Pdf letöltése</a>
 
                     <br><br>
-                    <table class="table tablestripped">
+                    <div class="d-none d-md-block">
+                        <div class="table-responsive">
+                            <table class="table w-100">
                         <thead>
                             <th>Termék neve</th>
                             <th>Mennyiség</th>
@@ -105,7 +107,35 @@
                             @endforeach
                         </tbody>
                     </table>
+                        </div>
+                    </div>
+                    <div class="d-md-none">
+                        <div class="row">
+                            @foreach ($order->items as $item)
+                                <div class="col-md-6 col-lg-4 mb-4">
+                                    <div class="product-card border rounded p-3 bg-white shadow-sm h-100">
+                                        <p><strong>🛒 Termék:</strong> {{ $item->product->title }}</p>
+                                        <p><strong>Mennyiség:</strong> {{ $item->quantity }} {{ $item->product->product_unit->measure }}</p>
+                                        <p><strong>Egységár:</strong>
+                                            @php
+                                                $specialPrice = substr($item->product->special_prices->pluck('price'), 2, -2);
+                                                $specialUser = substr($item->product->special_prices->pluck('user_id'), 2, -2);
+                                                $unitPrice = ($specialPrice && $specialUser == auth()->user()->id)
+                                                    ? (int) $specialPrice
+                                                    : $item->product->price;
+                                            @endphp
+                                            {{ number_format($unitPrice, 0, ',', ' ') }} Ft
+                                        </p>
+                                        <p><strong>Összesen:</strong>
+                                            {{ number_format($unitPrice * $item->quantity, 0, ',', ' ') }} Ft
+                                        </p>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
                 
+
         </section>
             </div>
         </div>

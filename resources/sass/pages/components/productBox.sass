@@ -76,28 +76,95 @@
 				font-weight: 600
 				color: #fff
 
-.swiper-slide, .swiper
-	overflow-y: visible !important
-
 .category-box
 	display: flex
 	flex-direction: column
 	justify-content: space-between
 	height: 100%
-	.category-image		
+
+	.category-image
 		border-radius: 0.3rem
+		overflow: hidden
+		height: 150px
+		background-color: #f8f9fa
+
 		img
 			border-radius: 0.3rem
-			height: 150px
+			height: 100%
+			width: 100%
+			object-fit: cover
+
+	.category-name
+		font-size: 1.2rem
+		color: #fff
+		padding-top: 0.5rem
 
 .quick-product-box
 	box-shadow: 0 6px 8px 0 rgba(49, 32, 138, 0.18)
+
 	&:hover
 		box-shadow: 0 6px 8px 2px rgba(0, 0, 0, 0.25)
 		-webkit-filter: contrast(111%)
 		-moz-filter: contrast(111%)
 		-ms-filter: contrast(111%)
 		filter: contrast(111%)
-	
 
-	
+.swiper-slide, .swiper
+	overflow-y: visible !important
+
+@media (max-width: 768px)
+	.product-box, .category-box
+		width: 48%
+
+		.image
+			height: 180px
+
+		.product-title
+			font-size: 1rem
+			-webkit-line-clamp: 3
+
+		.product-price
+			font-size: 16px
+
+		.category-image
+			height: 130px
+
+		.category-name
+			font-size: 1.1rem
+
+@media (max-width: 576px)
+	.product-box, .category-box
+		width: 100%
+
+		.image
+			height: 160px
+
+		.product-title
+			font-size: 0.95rem
+			-webkit-line-clamp: 2
+
+		.product-price
+			font-size: 15px
+
+		.category-image
+			height: 110px
+
+		.category-name
+			font-size: 1rem
+
+@media (max-width: 400px)
+	.product-box, .category-box
+		.image
+			height: 140px
+
+		.product-title
+			font-size: 0.875rem
+
+		.product-price
+			font-size: 14px
+
+		.category-image
+			height: 100px
+
+		.category-name
+			font-size: 0.95rem

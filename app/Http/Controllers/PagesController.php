@@ -258,7 +258,7 @@ class PagesController extends Controller
                 $query->orderBy('created_at', 'desc');
         }
 
-        $products = $query->paginate(12)->appends($request->query());
+        $products = $query->paginate(12)->onEachSide(0)->appends($request->query());
         $categories = Category::all();
 
         return view('pages.orderpage', compact('products', 'categories'));

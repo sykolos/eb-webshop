@@ -26,13 +26,13 @@
                                 @if(auth()->user()->orders && auth()->user()->orders->count())
                                     @foreach (auth()->user()->orders as $order)
                                         <tr>
-                                            <td class="align-middle">{{ \Carbon\Carbon::parse($order->created_at)->format('d/m/Y') }}</td>
+                                            <td data-label="Dátum" class="align-middle">{{ \Carbon\Carbon::parse($order->created_at)->format('d/m/Y') }}</td>
                                             
-                                            <td class="align-middle">{{ $order->total }}</td>
+                                            <td data-label="Végösszeg" class="align-middle">{{ $order->total }}</td>
                                             
-                                            <td class="align-middle">{{ $order->status }}</td>
-                                            <td class="align-middle">EBR-2025-{{ $order->id }}</td>
-                                            <td class="align-middle">
+                                            <td data-label="Státusz" class="align-middle">{{ $order->status }}</td>
+                                            <td data-label="Azonosító" class="align-middle">EBR-2025-{{ $order->id }}</td>
+                                            <td data-label="Részletek" class="align-middle">
                                                 <a href="{{ route('account.details', $order->id) }}" class="btn btn-secondary">Részletek</a> 
                                             </td>
                                         </tr>

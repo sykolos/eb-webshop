@@ -1,4 +1,4 @@
-<aside class="side-nav">
+<aside class="side-nav" id="adminSidebar">
     <div class="logo">
         <img src="{{asset('img/logo.svg')}}" alt="">
         ADMINPANEL

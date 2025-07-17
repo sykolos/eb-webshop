@@ -27,3 +27,22 @@
     .checkout-row
         box-shadow: 0 5px 10px 0 rgba(0,0,0,0.2) !important
         margin-left: 0 !important
+        margin-right: 0 !important
+        border-radius: 0.3rem
+        overflow: hidden
+.responsive-cart
+    .cart-item
+        display: flex
+        flex-direction: column
+        padding: 0.5em 0
+
+        div[data-label]
+            display: block !important
+            justify-content: space-between
+            font-size: 0.95em
+            padding: 0.25em 0
+
+            &::before
+                content: attr(data-label) ": "
+                font-weight: 600
+                color: #222

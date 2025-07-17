@@ -34,7 +34,7 @@ class AdminController extends Controller
             });
         }
 
-        $users = $query->orderBy('created_at', 'desc')->paginate(15);
+        $users = $query->orderBy('created_at', 'desc')->paginate(15)->onEachSide(0);
 
         if ($request->ajax()) {
             return view('admin.pages.users.partials.list', compact('users'))->render();
@@ -121,7 +121,7 @@ class AdminController extends Controller
             });
         }
 
-        $products = $query->paginate($perPage);
+        $products = $query->paginate($perPage)->onEachSide(0);
 
         return response()->json([
             'products' => $products,
@@ -160,53 +160,88 @@ class AdminController extends Controller
     }
 
     public function recommendedEdit()
-    {
-        // első betöltésre üres keresés
-        $products = Products::orderBy('id')->paginate(15);
-        $recommendedIds = RecommendedProduct::pluck('product_id')->toArray();
-
-        return view('admin.pages.recommended.index', compact('products', 'recommendedIds'));
-    }
-
-    public function ajaxList(Request $request)
 {
-    try {
-        $query = Products::query();
+    $products = Products::orderBy('id')->paginate(15);
+    $recommendedIds = RecommendedProduct::pluck('product_id')->toArray();
+    $recommendedProducts = Products::whereIn('id', $recommendedIds)->get();
 
-        if ($request->filled('q')) {
-            $q = $request->q;
-            $query->where(function ($subQuery) use ($q) {
-                if (is_numeric($q)) {
-                    $subQuery->where('serial_number', 'like', $q . '%');
-                } else {
-                    $subQuery->where('title', 'like', '%' . $q . '%');
-                }
-            });
-        }
+    // Itt készítjük elő a JS-ben használt adatokat
+    $recommendedData = $recommendedProducts->keyBy('id')->map(function ($item) {
+        return [
+            'id' => $item->id,
+            'serial_number' => $item->serial_number,
+            'title' => $item->title,
+        ];
+    });
 
-        $products = $query->orderBy('id')->paginate(15);
-        $recommendedIds = RecommendedProduct::pluck('product_id')->toArray();
+    return view('admin.pages.recommended.index', compact(
+        'products',
+        'recommendedIds',
+        'recommendedProducts',
+        'recommendedData'
+    ));
+}
 
-        $html = view('admin.pages.recommended.table', compact('products', 'recommendedIds'))->render();
+public function ajaxList(Request $request)
+{
+    $query = Products::query();
 
-        return response()->json(['html' => $html]);
-    } catch (\Throwable $e) {
-        return response()->json(['error' => $e->getMessage()], 500);
+    if ($request->filled('q')) {
+        $q = $request->q;
+        $query->where(function ($subQuery) use ($q) {
+            $subQuery->where('serial_number', 'like', $q . '%')
+                     ->orWhere('title', 'like', '%' . $q . '%');
+        });
     }
+
+    $products = $query->orderBy('id')->paginate(15);
+    $recommendedIds = RecommendedProduct::pluck('product_id')->toArray();
+
+    $html = view('admin.pages.recommended.table', compact('products', 'recommendedIds'))->render();
+
+    return response()->json(['html' => $html]);
+}
+
+public function recommendedUpdate(Request $request)
+{
+    \Log::info('--- Kiemelt termékek mentés indul ---');
+    \Log::info('products raw:', $request->all());
+
+    $incomingIds = collect($request->input('products', []))
+        ->filter(fn($id) => $id !== '__empty__')
+        ->map(fn($id) => (int) $id)
+        ->unique()
+        ->values()
+        ->toArray();
+
+    \Log::info('products integer IDs:', $incomingIds);
+
+    $currentIds = RecommendedProduct::pluck('product_id')
+        ->map(fn($id) => (int) $id)
+        ->toArray();
+
+    \Log::info('jelenlegi recommended DB-ben:', $currentIds);
+
+    $idsToDelete = array_diff($currentIds, $incomingIds);
+
+    \Log::info('Törlendő ID-k:', $idsToDelete);
+
+    if (!empty($idsToDelete)) {
+        RecommendedProduct::whereIn('product_id', $idsToDelete)->delete();
+    }
+
+    foreach ($incomingIds as $id) {
+        RecommendedProduct::firstOrCreate(['product_id' => $id]);
+    }
+
+    return redirect()->back()->with('success', 'Kiemelt termékek frissítve!');
 }
 
 
 
-    public function recommendedUpdate(Request $request)
-    {
-        RecommendedProduct::truncate(); // összes eddigit törli
-        if ($request->has('products')) {
-            foreach ($request->products as $productId) {
-                RecommendedProduct::create(['product_id' => $productId]);
-            }
-        }
-        return redirect()->back()->with('success', 'Ajánlott termékek frissítve!');
-    }
-    
+
+
+
+        
 
 }

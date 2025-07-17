@@ -25,10 +25,10 @@
 <main class="cart-page">
     <div class="container">
         <div class="cart-table">
-            <table class="table">
+            <table class="table-responsive">
                 <thead class="bg-dark text-white">
                     <tr>
-                        <th>Termék neve</th>
+                        <th>Termék</th>
                         <th>Egység ár</th>
                         <th>Mennyiség</th>
                         <th>Menny.Egység</th>
@@ -42,31 +42,31 @@
                         
                             @foreach (session()->get('cart') as $key => $item)
                             <tr data-key="{{$key}}" class="cart-row">
-                            <td class="px-2">
+                            <td data-label="Termék" class="px-2">
                                 <a href="{{route('product',$item['product']['id'])}}" class="cart-item-title d-flex align-items-center gap-2">
                                     <img src="{{ asset('storage/' . $item['product']['image']) }}" alt="" style="width:60px; height:auto">
                                     <p class="m-0">{{$item['product']['title']}}</p>
                                 </a>
                             </td>
-                            <td>{{ App\Models\Products::find($item['product']['id'])->getPriceForUser() }} Ft</td>
-                            <td>
+                            <td data-label="Egység ár">{{ App\Models\Products::find($item['product']['id'])->getPriceForUser() }} Ft</td>
+                            <td data-label="Mennyiségi">
                                 <div class="d-flex gap-2">
                                     <button class="btn btn-sm btn-outline-secondary quantity-decrease" data-key="{{ $key }}" data-change="-1">−</button>
                                     <span class="cart-quantity">{{ $item['quantity'] }}</span>
                                     <button class="btn btn-sm btn-outline-secondary quantity-increase" data-key="{{ $key }}" data-change="1">+</button>
                                 </div>
                             </td>
-                            <td>{{$item['q'] }}{{ $item['m']}}</td>
-                            <td class="cart-subtotal">{{ App\Models\Cart::unitprice($item) * $item['q'] }} Ft</td>
-                            <td>
+                            <td data-label="Menny. egység">{{$item['q'] }}{{ $item['m']}}</td>
+                            <td data-label="Összesen" class="cart-subtotal">{{ App\Models\Cart::unitprice($item) * $item['q'] }} Ft</td>
+                            <td data-label="Törlés">
                                 <button class="btn btn-danger btn-sm cart-remove" data-key="{{ $key }}">x</button>
                             </td>
                         </tr>
                             @endforeach
                         <tr class="cart-total">
-                            <td colspan="4" style="text-align:right">Összesen:</td>
-                            <td>{{App\Models\Cart::totalamount()}}Ft +Áfa</td>
-                            <td></td>
+                            <td colspan="6" class="text-center">
+                                Összesen: <strong>{{ App\Models\Cart::totalamount() }} Ft + Áfa</strong>
+                            </td>
                         </tr>
                     @else
                         <tr><td colspan="6" class="empty-cart">A kosarad üres</td></tr>

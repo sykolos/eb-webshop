@@ -66,4 +66,20 @@
     color: #fff
 
 
-    
+// shop oldal
+.products-row
+    display: flex
+    flex-wrap: wrap
+    justify-content: center
+    gap: 1rem
+
+@media (max-width: 576px)
+    .product-box
+        width: calc(50% - 1rem)
+
+        .product-title
+            font-size: 0.875rem
+            -webkit-line-clamp: 2
+
+        .product-price
+            font-size: 14px

@@ -149,7 +149,6 @@ Route::group(['prefix' =>'adminpanel','middleware'=>'admin'],function(){
     //recommended group
     Route::group(['prefix'=>'recommended'], function(){
         Route::get('/ajax', [AdminController::class, 'ajaxList'])->name('adminpanel.recommended.ajax');
-
         Route::get('/', [AdminController::class, 'recommendedEdit'])->name('adminpanel.recommended.edit');
         Route::post('/', [AdminController::class, 'recommendedUpdate'])->name('adminpanel.recommended.update');
     });

@@ -43,3 +43,61 @@ body
 .user-view, .spec-prices
     .row
         padding-bottom: 65px !important
+
+.admin-wrapper 
+    display: flex
+    flex-direction: row
+
+    .admin-main 
+        margin-left: $nav-width
+        width: 100%
+        padding: 2rem
+    
+
+    @media (max-width: 992px) 
+        .side-nav 
+            transform: translateX(-100%)
+            transition: transform 0.3s ease
+            z-index: 9999        
+
+        .side-nav.open 
+            transform: translateX(0)
+            position: fixed
+            width: 250px
+            background: $primary-color
+            padding: 40px 0
+            top: 0
+            left: 0
+            bottom: 0        
+
+        .admin-main 
+            margin-left: 0 !important
+            width: 100%        
+
+        .burger-menu 
+            position: fixed
+            top: 15px
+            left: 15px
+            z-index: 10000
+            background: $primary-color
+            color: white
+            border: none
+            padding: 8px 12px
+            font-size: 20px
+            border-radius: 4px
+        
+    
+
+.sidebar-overlay 
+    display: none
+    position: fixed
+    top: 0
+    left: 0
+    height: 100%
+    width: 100%
+    background: rgba(0, 0, 0, 0.4)
+    z-index: 9990
+
+
+.sidebar-overlay.active 
+    display: block

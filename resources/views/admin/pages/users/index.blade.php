@@ -77,13 +77,7 @@ document.addEventListener('DOMContentLoaded', function () {
         fetchUsers();
     });
 
-    // // Lapozás kezelése
-    // listContainer.addEventListener('click', function(e) {
-    //     if (e.target.tagName === 'A' && e.target.closest('.pagination')) {
-    //         e.preventDefault();
-    //         fetchUsers(e.target.href);
-    //     }
-    // });
+   
 });
 </script>
 @endsection

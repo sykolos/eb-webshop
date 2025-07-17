@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>@yield('title')</title>
     <meta name=”description” content=”Villanyszerelési eszközök kis és nagykereskedelme.” />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <link rel="icon" type="image/x-icon" href="{{asset('img/logo.png')}}">
     <link rel="apple-touch-icon" href="{{asset('img/logo.png')}}">
     <link rel="shortcut icon" href="{{asset('img/logo.png')}}">

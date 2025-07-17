@@ -17,6 +17,7 @@
     </div>
 
     <h4 id="selectedUserLabel" class="mb-3" style="display:none;"></h4>
+    
     <div id="loadingIndicator" class="mb-3 text-info" style="display:none;">Betöltés...</div>
 
     <div id="searchWrapper" class="mb-3" style="display:none;">
@@ -35,24 +36,31 @@
     </div>
 
     <div id="productTableWrapper" style="display:none;">
-        <div class="table-responsive">
-            <table class="table table-bordered" id="productTable">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Cikkszám</th>
-                        <th>Megnevezés</th>
-                        <th>Alapár</th>
-                        <th>Külön ár</th>
-                        <th>Mentés</th>
-                        <th>Törlés</th>
-                    </tr>
-                </thead>
-                <tbody id="productTableBody"></tbody>
-            </table>
-        </div>
-        <div id="paginationWrapper"></div>
-    </div>
+                {{-- Asztali táblázat --}}
+                <div class="table-responsive d-none d-lg-block">
+                    <table class="table table-bordered" id="productTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Cikkszám</th>
+                                <th>Megnevezés</th>
+                                <th>Alapár</th>
+                                <th>Külön ár</th>
+                                <th>Mentés</th>
+                                <th>Törlés</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productTableBody"></tbody>
+                    </table>
+                </div>
+
+                {{-- Mobil kártyák --}}
+                <div class="d-block d-lg-none">
+                    <div id="productCardContainer" class="row row-cols-1 g-3"></div>
+                </div>
+
+                <div id="paginationWrapper" class="mt-3"></div>
+            </div>
 </div>
 
 <script>
@@ -84,22 +92,47 @@
         function loadProducts(page = 1, query = '') {
             let hasPrice = $('#hasPrice').is(':checked') ? 1 : 0;
             let noPrice = $('#noPrice').is(':checked') ? 1 : 0;
+            const isMobile = window.innerWidth < 992;
 
             $.get(`/adminpanel/special-prices/ajax/${selectedUser}?page=${page}&search=${encodeURIComponent(query)}&has_price=${hasPrice}&no_price=${noPrice}`, function (data) {
-                $('#productTableBody').empty(); // ← EZ FONTOS!
+                $('#productTableBody').empty();
+                $('#productCardContainer').empty();
+
                 data.products.data.forEach(product => {
                     let special = product.special_prices[0]?.price || '';
-                    let row = `
-                    <tr data-id="${product.id}">
-                        <td>${product.id}</td>
-                        <td>${product.serial_number || '-'}</td>
-                        <td>${product.title}</td>
-                        <td>${product.price} Ft</td>
-                        <td><input type="number" class="form-control price-input" value="${special}"/></td>
-                        <td><button class="btn btn-success btn-save">Mentés</button></td>
-                        <td><button class="btn btn-danger btn-delete">Törlés</button></td>
-                    </tr>`;
-                    $('#productTableBody').append(row);
+
+                    if (!isMobile) {
+                        let row = `
+                        <tr data-id="${product.id}">
+                            <td>${product.id}</td>
+                            <td>${product.serial_number || '-'}</td>
+                            <td>${product.title}</td>
+                            <td>${product.price} Ft</td>
+                            <td><input type="number" class="form-control price-input" value="${special}"/></td>
+                            <td><button class="btn btn-success btn-save">Mentés</button></td>
+                            <td><button class="btn btn-danger btn-delete">Törlés</button></td>
+                        </tr>`;
+                        $('#productTableBody').append(row);
+                    } else {
+                        let card = `
+                        <div class="col" data-id="${product.id}">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">${product.title}</h5>
+                                    <p class="mb-1"><strong>Cikkszám:</strong> ${product.serial_number || '-'}</p>
+                                    <p class="mb-1"><strong>Alapár:</strong> ${product.price} Ft</p>
+                                    <div class="mb-2">
+                                        <input type="number" class="form-control price-input" value="${special}" placeholder="Külön ár">
+                                    </div>
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-success btn-save">Mentés</button>
+                                        <button class="btn btn-danger btn-delete">Törlés</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+                        $('#productCardContainer').append(card);
+                    }
                 });
 
                 $('#paginationWrapper').html(paginate(data.products));
@@ -126,9 +159,9 @@
         });
 
         $(document).on('click', '.btn-save', function () {
-            let row = $(this).closest('tr');
-            let productId = row.data('id');
-            let price = row.find('.price-input').val();
+            let container = $(this).closest('[data-id]');
+            let productId = container.data('id');
+            let price = container.find('.price-input').val();
 
             $.post('/adminpanel/special-prices/set', {
                 _token: '{{ csrf_token() }}',
@@ -136,14 +169,14 @@
                 product_id: productId,
                 price: price
             }, function () {
-                row.addClass('table-success');
-                setTimeout(() => row.removeClass('table-success'), 1500);
+                container.addClass('table-success bg-success-subtle');
+                setTimeout(() => container.removeClass('table-success bg-success-subtle'), 1500);
             });
         });
 
         $(document).on('click', '.btn-delete', function () {
-            let row = $(this).closest('tr');
-            let productId = row.data('id');
+            let container = $(this).closest('[data-id]');
+            let productId = container.data('id');
 
             $.ajax({
                 url: '/adminpanel/special-prices/delete',
@@ -154,9 +187,9 @@
                     product_id: productId
                 },
                 success: function () {
-                    row.find('.price-input').val('');
-                    row.addClass('table-warning');
-                    setTimeout(() => row.removeClass('table-warning'), 1500);
+                    container.find('.price-input').val('');
+                    container.addClass('table-warning bg-warning-subtle');
+                    setTimeout(() => container.removeClass('table-warning bg-warning-subtle'), 1500);
                 }
             });
         });
@@ -187,4 +220,5 @@
         });
     });
 </script>
+
 @endsection

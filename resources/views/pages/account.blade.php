@@ -2,8 +2,7 @@
 @section('title','Account Page')
 @section('content')
 
-<div class="main bg-light">
-    
+<div class="main bg-light">    
     
         @yield('content')
     </div>

@@ -32,8 +32,11 @@ document.addEventListener('DOMContentLoaded', () => {
             prevEl: '.highlighted-prev',
         },
         breakpoints: {
-            320: { slidesPerView: 1.2 },
-            576: { slidesPerView: 2.2 },
+            0: { slidesPerView: 1 },
+            375: { slidesPerView: 1.2 },
+            420: { slidesPerView: 1.4 },
+            480: { slidesPerView: 1.6 },
+            576: { slidesPerView: 2 },
             768: { slidesPerView: 3 },
             992: { slidesPerView: 4 },
             1200: { slidesPerView: 5 },
@@ -53,11 +56,14 @@ document.addEventListener('DOMContentLoaded', () => {
             prevEl: '.topcats-prev',
         },
         breakpoints: {
-            320: { slidesPerView: 1.2 },
-            576: { slidesPerView: 2.2 },
+            0: { slidesPerView: 1 },
+            375: { slidesPerView: 1.2 },
+            420: { slidesPerView: 1.4 },
+            480: { slidesPerView: 1.6 },
+            576: { slidesPerView: 2 },
             768: { slidesPerView: 3 },
             992: { slidesPerView: 4 },
-            1200: { slidesPerView: 4 },
+            1200: { slidesPerView: 5 },
         }
     });
 
@@ -74,8 +80,11 @@ document.addEventListener('DOMContentLoaded', () => {
             prevEl: '.latest-prev',
         },
         breakpoints: {
-            320: { slidesPerView: 1.2 },
-            576: { slidesPerView: 2.2 },
+            0: { slidesPerView: 1 },
+            375: { slidesPerView: 1.2 },
+            420: { slidesPerView: 1.4 },
+            480: { slidesPerView: 1.6 },
+            576: { slidesPerView: 2 },
             768: { slidesPerView: 3 },
             992: { slidesPerView: 4 },
             1200: { slidesPerView: 5 },

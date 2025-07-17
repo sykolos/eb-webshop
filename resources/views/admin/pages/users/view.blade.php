@@ -64,37 +64,31 @@
         </div>
     </div>
         <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-dark text-white">
-                    <h5>Kiszállítási adatok</h5>
-                </div>
-                <div class="card-body">
-                    <table class="table tablestripped">
-                        <tbody>
-                            <tr>
-                                <td>Átvevő</td>
-                                <td>{{$user->user_shipping->receiver}}</td>
-                            </tr>
-                            <tr>
-                                <td>Telefonszám</td>
-                                <td>{{$user->user_shipping->phone}}</td>
-                            </tr>
-                            <tr>
-                                <td>Kiszállítási cím</td>
-                                <td>{{$user->user_shipping->zipcode.", ".$user->user_shipping->city." ".$user->user_shipping->address}}</td>
-                            </tr>
-                            <tr>
-                                <td>Megjegyzés a futárnak</td>
-                                <td>{{$user->user_shipping->comment}}</td>
-                            </tr>                            
-                        </tbody>
-                    </table>
-                </div>
-                
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h5>Kiszállítási adatok</h5>
+            </div>
+            <div class="card-body">
+                @if ($user->user_shippings && $user->user_shippings->count())
+                    @foreach ($user->user_shippings as $shipping)
+                        <div class="mb-4 border-bottom pb-3">
+                            <p class="mb-1"><strong>Átvevő:</strong> {{ $shipping->receiver }}</p>
+                            <p class="mb-1"><strong>Telefonszám:</strong> {{ $shipping->phone }}</p>
+                            <p class="mb-1"><strong>Cím:</strong> {{ $shipping->zipcode }}, {{ $shipping->city }} {{ $shipping->address }}</p>
+                            @if($shipping->comment)
+                                <p class="mb-1"><strong>Megjegyzés a futárnak:</strong> {{ $shipping->comment }}</p>
+                            @endif
+                        </div>
+                    @endforeach
+                @else
+                    <em>Nincs kiszállítási cím rögzítve</em>
+                @endif
             </div>
         </div>
     </div>
+</div>
+
         <div class="row">
         <div class="col-12">
             <div class="card">

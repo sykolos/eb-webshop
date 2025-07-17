@@ -5,7 +5,7 @@
     <div class="container-fluid">
         <div class="row justify-content-center">
             {{-- Bal oldali menü --}}
-            <div class="col-lg-3 col-md-4 mb-4">
+            <div class="col-12 col-md-4 col-lg-3 mb-4">
                 @include('pages.components.account.header')
             </div>
 

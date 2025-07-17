@@ -36,8 +36,8 @@
                         <div class="col-md-7 d-flex bg-light right-side">
                             <div class="cart-mini w-100 p-md-5 p-4">
                             <h3 class="mb-4">Termék összesítő</h3>
-                            <table class="table ">
-                                <thead class="bg-dark text-white">
+                            <table class="table d-none d-md-table">
+                                <thead class="bg-dark text-white ">
                                     <tr>
                                         <th>Termék</th>
                                         <th>Egység ár</th>
@@ -88,6 +88,23 @@
                                     @endif
                                 </tbody>
                             </table>
+                            <div class="responsive-cart d-md-none">
+                                @foreach (session()->get('cart') as $item)
+                                    <div class="cart-item border-bottom py-2">
+                                        <div data-label="Termék">{{ $item['product']['title'] }}</div>
+                                        <div data-label="Egységár">{{ App\Models\Products::with('special_prices')->find($item['product']['id'])->getPriceForUser() }} Ft</div>
+                                        <div data-label="Mennyiség">{{ $item['quantity'] * $item['q'] }}</div>
+                                        <div data-label="M.egység">{{ $item['m'] }}</div>
+                                        <div data-label="Összesen">{{ number_format(App\Models\Cart::unitprice($item) * $item['q'], 0, '', ' ') }} Ft</div>
+                                    </div>
+                                @endforeach
+                                <div class="cart-total text-end mt-3">
+                                    <div><strong>Összesen nettó:</strong> {{ number_format(App\Models\Cart::totalamount(), 0, '', ' ') }} Ft</div>
+                                    <div><strong>Bruttó végösszeg:</strong> {{ number_format(App\Models\Cart::gettotalvatprice(), 0, '', ' ') }} Ft</div>
+                                    <div><strong>Áfa összesen:</strong> {{ number_format(App\Models\Cart::gettotalvat(), 0, '', ' ') }} Ft</div>
+                                </div>
+                            </div>
+
                         </div>
                         </div>
                     </div>
