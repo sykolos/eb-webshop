@@ -2,7 +2,7 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8">
-    <title>Szállítólevél</title>
+    <title>Rendelés részletező</title>
     <style>
         body { font-family: DejaVu Sans, sans-serif; font-size: 12px; }
         table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
@@ -27,6 +27,12 @@
             margin: 0;
             font-size: 24px;
         }
+
+        .note-section {
+            font-style: italic;
+            margin-bottom: 20px;
+            white-space: pre-line;
+        }
     </style>
 </head>
 <body>
@@ -48,11 +54,12 @@
         <td style="width: 50%; border-right: 1px solid #444;">
             <strong>Szállító:</strong><br>
             ElectroBusiness Kft.<br>
-            2600 Vác, Zrínyi Miklós utca 41/b<br>
+            2600 Vác, Naszály út 18.<br>
             Tel: +36 20 292 3769
         </td>
         <td style="width: 50%;">
             <strong>Szállítási cím:</strong><br>
+            {{ $order->name ?? '-' }}<br>
             {{ $order->user_shipping->receiver ?? '-' }}<br>
             {{ $order->user_shipping->zipcode }} {{ $order->user_shipping->city }} {{ $order->user_shipping->address }}<br>
             Tel: {{ $order->user_shipping->phone ?? '-' }}
@@ -63,7 +70,7 @@
 <table class="meta-table">
     <tr>
         <td>Rendelésszám:</td>
-        <td>EBR-2024-{{ $order->id }}</td>
+        <td>EBR-2025-{{ $order->id }}</td>
         <td>Rendelési dátum:</td>
         <td>{{ \Carbon\Carbon::parse($order->created_at)->format('Y.m.d') }}</td>
     </tr>
@@ -74,6 +81,13 @@
         <td>{{ $order->is_direct_shipping ? 'Igen' : 'Nem' }}</td>
     </tr>
 </table>
+
+@if($order->note)
+    <div class="note-section">
+        <strong>Rendelés megjegyzés:</strong><br>
+        {{ $order->note }}
+    </div>
+@endif
 
 <div class="section-title">Termékek</div>
 <table>

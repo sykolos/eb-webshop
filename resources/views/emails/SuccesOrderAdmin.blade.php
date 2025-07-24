@@ -16,7 +16,7 @@
 
 <h4>Szállítási cím</h4>
 <p>
-    {{ $order->user_shipping->receiver ?? '-' }}<br>
+    {{ $order->name ?? '-' }}<br>
     {{ $order->user_shipping->zipcode }} {{ $order->user_shipping->city }}<br>
     {{ $order->user_shipping->address }}
 </p>
