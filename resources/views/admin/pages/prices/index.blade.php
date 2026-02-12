@@ -1,224 +1,239 @@
 @extends('layouts.admin')
-@section('title','Külön árak')
+@section('title','Árazás')
 @section('content')
-<div class="container mt-4">
-    <h1 class="page-title">Felhasználóspecifikus árak</h1>
-
-    <div class="row mb-4">
-        <div class="col-md-4">
-            <label for="userSelect">Válassz felhasználót:</label>
-            <select class="form-control" id="userSelect">
-                <option value="">-- Felhasználó kiválasztása --</option>
+<div class="container-fluid mt-4">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 bg-dark text-white d-flex justify-content-between align-items-center">
+            <h5 class="m-0 font-weight-bold">Árazási Mátrix</h5>
+            <select class="form-select w-25" id="userSelect">
+                <option value="">-- Válassz ügyfelet --</option>
                 @foreach ($users as $user)
                     <option value="{{ $user->id }}">{{ $user->name }}</option>
                 @endforeach
             </select>
         </div>
-    </div>
 
-    <h4 id="selectedUserLabel" class="mb-3" style="display:none;"></h4>
-    
-    <div id="loadingIndicator" class="mb-3 text-info" style="display:none;">Betöltés...</div>
-
-    <div id="searchWrapper" class="mb-3" style="display:none;">
-        <input type="text" id="productSearch" class="form-control" placeholder="Keresés cikkszám vagy név alapján...">
-    </div>
-    <div id="filterOptions" class="mb-3" style="display:none;">
-        <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" id="hasPrice" value="1">
-            <label class="form-check-label" for="hasPrice">Csak ahol van külön ár</label>
-        </div>
-        <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" id="noPrice" value="1">
-            <label class="form-check-label" for="noPrice">Csak ahol nincs külön ár</label>
-        </div>
-        <button id="resetFilters" class="btn btn-secondary btn-sm ms-3">Szűrők törlése</button>
-    </div>
-
-    <div id="productTableWrapper" style="display:none;">
-                {{-- Asztali táblázat --}}
-                <div class="table-responsive d-none d-lg-block">
-                    <table class="table table-bordered" id="productTable">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Cikkszám</th>
-                                <th>Megnevezés</th>
-                                <th>Alapár</th>
-                                <th>Külön ár</th>
-                                <th>Mentés</th>
-                                <th>Törlés</th>
-                            </tr>
-                        </thead>
-                        <tbody id="productTableBody"></tbody>
-                    </table>
-                </div>
-
-                {{-- Mobil kártyák --}}
-                <div class="d-block d-lg-none">
-                    <div id="productCardContainer" class="row row-cols-1 g-3"></div>
-                </div>
-
-                <div id="paginationWrapper" class="mt-3"></div>
+        <div class="card-body">
+            <div id="mainLoader" class="text-center py-5" style="display:none;">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-2 text-muted">Adatok szinkronizálása...</p>
             </div>
+        </div>
+    </div>
 </div>
 
+<div id="controlsWrapper" style="display:none;" class="row mb-4 bg-light p-3 rounded shadow-sm g-3">
+    <div class="col-12 col-md-3">
+        <label class="small fw-bold">Keresés</label>
+        <input type="text" id="productSearch" class="form-control" placeholder="Név vagy cikkszám...">
+    </div>
+    <div class="col-12 col-md-3">
+        <label class="small fw-bold">Kategória szűrő</label>
+        <select id="categoryFilter" class="form-select">
+            <option value="">Összes kategória</option>
+            @foreach($categories as $cat)
+                <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+            @endforeach
+        </select>
+    </div>
+    <div class="col-12 col-md-3 d-flex align-items-end">
+        <div class="form-check form-switch mb-2">
+            <input class="form-check-input" type="checkbox" id="onlyModifiedFilter">
+            <label class="form-check-label fw-bold" for="onlyModifiedFilter">Csak módosított termékek</label>
+        </div>
+    </div>
+</div>
+
+<div id="tableWrapper" style="display:none;">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle border" id="priceTable">
+            <thead class="table-dark">
+                <tr>
+                    <th>Termék adatok</th>
+                    <th>Alapár</th>
+                    <th style="min-width: 100px;">Kategória %</th>
+                    <th style="min-width: 100px;">Extra %</th>
+                    <th class="text-info">Kalkulált ár</th>
+                    <th style="min-width: 150px;">Egyedi Fix Ár</th>
+                    <th>Megjelenített Ár</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="priceTableBody"></tbody>
+        </table>
+    </div>
+    <div id="paginationWrapper" class="d-flex justify-content-center mt-4"></div>
+</div>
+
+<style>
+    .calculated-price { font-weight: bold; color: #0d6efd; transition: all 0.3s; }
+    .row-has-fix-price { background-color: rgba(13, 110, 253, 0.05); }
+    .price-input-group { position: relative; }
+    .modified-badge { position: absolute; top: -10px; right: -5px; font-size: 10px; }
+</style>
+
 <script>
-    $(document).ready(function () {
-        let selectedUser = null;
+$(document).ready(function() {
+    let selectedUser = null;
 
-        $('#userSelect').on('change', function () {
-            selectedUser = $(this).val();
-            let userName = $(this).find('option:selected').text();
+    // 1. Ügyfél választás
+    $('#userSelect').on('change', function() {
+        selectedUser = $(this).val();
+        if (selectedUser) {
+            $('#controlsWrapper, #tableWrapper').hide();
+            $('#mainLoader').show();
+            loadMatrix(1);
+        } else {
+            $('#controlsWrapper, #tableWrapper').hide();
+        }
+    });
 
-            if (selectedUser) {
-                $('#selectedUserLabel').text(`Felhasználó: ${userName}`).show();
-                $('#loadingIndicator').show();
-                $('#productTableWrapper').hide();
-                $('#searchWrapper').show();
-                $('#filterOptions').show();
-                $('#productSearch').val('');
-                $('#hasPrice').prop('checked', false);
-                $('#noPrice').prop('checked', false);
-                loadProducts(1);
-            } else {
-                $('#selectedUserLabel').hide();
-                $('#productTableWrapper').hide();
-                $('#searchWrapper').hide();
-                $('#filterOptions').hide();
-            }
-        });
+    // 2. Mátrix betöltése (Keresés, Szűrés, Lapozás)
+    function loadMatrix(page = 1) {
+        if (!selectedUser) return;
 
-        function loadProducts(page = 1, query = '') {
-            let hasPrice = $('#hasPrice').is(':checked') ? 1 : 0;
-            let noPrice = $('#noPrice').is(':checked') ? 1 : 0;
-            const isMobile = window.innerWidth < 992;
+        let search = $('#productSearch').val();
+        let catId = $('#categoryFilter').val();
+        let onlyModified = $('#onlyModifiedFilter').is(':checked') ? 1 : 0;
 
-            $.get(`/adminpanel/special-prices/ajax/${selectedUser}?page=${page}&search=${encodeURIComponent(query)}&has_price=${hasPrice}&no_price=${noPrice}`, function (data) {
-                $('#productTableBody').empty();
-                $('#productCardContainer').empty();
+        $.get(`/adminpanel/special-prices/matrix-ajax/${selectedUser}`, {
+            page: page,
+            search: search,
+            category_id: catId,
+            only_modified: onlyModified
+        }, function(data) {
+            $('#priceTableBody').empty();
+            
+            data.products.data.forEach(p => {
+                let catDisc = p.category_discount?.discount_percent || 0;
+                // Javítás: Az extra százalékot a special_prices-ból vegyük, ha ott van
+                let specialData = p.special_prices.length > 0 ? p.special_prices[0] : null;
+                let extraDisc = specialData?.extra_percent || 0;
+                let fixPrice = specialData?.price || '';
+                
+                let basePrice = parseFloat(p.price);
+                let calculated = Math.round(basePrice * (1 - ((parseFloat(catDisc) + parseFloat(extraDisc)) / 100)));
 
-                data.products.data.forEach(product => {
-                    let special = product.special_prices[0]?.price || '';
-
-                    if (!isMobile) {
-                        let row = `
-                        <tr data-id="${product.id}">
-                            <td>${product.id}</td>
-                            <td>${product.serial_number || '-'}</td>
-                            <td>${product.title}</td>
-                            <td>${product.price} Ft</td>
-                            <td><input type="number" class="form-control price-input" value="${special}"/></td>
-                            <td><button class="btn btn-success btn-save">Mentés</button></td>
-                            <td><button class="btn btn-danger btn-delete">Törlés</button></td>
-                        </tr>`;
-                        $('#productTableBody').append(row);
-                    } else {
-                        let card = `
-                        <div class="col" data-id="${product.id}">
-                            <div class="card shadow-sm">
-                                <div class="card-body">
-                                    <h5 class="card-title">${product.title}</h5>
-                                    <p class="mb-1"><strong>Cikkszám:</strong> ${product.serial_number || '-'}</p>
-                                    <p class="mb-1"><strong>Alapár:</strong> ${product.price} Ft</p>
-                                    <div class="mb-2">
-                                        <input type="number" class="form-control price-input" value="${special}" placeholder="Külön ár">
-                                    </div>
-                                    <div class="d-grid gap-2">
-                                        <button class="btn btn-success btn-save">Mentés</button>
-                                        <button class="btn btn-danger btn-delete">Törlés</button>
-                                    </div>
-                                </div>
+                let row = `
+                    <tr data-id="${p.id}" data-base-price="${p.price}" data-cat-id="${p.category_id}" class="${fixPrice ? 'table-info' : ''}">
+                        <td>
+                            <div class="fw-bold">${p.title}</div>
+                            <code class="small text-muted">${p.serial_number || '-'}</code>
+                        </td>
+                        <td><span class="text-muted small">${p.price} Ft</span></td>
+                        <td><input type="number" class="form-control form-control-sm cat-disc-input" value="${catDisc}"></td>
+                        <td><input type="number" class="form-control form-control-sm extra-disc-input" value="${extraDisc}"></td>
+                        <td class="calculated-price text-secondary">${calculated} Ft</td>
+                        <td>
+                            <div class="input-group input-group-sm">
+                                <input type="number" class="form-control fix-price-input" value="${fixPrice}">
                             </div>
-                        </div>`;
-                        $('#productCardContainer').append(card);
-                    }
-                });
-
-                $('#paginationWrapper').html(paginate(data.products));
-                $('#loadingIndicator').hide();
-                $('#productTableWrapper').show();
+                        </td>
+                        <td class="fw-bold text-success final-display-price">${fixPrice ? fixPrice : calculated} Ft</td>
+                        <td>
+                            <button class="btn btn-sm btn-success btn-save-row px-3 w-100">
+                                <i class="fas fa-save"></i> Mentés
+                            </button>
+                        </td>
+                    </tr>`;
+                $('#priceTableBody').append(row);
             });
-        }
-
-        function paginate(data) {
-            let html = '<nav><ul class="pagination">';
-            for (let i = 1; i <= data.last_page; i++) {
-                html += `<li class="page-item ${i === data.current_page ? 'active' : ''}">
-                            <a class="page-link" href="#" data-page="${i}">${i}</a>
-                        </li>`;
-            }
-            html += '</ul></nav>';
-            return html;
-        }
-
-        $(document).on('click', '.pagination .page-link', function (e) {
-            e.preventDefault();
-            let page = $(this).data('page');
-            loadProducts(page, $('#productSearch').val());
+            
+            renderPagination(data.products);
+            $('#mainLoader').hide();
+            $('#controlsWrapper, #tableWrapper').fadeIn();
         });
+    }
 
-        $(document).on('click', '.btn-save', function () {
-            let container = $(this).closest('[data-id]');
-            let productId = container.data('id');
-            let price = container.find('.price-input').val();
+    // 3. ESEMÉNYKEZELŐK A FRISSÍTÉSHEZ (Kereső és Szűrők)
+    // A 'input' esemény jobb a keyup-nál, mert egérrel való beillesztésre is reagál
+    $('#productSearch').on('input', function() {
+        delay(function(){
+            loadMatrix(1);
+        }, 500 ); // 500ms várakozás, hogy ne küldjön minden betűnél kérést
+    });
 
-            $.post('/adminpanel/special-prices/set', {
-                _token: '{{ csrf_token() }}',
-                user_id: selectedUser,
-                product_id: productId,
-                price: price
-            }, function () {
-                container.addClass('table-success bg-success-subtle');
-                setTimeout(() => container.removeClass('table-success bg-success-subtle'), 1500);
-            });
-        });
+    $('#categoryFilter, #onlyModifiedFilter').on('change', function() {
+        loadMatrix(1);
+    });
 
-        $(document).on('click', '.btn-delete', function () {
-            let container = $(this).closest('[data-id]');
-            let productId = container.data('id');
+    // 4. Számítások élőben
+    function updateRowPrices(row) {
+        let base = parseFloat(row.data('base-price'));
+        let d1 = parseFloat(row.find('.cat-disc-input').val()) || 0;
+        let d2 = parseFloat(row.find('.extra-disc-input').val()) || 0;
+        let fix = row.find('.fix-price-input').val();
+        
+        let calc = Math.round(base * (1 - ((d1 + d2) / 100)));
+        row.find('.calculated-price').text(calc + ' Ft');
+        
+        let final = (fix && fix > 0) ? fix : calc;
+        row.find('.final-display-price').text(final + ' Ft');
+        
+        if(fix > 0) row.addClass('table-info'); else row.removeClass('table-info');
+    }
 
-            $.ajax({
-                url: '/adminpanel/special-prices/delete',
-                type: 'DELETE',
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    user_id: selectedUser,
-                    product_id: productId
-                },
-                success: function () {
-                    container.find('.price-input').val('');
-                    container.addClass('table-warning bg-warning-subtle');
-                    setTimeout(() => container.removeClass('table-warning bg-warning-subtle'), 1500);
+    $(document).on('input', '.cat-disc-input, .extra-disc-input, .fix-price-input', function() {
+        updateRowPrices($(this).closest('tr'));
+    });
+
+    // 5. Mentés
+    $(document).on('click', '.btn-save-row', function() {
+        let row = $(this).closest('tr');
+        let catId = row.data('cat-id');
+        let newCatDisc = row.find('.cat-disc-input').val() || 0;
+        let newExtraDisc = row.find('.extra-disc-input').val() || 0;
+
+        let postData = {
+            _token: '{{ csrf_token() }}',
+            user_id: selectedUser,
+            product_id: row.data('id'),
+            category_id: catId,
+            discount_percent: newCatDisc,
+            extra_percent: newExtraDisc,
+            fix_price: row.find('.fix-price-input').val()
+        };
+
+        $.post('/adminpanel/special-prices/save-matrix', postData, function(response) {
+            // Frissítjük az összes azonos kategóriájú sort az oldalon
+            $(`#priceTableBody tr[data-cat-id="${catId}"]`).each(function() {
+                let currentRow = $(this);
+                currentRow.find('.cat-disc-input').val(newCatDisc);
+                updateRowPrices(currentRow);
+                
+                if(currentRow.data('id') == postData.product_id) {
+                    currentRow.addClass('table-success');
+                    setTimeout(() => currentRow.removeClass('table-success'), 1000);
                 }
             });
         });
-
-        $('#productSearch').on('input', function () {
-            loadProducts(1, $(this).val());
-        });
-
-        $('#hasPrice').on('change', function () {
-            if ($(this).is(':checked')) {
-                $('#noPrice').prop('checked', false);
-            }
-            loadProducts(1, $('#productSearch').val());
-        });
-
-        $('#noPrice').on('change', function () {
-            if ($(this).is(':checked')) {
-                $('#hasPrice').prop('checked', false);
-            }
-            loadProducts(1, $('#productSearch').val());
-        });
-
-        $('#resetFilters').on('click', function () {
-            $('#productSearch').val('');
-            $('#hasPrice').prop('checked', false);
-            $('#noPrice').prop('checked', false);
-            loadProducts(1, '');
-        });
     });
-</script>
 
+    // Segédfüggvény a lapozáshoz
+    function renderPagination(data) {
+        let html = '<ul class="pagination pagination-sm">';
+        for (let i = 1; i <= data.last_page; i++) {
+            html += `<li class="page-item ${i === data.current_page ? 'active' : ''}">
+                <a class="page-link" href="#" data-page="${i}">${i}</a>
+            </li>`;
+        }
+        html += '</ul>';
+        $('#paginationWrapper').html(html);
+    }
+
+    $(document).on('click', '.page-link', function(e) {
+        e.preventDefault();
+        loadMatrix($(this).data('page'));
+    });
+
+    // Késleltetés (Debounce) funkció a kereséshez
+    let delay = (function(){
+        let timer = 0;
+        return function(callback, ms){
+            clearTimeout (timer);
+            timer = setTimeout(callback, ms);
+        };
+    })();
+});
+</script>
 @endsection

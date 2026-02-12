@@ -82,11 +82,15 @@ class AdminController extends Controller
     public function special_prices_show()
     {
         $users = \App\Models\User::all();
+        $categories = \App\Models\Category::all();
+
         return view('admin.pages.prices.index', [
             'users' => $users,
+            'categories' => $categories,
             'listaok' => false
         ]);
     }
+
     public function ajaxProductList(Request $request, $userId)
     {
         $perPage = 16;
@@ -160,88 +164,159 @@ class AdminController extends Controller
     }
 
     public function recommendedEdit()
-{
-    $products = Products::orderBy('id')->paginate(15);
-    $recommendedIds = RecommendedProduct::pluck('product_id')->toArray();
-    $recommendedProducts = Products::whereIn('id', $recommendedIds)->get();
+    {
+        $products = Products::orderBy('id')->paginate(15);
+        $recommendedIds = RecommendedProduct::pluck('product_id')->toArray();
+        $recommendedProducts = Products::whereIn('id', $recommendedIds)->get();
 
-    // Itt készítjük elő a JS-ben használt adatokat
-    $recommendedData = $recommendedProducts->keyBy('id')->map(function ($item) {
-        return [
-            'id' => $item->id,
-            'serial_number' => $item->serial_number,
-            'title' => $item->title,
-        ];
-    });
-
-    return view('admin.pages.recommended.index', compact(
-        'products',
-        'recommendedIds',
-        'recommendedProducts',
-        'recommendedData'
-    ));
-}
-
-public function ajaxList(Request $request)
-{
-    $query = Products::query();
-
-    if ($request->filled('q')) {
-        $q = $request->q;
-        $query->where(function ($subQuery) use ($q) {
-            $subQuery->where('serial_number', 'like', $q . '%')
-                     ->orWhere('title', 'like', '%' . $q . '%');
+        // Itt készítjük elő a JS-ben használt adatokat
+        $recommendedData = $recommendedProducts->keyBy('id')->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'serial_number' => $item->serial_number,
+                'title' => $item->title,
+            ];
         });
+
+        return view('admin.pages.recommended.index', compact(
+            'products',
+            'recommendedIds',
+            'recommendedProducts',
+            'recommendedData'
+        ));
     }
 
-    $products = $query->orderBy('id')->paginate(15);
-    $recommendedIds = RecommendedProduct::pluck('product_id')->toArray();
+    public function ajaxList(Request $request)
+    {
+        $query = Products::query();
 
-    $html = view('admin.pages.recommended.table', compact('products', 'recommendedIds'))->render();
+        if ($request->filled('q')) {
+            $q = $request->q;
+            $query->where(function ($subQuery) use ($q) {
+                $subQuery->where('serial_number', 'like', $q . '%')
+                        ->orWhere('title', 'like', '%' . $q . '%');
+            });
+        }
 
-    return response()->json(['html' => $html]);
-}
+        $products = $query->orderBy('id')->paginate(15);
+        $recommendedIds = RecommendedProduct::pluck('product_id')->toArray();
 
-public function recommendedUpdate(Request $request)
-{
-    \Log::info('--- Kiemelt termékek mentés indul ---');
-    \Log::info('products raw:', $request->all());
+        $html = view('admin.pages.recommended.table', compact('products', 'recommendedIds'))->render();
 
-    $incomingIds = collect($request->input('products', []))
-        ->filter(fn($id) => $id !== '__empty__')
-        ->map(fn($id) => (int) $id)
-        ->unique()
-        ->values()
-        ->toArray();
-
-    \Log::info('products integer IDs:', $incomingIds);
-
-    $currentIds = RecommendedProduct::pluck('product_id')
-        ->map(fn($id) => (int) $id)
-        ->toArray();
-
-    \Log::info('jelenlegi recommended DB-ben:', $currentIds);
-
-    $idsToDelete = array_diff($currentIds, $incomingIds);
-
-    \Log::info('Törlendő ID-k:', $idsToDelete);
-
-    if (!empty($idsToDelete)) {
-        RecommendedProduct::whereIn('product_id', $idsToDelete)->delete();
+        return response()->json(['html' => $html]);
     }
 
-    foreach ($incomingIds as $id) {
-        RecommendedProduct::firstOrCreate(['product_id' => $id]);
+    public function recommendedUpdate(Request $request)
+    {
+        \Log::info('--- Kiemelt termékek mentés indul ---');
+        \Log::info('products raw:', $request->all());
+
+        $incomingIds = collect($request->input('products', []))
+            ->filter(fn($id) => $id !== '__empty__')
+            ->map(fn($id) => (int) $id)
+            ->unique()
+            ->values()
+            ->toArray();
+
+        \Log::info('products integer IDs:', $incomingIds);
+
+        $currentIds = RecommendedProduct::pluck('product_id')
+            ->map(fn($id) => (int) $id)
+            ->toArray();
+
+        \Log::info('jelenlegi recommended DB-ben:', $currentIds);
+
+        $idsToDelete = array_diff($currentIds, $incomingIds);
+
+        \Log::info('Törlendő ID-k:', $idsToDelete);
+
+        if (!empty($idsToDelete)) {
+            RecommendedProduct::whereIn('product_id', $idsToDelete)->delete();
+        }
+
+        foreach ($incomingIds as $id) {
+            RecommendedProduct::firstOrCreate(['product_id' => $id]);
+        }
+
+        return redirect()->back()->with('success', 'Kiemelt termékek frissítve!');
     }
 
-    return redirect()->back()->with('success', 'Kiemelt termékek frissítve!');
-}
+    public function matrixAjax(Request $request, $userId)
+    {
+        $query = Products::with(['special_prices' => function($q) use ($userId) {
+            $q->where('user_id', $userId);
+        }]);
 
+        if ($request->search) {
+            $query->where(function($q) use ($request) {
+                $q->where('title', 'like', "%{$request->search}%")
+                ->orWhere('serial_number', 'like', "%{$request->search}%");
+            });
+        }
 
+        if ($request->category_id) {
+            $query->where('category_id', $request->category_id);
+        }
 
+        if ($request->only_modified == 1) {
+            $query->where(function($q) use ($userId) {
+                $q->whereHas('special_prices', function($sq) use ($userId) {
+                    $sq->where('user_id', $userId);
+                })
+                ->orWhereIn('category_id', function($subquery) use ($userId) {
+                    $subquery->select('category_id')
+                            ->from('group_discounts')
+                            ->where('user_id', $userId)
+                            ->where(function($dq) {
+                                $dq->where('discount_percent', '>', 0)
+                                    ->orWhere('extra_percent', '>', 0);
+                            });
+                });
+            });
+        }
 
+        $products = $query->paginate(20);
 
+        foreach ($products as $product) {
+            $discount = \DB::table('group_discounts')
+                ->where('user_id', $userId)
+                ->where('category_id', $product->category_id)
+                ->first();
 
-        
+            $product->category_discount = [
+                'discount_percent' => $discount->discount_percent ?? 0
+            ];
+        }
 
+        return response()->json(['products' => $products]);
+    }
+
+    public function saveMatrix(Request $request)
+    {
+        \DB::table('group_discounts')->updateOrInsert(
+            ['user_id' => $request->user_id, 'category_id' => $request->category_id],
+            [
+                'discount_percent' => $request->discount_percent ?? 0,
+                'updated_at' => now()
+            ]
+        );
+
+        if ($request->fix_price || ($request->extra_percent && $request->extra_percent > 0)) {
+            \DB::table('special_prices')->updateOrInsert(
+                ['user_id' => $request->user_id, 'product_id' => $request->product_id],
+                [
+                    'price' => $request->fix_price ?: null,
+                    'extra_percent' => $request->extra_percent ?? 0,
+                    'updated_at' => now()
+                ]
+            );
+        } else {
+            \DB::table('special_prices')
+                ->where('user_id', $request->user_id)
+                ->where('product_id', $request->product_id)
+                ->delete();
+        }
+
+        return response()->json(['success' => true]);
+    }
 }

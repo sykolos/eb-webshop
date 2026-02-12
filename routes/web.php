@@ -99,7 +99,6 @@ Route::group(['prefix'=>'account','middleware'=>'auth'],function(){
 Route::group(['prefix' =>'adminpanel','middleware'=>'admin'],function(){
 
     Route::get('/',[AdminController::class, 'dashboard'])->name('adminpanel');
-
     //products group
     Route::group(['prefix'=>'products',], function(){
         Route::get('/',[ProductController::class, 'index'])->name('adminpanel.products');
@@ -144,7 +143,11 @@ Route::group(['prefix' =>'adminpanel','middleware'=>'admin'],function(){
         Route::get('/', [AdminController::class, 'special_prices_show'])->name('adminpanel.special_prices');
         Route::get('/ajax/{user}', [AdminController::class, 'ajaxProductList'])->name('adminpanel.special_prices.ajax');
         Route::post('/set', [AdminController::class, 'ajaxSetPrice'])->name('adminpanel.special_prices.set');
-        Route::delete('/delete', [AdminController::class, 'ajaxDeletePrice'])->name('adminpanel.special_prices.delete');
+        Route::delete('/delete', [AdminController::class, 'ajaxDeletePrice'])->name('adminpanel.special_prices.delete');    
+        
+        // Az új mátrix útvonalak elnevezve
+        Route::get('/matrix-ajax/{user}', [AdminController::class, 'matrixAjax'])->name('adminpanel.special_prices.matrix');
+        Route::post('/save-matrix', [AdminController::class, 'saveMatrix'])->name('adminpanel.special_prices.save_matrix');
     });
     //recommended group
     Route::group(['prefix'=>'recommended'], function(){

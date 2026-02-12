@@ -5,7 +5,7 @@
             $imagePath = $product->image;
         @endphp
 		<img class="img-fluid w-100"
-			src="{{ Storage::exists($imagePath) ? Storage::url($imagePath) : asset('img/landscape-placeholder.svg') }}"
+			src="{{ ($imagePath && Storage::disk('public')->exists($imagePath)) ? Storage::url($imagePath) : asset('img/landscape-placeholder.svg') }}"
 			alt="{{ $product->title }}"
 			width="100" height="100"
 			loading="lazy">
