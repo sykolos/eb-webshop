@@ -5,3 +5,4 @@ $.ajaxSetup({
     });
 
 import '../sass/admin.scss';
+import '../sass/app.scss';

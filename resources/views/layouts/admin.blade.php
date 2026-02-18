@@ -8,7 +8,7 @@
     <title>@yield('title')</title>
     <meta name= “robots” content=noindex, nofollow”>
     {{-- <link rel="stylesheet" href="{{asset('css/admin.css')}}"> --}}
-    @vite(['resources/sass/admin.scss', 'resources/js/admin.js'])
+    @vite(['resources/js/admin.js'])
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 </head>
 <body>
