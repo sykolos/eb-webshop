@@ -22,6 +22,33 @@
     </div>
 </div>
 
+<div class="card border-danger mb-4 shadow-sm">
+    <div class="card-header bg-danger text-white py-2">
+        <h6 class="m-0"><i class="fas fa-globe"></i> Globális kategória kedvezmény (Minden ügyfélre!)</h6>
+    </div>
+    <div class="card-body">
+        <div class="row g-3 align-items-end">
+            <div class="col-12 col-md-4">
+                <label class="small fw-bold">Kategória kiválasztása</label>
+                <select id="globalCategorySelect" class="form-select">
+                    @foreach($categories as $cat)
+                        <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-12 col-md-3">
+                <label class="small fw-bold">Új kedvezmény %</label>
+                <input type="number" id="globalPercentValue" class="form-control" placeholder="Pl: 15">
+            </div>
+            <div class="col-12 col-md-3">
+                <button id="btnGlobalApply" class="btn btn-danger w-100">
+                    <i class="fas fa-sync"></i> Frissítés mindenkinek
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div id="controlsWrapper" style="display:none;" class="row mb-4 bg-light p-3 rounded shadow-sm g-3">
     <div class="col-12 col-md-3">
         <label class="small fw-bold">Keresés</label>
@@ -76,17 +103,42 @@
 $(document).ready(function() {
     let selectedUser = null;
 
+    // --- NEW: Load state from URL ---
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    if (urlParams.has('user')) {
+        $('#userSelect').val(urlParams.get('user')); 
+        selectedUser = urlParams.get('user');
+        initializeUser();
+        // .change() triggers your existing logic to show the table
+    }
+    
+    if (urlParams.has('search')) $('#productSearch').val(urlParams.get('search'));
+    if (urlParams.has('category')) $('#categoryFilter').val(urlParams.get('category'));
+    if (urlParams.get('modified') == '1') $('#onlyModifiedFilter').prop('checked', true);
+    
+    let initialPage = urlParams.get('page') || 1;
+    // --------------------------------
+
     // 1. Ügyfél választás
     $('#userSelect').on('change', function() {
         selectedUser = $(this).val();
+        initializeUser();
+    });
+
+    function initializeUser() {
         if (selectedUser) {
             $('#controlsWrapper, #tableWrapper').hide();
             $('#mainLoader').show();
+            // Check if there is a page in the URL, otherwise use 1
+            const urlParams = new URLSearchParams(window.location.search);
+            let targetPage = urlParams.get('page') || 1;
             loadMatrix(1);
         } else {
             $('#controlsWrapper, #tableWrapper').hide();
         }
-    });
+    }
+
 
     // 2. Mátrix betöltése (Keresés, Szűrés, Lapozás)
     function loadMatrix(page = 1) {
@@ -95,6 +147,16 @@ $(document).ready(function() {
         let search = $('#productSearch').val();
         let catId = $('#categoryFilter').val();
         let onlyModified = $('#onlyModifiedFilter').is(':checked') ? 1 : 0;
+
+        // --- NEW: Update the URL string ---
+        const url = new URL(window.location);
+        url.searchParams.set('user', selectedUser);
+        url.searchParams.set('page', page);
+        url.searchParams.set('search', search);
+        url.searchParams.set('category', catId);
+        url.searchParams.set('modified', onlyModified);
+        window.history.replaceState({}, '', url); // Updates URL without reload
+        // ----------------------------------
 
         $.get(`/adminpanel/special-prices/matrix-ajax/${selectedUser}`, {
             page: page,
@@ -207,6 +269,43 @@ $(document).ready(function() {
                 }
             });
         });
+    });
+
+    // Globális kategória frissítés eseménykezelő
+    $('#btnGlobalApply').on('click', function() {
+        const catId = $('#globalCategorySelect').val();
+        const catName = $('#globalCategorySelect option:selected').text();
+        const percent = $('#globalPercentValue').val();
+
+        if (!percent || percent < 0 || percent > 100) {
+            alert('Kérlek adj meg egy érvényes százalékot (0-100)!');
+            return;
+        }
+
+        const confirmMsg = `FIGYELEM!\n\nEz a művelet az ÖSSZES ügyfélnél átállítja a(z) "${catName}" kategória kedvezményét ${percent}%-ra.\n\nBiztosan folytatod?`;
+        
+        if (confirm(confirmMsg)) {
+            $(this).prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Dolgozom...');
+
+            $.post('/adminpanel/special-prices/global-category-update', {
+                _token: '{{ csrf_token() }}',
+                category_id: catId,
+                discount_percent: percent
+            })
+            .done(function(response) {
+                alert(response.message);
+                // Ha az aktuálisan nézett kategória megegyezik a frissítettel, töltsük újra a táblázatot
+                if ($('#categoryFilter').val() == catId || $('#categoryFilter').val() == "") {
+                    loadMatrix(1);
+                }
+            })
+            .fail(function() {
+                alert('Hiba történt a mentés során!');
+            })
+            .always(function() {
+                $('#btnGlobalApply').prop('disabled', false).html('<i class="fas fa-sync"></i> Frissítés mindenkinek');
+            });
+        }
     });
 
     // Segédfüggvény a lapozáshoz

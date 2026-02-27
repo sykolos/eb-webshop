@@ -21,7 +21,9 @@ return new class extends Migration
             $table->decimal('discount_percent', 5, 2)->default(0); 
             $table->decimal('extra_percent', 5, 2)->default(0);
             $table->timestamps();
+            $table->unique(['user_id', 'category_id']);
         });
+
     }
 
     /**

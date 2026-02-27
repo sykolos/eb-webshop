@@ -319,4 +319,43 @@ class AdminController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+    public function bulkUpdateCategoryForAll(Request $request)
+    {
+        $request->validate([
+            'category_id' => 'required|exists:categories,id',
+            'discount_percent' => 'required|numeric|min:0|max:100',
+        ]);
+
+        $categoryId = $request->category_id;
+        $percent = $request->discount_percent;
+
+        // 1. Get all User IDs from your users table
+        $userIds = \DB::table('users')->pluck('id');
+
+        // 2. Prepare the data for the group_discounts table
+        $now = now();
+        $data = $userIds->map(function($userId) use ($categoryId, $percent, $now) {
+            return [
+                'user_id' => $userId,
+                'category_id' => $categoryId,
+                'discount_percent' => $percent,
+                'updated_at' => $now,
+                // 'created_at' => $now, // Include if your table uses it
+            ];
+        })->toArray();
+
+        // 3. Use upsert to handle "Insert if new, Update if exists"
+        // Note: This requires a unique index on [user_id, category_id] in group_discounts
+        \DB::table('group_discounts')->upsert(
+            $data, 
+            ['user_id', 'category_id'], 
+            ['discount_percent', 'updated_at']
+        );
+
+        return response()->json([
+            'success' => true, 
+            'message' => "Sikeresen beállítva $percent% kedvezmény minden felhasználónak."
+        ]);
+    }
 }

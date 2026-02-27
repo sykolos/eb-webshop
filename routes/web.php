@@ -93,68 +93,72 @@ Route::group(['prefix'=>'account','middleware'=>'auth'],function(){
     Route::get('/shipping/{address}/edit', [ShippingAddressController::class, 'edit'])->name('shipping.edit');
     Route::put('/shipping/{address}', [ShippingAddressController::class, 'update'])->name('shipping.update');
     Route::delete('/shipping/{address}', [ShippingAddressController::class, 'destroy'])->name('shipping.destroy');
-});
-
-//adminpanel group
-Route::group(['prefix' =>'adminpanel','middleware'=>'admin'],function(){
-
-    Route::get('/',[AdminController::class, 'dashboard'])->name('adminpanel');
-    //products group
-    Route::group(['prefix'=>'products',], function(){
-        Route::get('/',[ProductController::class, 'index'])->name('adminpanel.products');
-        Route::get('/create',[ProductController::class, 'create'])->name('adminpanel.products.create');
-        Route::post('/create',[ProductController::class, 'store'])->name('adminpanel.products.store');
-        Route::get('/{id}',[ProductController::class, 'edit'])->name('adminpanel.products.edit');
-        Route::put('/{id}',[ProductController::class, 'update'])->name('adminpanel.products.update');
-        Route::delete('/{id}',[ProductController::class, 'destroy'])->name('adminpanel.products.destroy');
     });
-    //categories group
-    Route::group(['prefix'=>'categories',], function(){
-        Route::get('/',[CategoryController::class, 'index'])->name('adminpanel.categories');
-        Route::post('/',[CategoryController::class, 'store'])->name('adminpanel.category.store');
-        Route::delete('/{id}',[CategoryController::class, 'destroy'])->name('adminpanel.category.destroy');
-
-    });
-    //order group
-    Route::group(['prefix'=>'orders',], function(){
-        Route::get('/',[OrderController::class, 'index'])->name('adminpanel.orders');
-        Route::get('/view/{id}',[OrderController::class, 'view'])->name('adminpanel.orders.view');
-        Route::post('/{id}',[OrderController::class, 'updateStatus'])->name('adminpanel.orders.status.update');
-        Route::post('/store-filter-url', [OrderController::class, 'storeFilterUrl'])->name('adminpanel.orders.storeFilterUrl');
-        //pdf generálás
-        Route::get('/{id}',[OrderController::class,'getpdf'])->name('adminpanel.orders.getpdf');
-    });
-    //users group
-    Route::group(['prefix'=>'users',], function(){
-        Route::get('/',[AdminController::class, 'users'])->name('adminpanel.users');
-        Route::post('/',[AdminController::class, 'user_store'])->name('adminpanel.users.user_store');
-        Route::get('/{id}',[AdminController::class, 'user_view'])->name('adminpanel.users.user_view');
-        Route::delete('/{id}',[AdminController::class, 'user_destroy'])->name('adminpanel.users.user_destroy');
-
-    });
-    //units group
-    Route::group(['prefix'=>'units',], function(){
-        Route::get('/',[AdminController::class, 'units'])->name('adminpanel.units');
-        Route::post('/',[AdminController::class, 'unit_store'])->name('adminpanel.units.unit_store');
-        Route::delete('/{id}',[AdminController::class, 'unit_destroy'])->name('adminpanel.units.unit_destroy');
-    });
-    // special prices – új AJAX-os változat
-    Route::group(['prefix' => 'special-prices'], function () {
-        Route::get('/', [AdminController::class, 'special_prices_show'])->name('adminpanel.special_prices');
-        Route::get('/ajax/{user}', [AdminController::class, 'ajaxProductList'])->name('adminpanel.special_prices.ajax');
-        Route::post('/set', [AdminController::class, 'ajaxSetPrice'])->name('adminpanel.special_prices.set');
-        Route::delete('/delete', [AdminController::class, 'ajaxDeletePrice'])->name('adminpanel.special_prices.delete');    
+    
+    //adminpanel group
+    Route::group(['prefix' =>'adminpanel','middleware'=>'admin'],function(){
+        Route::get('/',[AdminController::class, 'dashboard'])->name('adminpanel');
         
-        // Az új mátrix útvonalak elnevezve
-        Route::get('/matrix-ajax/{user}', [AdminController::class, 'matrixAjax'])->name('adminpanel.special_prices.matrix');
-        Route::post('/save-matrix', [AdminController::class, 'saveMatrix'])->name('adminpanel.special_prices.save_matrix');
-    });
-    //recommended group
-    Route::group(['prefix'=>'recommended'], function(){
-        Route::get('/ajax', [AdminController::class, 'ajaxList'])->name('adminpanel.recommended.ajax');
-        Route::get('/', [AdminController::class, 'recommendedEdit'])->name('adminpanel.recommended.edit');
-        Route::post('/', [AdminController::class, 'recommendedUpdate'])->name('adminpanel.recommended.update');
-    });
+        //products group
+        Route::group(['prefix'=>'products',], function(){
+            Route::get('/',[ProductController::class, 'index'])->name('adminpanel.products');
+            Route::get('/create',[ProductController::class, 'create'])->name('adminpanel.products.create');
+            Route::post('/create',[ProductController::class, 'store'])->name('adminpanel.products.store');
+            Route::get('/{id}',[ProductController::class, 'edit'])->name('adminpanel.products.edit');
+            Route::put('/{id}',[ProductController::class, 'update'])->name('adminpanel.products.update');
+            Route::delete('/{id}',[ProductController::class, 'destroy'])->name('adminpanel.products.destroy');
+        });
+
+        //categories group
+        Route::group(['prefix'=>'categories',], function(){
+            Route::get('/',[CategoryController::class, 'index'])->name('adminpanel.categories');
+            Route::post('/',[CategoryController::class, 'store'])->name('adminpanel.category.store');
+            Route::delete('/{id}',[CategoryController::class, 'destroy'])->name('adminpanel.category.destroy');    
+        });
+
+        //order group
+        Route::group(['prefix'=>'orders',], function(){
+            Route::get('/',[OrderController::class, 'index'])->name('adminpanel.orders');
+            Route::get('/view/{id}',[OrderController::class, 'view'])->name('adminpanel.orders.view');
+            Route::post('/{id}',[OrderController::class, 'updateStatus'])->name('adminpanel.orders.status.update');
+            Route::post('/store-filter-url', [OrderController::class, 'storeFilterUrl'])->name('adminpanel.orders.storeFilterUrl');
+            //pdf generálás
+            Route::get('/{id}',[OrderController::class,'getpdf'])->name('adminpanel.orders.getpdf');
+        });
+
+        //users group
+        Route::group(['prefix'=>'users',], function(){
+            Route::get('/',[AdminController::class, 'users'])->name('adminpanel.users');
+            Route::post('/',[AdminController::class, 'user_store'])->name('adminpanel.users.user_store');
+            Route::get('/{id}',[AdminController::class, 'user_view'])->name('adminpanel.users.user_view');
+            Route::delete('/{id}',[AdminController::class, 'user_destroy'])->name('adminpanel.users.user_destroy');
+        });
+
+        //units group
+        Route::group(['prefix'=>'units',], function(){
+            Route::get('/',[AdminController::class, 'units'])->name('adminpanel.units');
+            Route::post('/',[AdminController::class, 'unit_store'])->name('adminpanel.units.unit_store');
+            Route::delete('/{id}',[AdminController::class, 'unit_destroy'])->name('adminpanel.units.unit_destroy');
+            });
+
+        // special prices – új AJAX-os változat
+        Route::group(['prefix' => 'special-prices'], function () {
+            Route::get('/', [AdminController::class, 'special_prices_show'])->name('adminpanel.special_prices');
+            Route::get('/ajax/{user}', [AdminController::class, 'ajaxProductList'])->name('adminpanel.special_prices.ajax');
+            Route::post('/set', [AdminController::class, 'ajaxSetPrice'])->name('adminpanel.special_prices.set');
+            Route::delete('/delete', [AdminController::class, 'ajaxDeletePrice'])->name('adminpanel.special_prices.delete');    
+            // Az új mátrix útvonalak elnevezve
+            Route::get('/matrix-ajax/{user}', [AdminController::class, 'matrixAjax'])->name('adminpanel.special_prices.matrix');
+            Route::post('/save-matrix', [AdminController::class, 'saveMatrix'])->name('adminpanel.special_prices.save_matrix');
+            Route::post('/global-category-update', [AdminController::class, 'bulkUpdateCategoryForAll']);
+        });
+
+        //recommended group
+        Route::group(['prefix'=>'recommended'], function(){
+            Route::get('/ajax', [AdminController::class, 'ajaxList'])->name('adminpanel.recommended.ajax');
+            Route::get('/', [AdminController::class, 'recommendedEdit'])->name('adminpanel.recommended.edit');
+            Route::post('/', [AdminController::class, 'recommendedUpdate'])->name('adminpanel.recommended.update');
+        });
 });
 
 
@@ -163,14 +167,14 @@ Route::group(['prefix' =>'adminpanel','middleware'=>'admin'],function(){
 //email verification
 Route::get('/email/verify', function () {
     return view('auth.verify-email');
-})->middleware('auth')->name('verification.notice');
-
-Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-    $request->fulfill();
-
-    return redirect('/account');
-})->middleware(['auth', 'signed'])->name('verification.verify');
-
+    })->middleware('auth')->name('verification.notice');
+    
+    Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+        $request->fulfill();
+        
+        return redirect('/account');
+        })->middleware(['auth', 'signed'])->name('verification.verify');
+        
 //email verification újraküldés
 Route::post('/verification-notification', function (Request $request) {
     $request->user()->sendEmailVerificationNotification();
