@@ -18,7 +18,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    @vite(['resources/sass/app.scss'])
     @vite('resources/js/app.js')
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
