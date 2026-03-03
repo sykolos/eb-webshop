@@ -291,34 +291,43 @@ class AdminController extends Controller
         return response()->json(['products' => $products]);
     }
 
-    public function saveMatrix(Request $request)
-    {
-        \DB::table('group_discounts')->updateOrInsert(
-            ['user_id' => $request->user_id, 'category_id' => $request->category_id],
+public function saveMatrix(Request $request)
+{
+    \Log::info('SaveMatrix Payload:', $request->all());
+
+    \DB::table('group_discounts')->updateOrInsert(
+        ['user_id' => $request->user_id, 'category_id' => $request->category_id],
+        [
+            'discount_percent' => $request->discount_percent ?? 0,
+            'updated_at' => now(),
+            'created_at' => now(),
+        ]
+    );
+
+    $hasFixPrice = !empty($request->fix_price);
+    $hasExtraPercent = !empty($request->extra_percent) && $request->extra_percent != 0;
+
+    if ($hasFixPrice || $hasExtraPercent) {
+        \DB::table('special_prices')->updateOrInsert(
+            ['user_id' => $request->user_id, 'product_id' => $request->product_id],
             [
-                'discount_percent' => $request->discount_percent ?? 0,
-                'updated_at' => now()
+                'price' => $request->fix_price ?: 0, 
+                'extra_percent' => $request->extra_percent ?? 0,
+                'updated_at' => now(),
+                'created_at' => now(),
             ]
         );
-
-        if ($request->fix_price || ($request->extra_percent && $request->extra_percent > 0)) {
-            \DB::table('special_prices')->updateOrInsert(
-                ['user_id' => $request->user_id, 'product_id' => $request->product_id],
-                [
-                    'price' => $request->fix_price ?: null,
-                    'extra_percent' => $request->extra_percent ?? 0,
-                    'updated_at' => now()
-                ]
-            );
-        } else {
+    } else {
+        if ($request->product_id) {
             \DB::table('special_prices')
                 ->where('user_id', $request->user_id)
                 ->where('product_id', $request->product_id)
                 ->delete();
         }
-
-        return response()->json(['success' => true]);
     }
+
+    return response()->json(['success' => true]);
+}
 
     public function bulkUpdateCategoryForAll(Request $request)
     {
