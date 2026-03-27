@@ -98,14 +98,18 @@
 
 <script>
 $(document).ready(function() {
-    // Initialize Select2 for status select
-    $('#orderStatusSelect').select2({
-        allowClear: true,
-        theme: 'bootstrap-5',
-        language: 'hu',
-        width: '100%',
-        placeholder: 'Válassz státuszt...'
-    });
+    if (typeof $.fn.select2 === 'function') {
+        // Initialize Select2 for status select
+        $('#orderStatusSelect').select2({
+            allowClear: true,
+            theme: 'bootstrap-5',
+            language: 'hu',
+            width: '100%',
+            placeholder: 'Válassz státuszt...'
+        });
+    } else {
+        console.warn('Select2 not loaded; skipping select2 initialization on order view.');
+    }
 });
 </script>
 @endsection

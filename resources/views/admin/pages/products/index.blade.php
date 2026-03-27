@@ -63,13 +63,17 @@ $(document).ready(function () {
     const listContainer = $('#products-list');
 
     // Initialize Select2 for category filter
-    form.find('select[name="category_id"]').select2({
-        allowClear: true,
-        theme: 'bootstrap-5',
-        language: 'hu',
-        width: '100%',
-        placeholder: 'Keresés...'
-    });
+    if (typeof $.fn.select2 === 'function') {
+        form.find('select[name="category_id"]').select2({
+            allowClear: true,
+            theme: 'bootstrap-5',
+            language: 'hu',
+            width: '100%',
+            placeholder: 'Keresés...'
+        });
+    } else {
+        console.warn('Select2 not loaded; skipping select2 initialization on products index.');
+    }
 
     // Load state from URL
     const urlParams = new URLSearchParams(window.location.search);

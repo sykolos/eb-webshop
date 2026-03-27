@@ -131,14 +131,18 @@ $sortedUnits = collect($product_units)->sortBy('unit');
 
 <script>
 $(document).ready(function() {
-    // Initialize Select2 for category and unit selects
-    $('#category_id, #unit_id').select2({
-        allowClear: true,
-        theme: 'bootstrap-5',
-        language: 'hu',
-        width: '100%',
-        placeholder: 'Keresés...'
-    });
+    if (typeof $.fn.select2 === 'function') {
+        // Initialize Select2 for category and unit selects
+        $('#category_id, #unit_id').select2({
+            allowClear: true,
+            theme: 'bootstrap-5',
+            language: 'hu',
+            width: '100%',
+            placeholder: 'Keresés...'
+        });
+    } else {
+        console.warn('Select2 not loaded; skipping select2 initialization.');
+    }
 });
 </script>
 @endsection

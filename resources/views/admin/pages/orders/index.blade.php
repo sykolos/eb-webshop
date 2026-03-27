@@ -68,13 +68,17 @@ $(document).ready(function () {
     const listContainer = $('#orders-list');
 
     // Initialize Select2 for status filter
-    form.find('select[name="status"]').select2({
-        allowClear: true,
-        theme: 'bootstrap-5',
-        language: 'hu',
-        width: '100%',
-        placeholder: 'Keresés...'
-    });
+    if (typeof $.fn.select2 === 'function') {
+        form.find('select[name="status"]').select2({
+            allowClear: true,
+            theme: 'bootstrap-5',
+            language: 'hu',
+            width: '100%',
+            placeholder: 'Keresés...'
+        });
+    } else {
+        console.warn('Select2 not loaded; skipping select2 initialization on orders index.');
+    }
 
     // Load state from URL
     const urlParams = new URLSearchParams(window.location.search);
