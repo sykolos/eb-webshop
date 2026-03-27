@@ -154,16 +154,17 @@ $(document).ready(function() {
     let selectedUser = null;
     let selectedProduct = null;
 
-    // Initialize Select2 for all searchable selects
-    $('.select2-search').select2({
-        allowClear: true,
-        theme: 'bootstrap-5',
-        language: 'hu',
-        width: '100%',
-        placeholder: 'Keresés...'
-    });
+    // Initialize Select2 for all searchable selects if plugin is loaded
+    if (typeof $.fn.select2 === 'function') {
+        $('.select2-search').select2({
+            allowClear: true,
+            theme: 'bootstrap-5',
+            language: 'hu',
+            width: '100%',
+            placeholder: 'Keresés...'
+        });
 
-    $('#productSelect').select2({
+        $('#productSelect').select2({
         ajax: {
             url: '{{ route("adminpanel.special_prices.product_select") }}',
             dataType: 'json',
@@ -180,6 +181,9 @@ $(document).ready(function() {
         allowClear: true,
         width: '100%'
     });
+    } else {
+        console.warn('Select2 plugin is not available; referring to native select fields');
+    }
 
     // Mode switcher
     $('#modeToggle button').on('click', function() {
