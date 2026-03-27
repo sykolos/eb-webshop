@@ -1,6 +1,10 @@
 @extends('layouts.admin')
 @section('title','Termékek')
 @section('content')
+<?php
+// Sort categories alphabetically
+$sortedCategories = collect($categories)->sortBy('name');
+?>
 <h1 class="page-title">Termékek</h1>
 
 <div class="container">
@@ -22,9 +26,9 @@
                     </div>
                     
                     <div class="col-md-2">
-                        <select name="category_id" class="form-select">
+                        <select name="category_id" class="form-select select2-search">
                             <option value="">-- Kategória --</option>
-                            @foreach ($categories as $category)
+                            @foreach ($sortedCategories as $category)
                                 <option value="{{ $category->id }}">{{ $category->name }}</option>
                             @endforeach
                         </select>
@@ -34,9 +38,6 @@
                     </div>
                     <div class="col-md-2">
                         <input type="date" name="to_date" class="form-control">
-                    </div>
-                    <div class="col-md-1">
-                        <button type="submit" class="btn btn-primary w-100">Szűrés</button>
                     </div>
                 </div>
             </form>
@@ -61,45 +62,90 @@ $(document).ready(function () {
     const spinner = $('#spinner');
     const listContainer = $('#products-list');
 
-    spinner.hide();
+    // Initialize Select2 for category filter
+    form.find('select[name="category_id"]').select2({
+        allowClear: true,
+        theme: 'bootstrap-5',
+        language: 'hu',
+        width: '100%',
+        placeholder: 'Keresés...'
+    });
 
-    form.on('submit', function (e) {
-        e.preventDefault();
-        spinner.show();
+    // Load state from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('search')) {
+        form.find('input[name="search"]').val(urlParams.get('search'));
+    }
+    if (urlParams.has('category_id')) {
+        form.find('select[name="category_id"]').val(urlParams.get('category_id')).trigger('change');
+    }
+    if (urlParams.has('from_date')) {
+        form.find('input[name="from_date"]').val(urlParams.get('from_date'));
+    }
+    if (urlParams.has('to_date')) {
+        form.find('input[name="to_date"]').val(urlParams.get('to_date'));
+    }
+
+    function updateUrl() {
+        const formData = form.serialize();
+        const url = new URL(window.location);
+        url.search = formData;
+        window.history.replaceState({}, '', url);
+    }
+
+    function loadProducts(page = 1) {
+        let data = form.serialize();
+        if (page > 1) {
+            data += '&page=' + page;
+        }
+
+        updateUrl();
+
         $.ajax({
             url: '{{ route('adminpanel.products') }}',
             type: 'GET',
-            data: form.serialize(),
+            data: data,
             success: function (data) {
                 listContainer.html(data);
-            },
-            complete: function () {
-                spinner.hide();
+                
+                // Reattach pagination handlers
+                $(document).on('click', '#products-list .pagination a', function (e) {
+                    e.preventDefault();
+                    const pageUrl = new URL($(this).attr('href'));
+                    const page = pageUrl.searchParams.get('page') || 1;
+                    loadProducts(page);
+                });
             },
             error: function () {
                 alert('Hiba történt a szűrés során.');
             }
         });
+    }
+
+    form.on('submit', function (e) {
+        e.preventDefault();
+        loadProducts(1);
+    });
+
+    // Debounce for search input
+    let searchTimeout;
+    form.find('input[name="search"]').on('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            loadProducts(1);
+        }, 500);
+    });
+
+    // Immediate update for select filters
+    form.find('select[name="category_id"], input[name="from_date"], input[name="to_date"]').on('change', function() {
+        loadProducts(1);
     });
 
     $(document).on('click', '#products-list .pagination a', function (e) {
         e.preventDefault();
-        const url = $(this).attr('href');
-        spinner.show();
-        $.ajax({
-            url: url,
-            type: 'GET',
-            data: form.serialize(),
-            success: function (data) {
-                listContainer.html(data);
-            },
-            complete: function () {
-                spinner.hide();
-            },
-            error: function () {
-                alert('Hiba történt a lapozás során.');
-            }
-        });
+        const pageUrl = new URL($(this).attr('href'));
+        const page = pageUrl.searchParams.get('page') || 1;
+        loadProducts(page);
     });
 });
 </script>

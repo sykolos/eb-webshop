@@ -6,8 +6,8 @@
 <script>
     $(document).ready(function(){
         let q = 1;
-        const t = {{ $unit->quantity }};
-        const p = {{ $product->getPriceForUser() }};
+        const t = {{ $unit->quantity ?? 1 }}; 
+        const p = {{ $product->getPriceForUser() ?? 0 }};;
         const updatePrice = () => {
             const quantity = $('#quantity').val();
             const total = quantity * t * p;

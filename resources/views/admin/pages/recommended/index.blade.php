@@ -55,6 +55,38 @@ window.recommendedData = @json($recommendedData);
 $(document).ready(function () {
     let selectedProductIds = new Set(window.recommendedIds.map(id => id.toString()));
 
+    // Load state from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('search')) {
+        $('#product-search').val(urlParams.get('search'));
+    }
+    
+    // Load selected products from URL if present
+    if (urlParams.has('selected')) {
+        const selected = urlParams.get('selected').split(',').filter(id => id);
+        selectedProductIds = new Set(selected);
+    }
+
+    function updateUrl() {
+        const url = new URL(window.location);
+        const searchQuery = $('#product-search').val();
+        const selectedIds = Array.from(selectedProductIds).join(',');
+        
+        if (searchQuery) {
+            url.searchParams.set('search', searchQuery);
+        } else {
+            url.searchParams.delete('search');
+        }
+        
+        if (selectedIds) {
+            url.searchParams.set('selected', selectedIds);
+        } else {
+            url.searchParams.delete('selected');
+        }
+        
+        window.history.replaceState({}, '', url);
+    }
+
     function logSelected(label = 'Aktuális lista') {
         console.log(`--- ${label} ---`);
         console.log('selectedProductIds:', Array.from(selectedProductIds));
@@ -100,6 +132,7 @@ $(document).ready(function () {
 
             logSelected('Pipa változás után');
             renderLiveList();
+            updateUrl();
         });
     }
 
@@ -109,16 +142,32 @@ $(document).ready(function () {
         $('.product-checkbox[value="' + id + '"]').prop('checked', false);
         logSelected('Élő lista sorból törlés után');
         renderLiveList();
+        updateUrl();
     });
 
+    let searchTimeout;
     $('#product-search').on('input', function () {
         const query = $(this).val();
-        $.get('/adminpanel/recommended/ajax', { q: query }, function (data) {
-            $('#product-table').html(data.html);
-            bindCheckboxes();
-            logSelected('AJAX újralekérés után');
-            renderLiveList();
-        });
+        
+        // Update URL immediately with search query
+        updateUrl();
+        
+        // Debounce the AJAX call
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            $.get('/adminpanel/recommended/ajax', { q: query }, function (data) {
+                $('#product-table').html(data.html);
+                
+                // Restore checkbox states from selectedProductIds
+                selectedProductIds.forEach(id => {
+                    $('.product-checkbox[value="' + id + '"]').prop('checked', true);
+                });
+                
+                bindCheckboxes();
+                logSelected('AJAX újralekérés után');
+                renderLiveList();
+            });
+        }, 300);
     });
 
     $('form').off('submit').on('submit', function () {
@@ -141,6 +190,7 @@ $(document).ready(function () {
     bindCheckboxes();
     logSelected('Inicializálás után');
     renderLiveList();
+    updateUrl();
 });
 </script>
 

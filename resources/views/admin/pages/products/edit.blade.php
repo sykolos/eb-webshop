@@ -1,12 +1,17 @@
 @extends('layouts.admin')
 @section('title','Termék módosítás')
 @section('content')
+<?php
+// Sort categories and units alphabetically
+$sortedCategories = collect($categories)->sortBy('name');
+$sortedUnits = collect($product_units)->sortBy('unit');
+?>
 <h1 class="page-title">Termék módosítás</h1>
 
 <div class="container">
     <div class="row mb-5">
         <div class="col-12">
-            <a href="{{ route('adminpanel.products') }}" class="btn btn-secondary mb-3">
+            <a href="{{ route('adminpanel.products') }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}" class="btn btn-secondary mb-3">
                 ← Vissza a termékekhez
             </a>
             <div class="card">
@@ -56,9 +61,9 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="category_id">Kategória</label>
-                                    <select name="category_id" id="category_id" class="form-control @error('category_id') is-invalid @enderror">
+                                    <select name="category_id" id="category_id" class="form-select select2-search @error('category_id') is-invalid @enderror">
                                     <option value="">--- Select category ---</option>
-                                    @foreach ($categories as $category)
+                                    @foreach ($sortedCategories as $category)
                                         <option value="{{$category->id}}" {{$product->category_id==$category->id ? 'selected' : ''}}> {{$category->name}} </option>
                                     @endforeach
                                 </select>
@@ -72,8 +77,8 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="Units">Mennyiségi egység</label>
-                                    <select name="unit_id" id="unit_id" class="form-control @error('unit_id') is-invalid @enderror" >
-                                        @foreach($product_units as $unit)
+                                    <select name="unit_id" id="unit_id" class="form-select select2-search @error('unit_id') is-invalid @enderror" >
+                                        @foreach($sortedUnits as $unit)
                                         <option value="{{$unit->id}}" {{$product->unit_id==$unit->id ? 'selected' : ''}}>{{$unit->unit}}({{$unit->quantity}}{{$unit->measure}})</option>
                                         @endforeach
                                     </select>
@@ -125,4 +130,17 @@
         </div>
     </div>
 </div>
+
+<script>
+$(document).ready(function() {
+    // Initialize Select2 for category and unit selects
+    $('#category_id, #unit_id').select2({
+        allowClear: true,
+        theme: 'bootstrap-5',
+        language: 'hu',
+        width: '100%',
+        placeholder: 'Keresés...'
+    });
+});
+</script>
 @endsection

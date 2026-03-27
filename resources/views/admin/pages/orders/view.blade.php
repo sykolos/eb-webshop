@@ -5,7 +5,7 @@
 <div class="container">
     <div class="row">
         <div class="col-12">
-            <a href="{{ session('orders_filter_url', route('adminpanel.orders')) }}" class="btn btn-secondary mb-3">
+            <a href="{{ session('orders_filter_url', route('adminpanel.orders')) }}" class="btn btn-secondary mb-3 text-nowrap">
     ← Vissza a listához
 </a>
             <div class="card">
@@ -26,7 +26,7 @@
                                     <td>
                                         <form action="{{route('adminpanel.orders.status.update', $order->id)}}" method="POST" class="d-flex flex-column flex-md-row gap-2">
                                         @csrf
-                                        <select name="status" id="form-control" style="text-align: center">
+                                        <select name="status" id="orderStatusSelect" class="form-select select2-search">
                                             @foreach ($states as $status)
                                                 <option value="{{$status}}" @if($order->status==$status) selected @endif>{{$status}}</option>
                                             @endforeach
@@ -95,4 +95,17 @@
         </div>
     </div>
 </div>
+
+<script>
+$(document).ready(function() {
+    // Initialize Select2 for status select
+    $('#orderStatusSelect').select2({
+        allowClear: true,
+        theme: 'bootstrap-5',
+        language: 'hu',
+        width: '100%',
+        placeholder: 'Válassz státuszt...'
+    });
+});
+</script>
 @endsection

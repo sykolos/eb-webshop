@@ -206,6 +206,50 @@ class AdminController extends Controller
         return response()->json(['html' => $html]);
     }
 
+    public function productSelectSearch(Request $request)
+    {
+        $search = $request->input('search');
+
+        $query = Products::query();
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('serial_number', 'like', "%{$search}%");
+            });
+        }
+
+        $products = $query->orderBy('title')->limit(30)->get();
+
+        return response()->json(['results' => $products->map(function ($product) {
+            return ['id' => $product->id, 'text' => $product->title . ' (' . $product->serial_number . ')'];
+        })]);
+    }
+
+    public function productUsersAjax(Request $request, $productId)
+    {
+        $query = User::with(['special_prices' => function ($q) use ($productId) {
+            $q->where('product_id', $productId);
+        }]);
+
+        if ($request->has('search') && strlen($request->search) >= 2) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->has('only_modified') && $request->only_modified == 1) {
+            $query->whereHas('special_prices', function ($q) use ($productId) {
+                $q->where('product_id', $productId);
+            });
+        }
+
+        $users = $query->orderBy('name')->paginate(20);
+
+        return response()->json(['users' => $users]);
+    }
+
     public function recommendedUpdate(Request $request)
     {
         \Log::info('--- Kiemelt termékek mentés indul ---');

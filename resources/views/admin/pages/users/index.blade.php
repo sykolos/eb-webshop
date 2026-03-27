@@ -52,11 +52,29 @@ document.addEventListener('DOMContentLoaded', function () {
     const listContainer = document.getElementById('users-list');
     const spinner = document.getElementById('spinner');
 
-    function fetchUsers(url = '{{ route("adminpanel.users") }}') {
+    // Load state from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('search')) {
+        form.querySelector('input[name="search"]').value = urlParams.get('search');
+    }
+
+    function fetchUsers(url = '{{ route("adminpanel.users") }}', page = 1) {
         spinner.classList.remove('d-none');
 
         const formData = new FormData(form);
         const params = new URLSearchParams(formData);
+        
+        // Add page to params if not 1
+        if (page > 1) {
+            params.set('page', page);
+        }
+
+        // Update URL with current filters
+        const url_obj = new URL(window.location);
+        params.forEach((value, key) => {
+            url_obj.searchParams.set(key, value);
+        });
+        window.history.replaceState({}, '', url_obj);
 
         fetch(url + '?' + params.toString(), {
             headers: {
@@ -66,6 +84,16 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(res => res.text())
         .then(html => {
             listContainer.innerHTML = html;
+            
+            // Attach pagination handlers
+            document.querySelectorAll('#users-list .pagination a').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const pageUrl = new URL(link.href);
+                    const page = pageUrl.searchParams.get('page') || 1;
+                    fetchUsers('{{ route("adminpanel.users") }}', page);
+                });
+            });
         })
         .finally(() => {
             spinner.classList.add('d-none');
@@ -74,10 +102,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
     form.addEventListener('submit', function(e) {
         e.preventDefault();
-        fetchUsers();
+        fetchUsers('{{ route("adminpanel.users") }}', 1);
     });
 
-   
+    // Debounce helper for search
+    let searchTimeout;
+    const searchInput = form.querySelector('input[name="search"]');
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            fetchUsers('{{ route("adminpanel.users") }}', 1);
+        }, 500);
+    });
 });
 </script>
 @endsection

@@ -43,7 +43,7 @@
                     <td>{{ \Carbon\Carbon::parse($product->created_at)->format('Y-m-d') }}</td>
                     <td>
                         <div class="d-flex gap-2">
-                            <a href="{{ route('adminpanel.products.edit', $product->id) }}" class="btn btn-secondary btn-sm">Edit</a>
+                            <a href="{{ route('adminpanel.products.edit', $product->id) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}" class="btn btn-secondary btn-sm">Edit</a>
                             <form action="{{ route('adminpanel.products.destroy', $product->id) }}" method="POST" onsubmit="return confirm('Biztosan törlöd?');">
                                 @csrf
                                 @method('DELETE')
@@ -89,7 +89,7 @@
                     @endif
 
                     <div class="mt-3 d-grid gap-2">
-                        <a href="{{ route('adminpanel.products.edit', $product->id) }}" class="btn btn-primary w-50 me-2">
+                        <a href="{{ route('adminpanel.products.edit', $product->id) }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}" class="btn btn-primary w-50 me-2">
                             <i class="bi bi-pencil-square"></i> Szerkeszt
                         </a>
                         <form action="{{ route('adminpanel.products.destroy', $product->id) }}" method="POST" onsubmit="return confirm('Biztosan törlöd?')">

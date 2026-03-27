@@ -35,15 +35,12 @@
                             <input type="date" name="to_date" class="form-control">
                         </div>
                         <div class="col-md-2">
-                            <select name="status" class="form-control">
+                            <select name="status" class="form-select select2-search">
                                 <option value="">-- Státusz --</option>
                                 @foreach(['függőben', 'feldolgozás', 'kiszállítva', 'törölve'] as $status)
                                     <option value="{{ $status }}">{{ ucfirst($status) }}</option>
                                 @endforeach
                             </select>
-                        </div>
-                        <div class="col-md-1">
-                            <button type="submit" class="btn btn-primary w-100">Szűrés</button>
                         </div>
                     </div>
                 </form>
@@ -70,60 +67,86 @@ $(document).ready(function () {
     const spinner = $('#spinner');
     const listContainer = $('#orders-list');
 
-    console.log('Spinner elem:', spinner.length);
+    // Initialize Select2 for status filter
+    form.find('select[name="status"]').select2({
+        allowClear: true,
+        theme: 'bootstrap-5',
+        language: 'hu',
+        width: '100%',
+        placeholder: 'Keresés...'
+    });
 
-    form.on('submit', function (e) {
-        e.preventDefault();
-        spinner.show();
+    // Load state from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('company_name')) {
+        form.find('input[name="company_name"]').val(urlParams.get('company_name'));
+    }
+    if (urlParams.has('from_date')) {
+        form.find('input[name="from_date"]').val(urlParams.get('from_date'));
+    }
+    if (urlParams.has('to_date')) {
+        form.find('input[name="to_date"]').val(urlParams.get('to_date'));
+    }
+    if (urlParams.has('status')) {
+        form.find('select[name="status"]').val(urlParams.get('status')).trigger('change');
+    }
+
+    function updateUrl() {
+        const formData = form.serialize();
+        const url = new URL(window.location);
+        url.search = formData;
+        window.history.replaceState({}, '', url);
+    }
+
+    function loadOrders(page = 1) {
+        let data = form.serialize();
+        if (page > 1) {
+            data += '&page=' + page;
+        }
+
+        updateUrl();
+
         $.ajax({
             url: '{{ route('adminpanel.orders') }}',
             type: 'GET',
-            data: form.serialize(),
+            data: data,
             success: function (data) {
                 listContainer.html(data);
 
                 // Session frissítéshez – mentjük az aktuális URL-t (szűrőkkel együtt)
-                $.post('{{ route('adminpanel.orders.storeFilterUrl') }}', form.serialize());
+                $.post('{{ route('adminpanel.orders.storeFilterUrl') }}', data);
             },
             error: function () {
                 alert('Hiba történt a lekérdezés során.');
-            },
-            complete: function () {
-                spinner.hide();
             }
         });
+    }
+
+    form.on('submit', function (e) {
+        e.preventDefault();
+        loadOrders(1);
+    });
+
+    // Debounce for search input
+    let searchTimeout;
+    form.find('input[name="company_name"]').on('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            loadOrders(1);
+        }, 500);
+    });
+
+    // Immediate update for select/date filters
+    form.find('input[name="from_date"], input[name="to_date"], select[name="status"]').on('change', function() {
+        loadOrders(1);
     });
 
     // Lapozás AJAX-szal
     $(document).on('click', '#orders-list .pagination a', function (e) {
         e.preventDefault();
-
         const url = new URL($(this).attr('href'));
         const page = url.searchParams.get("page") || 1;
-
-        spinner.show();
-
-        $.ajax({
-            url: url.toString(),
-            type: 'GET',
-            data: form.serialize(),
-            success: function (data) {
-                listContainer.html(data);
-
-                // Aktuális szűrők és oldalszám mentése session-be
-                const fullQuery = form.serialize() + '&page=' + encodeURIComponent(page);
-                $.post('{{ route('adminpanel.orders.storeFilterUrl') }}', fullQuery)
-                .fail(function(xhr) {
-                    console.error('Mentés nem sikerült:', xhr.responseText);
-                });
-            },
-            complete: function () {
-                spinner.hide();
-            },
-            error: function () {
-                alert('Hiba történt a lapozás során.');
-            }
-        });
+        loadOrders(page);
     });
 });
 </script>

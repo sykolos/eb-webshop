@@ -149,6 +149,8 @@ Route::group(['prefix'=>'account','middleware'=>'auth'],function(){
             Route::delete('/delete', [AdminController::class, 'ajaxDeletePrice'])->name('adminpanel.special_prices.delete');    
             // Az új mátrix útvonalak elnevezve
             Route::get('/matrix-ajax/{user}', [AdminController::class, 'matrixAjax'])->name('adminpanel.special_prices.matrix');
+            Route::get('/product-users-ajax/{product}', [AdminController::class, 'productUsersAjax'])->name('adminpanel.special_prices.product_users');
+            Route::get('/product-select-search', [AdminController::class, 'productSelectSearch'])->name('adminpanel.special_prices.product_select');
             Route::post('/save-matrix', [AdminController::class, 'saveMatrix'])->name('adminpanel.special_prices.save_matrix');
             Route::post('/global-category-update', [AdminController::class, 'bulkUpdateCategoryForAll']);
         });
