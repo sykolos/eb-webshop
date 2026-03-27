@@ -146,8 +146,3 @@ $(document).ready(function() {
 });
 </script>
 @endsection
-            </div>
-        </div>
-    </div>
-</div>
-@endsection
