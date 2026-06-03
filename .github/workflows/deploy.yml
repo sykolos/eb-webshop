@@ -57,7 +57,7 @@ jobs:
 
       - name: Prepare env file from secret
         env:
-          ENV_DEVELOP: ${{ secrets.ENV_DEVELOP }}
+          ENV_DEVELOP: ${{ secrets.ENV_DEVELOP}}
         run: |
           if [ -n "$ENV_DEVELOP" ]; then
             printf '%s\n' "$ENV_DEVELOP" > .env.deploy
@@ -71,12 +71,10 @@ jobs:
       - name: Deploy via SSH
         env:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
-          HOST: ${{ secrets.HOST }}
-          HOST_USER: ${{ secrets.HOST_USER }}
-          HOST_PORT: ${{ secrets.HOST_PORT }}
-          HOST_PATH: ${{ secrets.HOST_PATH }}
-          HOST_PUBLIC: ${{ secrets.HOST_PUBLIC }}
-          PHP_BINARY: ${{ secrets.PHP_BINARY }}
+          HOST_USER: ${{ secrets.SSS_USER }}
+          PORT: ${{ secrets.SSH_PORT  }}
+          PATH: ${{ secrets.DEPLOY_PATH }}
+          PUBLIC: ${{ secrets.PUBLIC_PATH }}
         run: |
           set -euo pipefail
 
@@ -87,17 +85,17 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -p "$PORT" -H "$HOST" >> ~/.ssh/known_hosts
 
-          sshpass -p "$SSH_PASSWORD" ssh -p "$PORT" "$HOST_USER@$HOST" "mkdir -p '$HOST_PATH' '$HOST_PUBLIC'"
+          sshpass -p "$SSH_PASSWORD" ssh -p "$PORT" "$HOST_USER@$HOST" "mkdir -p '$PATH' '$PUBLIC'"
 
-          sshpass -p "$SSH_PASSWORD" scp -P "$PORT" /tmp/app.tgz "$HOST_USER@$HOST:$HOST_PATH/app.tgz"
-          sshpass -p "$SSH_PASSWORD" scp -P "$PORT" /tmp/public.tgz "$HOST_USER@$HOST:$HOST_PUBLIC/public.tgz"
+          sshpass -p "$SSH_PASSWORD" scp -P "$PORT" /tmp/app.tgz "$HOST_USER@$HOST:$PATH/app.tgz"
+          sshpass -p "$SSH_PASSWORD" scp -P "$PORT" /tmp/public.tgz "$HOST_USER@$HOST:$PUBLIC/public.tgz"
           if [ -f .env.deploy ]; then
-            sshpass -p "$SSH_PASSWORD" scp -P "$PORT" .env.deploy "$HOST_USER@$HOST:$HOST_PATH/.env.deploy"
+            sshpass -p "$SSH_PASSWORD" scp -P "$PORT" .env.deploy "$HOST_USER@$HOST:$PATH/.env.deploy"
           fi
 
           sshpass -p "$SSH_PASSWORD" ssh -p "$PORT" "$HOST_USER@$HOST" "
             set -e
-            cd '$HOST_PATH'
+            cd '$PATH'
 
             mkdir -p storage/app/public storage/framework/cache storage/framework/sessions storage/framework/testing storage/framework/views storage/logs bootstrap/cache
 
@@ -126,7 +124,7 @@ jobs:
             tar -xzf public.tgz
             rm public.tgz
 
-            cd '$HOST_PATH'
+            cd '$PATH'
             if [ -f artisan ]; then
               $PHP_BIN artisan migrate --force
               $PHP_BIN artisan optimize:clear
