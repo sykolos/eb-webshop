@@ -13,6 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('group_discounts')) {
+            return;
+        }
+
         Schema::create('group_discounts', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id')->index();
