@@ -57,7 +57,7 @@ jobs:
 
       - name: Prepare env file from secret
         env:
-          ENV_DEVELOP: ${{ secrets.ENV_DEVELOP || secrets.env_develop || secrets.ENV_FILE || secrets.env_file }}
+          ENV_DEVELOP: ${{ secrets.ENV_DEVELOP }}
         run: |
           if [ -n "$ENV_DEVELOP" ]; then
             printf '%s\n' "$ENV_DEVELOP" > .env.deploy
@@ -70,13 +70,13 @@ jobs:
 
       - name: Deploy via SSH
         env:
-          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD || secrets.ssh_password || secrets.HOST_PASSWORD || secrets.host_password }}
-          HOST: ${{ secrets.HOST || secrets.host }}
-          HOST_USER: ${{ secrets.HOST_USER || secrets.host_user }}
-          HOST_PORT: ${{ secrets.HOST_PORT || secrets.host_port }}
-          HOST_PATH: ${{ secrets.HOST_PATH || secrets.host_path }}
-          HOST_PUBLIC: ${{ secrets.HOST_PUBLIC || secrets.host_public }}
-          PHP_BINARY: ${{ secrets.PHP_BINARY || secrets.php_binary }}
+          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+          HOST: ${{ secrets.HOST }}
+          HOST_USER: ${{ secrets.HOST_USER }}
+          HOST_PORT: ${{ secrets.HOST_PORT }}
+          HOST_PATH: ${{ secrets.HOST_PATH }}
+          HOST_PUBLIC: ${{ secrets.HOST_PUBLIC }}
+          PHP_BINARY: ${{ secrets.PHP_BINARY }}
         run: |
           set -euo pipefail
 
