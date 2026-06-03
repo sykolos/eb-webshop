@@ -71,8 +71,8 @@ jobs:
       - name: Deploy via SSH
         env:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
-          HOST: ${{ secrets.HOST }}
-          HOST_USER: ${{ secrets.HOST_USER }}
+          SSS_HOST: ${{ secrets.SSS_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
           SSH_PORT: ${{ secrets.SSH_PORT }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
           PUBLIC_PATH: ${{ secrets.PUBLIC_PATH }}
@@ -80,7 +80,7 @@ jobs:
           set -euo pipefail
 
           missing=0
-          for name in SSH_PASSWORD HOST HOST_USER SSH_PORT DEPLOY_PATH PUBLIC_PATH; do
+          for name in SSH_PASSWORD SSS_HOST SSH_USER SSH_PORT DEPLOY_PATH PUBLIC_PATH; do
             if [ -z "${!name:-}" ]; then
               echo "::error::Missing required GitHub secret: $name"
               missing=1
@@ -96,17 +96,17 @@ jobs:
           PUBLIC_DIR_NAME="$(basename "$PUBLIC_PATH")"
 
           mkdir -p ~/.ssh
-          ssh-keyscan -p "$PORT" -H "$HOST" >> ~/.ssh/known_hosts
+          ssh-keyscan -p "$PORT" -H "$SSS_HOST" >> ~/.ssh/known_hosts
 
-          sshpass -p "$SSH_PASSWORD" ssh -p "$PORT" "$HOST_USER@$HOST" "mkdir -p '$DEPLOY_PATH' '$PUBLIC_PATH'"
+          sshpass -p "$SSH_PASSWORD" ssh -p "$PORT" "$SSH_USER@$SSS_HOST" "mkdir -p '$DEPLOY_PATH' '$PUBLIC_PATH'"
 
-          sshpass -p "$SSH_PASSWORD" scp -P "$PORT" /tmp/app.tgz "$HOST_USER@$HOST:$DEPLOY_PATH/app.tgz"
-          sshpass -p "$SSH_PASSWORD" scp -P "$PORT" /tmp/public.tgz "$HOST_USER@$HOST:$PUBLIC_PATH/public.tgz"
+          sshpass -p "$SSH_PASSWORD" scp -P "$PORT" /tmp/app.tgz "$SSH_USER@$SSS_HOST:$DEPLOY_PATH/app.tgz"
+          sshpass -p "$SSH_PASSWORD" scp -P "$PORT" /tmp/public.tgz "$SSH_USER@$SSS_HOST:$PUBLIC_PATH/public.tgz"
           if [ -f .env.deploy ]; then
-            sshpass -p "$SSH_PASSWORD" scp -P "$PORT" .env.deploy "$HOST_USER@$HOST:$DEPLOY_PATH/.env.deploy"
+            sshpass -p "$SSH_PASSWORD" scp -P "$PORT" .env.deploy "$SSH_USER@$SSS_HOST:$DEPLOY_PATH/.env.deploy"
           fi
 
-          sshpass -p "$SSH_PASSWORD" ssh -p "$PORT" "$HOST_USER@$HOST" "
+          sshpass -p "$SSH_PASSWORD" ssh -p "$PORT" "$SSH_USER@$SSS_HOST" "
             set -e
             cd '$DEPLOY_PATH'
 
