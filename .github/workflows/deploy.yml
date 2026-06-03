@@ -136,6 +136,8 @@ jobs:
               chmod 600 .env
             fi
 
+            rm -f bootstrap/cache/config.php bootstrap/cache/routes-*.php bootstrap/cache/events.php
+
             cd '$PUBLIC_PATH'
 
             find . -mindepth 1 -maxdepth 1 \
@@ -148,8 +150,8 @@ jobs:
 
             cd '$DEPLOY_PATH'
             if [ -f artisan ]; then
-              $PHP_BIN artisan migrate --force
               $PHP_BIN artisan optimize:clear
+              $PHP_BIN artisan migrate --force
               $PHP_BIN artisan config:cache
               $PHP_BIN artisan view:cache
             fi
