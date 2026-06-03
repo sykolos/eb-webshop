@@ -55,14 +55,6 @@ jobs:
             --exclude='storage' \
             .
 
-      - name: Prepare env file from secret
-        env:
-          ENV_DEVELOP: ${{ secrets.ENV_DEVELOP }}
-        run: |
-          if [ -n "$ENV_DEVELOP" ]; then
-            printf '%s\n' "$ENV_DEVELOP" > .env.deploy
-          fi
-
       - name: Install sshpass
         run: |
           sudo apt-get update
@@ -109,11 +101,6 @@ jobs:
 
           echo "Uploading public package..."
           sshpass -e scp $SCP_OPTS /tmp/public.tgz "$SSH_USER@$SSS_HOST:$PUBLIC_PATH/public.tgz"
-          if [ -f .env.deploy ]; then
-            echo "Uploading Laravel env file..."
-            sshpass -e scp $SCP_OPTS .env.deploy "$SSH_USER@$SSS_HOST:$DEPLOY_PATH/.env.deploy"
-          fi
-
           echo "Deploying on remote server..."
           sshpass -e ssh $SSH_OPTS "$SSH_USER@$SSS_HOST" "
             set -e
@@ -130,11 +117,6 @@ jobs:
 
             tar -xzf app.tgz
             rm app.tgz
-
-            if [ -f .env.deploy ]; then
-              mv .env.deploy .env
-              chmod 600 .env
-            fi
 
             rm -f bootstrap/cache/config.php bootstrap/cache/routes-*.php bootstrap/cache/events.php
 
