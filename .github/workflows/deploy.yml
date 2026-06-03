@@ -57,7 +57,7 @@ jobs:
 
       - name: Prepare env file from secret
         env:
-          ENV_DEVELOP: ${{ secrets.ENV_DEVELOP}}
+          ENV_DEVELOP: ${{ secrets.ENV_DEVELOP }}
         run: |
           if [ -n "$ENV_DEVELOP" ]; then
             printf '%s\n' "$ENV_DEVELOP" > .env.deploy
@@ -71,31 +71,44 @@ jobs:
       - name: Deploy via SSH
         env:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
-          HOST_USER: ${{ secrets.SSS_USER }}
-          PORT: ${{ secrets.SSH_PORT  }}
-          PATH: ${{ secrets.DEPLOY_PATH }}
-          PUBLIC: ${{ secrets.PUBLIC_PATH }}
+          HOST: ${{ secrets.HOST }}
+          HOST_USER: ${{ secrets.HOST_USER }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          PUBLIC_PATH: ${{ secrets.PUBLIC_PATH }}
         run: |
           set -euo pipefail
 
-          PORT="${HOST_PORT:-22}"
-          PHP_BIN="${PHP_BINARY:-php}"
-          PUBLIC_DIR_NAME="$(basename "$HOST_PUBLIC")"
+          missing=0
+          for name in SSH_PASSWORD HOST HOST_USER SSH_PORT DEPLOY_PATH PUBLIC_PATH; do
+            if [ -z "${!name:-}" ]; then
+              echo "::error::Missing required GitHub secret: $name"
+              missing=1
+            fi
+          done
+
+          if [ "$missing" -ne 0 ]; then
+            exit 1
+          fi
+
+          PORT="$SSH_PORT"
+          PHP_BIN="php"
+          PUBLIC_DIR_NAME="$(basename "$PUBLIC_PATH")"
 
           mkdir -p ~/.ssh
           ssh-keyscan -p "$PORT" -H "$HOST" >> ~/.ssh/known_hosts
 
-          sshpass -p "$SSH_PASSWORD" ssh -p "$PORT" "$HOST_USER@$HOST" "mkdir -p '$PATH' '$PUBLIC'"
+          sshpass -p "$SSH_PASSWORD" ssh -p "$PORT" "$HOST_USER@$HOST" "mkdir -p '$DEPLOY_PATH' '$PUBLIC_PATH'"
 
-          sshpass -p "$SSH_PASSWORD" scp -P "$PORT" /tmp/app.tgz "$HOST_USER@$HOST:$PATH/app.tgz"
-          sshpass -p "$SSH_PASSWORD" scp -P "$PORT" /tmp/public.tgz "$HOST_USER@$HOST:$PUBLIC/public.tgz"
+          sshpass -p "$SSH_PASSWORD" scp -P "$PORT" /tmp/app.tgz "$HOST_USER@$HOST:$DEPLOY_PATH/app.tgz"
+          sshpass -p "$SSH_PASSWORD" scp -P "$PORT" /tmp/public.tgz "$HOST_USER@$HOST:$PUBLIC_PATH/public.tgz"
           if [ -f .env.deploy ]; then
-            sshpass -p "$SSH_PASSWORD" scp -P "$PORT" .env.deploy "$HOST_USER@$HOST:$PATH/.env.deploy"
+            sshpass -p "$SSH_PASSWORD" scp -P "$PORT" .env.deploy "$HOST_USER@$HOST:$DEPLOY_PATH/.env.deploy"
           fi
 
           sshpass -p "$SSH_PASSWORD" ssh -p "$PORT" "$HOST_USER@$HOST" "
             set -e
-            cd '$PATH'
+            cd '$DEPLOY_PATH'
 
             mkdir -p storage/app/public storage/framework/cache storage/framework/sessions storage/framework/testing storage/framework/views storage/logs bootstrap/cache
 
@@ -114,7 +127,7 @@ jobs:
               chmod 600 .env
             fi
 
-            cd '$HOST_PUBLIC'
+            cd '$PUBLIC_PATH'
 
             find . -mindepth 1 -maxdepth 1 \
               ! -name 'storage' \
@@ -124,7 +137,7 @@ jobs:
             tar -xzf public.tgz
             rm public.tgz
 
-            cd '$PATH'
+            cd '$DEPLOY_PATH'
             if [ -f artisan ]; then
               $PHP_BIN artisan migrate --force
               $PHP_BIN artisan optimize:clear
@@ -132,7 +145,7 @@ jobs:
               $PHP_BIN artisan view:cache
             fi
 
-            cd '$HOST_PUBLIC'
+            cd '$PUBLIC_PATH'
             rm -rf storage
-            ln -s '$HOST_PATH/storage/app/public' storage || true
+            ln -s '$DEPLOY_PATH/storage/app/public' storage || true
           "
