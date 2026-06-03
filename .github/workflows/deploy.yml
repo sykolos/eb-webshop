@@ -37,7 +37,7 @@ jobs:
 
       - name: Prepare deploy package
         run: |
-          tar -czf app.tgz \
+          tar -czf /tmp/app.tgz \
             --exclude='.git' \
             --exclude='.github' \
             --exclude='.env' \
@@ -51,7 +51,7 @@ jobs:
             --exclude='storage/logs/*' \
             .
 
-          tar -C public -czf public.tgz \
+          tar -C public -czf /tmp/public.tgz \
             --exclude='storage' \
             .
 
@@ -89,8 +89,8 @@ jobs:
 
           sshpass -p "$SSH_PASSWORD" ssh -p "$PORT" "$HOST_USER@$HOST" "mkdir -p '$HOST_PATH' '$HOST_PUBLIC'"
 
-          sshpass -p "$SSH_PASSWORD" scp -P "$PORT" app.tgz "$HOST_USER@$HOST:$HOST_PATH/app.tgz"
-          sshpass -p "$SSH_PASSWORD" scp -P "$PORT" public.tgz "$HOST_USER@$HOST:$HOST_PUBLIC/public.tgz"
+          sshpass -p "$SSH_PASSWORD" scp -P "$PORT" /tmp/app.tgz "$HOST_USER@$HOST:$HOST_PATH/app.tgz"
+          sshpass -p "$SSH_PASSWORD" scp -P "$PORT" /tmp/public.tgz "$HOST_USER@$HOST:$HOST_PUBLIC/public.tgz"
           if [ -f .env.deploy ]; then
             sshpass -p "$SSH_PASSWORD" scp -P "$PORT" .env.deploy "$HOST_USER@$HOST:$HOST_PATH/.env.deploy"
           fi
