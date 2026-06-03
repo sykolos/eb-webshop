@@ -1,0 +1,140 @@
+name: Build & Deploy (Laravel)
+
+on:
+  push:
+    branches: [ "develop" ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: mbstring, bcmath, ctype, fileinfo, json, openssl, pdo, tokenizer, xml, gd, zip
+          coverage: none
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install PHP deps
+        run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Install Node deps
+        run: npm ci
+
+      - name: Build assets
+        run: npm run build
+
+      - name: Prepare deploy package
+        run: |
+          tar -czf app.tgz \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='.env' \
+            --exclude='node_modules' \
+            --exclude='public' \
+            --exclude='storage/app/*' \
+            --exclude='storage/framework/cache/*' \
+            --exclude='storage/framework/sessions/*' \
+            --exclude='storage/framework/testing/*' \
+            --exclude='storage/framework/views/*' \
+            --exclude='storage/logs/*' \
+            .
+
+          tar -C public -czf public.tgz \
+            --exclude='storage' \
+            .
+
+      - name: Prepare env file from secret
+        env:
+          ENV_DEVELOP: ${{ secrets.ENV_DEVELOP || secrets.env_develop || secrets.ENV_FILE || secrets.env_file }}
+        run: |
+          if [ -n "$ENV_DEVELOP" ]; then
+            printf '%s\n' "$ENV_DEVELOP" > .env.deploy
+          fi
+
+      - name: Install sshpass
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y sshpass
+
+      - name: Deploy via SSH
+        env:
+          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD || secrets.ssh_password || secrets.HOST_PASSWORD || secrets.host_password }}
+          HOST: ${{ secrets.HOST || secrets.host }}
+          HOST_USER: ${{ secrets.HOST_USER || secrets.host_user }}
+          HOST_PORT: ${{ secrets.HOST_PORT || secrets.host_port }}
+          HOST_PATH: ${{ secrets.HOST_PATH || secrets.host_path }}
+          HOST_PUBLIC: ${{ secrets.HOST_PUBLIC || secrets.host_public }}
+          PHP_BINARY: ${{ secrets.PHP_BINARY || secrets.php_binary }}
+        run: |
+          set -euo pipefail
+
+          PORT="${HOST_PORT:-22}"
+          PHP_BIN="${PHP_BINARY:-php}"
+          PUBLIC_DIR_NAME="$(basename "$HOST_PUBLIC")"
+
+          mkdir -p ~/.ssh
+          ssh-keyscan -p "$PORT" -H "$HOST" >> ~/.ssh/known_hosts
+
+          sshpass -p "$SSH_PASSWORD" ssh -p "$PORT" "$HOST_USER@$HOST" "mkdir -p '$HOST_PATH' '$HOST_PUBLIC'"
+
+          sshpass -p "$SSH_PASSWORD" scp -P "$PORT" app.tgz "$HOST_USER@$HOST:$HOST_PATH/app.tgz"
+          sshpass -p "$SSH_PASSWORD" scp -P "$PORT" public.tgz "$HOST_USER@$HOST:$HOST_PUBLIC/public.tgz"
+          if [ -f .env.deploy ]; then
+            sshpass -p "$SSH_PASSWORD" scp -P "$PORT" .env.deploy "$HOST_USER@$HOST:$HOST_PATH/.env.deploy"
+          fi
+
+          sshpass -p "$SSH_PASSWORD" ssh -p "$PORT" "$HOST_USER@$HOST" "
+            set -e
+            cd '$HOST_PATH'
+
+            mkdir -p storage/app/public storage/framework/cache storage/framework/sessions storage/framework/testing storage/framework/views storage/logs bootstrap/cache
+
+            find . -mindepth 1 -maxdepth 1 \
+              ! -name '.env' \
+              ! -name 'storage' \
+              ! -name '$PUBLIC_DIR_NAME' \
+              ! -name 'app.tgz' \
+              -exec rm -rf {} +
+
+            tar -xzf app.tgz
+            rm app.tgz
+
+            if [ -f .env.deploy ]; then
+              mv .env.deploy .env
+              chmod 600 .env
+            fi
+
+            cd '$HOST_PUBLIC'
+
+            find . -mindepth 1 -maxdepth 1 \
+              ! -name 'storage' \
+              ! -name 'public.tgz' \
+              -exec rm -rf {} +
+
+            tar -xzf public.tgz
+            rm public.tgz
+
+            cd '$HOST_PATH'
+            if [ -f artisan ]; then
+              $PHP_BIN artisan migrate --force
+              $PHP_BIN artisan optimize:clear
+              $PHP_BIN artisan config:cache
+              $PHP_BIN artisan view:cache
+            fi
+
+            cd '$HOST_PUBLIC'
+            rm -rf storage
+            ln -s '$HOST_PATH/storage/app/public' storage || true
+          "
