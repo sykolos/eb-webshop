@@ -94,19 +94,28 @@ jobs:
           PORT="$SSH_PORT"
           PHP_BIN="php"
           PUBLIC_DIR_NAME="$(basename "$PUBLIC_PATH")"
+          export SSHPASS="$SSH_PASSWORD"
+          SSH_OPTS="-p $PORT -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+          SCP_OPTS="-P $PORT -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 
-          mkdir -p ~/.ssh
-          ssh-keyscan -p "$PORT" -H "$SSS_HOST" >> ~/.ssh/known_hosts
+          echo "Testing SSH connection..."
+          sshpass -e ssh $SSH_OPTS "$SSH_USER@$SSS_HOST" "pwd >/dev/null"
 
-          sshpass -p "$SSH_PASSWORD" ssh -p "$PORT" "$SSH_USER@$SSS_HOST" "mkdir -p '$DEPLOY_PATH' '$PUBLIC_PATH'"
+          echo "Creating target directories..."
+          sshpass -e ssh $SSH_OPTS "$SSH_USER@$SSS_HOST" "mkdir -p '$DEPLOY_PATH' '$PUBLIC_PATH'"
 
-          sshpass -p "$SSH_PASSWORD" scp -P "$PORT" /tmp/app.tgz "$SSH_USER@$SSS_HOST:$DEPLOY_PATH/app.tgz"
-          sshpass -p "$SSH_PASSWORD" scp -P "$PORT" /tmp/public.tgz "$SSH_USER@$SSS_HOST:$PUBLIC_PATH/public.tgz"
+          echo "Uploading application package..."
+          sshpass -e scp $SCP_OPTS /tmp/app.tgz "$SSH_USER@$SSS_HOST:$DEPLOY_PATH/app.tgz"
+
+          echo "Uploading public package..."
+          sshpass -e scp $SCP_OPTS /tmp/public.tgz "$SSH_USER@$SSS_HOST:$PUBLIC_PATH/public.tgz"
           if [ -f .env.deploy ]; then
-            sshpass -p "$SSH_PASSWORD" scp -P "$PORT" .env.deploy "$SSH_USER@$SSS_HOST:$DEPLOY_PATH/.env.deploy"
+            echo "Uploading Laravel env file..."
+            sshpass -e scp $SCP_OPTS .env.deploy "$SSH_USER@$SSS_HOST:$DEPLOY_PATH/.env.deploy"
           fi
 
-          sshpass -p "$SSH_PASSWORD" ssh -p "$PORT" "$SSH_USER@$SSS_HOST" "
+          echo "Deploying on remote server..."
+          sshpass -e ssh $SSH_OPTS "$SSH_USER@$SSS_HOST" "
             set -e
             cd '$DEPLOY_PATH'
 
