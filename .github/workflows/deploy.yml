@@ -132,6 +132,18 @@ jobs:
 
             cd '$DEPLOY_PATH'
             if [ -f artisan ]; then
+              if [ ! -f .env ]; then
+                echo 'ERROR: Missing .env in DEPLOY_PATH. The Laravel .env must be next to artisan.'
+                exit 1
+              fi
+
+              for key in APP_KEY DB_CONNECTION DB_HOST DB_DATABASE DB_USERNAME; do
+                if ! grep -q \"^$key=\" .env; then
+                  echo \"ERROR: Missing $key in DEPLOY_PATH/.env\"
+                  exit 1
+                fi
+              done
+
               $PHP_BIN artisan optimize:clear
               $PHP_BIN artisan migrate --force
               $PHP_BIN artisan config:cache
