@@ -152,6 +152,16 @@ jobs:
             tar -xzf public.tgz
             rm public.tgz
 
+            if [ ! -f index.php ]; then
+              echo 'ERROR: public/index.php was not deployed to PUBLIC_PATH.'
+              ls -la
+              exit 1
+            fi
+
+            chmod 755 '$PUBLIC_PATH'
+            find '$PUBLIC_PATH' -type d -exec chmod 755 {} +
+            find '$PUBLIC_PATH' -type f -exec chmod 644 {} +
+
             cd '$DEPLOY_PATH'
             if [ -f artisan ]; then
               if [ ! -f .env ]; then
@@ -176,4 +186,5 @@ jobs:
             cd '$PUBLIC_PATH'
             rm -rf storage
             ln -s '$DEPLOY_PATH/storage/app/public' storage || true
+            chmod 755 storage || true
           "
