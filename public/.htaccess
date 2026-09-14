@@ -23,10 +23,6 @@ DirectoryIndex index.php
     RewriteRule ^ index.php [L]
 </IfModule>
 
-<IfModule mod_dir.c>
-    FallbackResource /index.php
-</IfModule>
-
 # BEGIN cPanel-generated php ini directives, do not edit
 # Manual editing of this file may result in unexpected behavior.
 # To make changes to this file, use the cPanel MultiPHP INI Editor (Home >> Software >> MultiPHP INI Editor)
