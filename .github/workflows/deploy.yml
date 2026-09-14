@@ -138,8 +138,8 @@ jobs:
               fi
 
               for key in APP_KEY DB_CONNECTION DB_HOST DB_DATABASE DB_USERNAME; do
-                if ! grep -q \"^$key=\" .env; then
-                  echo \"ERROR: Missing $key in DEPLOY_PATH/.env\"
+                if ! grep -q \"^\$key=\" .env; then
+                  echo \"ERROR: Missing \$key in DEPLOY_PATH/.env\"
                   exit 1
                 fi
               done
