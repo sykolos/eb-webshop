@@ -55,6 +55,14 @@ jobs:
             --exclude='storage' \
             .
 
+      - name: Prepare fallback env file
+        env:
+          ENV_DEVELOP: ${{ secrets.ENV_DEVELOP }}
+        run: |
+          if [ -n "$ENV_DEVELOP" ]; then
+            printf '%s\n' "$ENV_DEVELOP" > /tmp/env.deploy
+          fi
+
       - name: Install sshpass
         run: |
           sudo apt-get update
@@ -101,6 +109,10 @@ jobs:
 
           echo "Uploading public package..."
           sshpass -e scp $SCP_OPTS /tmp/public.tgz "$SSH_USER@$SSS_HOST:$PUBLIC_PATH/public.tgz"
+          if [ -f /tmp/env.deploy ]; then
+            echo "Uploading fallback env file..."
+            sshpass -e scp $SCP_OPTS /tmp/env.deploy "$SSH_USER@$SSS_HOST:$DEPLOY_PATH/.env.deploy"
+          fi
           echo "Deploying on remote server..."
           sshpass -e ssh $SSH_OPTS "$SSH_USER@$SSS_HOST" "
             set -e
@@ -125,6 +137,11 @@ jobs:
               chmod 600 .env
             fi
 
+            if [ ! -f .env ] && [ -f .env.deploy ]; then
+              mv .env.deploy .env
+              chmod 600 .env
+            fi
+
             cd '$PUBLIC_PATH'
 
             find . -mindepth 1 -maxdepth 1 \
@@ -138,7 +155,8 @@ jobs:
             cd '$DEPLOY_PATH'
             if [ -f artisan ]; then
               if [ ! -f .env ]; then
-                echo 'ERROR: Missing .env in DEPLOY_PATH. The Laravel .env must be next to artisan.'
+                echo 'ERROR: Missing .env in DEPLOY_PATH. Available env files:'
+                find . -maxdepth 2 -type f -name '.env*' -print
                 exit 1
               fi
 
