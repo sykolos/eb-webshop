@@ -6,6 +6,7 @@ DirectoryIndex index.php
     </IfModule>
 
     RewriteEngine On
+    RewriteBase /
 
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
@@ -20,6 +21,10 @@ DirectoryIndex index.php
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
+</IfModule>
+
+<IfModule mod_dir.c>
+    FallbackResource /index.php
 </IfModule>
 
 # BEGIN cPanel-generated php ini directives, do not edit
