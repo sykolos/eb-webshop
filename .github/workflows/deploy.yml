@@ -109,7 +109,7 @@ jobs:
             mkdir -p storage/app/public storage/framework/cache storage/framework/sessions storage/framework/testing storage/framework/views storage/logs bootstrap/cache
 
             find . -mindepth 1 -maxdepth 1 \
-              ! -name '.env' \
+              ! -name '.env*' \
               ! -name 'storage' \
               ! -name '$PUBLIC_DIR_NAME' \
               ! -name 'app.tgz' \
@@ -119,6 +119,11 @@ jobs:
             rm app.tgz
 
             rm -f bootstrap/cache/config.php bootstrap/cache/routes-*.php bootstrap/cache/events.php
+
+            if [ ! -f .env ] && [ -f .env.develop ]; then
+              cp .env.develop .env
+              chmod 600 .env
+            fi
 
             cd '$PUBLIC_PATH'
 
