@@ -40,7 +40,7 @@ jobs:
           tar -czf /tmp/app.tgz \
             --exclude='.git' \
             --exclude='.github' \
-            --exclude='.env' \
+            --exclude='.env*' \
             --exclude='node_modules' \
             --exclude='public' \
             --exclude='storage/app/*' \
