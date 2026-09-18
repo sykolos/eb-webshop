@@ -15,6 +15,7 @@
 /public/css
 /public/mix-manifest.json
 /public/hot
+/public/.laravel-path.php
 /public/build
 
 # IDE / Editor specifikus
@@ -33,4 +34,3 @@ Desktop.ini
 # Lokális adatbázismentés vagy dump fájlok
 *.sql
 *.sqlite
-

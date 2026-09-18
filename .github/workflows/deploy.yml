@@ -36,7 +36,12 @@ jobs:
         run: npm run build
 
       - name: Prepare deploy package
+        env:
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          PUBLIC_PATH: ${{ secrets.PUBLIC_PATH }}
         run: |
+          set -euo pipefail
+          php scripts/deploy/configure-path.php
           tar -czf /tmp/app.tgz \
             --exclude='.git' \
             --exclude='.github' \
@@ -93,7 +98,6 @@ jobs:
 
           PORT="$SSH_PORT"
           PHP_BIN="php"
-          PUBLIC_DIR_NAME="$(basename "$PUBLIC_PATH")"
           export SSHPASS="$SSH_PASSWORD"
           SSH_OPTS="-p $PORT -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
           SCP_OPTS="-P $PORT -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
@@ -120,32 +124,23 @@ jobs:
 
             mkdir -p storage/app/public storage/framework/cache storage/framework/sessions storage/framework/testing storage/framework/views storage/logs bootstrap/cache
 
-            find . -mindepth 1 -maxdepth 1 \
-              ! -name '.env*' \
-              ! -name 'storage' \
-              ! -name '$PUBLIC_DIR_NAME' \
-              ! -name 'app.tgz' \
-              -exec rm -rf {} +
-
+            # Preserve old installations and data; the entry point selects DEPLOY_PATH explicitly.
             tar -xzf app.tgz
             rm app.tgz
 
             rm -f bootstrap/cache/config.php bootstrap/cache/routes-*.php bootstrap/cache/events.php
 
-            if [ ! -f .env ] && [ -f .env.develop ]; then
-              cp .env.develop .env
-              chmod 600 .env
-            fi
-
             if [ ! -f .env ] && [ -f .env.deploy ]; then
               mv .env.deploy .env
               chmod 600 .env
             fi
+            rm -f .env.deploy
 
             cd '$PUBLIC_PATH'
 
             find . -mindepth 1 -maxdepth 1 \
               ! -name 'storage' \
+              ! -name '.well-known' \
               ! -name 'public.tgz' \
               -exec rm -rf {} +
 
@@ -177,6 +172,7 @@ jobs:
                 fi
               done
 
+              $PHP_BIN scripts/deploy/check.php '$PUBLIC_PATH'
               $PHP_BIN artisan optimize:clear
               $PHP_BIN artisan migrate --force
               $PHP_BIN artisan config:cache
@@ -184,7 +180,24 @@ jobs:
             fi
 
             cd '$PUBLIC_PATH'
-            rm -rf storage
-            ln -s '$DEPLOY_PATH/storage/app/public' storage || true
-            chmod 755 storage || true
+            if [ -L storage ]; then
+              rm storage
+            elif [ -e storage ]; then
+              echo 'ERROR: public/storage is a real directory. Preserve its uploads before replacing it with a symlink.'
+              exit 1
+            fi
+            ln -s '$DEPLOY_PATH/storage/app/public' storage
           "
+
+      - name: Check deployed website
+        run: |
+          set -euo pipefail
+          for route in / /contact /login; do
+            echo "Checking $route"
+            status="$(curl --silent --show-error --connect-timeout 10 --max-time 30 \
+              --output /dev/null --write-out '%{http_code}' "https://ebtest.dekor26.hu$route")"
+            if [ "$status" != "200" ]; then
+              echo "::error::$route returned HTTP $status. Inspect DEPLOY_PATH/storage/logs/laravel.log and the cPanel Document Root."
+              exit 1
+            fi
+          done
