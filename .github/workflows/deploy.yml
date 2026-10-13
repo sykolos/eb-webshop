@@ -172,6 +172,7 @@ jobs:
                 fi
               done
 
+              $PHP_BIN scripts/deploy/ensure-app-key.php .env
               $PHP_BIN scripts/deploy/check.php '$PUBLIC_PATH'
               $PHP_BIN artisan optimize:clear
               $PHP_BIN artisan migrate --force
@@ -183,8 +184,9 @@ jobs:
             if [ -L storage ]; then
               rm storage
             elif [ -e storage ]; then
-              echo 'ERROR: public/storage is a real directory. Preserve its uploads before replacing it with a symlink.'
-              exit 1
+              echo 'public/storage is a real directory; preserving its contents before replacing it with a symlink.'
+              cp -a storage/. '$DEPLOY_PATH/storage/app/public/' 2>/dev/null || true
+              rm -rf storage
             fi
             ln -s '$DEPLOY_PATH/storage/app/public' storage
           "
