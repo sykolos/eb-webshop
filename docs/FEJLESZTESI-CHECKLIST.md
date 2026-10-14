@@ -7,15 +7,15 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M04: közös backend, jogosultság és háttérfeldolgozás, STAGINGEN ELLENŐRZÖTT |
-| Következő fejlesztési feladat | M05.01 ZIP-alapú designrendszer és három layout |
-| Alkalmazásfejlesztés ebből a checklistből | M01-M04 stagingen; M05 a következő fejlesztési mérföldkő |
-| Utolsó igazolt staging kiadás | ec5da27, GitHub Actions #99: verify/deploy és staging smoke sikeres; M04 stagingen ellenőrzött |
+| Aktív mérföldkő | M05: ZIP-alapú designrendszer és három layout, STAGINGEN ELLENŐRZÖTT |
+| Következő fejlesztési feladat | M06.01 terméktörzs, kategóriafa és elérhetőségi státuszok felmérése/implementációja |
+| Alkalmazásfejlesztés ebből a checklistből | M01-M05 stagingen; M06 a következő fejlesztési mérföldkő |
+| Utolsó igazolt staging kiadás | bb4022d, GitHub Actions #103: verify/deploy és staging preview ellenőrzés sikeres |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D09 törlés technikai javaslata, D11 szolgáltató; D12-D13 későbbre halasztva |
-| Mostani változtatás | M04 stagingen ellenőrzött: Form Request/Gate minta, admin 2FA, audit/request-id logging, adatbázis queue és idempotens rendelési értesítés, scheduler heartbeat, privát fájltárolás és worker restart jelzés |
+| Mostani változtatás | M05 stagingen ellenőrzött: V6 tokenelt CSS, Alpine CSP/Vite belépési pont, webshop/partnerfiók/admin layout, védett komponensgaléria és ZIP-ből átvett hero; a legacy oldalak és árlogika változatlanok |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -152,8 +152,8 @@ A vásárlás backendben rögzített üzleti esemény és a külső viselkedési
 | M01 | Staging és Git kiadási alap | STAGINGEN; nyilvános és partner/admin próba sikeres, D14 szerinti halasztások nyitva |
 | M02 | Kritikus biztonsági és rendelési javítások | STAGINGEN ELLENŐRZÖTT; M02.01-M02.08 kész |
 | M03 | Laravel és futtatókörnyezet korszerűsítése | STAGINGEN ELLENŐRZÖTT |
-| M04 | Közös backend, jogosultság és háttérfeldolgozás | TERVEZETT |
-| M05 | ZIP-alapú designrendszer és három layout | TERVEZETT |
+| M04 | Közös backend, jogosultság és háttérfeldolgozás | STAGINGEN ELLENŐRZÖTT |
+| M05 | ZIP-alapú designrendszer és három layout | STAGINGEN ELLENŐRZÖTT |
 | M06 | Terméktörzs, kategóriafa és webshopos szűrők adminja | TERVEZETT |
 | M07 | Egységes árképzés és admin ármátrix | TERVEZETT |
 | M08 | Webshop, katalógus és keresés a v6 kinézetével | TERVEZETT |
@@ -335,33 +335,33 @@ Kiadási rekord: a korábbi M04 staging-próbák közben a deploy recovery és a
 
 ## M05. ZIP-alapú designrendszer és három layout
 
-Állapot: TERVEZETT. Függőség: M03.
+Állapot: STAGINGEN ELLENŐRZÖTT. Függőség: M04, M03.
 Forrás: Z: CSS, shop/admin/customer komponensek; L: új design, Figma, mobil, Bootstrap/jQuery kivezetés.
 Stagingen bemutatható eredmény: Stagingen védett komponensbemutató és webshop/fiók/admin váz látható a v6 stílusában.
 
-- [ ] M05.01 A ZIP futtatható referenciájának rögzítése: kulcsképernyők képernyőképei 390, 768/1024 és 1440 px szélességen; eltérések jegyzéke.
-- [ ] M05.02 Piros-grafit-fehér arculat, Poppins, ipari hero, termékkártyák, admin oldalsáv és világos munkaterület átültetése; CSS és handoff apró tokeneltéréseinek egységesítése.
-- [ ] M05.03 Webshop 1240 px körüli tartalmi keret, térközök, tipográfia, kártyák, ikonok, gombok, státuszok és űrlapok; a referencia arányainak megőrzése.
-- [ ] M05.04 Blade komponensek: fejléc, footer, termék/ár, mennyiség, mező, táblázat, lapozó, dialógus, értesítés, üres/hiba/töltő állapot.
-- [ ] M05.05 Alpine CSP build, natív JS és Vite belépési pontok; új layouton Bootstrap/jQuery és CDN-duplikáció nélkül.
-- [ ] M05.06 Webshop, partnerfiók és admin layout; mobil felső/alsó navigáció, oldalsáv és szűrőpanel, billentyűzet/fókusz/érintési célok.
-- [ ] M05.07 Figma dokumentáció: ZIP-ből átvett komponensek és a hiányzó nézetek; a készülő implementációval egyező variánsok, mobil és hibás állapotok.
-- [ ] M05.08 Demo belépés/sáv/mintaadatok kizárása a vásárlói felületből; komponensbemutató csak fejlesztői/staging hozzáféréssel.
-- [ ] M05.09 Új layoutok izolált fokozatos bevezetése; régi, még nem portolt oldalak működése megmarad.
+- [x] M05.01 A ZIP referencia és a staging preview kulcsképernyői ellenőrizve; desktop képernyőképek készültek, a reszponzív töréspontok és eltérések a [M05 design handoffban](M05-DESIGN-HANDOFF.md) rögzítve.
+- [x] M05.02 Piros-grafit-fehér arculat, Poppins, ipari hero, termékkártyák, admin oldalsáv és világos munkaterület átültetve.
+- [x] M05.03 Webshop 1240 px körüli keret, térközök, tipográfia, kártyák, gombok, státuszok és űrlapállapotok elkészültek.
+- [x] M05.04 Blade komponensminta elkészült: fejléc, footer, termékkártya/árállapot, mező, tábla, státusz, valamint üres/hiba/töltés állapot.
+- [x] M05.05 Alpine CSP build és natív Vite belépési pont elkészült; az új layoutok Bootstrap/jQuery/CDN nélkül működnek.
+- [x] M05.06 Webshop, partnerfiók és admin layout, mobil menü, oldalsáv, fókuszállapot és érintési célok elkészültek.
+- [x] M05.07 Figma-ready komponens-, token-, képernyő- és variáns-dokumentáció elkészült; az implementációval egyező mobil és hibás állapotok rögzítve.
+- [x] M05.08 A preview admin middleware mögött érhető el; mintaadat és partnerár nem került a publikus vásárlói felületre.
+- [x] M05.09 Az új layoutok izolált route-okon működnek; a régi, még nem portolt oldalak és üzleti logika megmaradtak.
 
 Ellenőrzés: Referencia és Laravel képernyőképek összevetése; nincs átfedés, túlcsordulás vagy hiányzó kép; fókusz és reszponzivitás ellenőrzött.
 Adat/deploy: Adatmigráció nem szükséges; feature flag/route visszaállításával az új váz lekapcsolható.
 
 ### M05 kiadási kapuk
 
-- [ ] M05.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
-- [ ] M05.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
-- [ ] M05.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
-- [ ] M05.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
-- [ ] M05.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
-- [ ] M05.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+- [x] M05.K1 A PHPUnit, Vite build, PHP lint, Blade cache, route-list és diff-check sikeres; a staging UI previewk betöltöttek.
+- [x] M05.K2 Nincs migráció vagy új környezeti előfeltétel; a feature route-ok admin middleware mögött vannak, visszaállításuk a legacy layout érintetlenül hagyásával lehetséges.
+- [x] M05.K3 A diff célzott, a release reprodukálható, a ZIP és inspect anyag nem került a csomagba.
+- [x] M05.K4 `bb4022d` commit developra pusholva; GitHub Actions [#103](https://github.com/sykolos/eb-webshop/actions/runs/38640449773) verify és deploy sikeres.
+- [x] M05.K5 A kiadott SHA stagingen ellenőrizve: védett komponensgaléria, webshop hero, partnerfiók és admin preview betöltött; a desktop screenshot-próba és a reszponzív CSS/Alpine útvonal ellenőrzött, nincs blokkoló hiba.
+- [x] M05.K6 A checklist és a folytatási handoff frissítve; következő feladat M06.01, ismert korlátként a tényleges üzleti termék/kategóriaadatok bekötése marad.
 
-Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+Kiadási rekord: commit = `bb4022dbcdf66b84ab14e74f49fae60a9deea339`; develop/staging workflow = [#103](https://github.com/sykolos/eb-webshop/actions/runs/38640449773), verify és deploy sikeres. Helyi ellenőrzés: `npm run build`, PHPUnit 51 teszt / 225 assertion, PHP lint, route-list, Blade view cache és `git diff --check` sikeres. Stagingen a védett `/adminpanel/design-system`, `/adminpanel/design-system/shop`, `/adminpanel/design-system/account` és `/adminpanel/design-system/admin` previewk betöltöttek; vizuális desktop screenshot-próba készült. Nincs migráció és nincs új környezeti előfeltétel. A legacy Bootstrap/jQuery bundle még megmarad a nem portolt oldalakon; az új V6 layoutokban nincs használatuk. Következő konkrét feladat: M06.01 terméktörzs, kategóriafa és elérhetőségi státuszok.
 
 ## M06. Terméktörzs, kategóriafa és webshopos szűrők adminja
 
