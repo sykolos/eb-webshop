@@ -115,5 +115,7 @@ cd "$app"
 "$php_bin" artisan migrate --force
 "$php_bin" artisan config:cache
 "$php_bin" artisan view:cache
+# Tell a supervised queue worker to reload the deployed code after migrations.
+"$php_bin" artisan queue:restart
 "$php_bin" artisan up
 echo "Release $revision installed. Code backup: $backup"

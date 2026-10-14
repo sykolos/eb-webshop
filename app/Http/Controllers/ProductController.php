@@ -10,6 +10,9 @@ use Illuminate\Http\Request;
 use Intervention\Image\Laravel\Facades\Image;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\ProductStoreRequest;
+use App\Http\Requests\ProductUpdateRequest;
+use App\Services\AuditLogger;
 
 
 class ProductController extends Controller
@@ -57,34 +60,32 @@ class ProductController extends Controller
         return view('admin.pages.products.index', compact('products', 'units', 'categories'));
     }
 
-    public function store(Request $request){
-        // 1. VALIDÁCIÓ
-        $request->validate([
-            'title'=>'required|max:255',
-            'category_id'=>'required',
-            'price'=>'required',
-            'unit_id'=>'required',
-            'image'=>'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'serialnum'=>'required|max:255'
-        ]);
+    public function store(ProductStoreRequest $request, AuditLogger $audit){
+        $validated = $request->validated();
 
         // 2. KÉP KONVERTÁLÁS ÉS MENTÉS
         $filename = 'products/' . Str::uuid() . '.webp'; // Egyedi név
-        $image = Image::read($request->file('image'))->toWebp(90);
+        $image = Image::read($validated['image'])->toWebp(90);
         Storage::disk('public')->put($filename, $image); // Mentés storage/app/public/products/…
 
         // 3. ADATBÁZISBA MENTÉS
         $product = Products::create([
-            'serial_number' => $request->serialnum,
-            'title' => $request->title,
-            'category_id'=>$request->category_id,
-            'unit_id'=>$request->unit_id,
-            'price'=>$request->price,
-            'description'=>$request->description,
+            'serial_number' => $validated['serialnum'],
+            'title' => $validated['title'],
+            'category_id'=>$validated['category_id'],
+            'unit_id'=>$validated['unit_id'],
+            'price'=>$validated['price'],
+            'description'=>$validated['description'] ?? null,
             'image' => $filename // pl. "products/abc.webp"
         ]);
 
         // 4. VISSZAJELZÉS
+        $audit->record('product.created', $product, [
+            'title' => $product->title,
+            'category_id' => $product->category_id,
+            'price' => $product->price,
+        ]);
+
         return back()->with('success','Termék Feltöltve');
     }
 
@@ -96,17 +97,9 @@ class ProductController extends Controller
     
     
 
-    public function update(Request $request, $id)
+    public function update(ProductUpdateRequest $request, $id, AuditLogger $audit)
     {
-        // 1. VALIDÁCIÓ
-        $request->validate([
-            'title' => 'required|max:255',
-            'category_id' => 'required',
-            'unit_id' => 'required',
-            'price' => 'required',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'serialnum' => 'required|max:255',
-        ]);
+        $validated = $request->validated();
 
         // 2. TERMÉK LEKÉRÉSE
         $product = Products::findOrFail($id);
@@ -123,7 +116,7 @@ class ProductController extends Controller
 
             // Új WebP név és mentés
             $filename = 'products/' . Str::uuid() . '.webp';
-            $webp = Image::read($request->file('image'))->toWebp(90);
+            $webp = Image::read($validated['image'])->toWebp(90);
             Storage::disk('public')->put($filename, $webp);
 
             $imagePath = $filename;
@@ -131,16 +124,22 @@ class ProductController extends Controller
 
         // 5. FRISSÍTÉS
         $product->update([
-            'serial_number' => $request->serialnum,
-            'title' => $request->title,
-            'category_id' => $request->category_id,
-            'unit_id' => $request->unit_id,
-            'price' => $request->price,
-            'description' => $request->description,
+            'serial_number' => $validated['serialnum'],
+            'title' => $validated['title'],
+            'category_id' => $validated['category_id'],
+            'unit_id' => $validated['unit_id'],
+            'price' => $validated['price'],
+            'description' => $validated['description'] ?? null,
             'image' => $imagePath,
         ]);
 
         // 6. VISSZAJELZÉS
+        $audit->record('product.updated', $product, [
+            'title' => $product->title,
+            'category_id' => $product->category_id,
+            'price' => $product->price,
+        ]);
+
         return back()->with('success', 'Termék frissítve');
     }
 
@@ -152,8 +151,10 @@ class ProductController extends Controller
         return view('admin.pages.products.edit',['product_units'=>$units, 'categories'=>$categories,'product'=>$product]);
     }
     
-    public function destroy($id){
-        Products::findOrFail($id)->delete();
+    public function destroy($id, AuditLogger $audit){
+        $product = Products::findOrFail($id);
+        $product->delete();
+        $audit->record('product.deleted', $product, ['title' => $product->title]);
         return back()->with('success','Termék törölve'); 
     }
 

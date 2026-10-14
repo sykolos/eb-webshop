@@ -8,6 +8,7 @@ use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Notifications\Messages\MailMessage;
 use App\Models\Order;
 use App\Policies\OrderPolicy;
+use App\Models\User;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -28,6 +29,10 @@ class AuthServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerPolicies();
+
+        Gate::before(function (User $user, string $ability) {
+            return $user->hasPermission($ability) ? true : null;
+        });
 
         //verification email customization
         VerifyEmail::toMailUsing(function (object $notifiable, string $url) {

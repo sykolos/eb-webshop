@@ -11,6 +11,7 @@ use App\Models\Special_prices;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
 use App\Models\RecommendedProduct;
+use App\Services\AuditLogger;
 
 
 class AdminController extends Controller
@@ -134,7 +135,7 @@ class AdminController extends Controller
     }
 
 
-    public function ajaxSetPrice(Request $request)
+    public function ajaxSetPrice(Request $request, AuditLogger $audit)
     {
         $request->validate([
             'user_id' => 'required|integer|exists:users,id',
@@ -146,10 +147,15 @@ class AdminController extends Controller
             ['user_id' => $request->user_id, 'product_id' => $request->product_id],
             ['price' => $request->price]
         );
+        $audit->record('special_price.updated', $price, [
+            'user_id' => $request->user_id,
+            'product_id' => $request->product_id,
+            'price' => $request->price,
+        ]);
 
         return response()->json(['success' => true, 'message' => 'Ár elmentve.']);
     }
-    public function ajaxDeletePrice(Request $request)
+    public function ajaxDeletePrice(Request $request, AuditLogger $audit)
     {
         $request->validate([
             'user_id' => 'required|integer',
@@ -159,6 +165,10 @@ class AdminController extends Controller
         Special_prices::where('user_id', $request->user_id)
             ->where('product_id', $request->product_id)
             ->delete();
+        $audit->record('special_price.deleted', null, [
+            'user_id' => $request->user_id,
+            'product_id' => $request->product_id,
+        ]);
 
         return response()->json(['success' => true, 'message' => 'Ár törölve.']);
     }
@@ -335,7 +345,7 @@ class AdminController extends Controller
         return response()->json(['products' => $products]);
     }
 
-public function saveMatrix(Request $request)
+public function saveMatrix(Request $request, AuditLogger $audit)
 {
     \Log::info('SaveMatrix Payload:', $request->all());
 
@@ -369,6 +379,14 @@ public function saveMatrix(Request $request)
                 ->delete();
         }
     }
+
+    $audit->record('discount.matrix.updated', null, [
+        'user_id' => $request->user_id,
+        'product_id' => $request->product_id,
+        'category_id' => $request->category_id,
+        'discount_percent' => $request->discount_percent,
+        'extra_percent' => $request->extra_percent,
+    ]);
 
     return response()->json(['success' => true]);
 }

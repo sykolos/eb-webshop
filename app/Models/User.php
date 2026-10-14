@@ -31,7 +31,9 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $hidden = [
         'password',
         'remember_token',
-        'is_admin'
+        'is_admin',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
     ];
 
     /**
@@ -41,7 +43,33 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'two_factor_secret' => 'encrypted',
+        'two_factor_recovery_codes' => 'encrypted:array',
+        'two_factor_confirmed_at' => 'datetime',
+        'last_login_at' => 'datetime',
+        'is_admin' => 'boolean',
     ];
+
+    public function technicalRole(): string
+    {
+        $role = $this->role ?: ($this->is_admin ? 'administrator' : 'partner');
+
+        return config("permissions.aliases.$role", $role);
+    }
+
+    public function hasPermission(string $permission): bool
+    {
+        $permissions = config('permissions.roles.'.$this->technicalRole(), []);
+
+        return in_array('*', $permissions, true) || in_array($permission, $permissions, true);
+    }
+
+    public function hasTwoFactorEnabled(): bool
+    {
+        return $this->is_admin
+            && filled($this->two_factor_secret)
+            && filled($this->two_factor_confirmed_at);
+    }
 
     public function orders(){
         return $this->hasMany(Order::class);

@@ -23,6 +23,8 @@ use App\Http\Controllers\AccountpageController;
 use App\Http\Controllers\MailController;
 use App\Http\Controllers\ShippingAddressController;
 use App\Http\Controllers\ProductRecommend;
+use App\Http\Controllers\AdminTwoFactorController;
+use App\Http\Controllers\PrivateFileController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 
@@ -78,6 +80,17 @@ Route::post('register',[AuthController::class,'postregister'])->name('register.s
 Route::post('/login',[AuthController::class,'postlogin'])->name('login.submit')->middleware(['guest', 'throttle:login']);
 Route::post('logout/',[AuthController::class,'postlogout'])->name('logout')->middleware('auth');
 
+Route::middleware('auth')->group(function () {
+    Route::get('/private-files/{path}', [PrivateFileController::class, 'download'])
+        ->where('path', '.*')
+        ->middleware('signed')
+        ->name('private-file.download');
+    Route::get('/adminpanel/security/2fa/challenge', [AdminTwoFactorController::class, 'challenge'])
+        ->name('admin.2fa.challenge');
+    Route::post('/adminpanel/security/2fa/challenge', [AdminTwoFactorController::class, 'verify'])
+        ->name('admin.2fa.verify');
+});
+
 Route::group(['prefix'=>'account','middleware'=>'auth'],function(){
     Route::get('/',[PagesController::class,'account'])->name('account');
     Route::get('/orders',[AccountpageController::class,'orders'])->name('account.orders');
@@ -99,6 +112,9 @@ Route::group(['prefix'=>'account','middleware'=>'auth'],function(){
     //adminpanel group
     Route::group(['prefix' =>'adminpanel','middleware'=>'admin'],function(){
         Route::get('/',[AdminController::class, 'dashboard'])->name('adminpanel');
+        Route::get('/security/2fa', [AdminTwoFactorController::class, 'setup'])->name('admin.2fa.setup');
+        Route::post('/security/2fa/confirm', [AdminTwoFactorController::class, 'confirm'])->name('admin.2fa.confirm');
+        Route::post('/security/2fa/disable', [AdminTwoFactorController::class, 'disable'])->name('admin.2fa.disable');
         
         //products group
         Route::group(['prefix'=>'products',], function(){

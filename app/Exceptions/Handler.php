@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -35,7 +36,13 @@ class Handler extends ExceptionHandler
     public function register()
     {
         $this->reportable(function (Throwable $e) {
-            //
+            $request = app()->bound('request') ? request() : null;
+            Log::error('Unhandled application exception.', [
+                'exception' => $e::class,
+                'message' => $e->getMessage(),
+                'request_id' => $request?->attributes->get('request_id'),
+                'route' => $request?->route()?->getName(),
+            ]);
         });
     }
     

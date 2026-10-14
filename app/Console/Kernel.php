@@ -15,7 +15,10 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        $schedule->command('system:heartbeat')
+            ->everyFiveMinutes()
+            ->withoutOverlapping(10)
+            ->when(fn () => ! app()->environment('testing'));
     }
 
     /**

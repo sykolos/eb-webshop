@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Support\PasswordRules;
+use App\Http\Requests\LoginRequest;
+use App\Services\AuditLogger;
 
 class AuthController extends Controller
 {
@@ -60,7 +62,10 @@ class AuthController extends Controller
         return back()->with('success','Sikeres bejelentkezés');
     }
     //logout
-    public function postlogout(Request $request){
+    public function postlogout(Request $request, AuditLogger $audit){
+        if ($request->user()) {
+            $audit->record('auth.logout', $request->user());
+        }
         Auth::logout();
 
         $request->session()->invalidate();
@@ -71,18 +76,26 @@ class AuthController extends Controller
 
     //login user
 
-    public function postlogin(Request $request){
-        //validate
-        $details = $request->validate([     
-            'email'=>'required|email',            
-            'password'=>'required',
-        ]);
+    public function postlogin(LoginRequest $request, AuditLogger $audit){
+        $details = $request->validated();
         //login
         // login "remember me" opcióval
         $remember = $request->has('remember');
 
         if(Auth::attempt($details, $remember)){
             $request->session()->regenerate();
+
+            $user = $request->user();
+            $user->forceFill(['last_login_at' => now()])->save();
+            $audit->record('auth.login', $user);
+
+            if ($user->hasTwoFactorEnabled()) {
+                $request->session()->put(config('two_factor.pending_session_key'), $user->id);
+                $request->session()->forget(config('two_factor.verified_session_key'));
+
+                return redirect()->route('admin.2fa.challenge');
+            }
+
             return redirect()->intended('/');
         }
         return back()->withErrors([

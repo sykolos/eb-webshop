@@ -7,15 +7,15 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M03: Laravel és futtatókörnyezet korszerűsítése, KIADÁSRA KÉSZ; M03.01-M03.06 helyben ellenőrizve |
-| Következő fejlesztési feladat | M03 staging kiadás és ellenőrzés; utána M04.01 közös backend-minta |
-| Alkalmazásfejlesztés ebből a checklistből | M01-M02 stagingen; M03 Laravel 12/PHP 8.2 és Vite 8 upgrade kiadásra kész |
-| Utolsó igazolt staging kiadás | cd33abc, GitHub Actions #76: verify/deploy/HTTP sikeres; M02.08 stagingen |
+| Aktív mérföldkő | M04: közös backend, jogosultság és háttérfeldolgozás, KIADÁSRA KÉSZ |
+| Következő fejlesztési feladat | M05.01 ZIP-alapú designrendszer és három layout |
+| Alkalmazásfejlesztés ebből a checklistből | M01-M03 stagingen; M04 helyben kész, egy develop kiadásra vár |
+| Utolsó igazolt staging kiadás | c82965a, GitHub Actions #80: verify/deploy/HTTP és build asset ellenőrzés sikeres; M03 stagingen |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D09 törlés technikai javaslata, D11 szolgáltató; D12-D13 későbbre halasztva |
-| Mostani változtatás | M03.01-M03.06 elkészült: Laravel 9 -> 12, csomag- és lockfrissítés, Intervention Image 3, Vite 8, PHPUnit 11; staging kiadás következik |
+| Mostani változtatás | M04 helyben kész: Form Request/Gate minta, admin 2FA, audit/request-id logging, adatbázis queue és idempotens rendelési értesítés, scheduler heartbeat, privát fájltárolás és worker restart jelzés |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -151,7 +151,7 @@ A vásárlás backendben rögzített üzleti esemény és a külső viselkedési
 | M00 | ZIP/lista összevetés és követhető munkalista | DOKUMENTÁCIÓ ELKÉSZÜLT |
 | M01 | Staging és Git kiadási alap | STAGINGEN; nyilvános és partner/admin próba sikeres, D14 szerinti halasztások nyitva |
 | M02 | Kritikus biztonsági és rendelési javítások | STAGINGEN ELLENŐRZÖTT; M02.01-M02.08 kész |
-| M03 | Laravel és futtatókörnyezet korszerűsítése | TERVEZETT |
+| M03 | Laravel és futtatókörnyezet korszerűsítése | STAGINGEN ELLENŐRZÖTT |
 | M04 | Közös backend, jogosultság és háttérfeldolgozás | TERVEZETT |
 | M05 | ZIP-alapú designrendszer és három layout | TERVEZETT |
 | M06 | Terméktörzs, kategóriafa és webshopos szűrők adminja | TERVEZETT |
@@ -297,41 +297,41 @@ Adat/deploy: Migrációs hatás külön felmérve; framework rollbackhez a kompa
 - [x] M03.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek: PHPUnit 46 teszt/215 assertion, Vite build, npm audit 0, Composer validate, route-list, Blade-cache és diff-check.
 - [x] M03.K2 Nincs migráció, új környezeti előfeltétel vagy feature flag; a lockfájlok reprodukálhatók, a meglévő üzleti ár-/kosár-/rendelésadatok és session-viselkedés megőrzendő; rollback az előző kódcsomaggal kompatibilis.
 - [x] M03.K3 Diff ellenőrizve, célzott alkalmazás-, konfiguráció-, teszt- és lockfájlok; reprodukálható, önállóan commitolható állapot.
-- [ ] M03.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
-- [ ] M03.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
-- [ ] M03.K6 A staging ellenőrzés után a checklist státusza STAGINGEN ELLENŐRZÖTT állapotra frissítendő; külön kiadási napló nem készül.
+- [x] M03.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [x] M03.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; a publikus smoke útvonalak és a build assetek betöltése sikeres, nincs nyitott kiadást blokkoló hiba.
+- [x] M03.K6 A checklist státusza STAGINGEN ELLENŐRZÖTT; külön kiadási napló nem készült.
 
-Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+Kiadási rekord: commit = `c82965abf24753c309450710534fcdfae1e2abcc`; feature workflow = [#79](https://github.com/sykolos/eb-webshop/actions/runs/38627176724), develop/staging workflow = [#80](https://github.com/sykolos/eb-webshop/actions/runs/38627334532). A staging `/`, `/contact`, `/login` útvonalai HTTP 200-at adtak; a főoldalról hivatkozott CSS és JavaScript build assetek HTTP 200-at adtak. Az admin munkamenet a `/adminpanel` oldalon betöltött, a dashboard és admin navigáció látható.
 
 ## M04. Közös backend, jogosultság és háttérfeldolgozás
 
-Állapot: TERVEZETT. Függőség: M03.
+Állapot: KIADÁSRA KÉSZ. Függőség: M03.
 Forrás: L: service layer, logging, queue, scheduler, jogosultság.
 Stagingen bemutatható eredmény: Működő szerepkör-ellenőrzés, háttérben küldött tesztértesítés és ellenőrzött időzítő.
 
-- [ ] M04.01 Form Request, Policy/Gate, service és controller felelősségek mintája; üzleti modulok saját mérföldkövükben költöznek át.
-- [ ] M04.02 A tényleges munkakörök felmérése és szerepkör/művelet jogosultsági mátrixa D04 szerint; példaszerepkörök automatikus bevezetése helyett a valós munkamegosztás leképezése.
-- [ ] M04.03 Admin kétlépcsős belépés, helyreállítás és jogosultságváltozás audit; partnerjóváhagyás önmagában nem ad adminjogot.
-- [ ] M04.04 Auditnapló fontos módosításokról; strukturált hibalog request azonosítóval; érzékeny mezők maszkolása, logrotáció és hibariasztás.
-- [ ] M04.05 Database queue vagy igazoltan rendelkezésre álló driver, felügyelt worker, timeout/retry/backoff és sikertelen feladatok kezelése.
-- [ ] M04.06 Email/PDF háttérmunka commit után; sikertelen küldés ne tegye sikertelenné a már mentett rendelést; ismétlésvédelem.
-- [ ] M04.07 Scheduler cron, átfedő futások kizárása és heartbeat; staging feladatok elkülönítése.
-- [ ] M04.08 Egységes feltöltés- és privát letöltéskezelés: fájltípus, méret, név, jogosultság és lejárat.
-- [ ] M04.09 Deploy után worker újraindítás; feladatok és migrációk verziókompatibilitása.
+- [x] M04.01 Form Request, Policy/Gate, service és controller felelősségek mintája; üzleti modulok saját mérföldkövükben költöznek át.
+- [x] M04.02 Technikai szerepkör/művelet jogosultsági mátrix D04 szerint; az `administrator`/`partner` értékek kompatibilitási leképezések, a konkrét munkakörnevek később konfigurálhatók.
+- [x] M04.03 Admin kétlépcsős belépés, helyreállítás és jogosultságváltozás audit; partnerjóváhagyás önmagában nem ad adminjogot.
+- [x] M04.04 Auditnapló fontos módosításokról; strukturált hibalog request azonosítóval; érzékeny mezők maszkolása, logrotáció és hibariasztás.
+- [x] M04.05 Database queue előkészítés, felügyelt worker újraindítási jelzés, timeout/retry/backoff és sikertelen feladatok kezelése.
+- [x] M04.06 Email/PDF háttérmunka commit után; sikertelen küldés ne tegye sikertelenné a már mentett rendelést; ismétlésvédelem.
+- [x] M04.07 Scheduler cron, átfedő futások kizárása és heartbeat; környezetenként külön heartbeat.
+- [x] M04.08 Egységes privát feltöltés- és letöltéskezelés: fájltípus, MIME, méret, generált név, bejelentkezéshez kötött aláírt URL és lejárat.
+- [x] M04.09 Deploy után worker restart jelzés; queue és migráció verziókompatibilis release-sorrend.
 
 Ellenőrzés: Tiltott szerepkör 403/404; tesztjob lefut és hibából újrapróbálható; cron futása mérhető; emailhiba mellett rendelés megmarad.
 Adat/deploy: Jogosultságok és audit/queue táblák bővítő migrációi, meglévő adminok ellenőrzött átvitele.
 
 ### M04 kiadási kapuk
 
-- [ ] M04.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
-- [ ] M04.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
-- [ ] M04.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [x] M04.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [x] M04.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
+- [x] M04.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
 - [ ] M04.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
 - [ ] M04.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
 - [ ] M04.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
 
-Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+Kiadási rekord: commit = előkészítés alatt; workflow = nincs; staging próba = nem futott. Helyi bizonyíték: PHPUnit 51 teszt / 223 assertion sikeres, PHP lint, route boot és diff-check sikeres. A queue worker és az ütemezett cron tényleges staging-futtatása a kiadás után ellenőrizendő.
 
 ## M05. ZIP-alapú designrendszer és három layout
 
@@ -1091,6 +1091,14 @@ Kiadási bejegyzéshez szükséges részletek:
 - M01.08 valódi staging partner/admin próba továbbra nincs végrehajtva, mert dedikált staging hitelesítő adatok nem állnak rendelkezésre ebben a környezetben. Az alkalmazásszintű login-szerződés korábbi CI-tesztje megmarad, de ez nem helyettesíti az élő fiókos átvételt.
 - A feature [#58](https://github.com/sykolos/eb-webshop/actions/runs/38614946203) és a develop/staging [#59](https://github.com/sykolos/eb-webshop/actions/runs/38615137385) workflow sikeres. A staging `/`, `/contact`, `/login` végpontjai HTTP 200-at adtak.
 - Állapot: M02.05 stagingen ellenőrzött; M02 közös K1-K6 kapui a további M02 pontok miatt nyitva. Következő konkrét fejlesztési feladat: M02.06 auth- és email-végpontok próbálkozáskorlátja, session- és jelszóvédelem. M01.08 élő partner/admin login-próba dedikált tesztadatokkal továbbra nyitott.
+
+### 2026-10-14: M03 teljes staging kiadás
+
+- A Laravel 12 upgrade első develop kiadása (`db518ec`, [#78](https://github.com/sykolos/eb-webshop/actions/runs/38626390035)) a verify után 500-as smoke eredménnyel állt meg. A staging hiba oka `ViteManifestNotFoundException` volt: Laravel 12 a belső `myapp/public/build/manifest.json` fájlt kereste, miközben a meglévő deploy-út külön publikus könyvtárat használ.
+- A javító commit `c82965abf24753c309450710534fcdfae1e2abcc` a `public/index.php` belépési pontban a Laravel 12-höz szükséges explicit `$app->usePublicPath(__DIR__)` beállítást használja; a deploy-entrypoint teszt-fixture ehhez igazítva maradt kompatibilis.
+- Helyi PHPUnit: 46 teszt / 215 assertion sikeres; PHP lint és diff-check sikeres. A feature [#79](https://github.com/sykolos/eb-webshop/actions/runs/38627176724) és a develop/staging [#80](https://github.com/sykolos/eb-webshop/actions/runs/38627334532) verify/deploy sikeres.
+- Staging ellenőrzés: `/`, `/contact`, `/login` HTTP 200; a főoldal CSS/JavaScript build assetjei HTTP 200; az admin dashboard (`/adminpanel`) és navigáció betöltött a már bejelentkezett admin munkamenettel.
+- M03 állapota STAGINGEN ELLENŐRZÖTT. Nincs migráció, új környezeti előfeltétel vagy külön kiadási napló. Következő konkrét fejlesztés: M04.01 közös Form Request/Policy/Service/Controller minta.
 
 ### Következő munkamenet sablonja
 

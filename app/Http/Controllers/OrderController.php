@@ -6,6 +6,8 @@ use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Http\Requests\UpdateOrderStatusRequest;
+use App\Services\AuditLogger;
 
 class OrderController extends Controller
 {
@@ -66,10 +68,8 @@ class OrderController extends Controller
         $order=Order::with('user','items','items.product')->findOrFail($id);
         return view('admin.pages.orders.view',['order'=>$order,'states'=>$order->statusOptions()]);
     }
-    public function updateStatus(Request $request, $id){
-        $validated = $request->validate([
-            'status' => ['required', 'string', Rule::in(Order::allowedStatuses())],
-        ]);
+    public function updateStatus(UpdateOrderStatusRequest $request, $id, AuditLogger $audit){
+        $validated = $request->validated();
         $order = Order::findOrFail($id);
 
         if (!Order::canTransition((string) $order->status, $validated['status'])) {
@@ -79,6 +79,10 @@ class OrderController extends Controller
         }
 
         $order->update(['status' => $validated['status']]);
+        $audit->record('order.status_updated', $order, [
+            'from' => $order->getOriginal('status'),
+            'to' => $validated['status'],
+        ]);
         return back()->with('success','Rendelés Frissitve');
     }
     public function getpdf($id){

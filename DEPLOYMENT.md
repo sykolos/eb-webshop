@@ -63,7 +63,9 @@ remote.sh retains checks that need no new credentials:
 - Refuse to delete a real public/storage directory; existing symlinks are supported.
 - Use prerendered maintenance, run migrations and rebuild config/view caches.
 - Leave maintenance in place if a failure occurs after it starts.
-- Do not restart queues or rewrite existing server settings.
+- Signal the existing supervised queue worker to restart after a successful
+  migration/config cache; this does not create a worker or change server
+  settings.
 
 No APP_ENV=staging, Basic credentials, email sink, new cookie settings or sync
 queue are required by the current preflight. A missing/invalid APP_KEY still

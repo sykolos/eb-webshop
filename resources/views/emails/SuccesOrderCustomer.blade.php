@@ -30,7 +30,9 @@
 <body>
     <div class="header">
         <h2>Köszönjük a rendelésedet!</h2>
-        <img src="{{ $logoCid }}" alt="ElectroBusiness" style="max-height: 60px;">
+        @if ($logoCid)
+            <img src="{{ $logoCid }}" alt="ElectroBusiness" style="max-height: 60px;">
+        @endif
 
         
     </div>

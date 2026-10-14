@@ -25,7 +25,7 @@ class SuccesOrderCustomerMail extends Mailable
     {
         ini_set('memory_limit', '256M');
 
-        $pdf = \PDF::loadView('myPDF', [
+        $pdf = Pdf::loadView('myPDF', [
             'order' => $this->order,
             'states' => $this->states,
             'id' => $this->id,
@@ -33,21 +33,13 @@ class SuccesOrderCustomerMail extends Mailable
 
         $filename = 'EBR-2025-' . $this->order->id . '.pdf';
 
-        // Itt hozzuk létre a CID azonosítót
-        $logoPath = public_path('img/eb_logo.png');
-        $logoCid = '';
-
-        $this->withSwiftMessage(function ($message) use (&$logoCid, $logoPath) {
-            $logoCid = $message->embed($logoPath);
-        });
-
         return $this->view('emails.SuccesOrderCustomer')
             ->subject('Sikeres Rendelés')
             ->with([
                 'order' => $this->order,
                 'states' => $this->states,
                 'id' => $this->id,
-                'logoCid' => $logoCid,
+                'logoCid' => asset('img/eb_logo.png'),
             ])
             ->attachData($pdf->output(), $filename, [
                 'mime' => 'application/pdf',

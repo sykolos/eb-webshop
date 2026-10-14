@@ -70,7 +70,7 @@ class ExampleTest extends TestCase
         ])->assertRedirect('/');
 
         $this->get('/account')->assertOk();
-        $this->get('/adminpanel')->assertRedirect('/login');
+        $this->get('/adminpanel')->assertForbidden();
     }
 
     public function test_admin_login_reaches_admin_area(): void
@@ -104,7 +104,7 @@ class ExampleTest extends TestCase
             '/adminpanel/units',
             '/adminpanel/users',
         ] as $path) {
-            $this->actingAs($partner)->get($path)->assertRedirect('/login');
+            $this->actingAs($partner)->get($path)->assertForbidden();
         }
     }
 

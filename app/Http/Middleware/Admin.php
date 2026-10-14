@@ -17,11 +17,20 @@ class Admin
      */
     public function handle(Request $request, Closure $next)
     {
-        if(Auth::user() &&Auth::user()->is_admin){
-            
-            return $next($request);
-
+        if (!Auth::check()) {
+            return redirect()->route('login');
         }
-        return redirect('/login');
+
+        if (!Auth::user()->hasPermission('admin.access')) {
+            abort(403);
+        }
+
+        $user = Auth::user();
+        $verifiedKey = config('two_factor.verified_session_key');
+        if ($user->hasTwoFactorEnabled() && $request->session()->get($verifiedKey) !== $user->id) {
+            return redirect()->route('admin.2fa.challenge');
+        }
+
+        return $next($request);
     }
 }
