@@ -60,6 +60,8 @@ remote.sh retains checks that need no new credentials:
 - Boot a temporary candidate with a private copy of the actual existing .env.
 - Validate the application key, public binding, routes, views and writable paths.
 - Snapshot old code before replacement; preserve .env, uploads and .well-known.
+- Recover a stale maintenance marker left by an interrupted deploy before
+  running the new preflight.
 - Refuse to delete a real public/storage directory; existing symlinks are supported.
 - Use prerendered maintenance, run migrations and rebuild config/view caches.
 - Leave maintenance in place if a failure occurs after it starts.

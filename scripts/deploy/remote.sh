@@ -56,6 +56,10 @@ tar -tzf public.tgz >/dev/null
 [[ ! -e "$public/storage" || -L "$public/storage" ]] || {
   echo 'public/storage is a real directory; migrate uploads before deployment.' >&2; exit 1;
 }
+if [[ -f "$app/storage/framework/down" ]]; then
+  echo 'Stale maintenance state detected; restoring the current release before preflight.'
+  (cd "$app" && "$php_bin" artisan up)
+fi
 test ! -f "$app/storage/framework/down" || { echo 'Existing maintenance state; inspect before deploying.' >&2; exit 1; }
 
 # Boot the candidate with a private copy of the actual environment before downtime.

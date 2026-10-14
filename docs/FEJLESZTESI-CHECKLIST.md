@@ -331,7 +331,7 @@ Adat/deploy: Jogosultságok és audit/queue táblák bővítő migrációi, megl
 - [ ] M04.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
 - [ ] M04.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
 
-Kiadási rekord: commit = `b3c2e61` első staging próbája a queue restart jelzés miatt sikertelen lett és karbantartási módot hagyott; javítási commit szükséges. Helyi bizonyíték: PHPUnit 51 teszt / 225 assertion sikeres, PHP lint, route boot és diff-check sikeres. A queue worker és az ütemezett cron tényleges staging-futtatása a javított kiadás után ellenőrizendő.
+Kiadási rekord: commit = `b3c2e61` első staging próbája a queue restart jelzés miatt sikertelen lett és karbantartási módot hagyott; a `94ccb84` javítás még a stale maintenance marker védelmén állt meg, ezért helyreállítási commit szükséges. Helyi bizonyíték: PHPUnit 51 teszt / 225 assertion sikeres, PHP lint, route boot és diff-check sikeres. A queue worker és az ütemezett cron tényleges staging-futtatása a helyreállított kiadás után ellenőrizendő.
 
 ## M05. ZIP-alapú designrendszer és három layout
 
