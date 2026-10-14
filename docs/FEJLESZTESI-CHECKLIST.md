@@ -8,14 +8,14 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 | Mező | Aktuális érték |
 | --- | --- |
 | Aktív mérföldkő | M01: staging és Git kiadási alap, STAGINGEN; D14 szerinti deploy és nyilvános HTTP-próba sikeres |
-| Következő fejlesztési feladat | M01.08: bejelentkezett partner/admin próba és fennmaradó átadási ellenőrzések; utána M02. A D14-ben halasztott új infrastruktúra nem újabb deployblokkoló |
+| Következő fejlesztési feladat | M01.08 élő staging felhasználói próba dedikált partner/admin adatokkal; alkalmazásszintű login- és jogosultságteszt már zöld. Utána M02.01 |
 | Alkalmazásfejlesztés ebből a checklistből | M01 elkezdve; stagingvédelem, tesztkapu és deploy megerősítése |
 | Utolsó igazolt staging kiadás | 74d54f5296531370873f9182d10ead0b003d86ea, GitHub Actions #36: verify/deploy/HTTP sikeres |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D09 törlés technikai javaslata, D11 szolgáltató; D12-D13 későbbre halasztva |
-| Mostani változtatás | D14 kiadva: új audit/gate nélkül sikeres staging deploy; utólagos kiadási napló a munkaágon, a következő develop integráció része |
+| Mostani változtatás | M01.08 alkalmazásszintű partner/admin login- és hozzáférésteszt hozzáadva; 30 PHPUnit teszt / 105 assertion zöld. Élő staging felhasználói próba még nyitott |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -989,6 +989,13 @@ Kiadási bejegyzéshez szükséges részletek:
 - M01.K4 teljesült; M01 állapota STAGINGEN. A bejelentkezett partner/admin próba nincs lefuttatva, a D14-ben halasztott izoláció/hostkulcs/DB-média-visszaállítás nincs késznek jelölve. Éles deploy nem történt.
 - Az utólagos napló külön dokumentációs commit a munkaágon, és csak oda kerül pushra: nem indítunk pusztán naplózás miatt új staging deployt. Develop és a szerver marad `74d54f5`; a napló a következő rendes develop integrációval jut át.
 - Következő: M01.08 és fennmaradó átadási ellenőrzések, majd M02. Nem szükséges új GitHub-/tárhelybeállítást kérni a már működő kiadási út használatához.
+
+### 2026-10-14: M01.08 alkalmazásszintű login-ellenőrzés
+
+- A `tests/Feature/ExampleTest.php` két reprodukálható ellenőrzést kapott: partner belépés után `/account` 200, `/adminpanel` visszairányítás; admin belépés után `/adminpanel` 200. A tesztek izolált SQLite adatbázist és gyári felhasználót használnak, staging vagy ügyféladat nélkül.
+- Helyi ellenőrzés: teljes PHPUnit `30 teszt / 105 assertion` sikeres. Frontend- és deployfájl nem változott; CI teljes ellenőrzése a commit után esedékes.
+- M01.08-at nem pipálom ki: a valódi stagingen dedikált partner/admin felhasználókkal végzett próba nem történt meg. Az alkalmazásszintű szerződés most automatikusan védett.
+- Következő: célzott commit és a már működő develop -> staging folyamaton kiadás; utána M02.01 csak az élő staging-próba lezárása után.
 
 ### Következő munkamenet sablonja
 

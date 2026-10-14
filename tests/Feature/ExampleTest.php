@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -45,5 +46,35 @@ class ExampleTest extends TestCase
         $matching = array_values(array_filter($indexes, fn ($index) => $index->name === 'group_discounts_user_category_unique'));
         $this->assertCount(1, $matching);
         $this->assertSame(1, (int) $matching[0]->unique);
+    }
+
+    public function test_partner_login_reaches_account_but_not_admin_area(): void
+    {
+        $this->withoutVite();
+        $user = User::factory()->create(['password' => bcrypt('partner-password')]);
+
+        $this->post('/login', [
+            'email' => $user->email,
+            'password' => 'partner-password',
+        ])->assertRedirect('/');
+
+        $this->get('/account')->assertOk();
+        $this->get('/adminpanel')->assertRedirect('/login');
+    }
+
+    public function test_admin_login_reaches_admin_area(): void
+    {
+        $this->withoutVite();
+        $admin = User::factory()->create([
+            'password' => bcrypt('admin-password'),
+            'is_admin' => true,
+        ]);
+
+        $this->post('/login', [
+            'email' => $admin->email,
+            'password' => 'admin-password',
+        ])->assertRedirect('/');
+
+        $this->get('/adminpanel')->assertOk();
     }
 }
