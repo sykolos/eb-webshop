@@ -7,15 +7,15 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M02: kritikus biztonsági és rendelési javítások, FOLYAMATBAN; M02.01 és M02.02 stagingen |
-| Következő fejlesztési feladat | M01.08 élő staging felhasználói próba dedikált partner/admin adatokkal; M02.03 kosármennyiség- és paramétervalidáció |
+| Aktív mérföldkő | M02: kritikus biztonsági és rendelési javítások, FOLYAMATBAN; M02.01-M02.03 stagingen |
+| Következő fejlesztési feladat | M01.08 élő staging felhasználói próba dedikált partner/admin adatokkal; utána M02.04 checkout tranzakció és ismételt beküldés elleni védelem |
 | Alkalmazásfejlesztés ebből a checklistből | M01 elkezdve; stagingvédelem, tesztkapu és deploy megerősítése |
-| Utolsó igazolt staging kiadás | 08e4d5102a1312a7a49a77f3c614e752c925e3ab, GitHub Actions #45: verify/deploy/HTTP sikeres; M02.02 stagingen |
+| Utolsó igazolt staging kiadás | ee86f8ebe8c5b2e947ea2fc8c3fd7ab39a63394f, GitHub Actions #49: verify/deploy/HTTP sikeres; M02.03 stagingen |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D09 törlés technikai javaslata, D11 szolgáltató; D12-D13 későbbre halasztva |
-| Mostani változtatás | M02.02 `/clear` eltávolítása kiadva stagingre; M02.01 is stagingen; 32 PHPUnit teszt / 109 assertion, CI és deploy sikeres |
+| Mostani változtatás | M02.03 kosárvalidáció kiadva stagingre; M02.01-M02.02 is stagingen; helyi adatbázisteszt PDO SQLite-driver hiányában nem futott, CI és deploy sikeres |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -221,7 +221,7 @@ Stagingen bemutatható eredmény: A régi felület a javított hozzáférésekke
 
 - [x] M02.01 OrderPolicy és tulajdonosszűrés a fiókbeli rendelésrészletnél és PDF-letöltésnél; cím- és kosárhozzáférések átvizsgálása.
 - [x] M02.02 Nyilvános /clear eltávolítása; üzemeltetési cache-törlés csak CLI/deploy folyamatból.
-- [ ] M02.03 Kosármennyiség, termékazonosító és kiszerelés validációja; a kliens q/m paramétere ne dönthesse el az üzleti mennyiséget.
+- [x] M02.03 Kosármennyiség, termékazonosító és kiszerelés validációja; a kliens q/m paramétere ne dönthesse el az üzleti mennyiséget.
 - [ ] M02.04 Checkout tranzakció és ismételt beküldés elleni védelem; hiányzó számlázási adatok és megszűnt termék kezelése.
 - [ ] M02.05 Státuszmódosítás engedélyezett értékeinek és átmeneteinek validálása; a teljes új munkafolyamat M11-ben készül.
 - [ ] M02.06 Login, regisztrációkérés, jelszóreset, email és kapcsolat végpontok próbálkozáskorlátja; logout session-érvénytelenítés és egységes jelszóvalidáció.
@@ -240,7 +240,7 @@ Adat/deploy: Új egyedi beküldési kulcs esetén kompatibilis migráció; megl�
 - [ ] M02.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
 - [ ] M02.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
 
-Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+Kiadási rekord M02.03 részkiadás: commit = `ee86f8ebe8c5b2e947ea2fc8c3fd7ab39a63394f`; feature workflow = [#48](https://github.com/sykolos/eb-webshop/actions/runs/38588072011), verify sikeres; develop workflow = [#49](https://github.com/sykolos/eb-webshop/actions/runs/38588688231), verify/deploy sikeres; staging smoke = `/`, `/contact`, `/login` HTTP 200. A helyi PHPUnit a hiányzó PDO SQLite-driver miatt nem futott le, a CI izolált SQLite ellenőrzése volt az alkalmazásellenőrzés. M02 közös K1-K6 kapui a további M02 pontok miatt nyitva maradnak.
 
 ## M03. Laravel és futtatókörnyezet korszerűsítése
 
@@ -1026,6 +1026,16 @@ Kiadási bejegyzéshez szükséges részletek:
 - Elkészült `OrderPolicy::view`, az explicit policy-regisztráció és mindkét controller-ágon az authorize ellenőrzés. A rendelés tulajdonosa továbbra hozzáfér, más partner 403-at kap; adminfelületi rendeléskezelés nem változott.
 - Új regresszióteszt: idegen rendelés részlete és PDF 403, tulajdonos részlete 200. Helyi teljes PHPUnit: 31 teszt / 108 assertion sikeres. Nincs migráció, meglévő rendelésadat nem változik.
 - M02.01 kód kész és helyben ellenőrzött; kiadása a már működő develop -> staging útvonalon következik. M01.08 valódi staging partner/admin belépése továbbra nyitott.
+
+### 2026-10-14: M02.03 kosárvalidáció staging kiadás
+
+- A kosárba helyezés szerveroldalon kötelező pozitív egész `quantity` értéket fogad el. A termékazonosító numerikus route-paraméter, az ismeretlen termék 404; a gyorskosár és a régi termékoldal route-formája megmaradt.
+- A kliensből érkező `q/m` paraméterek nem kerülnek üzleti adatként a kosárba. A `q` kiszerelési szorzó és az `m` mértékegység a termék adatbázisban tárolt `product_unit` rekordjából származik; a meglévő rugalmas partnerár-számítás nem változott.
+- A kosár +/- módosítása csak `-1` vagy `+1` lépést fogad el; hibás index és hibás lépés validációs hibát ad, a meglévő mennyiség nem módosul. Négy új Feature regresszióteszt fedi le a hozzáadást, hibás mennyiséget, ismeretlen terméket és léptetést.
+- Módosított fájlok: `app/Http/Controllers/CartController.php`, `routes/web.php`, `tests/Feature/ExampleTest.php`. Nincs migráció, árváltozás, session-struktúra-átállás vagy deploy-környezeti előfeltétel.
+- Helyben PHP lint és `git diff --check` sikeres. A helyi PHPUnit adatbázisteszt nem indult el, mert a gépen nincs PDO SQLite-driver; a feature [#48](https://github.com/sykolos/eb-webshop/actions/runs/38588072011) és develop/staging [#49](https://github.com/sykolos/eb-webshop/actions/runs/38588688231) verify/deploy sikeres. A staging `/`, `/contact`, `/login` végpontjai HTTP 200 választ adtak.
+- Az `ee86f8e` SHA mindkét távoli ágon azonos. M02.03 stagingen ellenőrzött; M02 közös kapui nyitva maradnak, mert M02.04-M02.08 még nincs elkészítve. M01.08 valódi partner/admin staging-belépési próba külön nyitott elfogadási pont.
+- Következő konkrét fejlesztés: M02.04 checkout tranzakció, ismételt beküldés elleni védelem, hiányzó számlázási adatok és megszűnt termék kezelése; az M01.08 élő login-próba dedikált tesztadatot igényel.
 
 ### Következő munkamenet sablonja
 
