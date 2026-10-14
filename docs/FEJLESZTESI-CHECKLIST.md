@@ -7,15 +7,15 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M01: staging és Git kiadási alap, STAGINGEN; D14 szerinti deploy és nyilvános HTTP-próba sikeres |
-| Következő fejlesztési feladat | M01.08 élő staging felhasználói próba dedikált partner/admin adatokkal; M02.02 nyilvános `/clear` eltávolítása |
+| Aktív mérföldkő | M02: kritikus biztonsági és rendelési javítások, FOLYAMATBAN; M02.01 és M02.02 stagingen |
+| Következő fejlesztési feladat | M01.08 élő staging felhasználói próba dedikált partner/admin adatokkal; M02.03 kosármennyiség- és paramétervalidáció |
 | Alkalmazásfejlesztés ebből a checklistből | M01 elkezdve; stagingvédelem, tesztkapu és deploy megerősítése |
-| Utolsó igazolt staging kiadás | d9c0cc16393fd585beab8f52e8881448881357c0, GitHub Actions #41: verify/deploy/HTTP sikeres; M02.01 stagingen |
+| Utolsó igazolt staging kiadás | 08e4d5102a1312a7a49a77f3c614e752c925e3ab, GitHub Actions #45: verify/deploy/HTTP sikeres; M02.02 stagingen |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D09 törlés technikai javaslata, D11 szolgáltató; D12-D13 későbbre halasztva |
-| Mostani változtatás | M02.01 OrderPolicy és rendeléstulajdonos-védelem kiadva stagingre; 31 PHPUnit teszt / 108 assertion, CI és deploy sikeres |
+| Mostani változtatás | M02.02 `/clear` eltávolítása kiadva stagingre; M02.01 is stagingen; 32 PHPUnit teszt / 109 assertion, CI és deploy sikeres |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -858,6 +858,7 @@ Kiadáskor új sor kerül ide. Nem szabad előre sikeresnek kitölteni.
 | 2026-10-14 | M00/M01 | Developra integrálva, CI sikeres; deploy kihagyva | 7ad56f6823a6c5e4a45b5fae79b4a4c2c0398a57 | [#26](https://github.com/sykolos/eb-webshop/actions/runs/38520202165) | Nincs új staging SHA; deploy=skipped | M01.01/M01.02/M01.04/M01.09 |
 | 2026-10-14 | M01 / D14 | STAGINGEN, meglévő deploybeállításokkal | 74d54f5296531370873f9182d10ead0b003d86ea | [#36](https://github.com/sykolos/eb-webshop/actions/runs/38574327623) | verify és deploy success; /, /contact, /login HTTP 200 CI-ban és külön helyi próbával | M01.08, majd M02; D14 halasztások megőrzése |
 | 2026-10-14 | M02.01 | Részkiadás stagingen; rendelés-tulajdonosvédelem | d9c0cc16393fd585beab8f52e8881448881357c0 | [#41](https://github.com/sykolos/eb-webshop/actions/runs/38585205515) | verify és deploy success; idegen részlet/PDF 403, saját részlet 200 a célzott tesztben | M02.02; M01.08 élő partner/admin próba tovább nyitott |
+| 2026-10-14 | M02.02 | Részkiadás stagingen; nyilvános `/clear` eltávolítva | 08e4d5102a1312a7a49a77f3c614e752c925e3ab | [#45](https://github.com/sykolos/eb-webshop/actions/runs/38586495639) | verify és deploy success; `/clear` 404 regressziótesztben | M02.03; M01.08 élő partner/admin próba tovább nyitott |
 
 Kiadási bejegyzéshez szükséges részletek:
 
@@ -1011,6 +1012,13 @@ Kiadási bejegyzéshez szükséges részletek:
 - A `routes/web.php` nyilvános `/clear` útvonala törölve. Cache-törlés kizárólag a meglévő deploy CLI-folyamatban maradt.
 - Új regresszióteszt igazolja, hogy `/clear` 404-et ad. Helyi teljes teszt a változtatás után futtatandó; nincs migráció és nincs adatváltozás.
 - Következő: célzott CI, develop integráció és a működő staging kiadási út ellenőrzése. M02.03 a következő alkalmazásfeladat.
+
+### 2026-10-14: M02.02 staging kiadás
+
+- A `08e4d51` munkaági [#44](https://github.com/sykolos/eb-webshop/actions/runs/38586185152) verify sikeres; develop push után [#45](https://github.com/sykolos/eb-webshop/actions/runs/38586495639) verify és deploy sikeres.
+- A stagingre kiadott SHA `08e4d5102a1312a7a49a77f3c614e752c925e3ab`. A `/clear` route eltávolítása és a 404 regresszióteszt a csomagban van; a deploy CLI cache-törlése változatlan.
+- Helyi teljes PHPUnit: 32 teszt / 109 assertion. CI-ban build, ShellCheck, kilenc Linux deploy-forgatókönyv és PHPUnit sikeres. M01.08 élő partner/admin belépési próba továbbra nincs igazolva.
+- M02.02 stagingen van, M02 teljes mérföldköve még nyitott. Következő fejlesztés: M02.03 kosármennyiség-, termékazonosító- és kiszerelésvalidáció.
 
 ### 2026-10-14: M02.01 rendelés-tulajdonosvédelem
 
