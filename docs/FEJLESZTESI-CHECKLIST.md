@@ -7,10 +7,10 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M07: Egységes árképzés és admin ármátrix, KIADÁSRA KÉSZ |
-| Következő fejlesztési feladat | M07 staging deploy és partner/admin árfolyamat ellenőrzése |
-| Alkalmazásfejlesztés ebből a checklistből | M01-M06 stagingen; M07.01-M07.07 kód kész, K1-K3 ellenőrizve |
-| Utolsó igazolt staging kiadás | 7dc6771, GitHub Actions #109: verify/deploy és M06 admin ellenőrzés sikeres |
+| Aktív mérföldkő | M07: Egységes árképzés és admin ármátrix, STAGINGEN ELLENŐRZÖTT |
+| Következő fejlesztési feladat | M08.01 webshop főoldal és v6-alapú katalógusfolyamat |
+| Alkalmazásfejlesztés ebből a checklistből | M01-M07 stagingen ellenőrzött; M07.01-M07.07 kész |
+| Utolsó igazolt staging kiadás | d5e7832, GitHub Actions #110: verify/deploy, admin ármátrix és partner webshop ellenőrzés sikeres |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
@@ -155,7 +155,7 @@ A vásárlás backendben rögzített üzleti esemény és a külső viselkedési
 | M04 | Közös backend, jogosultság és háttérfeldolgozás | STAGINGEN ELLENŐRZÖTT |
 | M05 | ZIP-alapú designrendszer és három layout | STAGINGEN ELLENŐRZÖTT |
 | M06 | Terméktörzs, kategóriafa és webshopos szűrők adminja | STAGINGEN ELLENŐRZÖTT |
-| M07 | Egységes árképzés és admin ármátrix | KIADÁSRA KÉSZ |
+| M07 | Egységes árképzés és admin ármátrix | STAGINGEN ELLENŐRZÖTT |
 | M08 | Webshop, katalógus és keresés a v6 kinézetével | TERVEZETT |
 | M09 | Adatbázisos kosár és teljes rendelési folyamat | TERVEZETT |
 | M10 | Belépés, regisztrációkérés és partnerfiók | TERVEZETT |
@@ -416,11 +416,13 @@ Adat/deploy: Meglévő árak és szerkesztési lehetőségek migrációs összev
 - [x] M07.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
 - [x] M07.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
 - [x] M07.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
-- [ ] M07.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
-- [ ] M07.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
-- [ ] M07.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+- [x] M07.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [x] M07.K5 A kiadott SHA stagingen ellenőrizve: admin partner- és terméknézet, 280 termékes partner webshoplista és termékoldal betöltött; az ár minden felületen megjelent; nincs nyitott kiadást blokkoló hiba.
+- [x] M07.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
 
-Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott. Helyi bizonyíték: M07 célteszt 5 teszt / 14 assertion, teljes PHPUnit 61 teszt / 249 assertion, Vite build, PHP lint, route-list, Blade cache és diff-check sikeres. A build a meglévő Bootstrap/jQuery függőségek miatt deprecation warningokat jelez; ezek M21 fokozatos kivezetési feladatai, M07 működését nem blokkolják.
+Kiadási rekord: commit = `d5e783274a3a7fb138ca5fce9493f4e32626e857`; workflow = [#110](https://github.com/sykolos/eb-webshop/actions/runs/38646424266), verify és deploy sikeres; staging próba = admin partner- és terméknézet, partner webshoplista és termékoldal betöltött. Helyi bizonyíték: M07 célteszt 5 teszt / 14 assertion, teljes PHPUnit 61 teszt / 249 assertion, Vite build, PHP lint, route-list, Blade cache és diff-check sikeres. A build a meglévő Bootstrap/jQuery függőségek miatt deprecation warningokat jelez; ezek M21 fokozatos kivezetési feladatai, M07 működését nem blokkolják. A staging ármátrix adminnézete 390, 768 és 1440 px viewporton is betöltött; a mért `scrollWidth` mindhárom méreten megegyezett a viewport szélességével, vízszintes túlcsordulás nem volt.
+
+2026-10-15: M07 stagingen ellenőrzött. A `d5e7832` kiadásban a partnerenként elkülönített, fixpontos PricingService, a kategória + extra kedvezmény összeadása, a fix ár elsőbbsége, az áfa/csomagkalkuláció, az áradmin partner- és terméknézete, a célzott cache-invalidálás és az audit események éles útvonalra kerültek. A régi katalógus, ajánlott termékek, termékoldal, kosár, checkout és rendeléstörténet közös árforrást használ; a nyilvános feed továbbra nem ad speciális árakat.
 
 ## M08. Webshop, katalógus és keresés a v6 kinézetével
 
