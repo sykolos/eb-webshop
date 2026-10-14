@@ -1,0 +1,94 @@
+name: Staging configuration audit
+
+on:
+  push:
+    branches: [develop]
+    paths:
+      - '.github/workflows/staging-readiness.yml'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: staging-configuration-audit
+  cancel-in-progress: false
+
+jobs:
+  settings:
+    if: github.ref == 'refs/heads/develop'
+    environment: staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Required secret - SSS_HOST
+        id: sss_host
+        continue-on-error: true
+        env:
+          VALUE: ${{ secrets.SSS_HOST }}
+        run: test -n "$VALUE"
+      - name: Required secret - SSH_USER
+        id: ssh_user
+        continue-on-error: true
+        env:
+          VALUE: ${{ secrets.SSH_USER }}
+        run: test -n "$VALUE"
+      - name: Required secret - SSH_PORT
+        id: ssh_port
+        continue-on-error: true
+        env:
+          VALUE: ${{ secrets.SSH_PORT }}
+        run: test -n "$VALUE"
+      - name: Required secret - SSH_PASSWORD
+        id: ssh_password
+        continue-on-error: true
+        env:
+          VALUE: ${{ secrets.SSH_PASSWORD }}
+        run: test -n "$VALUE"
+      - name: Required secret - DEPLOY_PATH
+        id: deploy_path
+        continue-on-error: true
+        env:
+          VALUE: ${{ secrets.DEPLOY_PATH }}
+        run: test -n "$VALUE"
+      - name: Required secret - PUBLIC_PATH
+        id: public_path
+        continue-on-error: true
+        env:
+          VALUE: ${{ secrets.PUBLIC_PATH }}
+        run: test -n "$VALUE"
+      - name: Required secret - SSH_KNOWN_HOSTS
+        id: ssh_known_hosts
+        continue-on-error: true
+        env:
+          VALUE: ${{ secrets.SSH_KNOWN_HOSTS }}
+        run: test -n "$VALUE"
+      - name: Required secret - STAGING_ACCESS_USER
+        id: staging_access_user
+        continue-on-error: true
+        env:
+          VALUE: ${{ secrets.STAGING_ACCESS_USER }}
+        run: test -n "$VALUE"
+      - name: Required secret - STAGING_ACCESS_PASSWORD
+        id: staging_access_password
+        continue-on-error: true
+        env:
+          VALUE: ${{ secrets.STAGING_ACCESS_PASSWORD }}
+        run: test -n "$VALUE"
+      - name: Report deploy switch without changing it
+        env:
+          ENABLED: ${{ vars.STAGING_DEPLOY_ENABLED }}
+        run: |
+          if [[ $ENABLED == true ]]; then
+            echo 'Staging deployment switch: enabled.' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'Staging deployment switch: disabled.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo 'Presence checks only: no SSH connection, environment change, backup or deploy was performed.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'ENV_DEVELOP is an optional first-install fallback; it does not update the existing server environment.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Fail audit when a required secret is missing
+        if: ${{ !cancelled() && contains(steps.*.outcome, 'failure') }}
+        run: |
+          echo '::error::Required staging settings are missing. Inspect the named secret-check steps; no secret values are displayed.'
+          exit 1

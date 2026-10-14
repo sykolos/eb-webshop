@@ -5,6 +5,16 @@ Pushes to `develop` deploy only after verification and when the repository varia
 `STAGING_DEPLOY_ENABLED` is exactly `true`. Keep it unset until the checklist below
 is completed. A skipped deployment is not a staging release.
 
+`Staging configuration audit` is a separate, non-deploying workflow. It runs on
+develop when either workflow changes, or manually on develop. It checks whether
+the nine required secrets are available to the same `staging` environment as the
+deploy job. Each named step reports presence only; values are never printed.
+Missing settings deliberately fail the audit, independently of the build job.
+It does not open SSH, update settings, validate credential correctness, or prove
+server isolation/backups. A successful audit alone is not permission to enable
+deployment. Its step outcomes are also readable through the public Actions API,
+so missing setting names can be diagnosed using the existing Git push access.
+
 Configure these GitHub repository secrets:
 
 | Setting | Value |

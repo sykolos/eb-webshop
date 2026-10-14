@@ -8,7 +8,7 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 | Mező | Aktuális érték |
 | --- | --- |
 | Aktív mérföldkő | M01: staging és Git kiadási alap, FOLYAMATBAN |
-| Következő fejlesztési feladat | M01.01/M01.02/M01.04: staging környezet és titkok ellenőrzése; M01.09 mentés-visszaállítás, majd staging aktiválás és tényleges deploy |
+| Következő fejlesztési feladat | M01.01/M01.04: csak jelenlétet vizsgáló Actions konfigurációaudit futtatása, hiányzó titoknevek azonosítása; utána szerverkörnyezet és M01.09 mentés-visszaállítás |
 | Alkalmazásfejlesztés ebből a checklistből | M01 elkezdve; stagingvédelem, tesztkapu és deploy megerősítése |
 | Utolsó igazolt staging kiadás | Korábbi deployjavítás: 936fd9e, GitHub Actions #23 sikeres; M01 változtatásai még nincsenek stagingen |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
@@ -946,6 +946,15 @@ Kiadási bejegyzéshez szükséges részletek:
 - A staging job feltétele nem teljesült: `STAGING_DEPLOY_ENABLED` nincs `true` értéken. Ezt nem kapcsoltuk be az igazolatlan DB/média-elkülönítés, megbízható SSH-hostkulcs, Basic/email-sink beállítás és mentés-visszaállítási próba helyett. Az utolsó igazolt szerverkiadás továbbra `936fd9e` (#23).
 - A dokumentációs zárócommit csak a naplót és az AGENTS.md workflow-leírását frissíti; alkalmazáskódja megegyezik a #25/#26 által ellenőrzött állapottal. A munkaág továbbra `codex/m01-staging-foundation`; másik worktree develop ágát nem váltottuk át.
 - Következő: meglévő Actions útvonalon a tényleges staging előfeltételek rendezése, M01.09 bizonyíték, majd a kapcsoló engedélyezése és engedélyezett staging deploy/HTTP SHA + partner/admin próba. Commit/push engedélyt ehhez az M01 kiadáshoz nem kell ismét kérni; éles deploy továbbra nincs engedélyezve.
+
+### 2026-10-14: staging konfigurációaudit előkészítése
+
+- A záró #27/#28 CI-futás sikeres, mindkét távoli ág `3059074`; a develop deploy lépése skipped. A korábbi megszakadt ellenőrzés lezárva.
+- A korábbi hozzáférési és deployjavító beszélgetések alapján a működő út Git push -> Actions, nem közvetlen helyi staging SSH. Most sincs helyi staging SSH-hostconfig vagy a szükséges nevű hozzáférési környezeti változó; ez nem bizonyítja a GitHub titkok hiányát.
+- Új `.github/workflows/staging-readiness.yml`: developon, a deployjal azonos staging environmentben kilenc kötelező titok jelenlétét ellenőrzi külön, név szerinti lépésekben. Nem ír ki titkos értéket, nem kapcsolódik szerverhez és nem módosítja a deploykapcsolót. Hiányzó beállításnál az audit szándékosan hibás; a build ellenőrzése külön marad.
+- Ez az audit csak jelenlétet igazolhat, nem a hostkulcs hitelességét, a hitelesítő adatok helyességét, a környezet izolációját vagy a mentések visszaállíthatóságát. Az ENV_DEVELOP csak első telepítési fallback, nem kötelező egy meglévő szerverenv mellett.
+- Következő: ellenőrzött audit commit/push a már engedélyezett M01 körben, futáseredményből pontos hiánylista; a szerveroldali kapuk továbbra nyitva.
+- Helyi ellenőrzés: YAML parse, develop trigger és staging environment, kilenc egyedi step ID és hibagyűjtés; minden inline parancs Bash szintaxisa sikeres. Üres érték hibás, tesztérték és parancsszerű literál sikeres, kimenetük üres. Alkalmazáskód nem változott; távoli build/CI eredménye push után ellenőrizendő.
 
 ### Következő munkamenet sablonja
 
