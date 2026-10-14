@@ -11,10 +11,7 @@ $.ajaxSetup({
     }
 });
 
-// 2. Bootstrap (ez NEM jQuery-t használ, csak tiszta JS)
-import 'bootstrap';
-
-// 3. Axios beállítás
+// 2. Axios beállítás
 import axios from 'axios';
 window.axios = axios;
 
