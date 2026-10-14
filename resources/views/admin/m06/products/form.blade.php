@@ -1,6 +1,8 @@
 @extends('layouts.v6.admin')
 
-@php($isEdit = $mode === 'edit')
+@php
+    $isEdit = $mode === 'edit';
+@endphp
 @section('title', $isEdit ? 'Termék szerkesztése' : 'Új termék')
 @section('heading', $isEdit ? 'Termék szerkesztése' : 'Új termék')
 @section('intro', 'A meglévő árképzés és rendelési adatok változatlanul kapcsolódnak a termékhez.')
