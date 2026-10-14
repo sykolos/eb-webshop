@@ -30,7 +30,7 @@
         <main class="v6-admin-main">
             <div class="v6-admin-topbar">
                 <div>
-                    <button class="v6-button v6-button--outline v6-admin-mobile-toggle" type="button" @click="sidebarOpen = !sidebarOpen" :aria-expanded="sidebarOpen.toString()">Menü</button>
+                    <button class="v6-button v6-button--outline v6-admin-mobile-toggle" type="button" x-on:click="sidebarOpen = !sidebarOpen" :aria-expanded="sidebarOpen.toString()">Menü</button>
                     <h1>@yield('heading', 'Adminpanel')</h1>
                     @hasSection('intro')<p>@yield('intro')</p>@endif
                 </div>

@@ -14,7 +14,7 @@
     <div class="v6-section__header"><div><span class="v6-eyebrow">Terméktörzs</span><h2>{{ $isEdit ? $product->title : 'Termék alapadatai' }}</h2></div><a class="v6-button v6-button--outline" href="{{ route('adminpanel.products') }}">Vissza a listához</a></div>
     <form method="POST" action="{{ $isEdit ? route('adminpanel.products.update', $product->id) : route('adminpanel.products.store') }}" enctype="multipart/form-data" class="v6-form" x-data="{ tab: 'basic' }">
         @csrf @if($isEdit) @method('PUT') @endif
-        <div class="v6-tabs" role="tablist"><button type="button" class="v6-button v6-button--small" :class="{ 'v6-button--outline': tab !== 'basic' }" @click="tab = 'basic'">Alapadatok</button><button type="button" class="v6-button v6-button--small" :class="{ 'v6-button--outline': tab !== 'technical' }" @click="tab = 'technical'">Műszaki adatok</button><button type="button" class="v6-button v6-button--small" :class="{ 'v6-button--outline': tab !== 'media' }" @click="tab = 'media'">Képek és szűrők</button></div>
+        <div class="v6-tabs" role="tablist"><button type="button" class="v6-button v6-button--small" :class="{ 'v6-button--outline': tab !== 'basic' }" x-on:click="tab = 'basic'">Alapadatok</button><button type="button" class="v6-button v6-button--small" :class="{ 'v6-button--outline': tab !== 'technical' }" x-on:click="tab = 'technical'">Műszaki adatok</button><button type="button" class="v6-button v6-button--small" :class="{ 'v6-button--outline': tab !== 'media' }" x-on:click="tab = 'media'">Képek és szűrők</button></div>
         <div x-show="tab === 'basic'">
         <div class="v6-form-grid">
             <label>Megnevezés<input name="title" value="{{ old('title', $product->title ?? '') }}" required></label>

@@ -1113,7 +1113,7 @@ Kiadási bejegyzéshez szükséges részletek:
 
 - A 06e72b6 verify jobja sikeres volt, a staging deploy azonban a product_media.product_id idegenkulcs létrehozásánál megállt errno: 150 hibával. A deploy előtti preflight és a rollback működött: a staging szolgáltatás karbantartási mód nélkül, a korábbi kiadással maradt elérhető.
 - A javítás az új M06 pivot/média kapcsolati oszlopokat idegenkulcs nélkül hozza létre, mert a meglévő legacy táblák azonosító-típusa stagingenként eltérhet. A kapcsolatok Eloquent oldalon explicit kulcsokkal működnek, az adatbázis nem töröl történeti terméket/kategóriát kaszkáddal.
-- Következő: a javító commit developra pusholása, a workflow sikerének megvárása, majd az M06 admin staging ellenőrzése. Sikertelen #106 után új deploy futás szükséges; a korábbi kiadás visszaállítása megtörtént.
+- Következő: a javító commit developra pusholása, a workflow sikerének megvárása, majd az M06 admin staging ellenőrzése. Sikertelen #106 után új deploy futás szükséges; a korábbi kiadás visszaállítása megtörtént. A #107 sikeres deploy után a terméklista, kategóriafa és egységadmin betöltött, a termék létrehozó nézet Blade-kompatibilitási hibája külön javítást igényel.
 
 ### Következő munkamenet sablonja
 
