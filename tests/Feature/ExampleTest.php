@@ -329,4 +329,38 @@ class ExampleTest extends TestCase
             'unit_price' => 1000,
         ]);
     }
+
+    public function test_admin_order_status_updates_follow_the_allowed_transition_graph(): void
+    {
+        $this->withoutVite();
+        $admin = User::factory()->create(['is_admin' => true]);
+        $order = Order::create([
+            'user_id' => $admin->id,
+            'name' => 'Teszt Kft.',
+            'email' => $admin->email,
+            'address' => 'Teszt utca 1.',
+            'total' => 1000,
+            'status' => 'függőben',
+        ]);
+
+        $this->actingAs($admin)
+            ->from(route('adminpanel.orders.view', $order->id))
+            ->post(route('adminpanel.orders.status.update', $order->id), ['status' => 'feldolgozás'])
+            ->assertRedirect(route('adminpanel.orders.view', $order->id));
+        $this->assertDatabaseHas('orders', ['id' => $order->id, 'status' => 'feldolgozás']);
+
+        $this->actingAs($admin)
+            ->from(route('adminpanel.orders.view', $order->id))
+            ->post(route('adminpanel.orders.status.update', $order->id), ['status' => 'függőben'])
+            ->assertRedirect(route('adminpanel.orders.view', $order->id))
+            ->assertSessionHasErrors('status');
+        $this->assertDatabaseHas('orders', ['id' => $order->id, 'status' => 'feldolgozás']);
+
+        $this->actingAs($admin)
+            ->from(route('adminpanel.orders.view', $order->id))
+            ->post(route('adminpanel.orders.status.update', $order->id), ['status' => 'ismeretlen'])
+            ->assertRedirect(route('adminpanel.orders.view', $order->id))
+            ->assertSessionHasErrors('status');
+        $this->assertDatabaseHas('orders', ['id' => $order->id, 'status' => 'feldolgozás']);
+    }
 }

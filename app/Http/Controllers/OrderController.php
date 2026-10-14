@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderController extends Controller
@@ -62,12 +63,22 @@ class OrderController extends Controller
 
 
     public function view($id){
-        $status=['függőben','feldolgozás','kiszállítva','törölve'];
         $order=Order::with('user','items','items.product')->findOrFail($id);
-        return view('admin.pages.orders.view',['order'=>$order,'states'=>$status]);
+        return view('admin.pages.orders.view',['order'=>$order,'states'=>$order->statusOptions()]);
     }
     public function updateStatus(Request $request, $id){
-        Order::findOrFail($id)->update(['status'=>$request->status]);
+        $validated = $request->validate([
+            'status' => ['required', 'string', Rule::in(Order::allowedStatuses())],
+        ]);
+        $order = Order::findOrFail($id);
+
+        if (!Order::canTransition((string) $order->status, $validated['status'])) {
+            return back()->withErrors([
+                'status' => 'A rendelés státusza ebből az állapotból nem módosítható.',
+            ])->withInput();
+        }
+
+        $order->update(['status' => $validated['status']]);
         return back()->with('success','Rendelés Frissitve');
     }
     public function getpdf($id){
