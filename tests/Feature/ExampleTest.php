@@ -242,7 +242,9 @@ class ExampleTest extends TestCase
 
     public function test_cart_count_has_one_controller_route_and_returns_session_quantity(): void
     {
-        $routes = collect(Route::getRoutes()->getRoutesByName('cart.count'));
+        $routes = collect(Route::getRoutes()->getRoutesByName())
+            ->filter(fn ($route, $name) => $name === 'cart.count')
+            ->values();
 
         $this->assertCount(1, $routes);
         $this->assertSame(CartController::class, $routes->first()->getControllerClass());
