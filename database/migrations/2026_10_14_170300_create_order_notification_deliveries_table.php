@@ -8,9 +8,16 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Az örökölt orders.id mező stagingen nem minden telepítésen azonos
+        // MySQL-típusú. Az értesítés-idempotencia nem igényel FK-kényszert,
+        // a hivatkozás indexelve marad és a meglévő félkész táblát megőrizzük.
+        if (Schema::hasTable('order_notification_deliveries')) {
+            return;
+        }
+
         Schema::create('order_notification_deliveries', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('order_id')->constrained()->cascadeOnDelete();
+            $table->unsignedInteger('order_id')->index();
             $table->string('notification_type');
             $table->string('status')->default('pending')->index();
             $table->unsignedInteger('attempts')->default(0);
