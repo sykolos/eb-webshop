@@ -8,14 +8,14 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 | Mező | Aktuális érték |
 | --- | --- |
 | Aktív mérföldkő | M01: staging és Git kiadási alap, FOLYAMATBAN |
-| Következő fejlesztési feladat | M01.01/M01.04: csak jelenlétet vizsgáló Actions konfigurációaudit futtatása, hiányzó titoknevek azonosítása; utána szerverkörnyezet és M01.09 mentés-visszaállítás |
+| Következő fejlesztési feladat | M01.01/M01.02/M01.04: SSH_KNOWN_HOSTS, STAGING_ACCESS_USER, STAGING_ACCESS_PASSWORD biztonságos beállítása és hozzájuk tartozó szerverenv; M01.09 visszaállítási próba, majd deploykapcsoló |
 | Alkalmazásfejlesztés ebből a checklistből | M01 elkezdve; stagingvédelem, tesztkapu és deploy megerősítése |
 | Utolsó igazolt staging kiadás | Korábbi deployjavítás: 936fd9e, GitHub Actions #23 sikeres; M01 változtatásai még nincsenek stagingen |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
-| Meglévő workflow | Új workflow developon: verify sikeres (#26), deploy skipped; STAGING_DEPLOY_ENABLED nem true |
+| Meglévő workflow | Új workflow developon: verify sikeres (#32), deploy skipped; külön konfigurációaudit #2 három hiányzó új titkot azonosított |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D09 törlés technikai javaslata, D11 szolgáltató; D12-D13 későbbre halasztva |
-| Mostani változtatás | M01 implementáció commitolva és developra pusholva: 7ad56f6; korábbi javítás beolvasztva; munkaági és develop CI sikeres, staging még nem frissült |
+| Mostani változtatás | M01 konfigurációaudit developon: 23739b8; a hat régi deploytitok elérhető, három új titok hiányzik. Nem Git-hozzáférési hiba; staging még nem frissült |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -957,6 +957,14 @@ Kiadási bejegyzéshez szükséges részletek:
 - Helyi ellenőrzés: YAML parse, develop trigger és staging environment, kilenc egyedi step ID és hibagyűjtés; minden inline parancs Bash szintaxisa sikeres. Üres érték hibás, tesztérték és parancsszerű literál sikeres, kimenetük üres. Alkalmazáskód nem változott; távoli build/CI eredménye push után ellenőrizendő.
 - Audit első commitja developon: `cf28e33`. [Első futás](https://github.com/sykolos/eb-webshop/actions/runs/38572610564) hiányzó beállítást jelzett, de a continue-on-error miatt az API a részlépések conclusion értékét successre módosította. A hibás részlépések láthatóságát javítottuk: nincs continue-on-error, minden ellenőrzés explicit nem-megszakított feltétellel lefut az előző hibája után is. Az első futásból pontos hiánylista nem állítható.
 - Friss külső HEAD próba: `/`, `/contact`, `/login` HTTP 200; nincs X-Robots-Tag, X-Release-Sha vagy Basic challenge. Nincs M01 staging kiadás, nincs szerveroldali változtatás.
+
+### 2026-10-14: staging konfigurációaudit eredménye
+
+- Develop commit: `23739b87aa7d169035e9562daa292855797fc364`. [Konfigurációaudit #2](https://github.com/sykolos/eb-webshop/actions/runs/38572800669): hat régi titok elérhető (SSS_HOST, SSH_USER, SSH_PORT, SSH_PASSWORD, DEPLOY_PATH, PUBLIC_PATH); kizárólag SSH_KNOWN_HOSTS, STAGING_ACCESS_USER, STAGING_ACCESS_PASSWORD hiányzik a staging job számára.
+- Az audit failure állapota a három hiányt jelzi, nem alkalmazásteszthibát. [Develop build #32](https://github.com/sykolos/eb-webshop/actions/runs/38572801059) sikeres. A szerverhez az audit nem kapcsolódott, ezért a jelszó aktuális érvényességét és az izolációt nem igazolja.
+- A felhasználó ismét jogosan jelezte, hogy másik beszélgetésben már működött a push/deploy. Tisztázva: a #23 korábbi deploy sikeres volt; az M01 új védelmei és alapból kikapcsolt kapcsolója hozták létre az új előfeltételeket. Nem elveszett hozzáférés vagy új GitHub-kulcs szükséges.
+- Biztonságos egyszeri konfigurációhoz böngészős GitHub/tárhely bejelentkezést vagy felhasználói beállítást kértünk, jelszó/token chatbe küldése nélkül. Git SSH-jogosultság nem biztosít GitHub titok-/változószerkesztési API-hozzáférést. Titkos értékeket az audit nem ír ki és nem másol helyi gépre.
+- Következő: megbízható tárhelyi forrásból ellenőrzött SSH-hostkulcs, külön staging HTTP-belépő és megfelelő szerveroldali hash/email-sink/izoláció. A meglévő APP_KEY megőrzendő. M01.09 igazolt DB/média-visszaállítás után kapcsolható be a deploy; ennek hiányát az új audit nem helyettesíti. Éles rendszerhez nem nyúltunk.
 
 ### Következő munkamenet sablonja
 
