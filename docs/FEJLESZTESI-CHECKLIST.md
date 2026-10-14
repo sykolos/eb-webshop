@@ -8,14 +8,14 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 | Mező | Aktuális érték |
 | --- | --- |
 | Aktív mérföldkő | M01: staging és Git kiadási alap, FOLYAMATBAN |
-| Következő fejlesztési feladat | M01: engedélyezett commit/push, 936fd9e Git-integráció, sikeres munkaági CI után develop; staging előfeltételek és mentéspróba még nyitott |
+| Következő fejlesztési feladat | M01.01/M01.02/M01.04: staging környezet és titkok ellenőrzése; M01.09 mentés-visszaállítás, majd staging aktiválás és tényleges deploy |
 | Alkalmazásfejlesztés ebből a checklistből | M01 elkezdve; stagingvédelem, tesztkapu és deploy megerősítése |
 | Utolsó igazolt staging kiadás | Korábbi deployjavítás: 936fd9e, GitHub Actions #23 sikeres; M01 változtatásai még nincsenek stagingen |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
-| Meglévő workflow | Új munkapéldány: verify tesztkapu; develop deploy csak STAGING_DEPLOY_ENABLED=true mellett; távoli workflow még változatlan |
+| Meglévő workflow | Új workflow developon: verify sikeres (#26), deploy skipped; STAGING_DEPLOY_ENABLED nem true |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D09 törlés technikai javaslata, D11 szolgáltató; D12-D13 későbbre halasztva |
-| Mostani változtatás | M01 preflight a leállás előtt, karbantartási válasz javítása, Linux hibaforgatókönyvek; 936fd9e helper/tesztek megőrizve; nincs commit/push/deploy |
+| Mostani változtatás | M01 implementáció commitolva és developra pusholva: 7ad56f6; korábbi javítás beolvasztva; munkaági és develop CI sikeres, staging még nem frissült |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -176,7 +176,7 @@ A vásárlás backendben rögzített üzleti esemény és a külső viselkedési
 - [x] M00.02 ZIP-többletek, lista-többletek és üzleti eltérések rögzítve.
 - [x] M00.03 Stabil azonosítós mérföldkövek, kiadási kapuk és folytatási napló létrehozva.
 - [x] M00.04 Checklist belső hivatkozásainak, feladatazonosítóinak és lefedettségének ellenőrzése: 328 egyedi checkbox, 176 fejlesztési feladat, 126 kiadási kapu, 21 vizuális csoport; nincs duplikált azonosító vagy feloldatlan feladathivatkozás.
-- [ ] M00.05 Dokumentációs commit rögzítve a következő engedélyezett Git-műveletkor; alkalmazásdeploy nem szükséges.
+- [x] M00.05 Dokumentációs commit rögzítve a következő engedélyezett Git-műveletkor; alkalmazásdeploy nem szükséges.
 
 ## M01. Staging és Git kiadási alap
 
@@ -190,7 +190,7 @@ Stagingen bemutatható eredmény: Az aktuális Laravel-verzió tiszta checkoutb�
 - [ ] M01.04 A workflow SSH hostkulcs-ellenőrzésének bekapcsolása rögzített megbízható hostkulccsal; deploy titkok ne kerüljenek logba.
 - [ ] M01.05 Deploy concurrency, félbeszakadt kiadás kezelése, előző build megőrzése és visszaállítási leírás; feltöltések és APP_KEY megőrzése.
 - [x] M01.06 Git/release folyamat rögzítése: codex/m01-... munkaág, ellenőrzés, develop integráció, staging deploy; védett éles kiadási út előkészítése.
-- [ ] M01.07 Deploycsomagból ZIP-ek, .codex-inspect, lokális referenciák és nem szükséges fejlesztési anyagok kizárása; csak célzott fájlok stage-elése.
+- [x] M01.07 Deploycsomagból ZIP-ek, .codex-inspect, lokális referenciák és nem szükséges fejlesztési anyagok kizárása; csak célzott fájlok stage-elése.
 - [ ] M01.08 Build/commit azonosító ellenőrizhető rögzítése; HTTP smoke tesztek mellett bejelentkezett tesztpartner/admin útvonalak ellenőrzése.
 - [ ] M01.09 Adatbázis- és feltöltésmentés visszaállításának próbaköre külön tesztkörnyezetben; a siker dokumentálása.
 
@@ -203,7 +203,7 @@ Adat/deploy: Csak staging próbaadat. Destruktív adatbázis-változás nincs.
 
 - [ ] M01.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
 - [ ] M01.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
-- [ ] M01.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [x] M01.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
 - [ ] M01.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
 - [ ] M01.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
 - [ ] M01.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
@@ -852,6 +852,7 @@ Kiadáskor új sor kerül ide. Nem szabad előre sikeresnek kitölteni.
 | Dátum | Mérföldkő | Állapot | Commit SHA | Workflow / futás | Staging próba / bizonyíték | Következő pont |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-13 | M00 | Dokumentáció elkészült, nincs deploy | Nincs | Nem futott | Nem alkalmazható | M01.01 |
+| 2026-10-14 | M00/M01 | Developra integrálva, CI sikeres; deploy kihagyva | 7ad56f6823a6c5e4a45b5fae79b4a4c2c0398a57 | [#26](https://github.com/sykolos/eb-webshop/actions/runs/38520202165) | Nincs új staging SHA; deploy=skipped | M01.01/M01.02/M01.04/M01.09 |
 
 Kiadási bejegyzéshez szükséges részletek:
 
@@ -934,6 +935,17 @@ Kiadási bejegyzéshez szükséges részletek:
 
 - A felhasználó engedélyezte a commit/push műveletet, a develop ágra is. Ezt ehhez az M01 kiadáshoz nem kell újra bekérni. Éles deployra ez nem felhatalmazás.
 - Sorrend: célzott commit, `936fd9e` előzmény integrációja, munkaági CI, siker esetén develop push és a tényleges workflow/deploy eredmény ellenőrzése. Az új staging kapcsoló és szerveroldali előfeltételek ettől még szükségesek; a kihagyott deploy nem sikeres telepítés.
+
+### 2026-10-14: M01 commit, CI-javítás és develop integráció
+
+- A felhasználó engedélyével célzottan commitolt M00/M01: `57d176f`; a korábbi `936fd9e` javítás valódi merge-je: `fba9393`. A workflow ütközése az M01 ellenőrzött kiadási folyamatának megtartásával feloldva, a korábbi helper és tesztjei megőrizve. Nincs force push vagy idegen munkafa-változtatás felülírása.
+- Munkaági [#24](https://github.com/sykolos/eb-webshop/actions/runs/38519752034): build, ShellCheck és mind a kilenc Linux-fájlrendszeres deployforgatókönyv sikeres; PHPUnit lépés hibás. A tiszta checkoutból hiányzó runtime könyvtárakat Gitben követett `.gitignore` helykitöltőkkel pótoltuk a cache/sessions/views mappákban: `7ad56f6`. Valódi cache/session adatok nem kerültek Gitbe.
+- Munkaági [#25](https://github.com/sykolos/eb-webshop/actions/runs/38520082781) ezután teljesen sikeres. A tesztelt `7ad56f6823a6c5e4a45b5fae79b4a4c2c0398a57` commit fast-forward push-sal developra került. Develop [#26](https://github.com/sykolos/eb-webshop/actions/runs/38520202165): workflow success, verify success, deploy skipped.
+- Ellenőrzés: helyben PHP 8.4 alatt 27 teszt / 94 assertion; GitHubon PHP 8.2.31 tiszta checkout, Composer install, npm ci/build, Bash/ShellCheck, kilenc szimulált Linux deployforgatókönyv és PHPUnit sikeres. Ezek nem jelentik egy valós MySQL-adatbázis vagy staging médiamentés visszaállítását.
+- M00.05, M01.07 és M01.K3 teljesült. M01.K4 nem pipa: a commit/develop integráció megvan, de a feladat a sikeres staging deployt is megköveteli. M01 továbbra FOLYAMATBAN, nem STAGINGEN ELLENŐRZÖTT.
+- A staging job feltétele nem teljesült: `STAGING_DEPLOY_ENABLED` nincs `true` értéken. Ezt nem kapcsoltuk be az igazolatlan DB/média-elkülönítés, megbízható SSH-hostkulcs, Basic/email-sink beállítás és mentés-visszaállítási próba helyett. Az utolsó igazolt szerverkiadás továbbra `936fd9e` (#23).
+- A dokumentációs zárócommit csak a naplót és az AGENTS.md workflow-leírását frissíti; alkalmazáskódja megegyezik a #25/#26 által ellenőrzött állapottal. A munkaág továbbra `codex/m01-staging-foundation`; másik worktree develop ágát nem váltottuk át.
+- Következő: meglévő Actions útvonalon a tényleges staging előfeltételek rendezése, M01.09 bizonyíték, majd a kapcsoló engedélyezése és engedélyezett staging deploy/HTTP SHA + partner/admin próba. Commit/push engedélyt ehhez az M01 kiadáshoz nem kell ismét kérni; éles deploy továbbra nincs engedélyezve.
 
 ### Következő munkamenet sablonja
 
