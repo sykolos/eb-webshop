@@ -10,7 +10,7 @@ $pathFile = __DIR__.'/.laravel-path.php';
 $appPath = is_file($pathFile) ? require $pathFile : dirname(__DIR__);
 $appPath = is_string($appPath) ? realpath($appPath) : false;
 
-if (!$appPath || !is_file($appPath.'/vendor/autoload.php') || !is_file($appPath.'/bootstrap/app.php')) {
+if (!$appPath) {
     error_log('Laravel deployment: configured application root is missing or incomplete.');
     http_response_code(500);
     exit('Application deployment is incomplete.');
@@ -20,6 +20,12 @@ $_ENV['APP_BASE_PATH'] = $appPath;
 
 if (file_exists($maintenance = $appPath.'/storage/framework/maintenance.php')) {
     require $maintenance;
+}
+
+if (!is_file($appPath.'/vendor/autoload.php') || !is_file($appPath.'/bootstrap/app.php')) {
+    error_log('Laravel deployment: configured application root is missing or incomplete.');
+    http_response_code(500);
+    exit('Application deployment is incomplete.');
 }
 
 require $appPath.'/vendor/autoload.php';

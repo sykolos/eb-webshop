@@ -71,6 +71,15 @@ class DeploymentEntryPointTest extends TestCase
         file_put_contents($this->directory.'/public_html/.laravel-path.php', '<?php return '.var_export($path, true).';');
     }
 
+    public function test_prerendered_maintenance_still_works_while_vendor_is_being_replaced(): void
+    {
+        $path = $this->directory.'/myapp';
+        mkdir($path.'/storage/framework', 0777, true);
+        file_put_contents($path.'/storage/framework/maintenance.php', "<?php exit('MAINTENANCE');");
+        $this->configure($path);
+        $this->assertSame('MAINTENANCE', $this->runEntryPoint()->getOutput());
+    }
+
     /** @dataProvider deploymentPaths */
     public function test_build_configuration_validates_server_layout(string $app, string $public, bool $valid): void
     {
@@ -101,9 +110,41 @@ class DeploymentEntryPointTest extends TestCase
         ];
     }
 
+    public function test_deployment_app_key_helper_preserves_valid_key(): void
+    {
+        $envFile = $this->directory.'/.env';
+        $key = 'base64:'.base64_encode(str_repeat('a', 32));
+        file_put_contents($envFile, "APP_KEY=$key\nDB_CONNECTION=mysql\n");
+
+        $process = $this->runAppKeyHelper($envFile);
+
+        $this->assertSame(0, $process->getExitCode(), $process->getErrorOutput());
+        $this->assertStringContainsString("APP_KEY=$key", file_get_contents($envFile));
+    }
+
+    public function test_deployment_app_key_helper_replaces_placeholder_key(): void
+    {
+        $envFile = $this->directory.'/.env';
+        file_put_contents($envFile, "APP_KEY=base64:CHANGE_ME_GENERATE_ON_SERVER_OR_COPY_EXISTING_KEY\nDB_CONNECTION=mysql\n");
+
+        $process = $this->runAppKeyHelper($envFile);
+
+        $this->assertSame(0, $process->getExitCode(), $process->getErrorOutput());
+        $contents = file_get_contents($envFile);
+        $this->assertStringNotContainsString('CHANGE_ME', $contents);
+        $this->assertMatchesRegularExpression('/^APP_KEY=base64:[A-Za-z0-9+\/=]+\r?$/m', $contents);
+    }
+
     private function runEntryPoint(): Process
     {
         $process = new Process([PHP_BINARY, $this->directory.'/public_html/index.php']);
+        $process->run();
+        return $process;
+    }
+
+    private function runAppKeyHelper(string $envFile): Process
+    {
+        $process = new Process([PHP_BINARY, dirname(__DIR__, 2).'/scripts/deploy/ensure-app-key.php', $envFile]);
         $process->run();
         return $process;
     }

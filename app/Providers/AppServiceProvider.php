@@ -25,6 +25,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->app['events']->listen(
+            \Illuminate\Mail\Events\MessageSending::class,
+            \App\Listeners\RedirectStagingMail::class
+        );
         Schema::defaultStringLength(191);
          Paginator::useBootstrap();
     }

@@ -38,6 +38,16 @@ return new class extends Migration
 
     private function indexExists(): bool
     {
+        if (DB::getDriverName() === 'sqlite') {
+            foreach (DB::select("PRAGMA index_list('group_discounts')") as $index) {
+                if ($index->name === $this->indexName) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         $database = DB::getDatabaseName();
 
         $result = DB::selectOne(

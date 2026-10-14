@@ -2,202 +2,137 @@ name: Build & Deploy (Laravel)
 
 on:
   push:
-    branches: [ "develop" ]
+    branches: [develop, 'codex/**']
+  pull_request:
+    branches: [develop]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: laravel-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
-  deploy:
+  verify:
     runs-on: ubuntu-latest
-
+    timeout-minutes: 20
+    env:
+      APP_ENV: testing
+      APP_KEY: base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.2"
-          extensions: mbstring, bcmath, ctype, fileinfo, json, openssl, pdo, tokenizer, xml, gd, zip
+          php-version: '8.2.31'
+          extensions: mbstring, bcmath, fileinfo, pdo_sqlite, xml, gd, zip
           coverage: none
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: "npm"
+          node-version: '20'
+          cache: npm
+      - name: Install test dependencies
+        run: composer install --no-interaction --prefer-dist
+      - name: Build frontend
+        run: |
+          npm ci
+          npm run build
+      - name: Verify shell scripts
+        run: |
+          bash -n scripts/deploy/package.sh
+          bash -n scripts/deploy/remote.sh
+          bash -n tests/Deployment/remote.sh
+          shellcheck scripts/deploy/package.sh scripts/deploy/remote.sh tests/Deployment/remote.sh
+      - name: Exercise deployment filesystem and failure paths
+        run: sudo bash tests/Deployment/remote.sh
+      - name: Run isolated tests
+        run: vendor/bin/phpunit
+      - uses: actions/upload-artifact@v4
+        with:
+          name: frontend-${{ github.sha }}
+          path: public/build
+          if-no-files-found: error
+          retention-days: 14
 
-      - name: Install PHP deps
+  deploy:
+    needs: verify
+    if: github.ref == 'refs/heads/develop' && github.event_name != 'pull_request' && vars.STAGING_DEPLOY_ENABLED == 'true'
+    environment: staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2.31'
+          extensions: mbstring, bcmath, fileinfo, curl, pdo_mysql, xml, gd, zip
+          coverage: none
+      - name: Install production dependencies
         run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
-
-      - name: Install Node deps
-        run: npm ci
-
-      - name: Build assets
-        run: npm run build
-
-      - name: Prepare deploy package
+      - uses: actions/download-artifact@v4
+        with:
+          name: frontend-${{ github.sha }}
+          path: public/build
+      - name: Prepare verified release
         env:
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
           PUBLIC_PATH: ${{ secrets.PUBLIC_PATH }}
         run: |
           set -euo pipefail
+          printf '%s\n' "$GITHUB_SHA" > REVISION
           php scripts/deploy/configure-path.php
-          tar -czf /tmp/app.tgz \
-            --exclude='.git' \
-            --exclude='.github' \
-            --exclude='.env*' \
-            --exclude='node_modules' \
-            --exclude='public' \
-            --exclude='storage/app/*' \
-            --exclude='storage/framework/cache/*' \
-            --exclude='storage/framework/sessions/*' \
-            --exclude='storage/framework/testing/*' \
-            --exclude='storage/framework/views/*' \
-            --exclude='storage/logs/*' \
-            .
-
-          tar -C public -czf /tmp/public.tgz \
-            --exclude='storage' \
-            .
-
-      - name: Prepare fallback env file
-        env:
-          ENV_DEVELOP: ${{ secrets.ENV_DEVELOP }}
-        run: |
-          if [ -n "$ENV_DEVELOP" ]; then
-            printf '%s\n' "$ENV_DEVELOP" > /tmp/env.deploy
-          fi
-
-      - name: Install sshpass
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y sshpass
-
-      - name: Deploy via SSH
+          bash scripts/deploy/package.sh "$RUNNER_TEMP/release"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ github.sha }}
+          path: ${{ runner.temp }}/release
+          if-no-files-found: error
+          retention-days: 14
+      - name: Install SSH client helper
+        run: sudo apt-get update && sudo apt-get install -y sshpass
+      - name: Deploy to staging over verified SSH
         env:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
           SSS_HOST: ${{ secrets.SSS_HOST }}
           SSH_USER: ${{ secrets.SSH_USER }}
           SSH_PORT: ${{ secrets.SSH_PORT }}
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
           PUBLIC_PATH: ${{ secrets.PUBLIC_PATH }}
+          ENV_DEVELOP: ${{ secrets.ENV_DEVELOP }}
+          DEPLOY_PHP_BIN: ${{ vars.DEPLOY_PHP_BIN }}
         run: |
           set -euo pipefail
-
-          missing=0
-          for name in SSH_PASSWORD SSS_HOST SSH_USER SSH_PORT DEPLOY_PATH PUBLIC_PATH; do
-            if [ -z "${!name:-}" ]; then
-              echo "::error::Missing required GitHub secret: $name"
-              missing=1
-            fi
+          umask 077
+          for name in SSH_PASSWORD SSS_HOST SSH_USER SSH_PORT SSH_KNOWN_HOSTS DEPLOY_PATH PUBLIC_PATH; do
+            test -n "${!name}" || { echo "::error::Missing setting: $name"; exit 1; }
           done
-
-          if [ "$missing" -ne 0 ]; then
-            exit 1
-          fi
-
-          PORT="$SSH_PORT"
-          PHP_BIN="php"
+          [[ $SSS_HOST =~ ^[a-zA-Z0-9][a-zA-Z0-9.-]*$ && $SSH_USER =~ ^[a-zA-Z0-9_-]+$ && $SSH_PORT =~ ^[0-9]+$ ]] || exit 1
+          for path in "$DEPLOY_PATH" "$PUBLIC_PATH"; do
+            [[ $path =~ ^/home/[a-zA-Z0-9_-]+/ebtest/[a-zA-Z0-9_-]+$ ]] || exit 1
+          done
+          [[ $(dirname "$DEPLOY_PATH") == "$(dirname "$PUBLIC_PATH")" && $DEPLOY_PATH != "$PUBLIC_PATH" ]] || exit 1
+          PHP_BIN=${DEPLOY_PHP_BIN:-php}
+          [[ $PHP_BIN =~ ^[a-zA-Z0-9_./-]+$ ]] || exit 1
+          mkdir -p "$HOME/.ssh"
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
           export SSHPASS="$SSH_PASSWORD"
-          SSH_OPTS="-p $PORT -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
-          SCP_OPTS="-P $PORT -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
-
-          echo "Testing SSH connection..."
-          sshpass -e ssh $SSH_OPTS "$SSH_USER@$SSS_HOST" "pwd >/dev/null"
-
-          echo "Creating target directories..."
-          sshpass -e ssh $SSH_OPTS "$SSH_USER@$SSS_HOST" "mkdir -p '$DEPLOY_PATH' '$PUBLIC_PATH'"
-
-          echo "Uploading application package..."
-          sshpass -e scp $SCP_OPTS /tmp/app.tgz "$SSH_USER@$SSS_HOST:$DEPLOY_PATH/app.tgz"
-
-          echo "Uploading public package..."
-          sshpass -e scp $SCP_OPTS /tmp/public.tgz "$SSH_USER@$SSS_HOST:$PUBLIC_PATH/public.tgz"
-          if [ -f /tmp/env.deploy ]; then
-            echo "Uploading fallback env file..."
-            sshpass -e scp $SCP_OPTS /tmp/env.deploy "$SSH_USER@$SSS_HOST:$DEPLOY_PATH/.env.deploy"
+          ssh_args=(-p "$SSH_PORT" -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$HOME/.ssh/known_hosts" -o ConnectTimeout=15)
+          scp_args=(-P "$SSH_PORT" -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$HOME/.ssh/known_hosts" -o ConnectTimeout=15)
+          target="$SSH_USER@$SSS_HOST"
+          incoming="$(dirname "$DEPLOY_PATH")/.deploy-incoming/$GITHUB_SHA"
+          sshpass -e ssh "${ssh_args[@]}" "$target" "umask 077; mkdir -p '$incoming'"
+          sshpass -e scp "${scp_args[@]}" "$RUNNER_TEMP/release/"* scripts/deploy/remote.sh "$target:$incoming/"
+          if [[ -n $ENV_DEVELOP ]]; then
+            printf '%s\n' "$ENV_DEVELOP" > "$RUNNER_TEMP/env.deploy"
+            sshpass -e scp "${scp_args[@]}" "$RUNNER_TEMP/env.deploy" "$target:$incoming/env.deploy"
+            rm -f "$RUNNER_TEMP/env.deploy"
           fi
-          echo "Deploying on remote server..."
-          sshpass -e ssh $SSH_OPTS "$SSH_USER@$SSS_HOST" "
-            set -e
-            cd '$DEPLOY_PATH'
-
-            mkdir -p storage/app/public storage/framework/cache storage/framework/sessions storage/framework/testing storage/framework/views storage/logs bootstrap/cache
-
-            # Preserve old installations and data; the entry point selects DEPLOY_PATH explicitly.
-            tar -xzf app.tgz
-            rm app.tgz
-
-            rm -f bootstrap/cache/config.php bootstrap/cache/routes-*.php bootstrap/cache/events.php
-
-            if [ ! -f .env ] && [ -f .env.deploy ]; then
-              mv .env.deploy .env
-              chmod 600 .env
-            fi
-            rm -f .env.deploy
-
-            cd '$PUBLIC_PATH'
-
-            find . -mindepth 1 -maxdepth 1 \
-              ! -name 'storage' \
-              ! -name '.well-known' \
-              ! -name 'public.tgz' \
-              -exec rm -rf {} +
-
-            tar -xzf public.tgz
-            rm public.tgz
-
-            if [ ! -f index.php ]; then
-              echo 'ERROR: public/index.php was not deployed to PUBLIC_PATH.'
-              ls -la
-              exit 1
-            fi
-
-            chmod 755 '$PUBLIC_PATH'
-            find '$PUBLIC_PATH' -type d -exec chmod 755 {} +
-            find '$PUBLIC_PATH' -type f -exec chmod 644 {} +
-
-            cd '$DEPLOY_PATH'
-            if [ -f artisan ]; then
-              if [ ! -f .env ]; then
-                echo 'ERROR: Missing .env in DEPLOY_PATH. Available env files:'
-                find . -maxdepth 2 -type f -name '.env*' -print
-                exit 1
-              fi
-
-              for key in APP_KEY DB_CONNECTION DB_HOST DB_DATABASE DB_USERNAME; do
-                if ! grep -q \"^\$key=\" .env; then
-                  echo \"ERROR: Missing \$key in DEPLOY_PATH/.env\"
-                  exit 1
-                fi
-              done
-
-              $PHP_BIN scripts/deploy/check.php '$PUBLIC_PATH'
-              $PHP_BIN artisan optimize:clear
-              $PHP_BIN artisan migrate --force
-              $PHP_BIN artisan config:cache
-              $PHP_BIN artisan view:cache
-            fi
-
-            cd '$PUBLIC_PATH'
-            if [ -L storage ]; then
-              rm storage
-            elif [ -e storage ]; then
-              echo 'ERROR: public/storage is a real directory. Preserve its uploads before replacing it with a symlink.'
-              exit 1
-            fi
-            ln -s '$DEPLOY_PATH/storage/app/public' storage
-          "
-
-      - name: Check deployed website
-        run: |
-          set -euo pipefail
-          for route in / /contact /login; do
-            echo "Checking $route"
-            status="$(curl --silent --show-error --connect-timeout 10 --max-time 30 \
-              --output /dev/null --write-out '%{http_code}' "https://ebtest.dekor26.hu$route")"
-            if [ "$status" != "200" ]; then
-              echo "::error::$route returned HTTP $status. Inspect DEPLOY_PATH/storage/logs/laravel.log and the cPanel Document Root."
-              exit 1
-            fi
-          done
+          sshpass -e ssh "${ssh_args[@]}" "$target" "bash '$incoming/remote.sh' '$DEPLOY_PATH' '$PUBLIC_PATH' '$GITHUB_SHA' '$PHP_BIN'"
+      - name: Verify staging protection and deployed revision
+        env:
+          STAGING_ACCESS_USER: ${{ secrets.STAGING_ACCESS_USER }}
+          STAGING_ACCESS_PASSWORD: ${{ secrets.STAGING_ACCESS_PASSWORD }}
+          RELEASE_SHA: ${{ github.sha }}
+        run: php scripts/deploy/smoke.php

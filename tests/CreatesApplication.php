@@ -17,6 +17,13 @@ trait CreatesApplication
 
         $app->make(Kernel::class)->bootstrap();
 
+        if (!$app->environment('testing')
+            || config('database.default') !== 'sqlite'
+            || config('database.connections.sqlite.database') !== ':memory:'
+            || config('database.connections.sqlite.url')) {
+            throw new \RuntimeException('Tests require an isolated in-memory SQLite database.');
+        }
+
         return $app;
     }
 }

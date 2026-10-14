@@ -1,0 +1,947 @@
+# Electrobusiness fejlesztési checklist
+
+Frissítve: 2026-10-14. Ez a megvalósítás és a folytatás elsődleges, Gitben verziózandó munkalistája.
+Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés esetén a frissebb felhasználói döntés és ez a checklist irányadó.
+
+## Aktuális állapot és folytatás
+
+| Mező | Aktuális érték |
+| --- | --- |
+| Aktív mérföldkő | M01: staging és Git kiadási alap, FOLYAMATBAN |
+| Következő fejlesztési feladat | M01: engedélyezett commit/push, 936fd9e Git-integráció, sikeres munkaági CI után develop; staging előfeltételek és mentéspróba még nyitott |
+| Alkalmazásfejlesztés ebből a checklistből | M01 elkezdve; stagingvédelem, tesztkapu és deploy megerősítése |
+| Utolsó igazolt staging kiadás | Korábbi deployjavítás: 936fd9e, GitHub Actions #23 sikeres; M01 változtatásai még nincsenek stagingen |
+| Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
+| Meglévő workflow | Új munkapéldány: verify tesztkapu; develop deploy csak STAGING_DEPLOY_ENABLED=true mellett; távoli workflow még változatlan |
+| Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
+| Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D09 törlés technikai javaslata, D11 szolgáltató; D12-D13 későbbre halasztva |
+| Mostani változtatás | M01 preflight a leállás előtt, karbantartási válasz javítása, Linux hibaforgatókönyvek; 936fd9e helper/tesztek megőrizve; nincs commit/push/deploy |
+
+### Kezelési szabályok a következő munkamenetekhez
+
+1. Kezdéskor olvasd ezt a fájlt, a folytatási naplót és a Git állapotát. A felhasználó más változtatásait őrizd meg.
+2. A következő nyitott, függőségei alapján elkezdhető feladat azonosítójával dolgozz. Egy feladatot csak implementáció és arányos ellenőrzés után pipálj ki.
+3. A feladat jelölése `[ ]` = nyitott, `[x]` = teljesült. Folyamatban/blokkolt/halasztott állapot szövegesen szerepeljen; a halasztott feladat nem kész.
+4. Minden munkamenet végén frissítsd az aktív pontot, a tényleges ellenőrzéseket, a nyitott hibákat és a következő konkrét feladatot. Sikertelen vagy nem futott tesztet ne jelölj sikeresnek.
+5. Mérföldkőállapotok: TERVEZETT -> FOLYAMATBAN -> KÓD KÉSZ -> KIADÁSRA KÉSZ -> STAGINGEN -> STAGINGEN ELLENŐRZÖTT. Ez utóbbihoz futás/commit és helyszíni ellenőrzés kell.
+6. Egy elkészült mérföldkő önálló, működő staging kiadás legyen. Félkész modul csak kikapcsolt feature flaggel, működő régi útvonallal kerülhet csomagba; ettől a modul még nem kész.
+7. A közvetlenül ráépülő mérföldkő a stagingellenőrzés után folytatódjon. Független dokumentáció/tesztelőkészítés deploy-blokkolás esetén is végezhető.
+8. A ZIP és dokumentumai kinézeti/működési referenciák. Demóadat, localStorage és mintaszabály nem válik automatikusan éles üzleti szabállyá.
+9. Új igényt stabil új azonosítóval vegyél fel. A már használt azonosítókat ne számozd át; felbontáskor például M09.03a/M09.03b használható.
+10. A checklist létrehozása és a skill elkészítése dokumentációs feladat volt. Későbbi „folytasd” vagy mérföldkőre szóló fejlesztési utasítás a megfelelő munka végrehajtását jelenti; a Git/deploy lépéseket a munkamenetben már megadott felhatalmazás szerint kell végigvinni, azt nem szükséges újra bekérni.
+11. A projekt folytatási skillje: [electrobusiness-development](../.agents/skills/electrobusiness-development/SKILL.md). A gyökér AGENTS.md is ide irányít; a haladást továbbra is ez a checklist tartja nyilván.
+
+## Referencia és összevetési alap
+
+- ZIP: `C:/Users/kolos/Downloads/electrobusiness-v6-local(1).zip`.
+- SHA256: `293EC8E62F8827DA5286FF32F6C997FD009C2214BC39CE9FD62ACD179F83E393`.
+- Vizsgált kibontás: `.codex-inspect/electrobusiness-v6-local-1-20261013-213631/electrobusiness-v6/`.
+- Az alábbi Z-hivatkozások ehhez a ZIP-gyökérhez képesti forrásfájlok; a ZIP nem szükséges az alkalmazás buildjéhez.
+- Z = ZIP-ben látott nézet/működés; L = felhasználói lista; K = jelenlegi Laravel-kód alapján szükséges alapmunka.
+- Most forráskód/CSS/átadási leírás alapján történt összevetés. A futó ZIP és Laravel képernyőképes összehasonlítása M05 és az egyes UI-mérföldkövek ellenőrzése.
+- A ZIP route-nevei referenciák: a Laravel végleges útvonalai és átirányításai külön mappinget kapnak.
+
+| ZIP-forrás | Mit ad a tervhez? |
+| --- | --- |
+| DESIGN-HANDOFF.md; app/design-pages.tsx | Funkcióleírás, oldaltérkép, dashboard és nyitott üzleti kérdések |
+| app/globals.css; app/design-extension.css; app/admin-workflows.css | Színek, tipográfia, térközök, reszponzív webshop/fiók/admin |
+| app/shop-experience.tsx; public/electrobusiness-hero.png | Főoldal, hero, katalógus, kártyák, adatlap, navigáció, footer |
+| app/customer-experience.tsx; app/demo-provider.tsx | Belépés, kosár, checkout, fiók, cím, kedvenc és újrarendelés; helyi demóállapot |
+| app/admin-experience.tsx; app/admin-workflows.tsx | Adminváz, rendelések, kategóriák/szűrők, partnerek, árak, support |
+| app/product-editor.tsx; app/taxonomy.tsx | Füles termékszerkesztő, képelőnézet, kategória/szűrő viselkedés |
+| app/admin-create-order.tsx | Admin rendelésrögzítés ellenőrzéssel és helyi pillanatképpel |
+| app/admin-transfer.tsx; app/import-validation.ts | XLSX/CSV export és XLSX import szabályai |
+
+## ZIP és igénylista egyesítése
+
+A „van” mindenhol prototípust jelent, nem kész Laravel-funkciót. A „nincs” az átnézett ZIP-ben nem azonosított teljes folyamatot jelenti.
+
+| Terület / felhasználói igény | ZIP-ben látható | Egyesített feladat |
+| --- | --- | --- |
+| Laravel/service/controller refaktor, jogosultság, biztonság | Backend nincs, csak demóhozzáférés | M02-M04, modulonként service-ek |
+| Logging/hibakezelés | UI hibaállapotok, tartós üzemi napló nincs | M04, M05, M21 |
+| Scheduler, queue, staging -> éles deploy | Nincs | M01, M03-M04, M21 |
+| Bootstrap és jQuery kiváltása | React és saját CSS a referencia | M05, oldalanként átvezetés, teljes kivezetés M21 |
+| Új webshopdesign, Figma, mobil | Meglévő arculat és reszponzív nézetek; Figma-fájl nem azonosított | M05, M08; a ZIP kinézete az alap |
+| Hero/úszó banner, 3 képfeltöltés, banner-PPT | Hero van; teljes banneradmin/PPT nincs | M14 |
+| Kategória/alkategória és szűrők | Két szint, öröklődő szűrők, admin és webshop kapcsolat demóban | M06, M08; D02 szerint tetszőleges mélységre bővítve |
+| Termékek fül/termékszerkesztő | Lista és fülek, csomagolás, műszaki adat, helyi képelőnézet | M06, M08 |
+| Felhasználók összes adata és sokféle szűrés | Partnerlista, adatlap, jóváhagyás, szerepkör; aktivitási szűrés bővítendő | M10, M12, M15 |
+| Rendelés listabeli státusz és tömeges módosítás | Kipróbálható; szűrésváltás törli a kijelölést | M11 |
+| Admin kézi rendelésfelvitel | V6 többlet, a listában nem külön szerepel | M11 |
+| Ármátrix és globális kedvezmény | Partner/terméknézet, előnézet; webshopárral nem közös | M07; D01 szerint a jelenlegi Laravel-szabályok és szerkesztési lehetőségek maradnak |
+| Dashboard/top termékek | Mutatók definíciói és minták, nem valódi statisztika | M15 |
+| Aktivitás és live tracking | Teljes mérőrendszer nincs | M12, M15; D10-D11 |
+| Kosármentés/figyelés, mennyiség, gyors hozzáadás | Helyi demókosár és csomagszám; DB/adminfigyelés nincs | M09, M15 |
+| Tovább vásárlok modal megszüntetése, kosárértesítés | Új kosárkezelési minta | M09; régi modal kivezetése |
+| Keresés/autocomplete, megtartott keresés | Katalógus keres/szűr; teljes szerveroldali autocomplete/persist bővítés | M08 |
+| Fiók és regisztrációkérés | Belépő/partnerkérelem/jelszó/fiók demo | M10, M12 |
+| Kedvencek, újrarendelés, gyorsrendelés, alapértelmezett cím | ZIP-többlet | M08-M10 |
+| Checkout/árazatlan szállítólevél/megjegyzés/visszaigazolás | ZIP-többlet; éles rendelés és küldés nincs | M09, M16 |
+| Excel export minden táblához | XLSX + CSV, összes szűrt sor | M13, minden későbbi táblás modul exportja |
+| Excel import | ZIP-többlet; beolvasás/előnézet/hibák, helyi mentés | M13 |
+| Email menüpont/admin küldés/hírlevél | Csak email-látvány és preferenciaminta | M16 |
+| Rendszeres hírlevél/automatikus és időzített értesítés | Teljes folyamat nincs | M16-M17 |
+| Kosárelhagyás emlékeztető | Nincs | M17 |
+| Ticket/fejlesztői üzenőfal | Belső support demo van | M18 |
+| Chat továbbfejlesztése | Éles chat nem azonosított | M18, D13 felmérés |
+| Készletkezelés?/alacsony készlet? | Mező és jelzés van, mozgás/foglalás/szinkron nincs | D06: termékenként állítható elérhetőség; M06/M19. Mennyiségi készlet és minimumfigyelés későbbi bővítés |
+| Akció? | Oldal üres állapota, teljes árazási modul nincs | D07: meglévő kedvezményrendszer megőrzése; M14/M20 ajánlatmegjelenítés új árprioritás nélkül |
+| Kapcsolat, GYIK, szállítás/fizetés, katalógus, jogi oldalak | ZIP-többlet, részben helykitöltő tartalom | M14 |
+| Üres/hiba/töltő/404 és emailnézet | ZIP-többlet | M05, minden UI-csomag, M16 |
+| Heti 5 nap, havi meeting/riport, SLA, hibaprioritások | Nincs, folyamatos szolgáltatási keret | M21 és üzemeltetési napló |
+| Frissítések/biztonság/backup/log/teljesítmény ellenőrzés | Üzemi folyamat nincs | M01-M04, M21 és rendszeres napló |
+| Tárhelybővítés emailek/adatok miatt | Nincs | M01 felmérés, M16 email, M21 kapacitás |
+
+## Eltérések és döntési napló
+
+A „nyitott” nem engedély automatikus üzleti szabályváltoztatásra. Technikai előkészítés folytatható, a döntést igénylő viselkedés addig nem aktiválható.
+
+| ID | Eltérés / döntés | Kiindulás és érintett pont | Állapot |
+| --- | --- | --- | --- |
+| D01 | A jelenlegi teljes árazási/kedvezményezési rendszer megmarad | Felhasználó/termék/termékkör speciális árak, kategória- és extra kedvezmények, globális/tömeges szerkesztés megőrzése. A mostani prioritás, összeadott kedvezmény és kerekítés regressziós szerződés; M07 | ELDÖNTVE |
+| D02 | Tetszőleges mélységű kategóriafa | Nincs üzleti szintkorlát; ciklusvédelem, öröklődő szűrők és mély fa mellett is használható admin; kategóriamélység önmagában nem változtat árazást; M06/M08 | ELDÖNTVE |
+| D03 | Hozzáférés a ZIP szerint | Nyilvános ár nélküli katalógus, belépett/jóváhagyott partnernek saját ár és vásárlás, regisztrációkérés; demóbelépés helyett valódi hitelesítés. Többfelhasználós céges modell nem része ennek; M08-M10 | ELDÖNTVE |
+| D04 | Jogosultságok tényleges munkakörökhöz | Munkakörök és műveletek felmérése M04-ben; a korábban felsorolt szerepkörök példák, nem elfogadott végleges lista; M04/M12 | IRÁNY ELDÖNTVE, NÉVSOR KÉSŐBB |
+| D05 | Mostani működés megőrzése | Jelenlegi mennyiség/kiszerelés, fizetési és szállítási működés felmérése és regressziós tesztje; a ZIP 1-9999 korlátja nem írja felül. Bemenetvalidáció és szerveroldali számítás ettől még szükséges; M06/M09/M11 | ELDÖNTVE |
+| D06 | Termékenként szerkeszthető elérhetőségi státusz | Készleten / Beszállítói készleten / Beszerzés alatt, szükség szerint további állapotok. Mennyiségi raktárkönyvelés, foglalás és minimumküszöb nincs ebben a körben; M06/M19 | ELDÖNTVE |
+| D07 | Akciós árazásra is D01 érvényes | Meglévő kedvezményes/speciális árak maradnak; új, azokat felülíró akciómotor nem készül. Aktuális ajánlatok kiemelése/bannere és oldala M14/M20, mindig a meglévő árképzésből | ELDÖNTVE |
+| D08 | Hero, úszó képek, aktuális akciók és termékkategóriák kellenek | Stagingen próbaképekkel is készülhet; eszközönkénti képfeltöltés és PPT megmarad. Cégcím/jogi tartalom és végleges képarány külön véglegesítendő; M14 | FUNKCIÓ ELDÖNTVE, TARTALOM KÉSŐBB |
+| D09 | A ZIP egyszerű törlési felülete a felhasználó által felvetett irány | Javaslat: Törlés gomb + megerősítés + eltűnés az aktív listából, háttérben visszaállítható törlés és audit. Fizikai végleges adattörlés nincs jóváhagyva; M11 | FELÜLETI IRÁNY JELÖLVE, TECHNIKAI JAVASLAT |
+| D10 | Top termék: nettó forgalom; inaktivitás: utolsó rendelés | Felhasználó pontosította: mindkettő. Időszak állítható, törölt/visszaállíthatóan törölt rendelések riportkezelése egységes. Rendelés nélküli partner külön csoport, inaktivitási időhatár állítható; M12/M15 | ELDÖNTVE |
+| D11 | Részletes valódi tracking kell, külső szolgáltató is lehet | Látogatások, események, keresés, termék/kosár/checkout tölcsér, kampányok, élő aktivitás; hőtérkép/visszajátszás jelölt funkció. Szolgáltató és adatmegőrzés kiválasztása M15; hozzájárulás és tájékoztatás az éles indulás előtt | TERJEDELEM ELDÖNTVE, SZOLGÁLTATÓ KÉSŐBB |
+| D12 | Küldési szolgáltató, feliratkozások és automatizmusok | A felhasználó későbbre hagyta; az érintett M16/M17 előtt véglegesítendő | KÉSŐBB |
+| D13 | Meglévő chat megoldása és integrációja | A felhasználó későbbre hagyta; M18 előtt felmérendő | KÉSŐBB |
+
+További kötelező különbségek: a ZIP admin- és webshopadatai részben külön demótárak; az éles rendszer közös adatbázist/árszámítást használ. A termékimport eredménye a webshopban is megjelenik. A helyi képelőnézetből tényleges feltöltés lesz. A prototípus 27%-os áfája nem igazolja minden termék adóbesorolását.
+
+## Tracking javaslat D11-hez
+
+2026-10-13-án ellenőrzött szolgáltatói dokumentáció alapján, még nem kiválasztott vagy bekötött szolgáltatások. Első javaslat: GA4 + Microsoft Clarity, közös hozzájárulás-kezeléssel. Az admin üzleti számai továbbra is a Laravel rendelésadatbázisából jönnek.
+
+| Jelölt | Szerep | Megvalósítási szempont |
+| --- | --- | --- |
+| Google Analytics 4 | Forgalmi források és ecommerce események/riportok | Egyedi Laravel-oldalon a termék/kosár/checkout/vásárlás eseményeket külön be kell kötni; [GA4 ecommerce](https://support.google.com/analytics/answer/14430645?hl=en) |
+| Microsoft Clarity | Hőtérképek, munkamenet-visszajátszás és élő felvételek | Consent API/CMP és maszkolás szükséges a terv szerint; [funkciók](https://clarity.microsoft.com/), [élő felvételek](https://learn.microsoft.com/en-us/clarity/session-recordings/clarity-real-time), [maszkolás](https://learn.microsoft.com/en-us/clarity/setup-and-installation/clarity-masking) |
+| Matomo | Alternatív analitikai alap ecommerce eseményekkel és konfigurálható tracking-hozzájárulással | Saját üzemeltetés vagy szolgáltatói csomag felmérendő; [tracking API](https://developer.matomo.org/guides/tracking-javascript), [hozzájárulás](https://developer.matomo.org/guides/tracking-consent) |
+
+A részletes méréshez eseményszótár, szolgáltatói fiók, megőrzési idő és jogosultságok szükségesek. M15 tartalmazza az éles bekapcsolás előtti consent-ellenőrzést és tájékoztatást; az adatkezelési szöveg utólagos hozzáadása önmagában nem készíti el ezt az integrációt. A Clarity is külön hozzájárulási jelek kezelését dokumentálja: [szolgáltatói tájékoztató](https://clarity.microsoft.com/blog/clarity-cookie-consent-update/).
+
+A vásárlás backendben rögzített üzleti esemény és a külső viselkedési analitika külön adatfolyam. Külső eseménybe nem kerül jelszó, token, email/cím vagy tetszőleges űrlapszöveg; partnerárak és fiókadatok a replay-ben maszkolandók. A hozzájárulást megtagadó és blokkoló böngészők miatt a részletes analitika nem azonos az összes szerveroldali rendelés számával. A szükséges működési naplózás megmarad.
+
+## Kiadási rend minden nagyobb ponthoz
+
+**Fejlesztés -> ellenőrzés -> önálló commit -> develop integráció/push -> staging deploy -> staging próba -> naplózás -> következő pont.**
+
+- A munkának egy új checkoutból telepíthető állapotban kell lezárulnia. Migráció, asset, lockfájl, környezeti előfeltétel és dokumentáció ugyanahhoz a kiadáshoz tartozik.
+- Az M01 előtti workflow már develop pushra deployol, de nincs külön tesztkapuja, SSH hostellenőrzése ki van kapcsolva, és nem igazolt a rollback. Ezek M01 feladatok, nem kész képességek.
+- Csak a mérföldkő fájljait commitoljuk; .env, mentés, ZIP és .codex-inspect nem kerülhet véletlenül a commitba.
+- A K1-K3 kapuk után a pont KIADÁSRA KÉSZ. K4 után STAGINGEN. K5-K6 után STAGINGEN ELLENŐRZÖTT.
+- A commit nem egyenlő a deployjal; a sikeres workflow nem egyenlő a működő felhasználói folyamattal.
+- A következő mérföldkő ne igényelje nem commitolt helyi fájl jelenlétét. Hiányzó titok/szerverhozzáférés esetén pontos blokk és folytatási pont rögzítendő.
+- Éles kiadás külön állapot és esemény. Egy stagingre kész csomag nem automatikus élesítési felhatalmazás.
+- Utólagos deploynapló a következő dokumentációs/fejlesztési commitban rögzíthető; ugyanannak a dokumentumnak a saját hashét nem kell önmagába írni. Ne indítsunk véletlen új deployt csak a napló mentéséért.
+- A M00 dokumentációs pont, nincs hozzá alkalmazásdeploy. M19 termékelérhetőség és M20 ajánlatmegjelenítés a D06-D08 döntésekkel az elfogadott scope része. A korábban felvetett mennyiségi készletmotor és új akció-árazómotor későbbi bővítés; most nem készítendő.
+
+## Mérföldkőjegyzék
+
+| Pont | Téma | Állapot |
+| --- | --- | --- |
+| M00 | ZIP/lista összevetés és követhető munkalista | DOKUMENTÁCIÓ ELKÉSZÜLT |
+| M01 | Staging és Git kiadási alap | FOLYAMATBAN |
+| M02 | Kritikus biztonsági és rendelési javítások | TERVEZETT |
+| M03 | Laravel és futtatókörnyezet korszerűsítése | TERVEZETT |
+| M04 | Közös backend, jogosultság és háttérfeldolgozás | TERVEZETT |
+| M05 | ZIP-alapú designrendszer és három layout | TERVEZETT |
+| M06 | Terméktörzs, kategóriafa és webshopos szűrők adminja | TERVEZETT |
+| M07 | Egységes árképzés és admin ármátrix | TERVEZETT |
+| M08 | Webshop, katalógus és keresés a v6 kinézetével | TERVEZETT |
+| M09 | Adatbázisos kosár és teljes rendelési folyamat | TERVEZETT |
+| M10 | Belépés, regisztrációkérés és partnerfiók | TERVEZETT |
+| M11 | Admin rendeléskezelés és kézi rendelésfelvitel | TERVEZETT |
+| M12 | Admin partnerek és felhasználók teljes kezelése | TERVEZETT |
+| M13 | Excel-import és minden üzleti táblázat exportja | TERVEZETT |
+| M14 | Hero, úszó banner, tartalmi oldalak és PPT | TERVEZETT |
+| M15 | Dashboard, top termékek, kosár- és aktivitásfigyelés | TERVEZETT |
+| M16 | Emailközpont és hírlevél | TERVEZETT |
+| M17 | Kosárelhagyás és időzített automatizmusok | TERVEZETT |
+| M18 | Ticket, belső üzenőfal és chat | TERVEZETT |
+| M19 | Termékelérhetőségi státuszok | TERVEZETT |
+| M20 | Aktuális akciók és partneri ajánlatok megjelenítése | TERVEZETT |
+| M21 | Teljes átállás, teljesítmény és üzemeltetési átadás | TERVEZETT |
+
+## M00. Összevetés és folytatható munkalista
+
+- [x] M00.01 ZIP képernyői, CSS-e, működése és korlátai összevetve a felhasználói listával.
+- [x] M00.02 ZIP-többletek, lista-többletek és üzleti eltérések rögzítve.
+- [x] M00.03 Stabil azonosítós mérföldkövek, kiadási kapuk és folytatási napló létrehozva.
+- [x] M00.04 Checklist belső hivatkozásainak, feladatazonosítóinak és lefedettségének ellenőrzése: 328 egyedi checkbox, 176 fejlesztési feladat, 126 kiadási kapu, 21 vizuális csoport; nincs duplikált azonosító vagy feloldatlan feladathivatkozás.
+- [ ] M00.05 Dokumentációs commit rögzítve a következő engedélyezett Git-műveletkor; alkalmazásdeploy nem szükséges.
+
+## M01. Staging és Git kiadási alap
+
+Állapot: FOLYAMATBAN. Függőség: M00.
+Forrás: L: staging, deploy, infrastruktúra; K: meglévő develop workflow.
+Stagingen bemutatható eredmény: Az aktuális Laravel-verzió tiszta checkoutból ellenőrizhetően stagingre települ.
+
+- [ ] M01.01 A jelenlegi develop deploy célkörnyezetének ellenőrzése: domain, public/app könyvtár, PHP CLI/web, adatbázis, build és titokkezelés; az éles környezet elkülönítése.
+- [ ] M01.02 Staging külön adatbázis, kulcs, session/cookie, média, queue; anonimizált tesztadat, tesztcímzettes email, hozzáférés-védelem és noindex.
+- [x] M01.03 CI ellenőrző job létrehozása dev függőségekkel és tesztekkel a deploy előtt; produkciós csomag külön, lockfájlokból építve.
+- [ ] M01.04 A workflow SSH hostkulcs-ellenőrzésének bekapcsolása rögzített megbízható hostkulccsal; deploy titkok ne kerüljenek logba.
+- [ ] M01.05 Deploy concurrency, félbeszakadt kiadás kezelése, előző build megőrzése és visszaállítási leírás; feltöltések és APP_KEY megőrzése.
+- [x] M01.06 Git/release folyamat rögzítése: codex/m01-... munkaág, ellenőrzés, develop integráció, staging deploy; védett éles kiadási út előkészítése.
+- [ ] M01.07 Deploycsomagból ZIP-ek, .codex-inspect, lokális referenciák és nem szükséges fejlesztési anyagok kizárása; csak célzott fájlok stage-elése.
+- [ ] M01.08 Build/commit azonosító ellenőrizhető rögzítése; HTTP smoke tesztek mellett bejelentkezett tesztpartner/admin útvonalak ellenőrzése.
+- [ ] M01.09 Adatbázis- és feltöltésmentés visszaállításának próbaköre külön tesztkörnyezetben; a siker dokumentálása.
+
+Ellenőrzés: Üres checkout build; kontrollált hibás teszt megállítja a deployt; staging nem küld ügyfélnek; mentés/visszaállítás és HTTP smoke ellenőrzés.
+Adat/deploy: Csak staging próbaadat. Destruktív adatbázis-változás nincs.
+
+2026-10-13 helyi részállapot: M01.03 és M01.06 implementálva/dokumentálva. M01.02 védelem és email-sink tesztelt; M01.04 hostellenőrzés, M01.05 zárolás/kódmentés, M01.07 csomagkizárás és M01.08 SHA/HTTP smoke kódja megvan, de a teljes feladatok távoli ellenőrzése/stage-elése még hátravan. A deploy új engedélyező változója alapból kikapcsolt. Részletes beállítások és helyreállítás: [DEPLOYMENT.md](../DEPLOYMENT.md).
+
+### M01 kiadási kapuk
+
+- [ ] M01.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [ ] M01.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
+- [ ] M01.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [ ] M01.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [ ] M01.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
+- [ ] M01.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+
+Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+
+## M02. Kritikus biztonsági és rendelési javítások
+
+Állapot: TERVEZETT. Függőség: M01.
+Forrás: L: biztonság; K: konkrét kódhiányok.
+Stagingen bemutatható eredmény: A régi felület a javított hozzáférésekkel és rendelésmentéssel tovább használható.
+
+- [ ] M02.01 OrderPolicy és tulajdonosszűrés a fiókbeli rendelésrészletnél és PDF-letöltésnél; cím- és kosárhozzáférések átvizsgálása.
+- [ ] M02.02 Nyilvános /clear eltávolítása; üzemeltetési cache-törlés csak CLI/deploy folyamatból.
+- [ ] M02.03 Kosármennyiség, termékazonosító és kiszerelés validációja; a kliens q/m paramétere ne dönthesse el az üzleti mennyiséget.
+- [ ] M02.04 Checkout tranzakció és ismételt beküldés elleni védelem; hiányzó számlázási adatok és megszűnt termék kezelése.
+- [ ] M02.05 Státuszmódosítás engedélyezett értékeinek és átmeneteinek validálása; a teljes új munkafolyamat M11-ben készül.
+- [ ] M02.06 Login, regisztrációkérés, jelszóreset, email és kapcsolat végpontok próbálkozáskorlátja; logout session-érvénytelenítés és egységes jelszóvalidáció.
+- [ ] M02.07 Duplikált cart.count és hibás/hiányzó kosár route-controller összerendelések rendezése a hívó felületekkel együtt.
+- [ ] M02.08 Kritikus biztonsági regressziós tesztek; talált további kockázatok pontos felvétele a checklistbe.
+
+Ellenőrzés: A partner nem érheti el B rendelését/PDF-jét; hibás mennyiség elutasítva; dupla beküldés egy rendelés; részleges mentés visszagörgetve.
+Adat/deploy: Új egyedi beküldési kulcs esetén kompatibilis migráció; meglévő rendelések megőrzése.
+
+### M02 kiadási kapuk
+
+- [ ] M02.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [ ] M02.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
+- [ ] M02.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [ ] M02.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [ ] M02.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
+- [ ] M02.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+
+Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+
+## M03. Laravel és futtatókörnyezet korszerűsítése
+
+Állapot: TERVEZETT. Függőség: M02.
+Forrás: L: Laravel refaktor, frissítések; K: Laravel 9.
+Stagingen bemutatható eredmény: A meglévő webshop támogatott Laravel/PHP alapon működik stagingen.
+
+- [ ] M03.01 PHP, adatbázis, Composer és npm csomagkompatibilitási lista; támogatott célverzió véglegesítése az aktuális hivatalos dokumentációval.
+- [ ] M03.02 Laravel főverziónkénti frissítés, külön ellenőrzött commitokkal; a repo platform-beállítása és CI/server PHP összhangja.
+- [ ] M03.03 PDF-, képfeldolgozó-, hitelesítési és cookie-csomagok kompatibilitása; kivezetett API-k átvezetése.
+- [ ] M03.04 Vite/Node build kompatibilitás és függőségaudit; Bootstrap/jQuery végleges eltávolítása majd M21-ben.
+- [ ] M03.05 Belépés, partnerár, kosár, checkout, PDF és admin regressziós tesztek; érintett deploy-scriptek ellenőrzése.
+- [ ] M03.06 Upgrade és visszaállítás dokumentálása; ha köztes frissítés külön staging kiadás, M03a/M03b alkibocsátásként naplózni.
+
+Ellenőrzés: A kritikus folyamatok a frissített stacken futnak; Composer/npm telepítés lockfájlból reprodukálható.
+Adat/deploy: Migrációs hatás külön felmérve; framework rollbackhez a kompatibilis adatbázis-állapot megadva.
+
+### M03 kiadási kapuk
+
+- [ ] M03.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [ ] M03.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
+- [ ] M03.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [ ] M03.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [ ] M03.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
+- [ ] M03.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+
+Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+
+## M04. Közös backend, jogosultság és háttérfeldolgozás
+
+Állapot: TERVEZETT. Függőség: M03.
+Forrás: L: service layer, logging, queue, scheduler, jogosultság.
+Stagingen bemutatható eredmény: Működő szerepkör-ellenőrzés, háttérben küldött tesztértesítés és ellenőrzött időzítő.
+
+- [ ] M04.01 Form Request, Policy/Gate, service és controller felelősségek mintája; üzleti modulok saját mérföldkövükben költöznek át.
+- [ ] M04.02 A tényleges munkakörök felmérése és szerepkör/művelet jogosultsági mátrixa D04 szerint; példaszerepkörök automatikus bevezetése helyett a valós munkamegosztás leképezése.
+- [ ] M04.03 Admin kétlépcsős belépés, helyreállítás és jogosultságváltozás audit; partnerjóváhagyás önmagában nem ad adminjogot.
+- [ ] M04.04 Auditnapló fontos módosításokról; strukturált hibalog request azonosítóval; érzékeny mezők maszkolása, logrotáció és hibariasztás.
+- [ ] M04.05 Database queue vagy igazoltan rendelkezésre álló driver, felügyelt worker, timeout/retry/backoff és sikertelen feladatok kezelése.
+- [ ] M04.06 Email/PDF háttérmunka commit után; sikertelen küldés ne tegye sikertelenné a már mentett rendelést; ismétlésvédelem.
+- [ ] M04.07 Scheduler cron, átfedő futások kizárása és heartbeat; staging feladatok elkülönítése.
+- [ ] M04.08 Egységes feltöltés- és privát letöltéskezelés: fájltípus, méret, név, jogosultság és lejárat.
+- [ ] M04.09 Deploy után worker újraindítás; feladatok és migrációk verziókompatibilitása.
+
+Ellenőrzés: Tiltott szerepkör 403/404; tesztjob lefut és hibából újrapróbálható; cron futása mérhető; emailhiba mellett rendelés megmarad.
+Adat/deploy: Jogosultságok és audit/queue táblák bővítő migrációi, meglévő adminok ellenőrzött átvitele.
+
+### M04 kiadási kapuk
+
+- [ ] M04.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [ ] M04.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
+- [ ] M04.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [ ] M04.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [ ] M04.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
+- [ ] M04.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+
+Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+
+## M05. ZIP-alapú designrendszer és három layout
+
+Állapot: TERVEZETT. Függőség: M03.
+Forrás: Z: CSS, shop/admin/customer komponensek; L: új design, Figma, mobil, Bootstrap/jQuery kivezetés.
+Stagingen bemutatható eredmény: Stagingen védett komponensbemutató és webshop/fiók/admin váz látható a v6 stílusában.
+
+- [ ] M05.01 A ZIP futtatható referenciájának rögzítése: kulcsképernyők képernyőképei 390, 768/1024 és 1440 px szélességen; eltérések jegyzéke.
+- [ ] M05.02 Piros-grafit-fehér arculat, Poppins, ipari hero, termékkártyák, admin oldalsáv és világos munkaterület átültetése; CSS és handoff apró tokeneltéréseinek egységesítése.
+- [ ] M05.03 Webshop 1240 px körüli tartalmi keret, térközök, tipográfia, kártyák, ikonok, gombok, státuszok és űrlapok; a referencia arányainak megőrzése.
+- [ ] M05.04 Blade komponensek: fejléc, footer, termék/ár, mennyiség, mező, táblázat, lapozó, dialógus, értesítés, üres/hiba/töltő állapot.
+- [ ] M05.05 Alpine CSP build, natív JS és Vite belépési pontok; új layouton Bootstrap/jQuery és CDN-duplikáció nélkül.
+- [ ] M05.06 Webshop, partnerfiók és admin layout; mobil felső/alsó navigáció, oldalsáv és szűrőpanel, billentyűzet/fókusz/érintési célok.
+- [ ] M05.07 Figma dokumentáció: ZIP-ből átvett komponensek és a hiányzó nézetek; a készülő implementációval egyező variánsok, mobil és hibás állapotok.
+- [ ] M05.08 Demo belépés/sáv/mintaadatok kizárása a vásárlói felületből; komponensbemutató csak fejlesztői/staging hozzáféréssel.
+- [ ] M05.09 Új layoutok izolált fokozatos bevezetése; régi, még nem portolt oldalak működése megmarad.
+
+Ellenőrzés: Referencia és Laravel képernyőképek összevetése; nincs átfedés, túlcsordulás vagy hiányzó kép; fókusz és reszponzivitás ellenőrzött.
+Adat/deploy: Adatmigráció nem szükséges; feature flag/route visszaállításával az új váz lekapcsolható.
+
+### M05 kiadási kapuk
+
+- [ ] M05.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [ ] M05.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
+- [ ] M05.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [ ] M05.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [ ] M05.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
+- [ ] M05.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+
+Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+
+## M06. Terméktörzs, kategóriafa és webshopos szűrők adminja
+
+Állapot: TERVEZETT. Függőség: M04, M05.
+Forrás: Z: product-editor, taxonomy, admin-workflows; L: kategória/alkategória, termékek, szűrők.
+Stagingen bemutatható eredmény: Az adminban létrehozott vagy szerkesztett termék és kategória tartósan mentődik, a régi webshop kompatibilis marad.
+
+- [ ] M06.01 Termékmodell bővítése: cikkszám, slug, név, leírás, gyártó, kategória, alapegység, csomagszorzó, csomagnév, publikálási állapot.
+- [ ] M06.02 Tetszőleges mélységű kategóriafa D02 szerint, sorrenddel és aktív állapottal; nincs két szintre korlátozás, mély fában keresés/összecsukás/breadcrumb.
+- [ ] M06.03 Saját maga vagy leszármazottja alá mozgatás tiltása; terméket vagy gyermeket tartalmazó kategória törlése tiltott; teljes részfa áthelyezése konzisztens.
+- [ ] M06.04 Szűrődefiníciók, értékek, aktív állapot és kategória-hozzárendelés; minden ős releváns szűrőinek öröklődése, duplikáció nélkül. Ez nem vezet be új öröklődő kedvezményszabályt.
+- [ ] M06.05 Termékszerkesztő fülek: alapadatok, jelenlegi kiszerelés, műszaki adatok, képek/dokumentumok; külön publikálási állapot és D06 szerinti elérhetőségi státusz, mennyiségi készletmező nélkül.
+- [ ] M06.06 Valódi kép/PDF feltöltés, sorrend, előnézet, törlés és privát/publikus hozzáférés; a ZIP helyi előnézetének kiváltása.
+- [ ] M06.07 Mennyiségi egységek adminja; használt egység törlési védelme, db/m és egyéb meglévő egységek migrációs szabálya.
+- [ ] M06.08 Terméklista keresés/szűrés/lapozás, archiválás; törlés ne bontsa meg a történeti rendeléseket.
+- [ ] M06.09 Meglévő cikkszámok, kategóriák és csomagolások adatminőség-ellenőrzése; ismeretlen értékből ne legyen kitalált adat.
+- [ ] M06.10 Admin termék és későbbi webshop ugyanazt a terméktörzset használja; termék- és kategória-service a nagy controllerekből.
+
+Ellenőrzés: Legalább öt szintű kategóriafa, részfamozgatás, ciklusvédelem és szűrőöröklés; tiltott törlés; fájlfeltöltés; elérhetőségi állapot mentése; régi katalógus regresszió.
+Adat/deploy: Bővítő migráció, visszakövethető kategória/egység mapping, SKU ütközési riport.
+
+### M06 kiadási kapuk
+
+- [ ] M06.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [ ] M06.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
+- [ ] M06.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [ ] M06.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [ ] M06.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
+- [ ] M06.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+
+Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+
+## M07. Egységes árképzés és admin ármátrix
+
+Állapot: TERVEZETT. Függőség: M06; D01 eldöntve: meglévő árképzés megőrzése.
+Forrás: Z: ármátrix és ármegjelenítés; L: refaktor/gyorsaság; K: meglévő árlogika.
+Stagingen bemutatható eredmény: Az admin előnézet, a terméklista és a kosár ugyanarra a partnerre ugyanazt az árat adja.
+
+- [ ] M07.01 A jelenlegi rendszer ár- és szerkesztési szabályainak regressziós rögzítése: fix partnerár, összeadott kategória/extra kedvezmény, kerekítés; felhasználó/termék/termékkör kombinációk és globális/tömeges módosítások teljes megőrzése. A ZIP egymás utáni százalékszámítása nem kerül át.
+- [ ] M07.02 PricingService és kérésenként egyszer betöltött partner/kategória árkontextus; minden speciális partnerár automatikus betöltésének megszüntetése.
+- [ ] M07.03 Alapegységár, csomagár, nettó/áfa/bruttó és csomagszám egységes kezelése; lebegőpontos pénzszámítás helyett rögzített pontosság.
+- [ ] M07.04 Ármátrix partnernézet és terméknézet, keresés, mentetlen módosítás jelzése, mezővalidáció és mentés.
+- [ ] M07.05 Globális kategóriakedvezmény-módosítás hatáselőnézettel és megerősítéssel; fix/extra szabályok megőrzése az elfogadott logika szerint.
+- [ ] M07.06 Árváltozás audit és partnerenként elkülönített cache, célzott invalidáció; jogosulatlan ármezők ne jussanak a klienshez.
+- [ ] M07.07 Árazás bekötése a még régi felületekbe is; N+1 mérés és regressziós ártesztek.
+
+Ellenőrzés: Konkrét fix/kategória/extra kombinációk; 1000 Ft + 10% + 5% példája; csomagszorzó és kerekítés; más partner ára nem szivárog.
+Adat/deploy: Meglévő árak és szerkesztési lehetőségek migrációs összevetése; ugyanarra a bemenetre árváltozás nem megengedett. A mélyebb kategóriák nem írhatják át a régi megállapodásokat.
+
+### M07 kiadási kapuk
+
+- [ ] M07.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [ ] M07.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
+- [ ] M07.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [ ] M07.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [ ] M07.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
+- [ ] M07.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+
+Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+
+## M08. Webshop, katalógus és keresés a v6 kinézetével
+
+Állapot: TERVEZETT. Függőség: M05, M06, M07; D03 eldöntve: ZIP szerinti nyilvános katalógus és partnerárak.
+Forrás: Z: shop-experience; L: webshop, mobil, autocomplete, megtartott keresés, top termékek.
+Stagingen bemutatható eredmény: Főoldalról kereséssel vagy kategóriával valódi termékhez jutunk, mobilon is.
+
+- [ ] M08.01 Főoldal: ZIP ipari hero, főmenü, kategóriakártyák, terméksávok, partnerfelhívás és footer; a banneradmin M14-ben kapcsolódik.
+- [ ] M08.02 Katalógus rács/lista, találatszám, rendezés, lapozás, kategória/alkategória, breadcrumb és mobil szűrők.
+- [ ] M08.03 Termékkártya és termékadatlap: kép, cikkszám, műszaki adatok, dokumentumok, jelenlegi kiszerelés, elérhetőségi státusz; vendégnek ár nélküli katalógus és regisztrációkérés, jóváhagyott partnernek saját ár és vásárlás. Árak a publikus HTML/JSON-ban sem lehetnek.
+- [ ] M08.04 Főmenü autocomplete névre/cikkszámra: debounce, minimum keresési hossz, találati limit, régi válasz eldobása, billentyűzet.
+- [ ] M08.05 Keresés/szűrők/rendezés/lap az URL-ben; visszalépés és termékből listára visszatérés megőrzi az állapotot.
+- [ ] M08.06 Gyorsrendelés oldal a ZIP szerint, cikkszámkereséssel és csomagszámmal; meglévő kosárhívás kompatibilis bekötése M09-ig.
+- [ ] M08.07 Kiemelt termékek kézi szerkesztése/sorrendje; top termék modul csak valódi adatra, a végleges statisztika M15-ben.
+- [ ] M08.08 Nincs találat, hibás URL, inaktív/törölt termék, kép- vagy dokumentumhiány kezelése; régi publikus URL-ek leképezése.
+- [ ] M08.09 DB keresés/index/lapozás mérése; képek méretezése, helyi font és az oldalhoz szükséges JS.
+
+Ellenőrzés: Keresés -> szűrés -> adatlap -> vissza út; mobil navigáció; vendég/partner árjogosultság; kép/PDF linkek; teljesítménymérés.
+Adat/deploy: Slug és URL mapping bővítő migrációval, régi URL-ek átirányítási jegyzéke.
+
+### M08 kiadási kapuk
+
+- [ ] M08.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [ ] M08.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
+- [ ] M08.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [ ] M08.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [ ] M08.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
+- [ ] M08.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+
+Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+
+## M09. Adatbázisos kosár és teljes rendelési folyamat
+
+Állapot: TERVEZETT. Függőség: M04, M07, M08; D05 eldöntve: jelenlegi mennyiség/fizetés/szállítás.
+Forrás: Z: Basket, pénztár, sikeroldal; L: kosármentés, mennyiség, egyszerű hozzáadás, modal eltávolítás.
+Stagingen bemutatható eredmény: Valódi partner terméket tesz kosárba, új belépés után megtalálja, és egyetlen konzisztens rendelést ad le.
+
+- [ ] M09.01 CartService és carts/cart_items adatmodell; felhasználói tulajdon, aktív kosár egyedisége, utolsó aktivitás, konkurens frissítések.
+- [ ] M09.02 Meglévő session kosár egyszeri és ismétlésbiztos átvitele; ZIP szerinti partnerhez kötött vásárlás, vendégnek belépési/regisztrációs felhívás; külön vendégkosár-bővítés nincs.
+- [ ] M09.03 Gyors hozzáadás listából/adatlapról/gyorsrendelésből; jelenlegi mennyiség/egység/szorzó és összevonás regressziós ellenőrzéssel, szerveroldali validációval; ZIP-ből új üzleti mennyiségkorlát nem kerül át.
+- [ ] M09.04 Tovább vásárlok modal eltávolítása; nem blokkoló siker/hiba értesítés, fejléc- és mobil kosárszámláló frissítése.
+- [ ] M09.05 Üres és feltöltött kosár, törlés, mennyiségmódosítás, árfrissítés, megszűnt termék, hibás hálózat és párhuzamos lapok kezelése.
+- [ ] M09.06 CheckoutService: címválasztás, fizetési/szállítási mód, megjegyzés, árazatlan szállítólevél, ellenőrzés és elfogadás.
+- [ ] M09.07 Backend újraszámítás, tranzakció és dupla beküldés elleni DB védelem; termék/ár/cím/kiszerelés/áfa pillanatkép a rendelésben.
+- [ ] M09.08 Csak sikeres rendelésmentéskor záródjon a kosár; háttérértesítés, sikeroldal és rendeléslink.
+- [ ] M09.09 Rendelésszám és PDF ne tartalmazzon rögzített demóévet; régi rendelések hiányzó történeti mezői elkülönítve.
+
+Ellenőrzés: Teljes vásárlás; dupla kattintás/újraküldés; tranzakcióhiba; emailhiba; árközbeni változás; új belépés és két böngészőlap.
+Adat/deploy: DB kosár és order snapshot bővítő migráció; session átvitel naplózva; visszaállítás ne vesszen el kosár/rendelés.
+
+### M09 kiadási kapuk
+
+- [ ] M09.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [ ] M09.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
+- [ ] M09.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [ ] M09.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [ ] M09.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
+- [ ] M09.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+
+Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+
+## M10. Belépés, regisztrációkérés és partnerfiók
+
+Állapot: TERVEZETT. Függőség: M04, M05, M09; D03.
+Forrás: Z: customer-experience; L: fiók újragondolás, regisztráció kérés.
+Stagingen bemutatható eredmény: Partnerkérelemtől a saját rendelésekig, címekig és kedvencekig végigjárható fiók.
+
+- [ ] M10.01 V6 belépő és jelszó-helyreállító felület, email ellenőrzés, hibás/lejárt token és sikerállapot; demóbelépés nélkül.
+- [ ] M10.02 Regisztráció kérés gomb és céges kérelem; függő/jóváhagyott/elutasított/tiltott állapot és valódi visszajelzés.
+- [ ] M10.03 Fiókáttekintő és mobil navigáció, rendeléstörténet szűréssel és saját rendelésrészlet/PDF.
+- [ ] M10.04 Újrarendelés a pillanatnyilag rendelhető termékekkel és aktuális árakkal; megszűnt termék jelzése.
+- [ ] M10.05 Szállítási cím létrehozás/szerkesztés/törlés/alapértelmezés; tulajdon és egyetlen alapértelmezett cím.
+- [ ] M10.06 Kedvencek adatbázisban, gyors kosárba helyezés és megszűnt termék kezelése.
+- [ ] M10.07 Céges és kapcsolattartói adatok szerkesztése a szabályok szerint; emailváltás újraellenőrzése; jelszó módosítása.
+- [ ] M10.08 Értesítési és hírlevél-beállítások tartós tárolása, a marketingküldés M16-ban kapcsolódik.
+
+Ellenőrzés: Más fiók adatainak tiltása; függő partner jogai; cím CRUD; újrarendelés árváltozással; kedvencek új belépés után.
+Adat/deploy: Partnerstátusz/kedvencek/preferenciák migrációja; meglévő aktív ügyfelek ne veszítsék el hozzáférésüket.
+
+### M10 kiadási kapuk
+
+- [ ] M10.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [ ] M10.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
+- [ ] M10.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [ ] M10.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [ ] M10.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
+- [ ] M10.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+
+Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+
+## M11. Admin rendeléskezelés és kézi rendelésfelvitel
+
+Állapot: TERVEZETT. Függőség: M04, M05, M09.
+Forrás: Z: OrderWorkbench, CreateOrder; L: lista státusz, kijelölés, tömeges módosítás.
+Stagingen bemutatható eredmény: Admin kézzel rendelést rögzít partnernek, majd listából egyesével és tömegesen feldolgozza.
+
+- [ ] M11.01 V6 rendeléslista kereséssel és cég/dátum/státusz/összeg szűrőkkel, lapozással és megőrzött URL-állapottal.
+- [ ] M11.02 Soronkénti állapotváltás; kijelölés és látható sorok kijelölése; szűrés/keresés váltáskor kijelölés törlése.
+- [ ] M11.03 Tömeges státuszváltás megerősítéssel, rekordjogosultság és állapotátmenet ellenőrzéssel, részleges hibák jelzésével.
+- [ ] M11.04 OrderStatusService, státuszelőzmények, felelős és megjegyzés; kapcsolódó értesítések.
+- [ ] M11.05 Rendelésadatlap rögzített címekkel/árakkal, dokumentumokkal; D09 szerinti egyszerű Törlés gomb megerősítéssel. Javasolt technika: visszaállítható törlés, audit és külön jogosultság, a Törölve státusztól elkülönítve; végleges fizikai törlés nincs jóváhagyva.
+- [ ] M11.06 Új rendelés: aktív partner, kapcsolattartó, mentett/egyedi cím, fizetés, termékkereső, csomagszám, ellenőrzés és rögzítés.
+- [ ] M11.07 Kézzel szerkesztett/importált termék és ugyanazon partner PricingService ára használható; ZIP elkülönült demóárazása helyett közös backend.
+- [ ] M11.08 Adminrendelés is tranzakciós és ismétlésbiztos; admin szereplő audit, a partner saját fiókjában ugyanaz a rendelés látszik.
+
+Ellenőrzés: Kijelölés reset; tiltott átmenet; több admin ütközése; aktív/inaktív partner; adminrendelés -> partnerfiók egyezés.
+Adat/deploy: Állapotmapping és audit bővítő migráció; történeti rendelések megőrzése.
+
+### M11 kiadási kapuk
+
+- [ ] M11.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [ ] M11.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
+- [ ] M11.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [ ] M11.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [ ] M11.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
+- [ ] M11.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+
+Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+
+## M12. Admin partnerek és felhasználók teljes kezelése
+
+Állapot: TERVEZETT. Függőség: M04, M10, M11.
+Forrás: Z: Partners és részletes adatlap; L: összes adat, inaktív/sima felhasználó szűrés.
+Stagingen bemutatható eredmény: Admin kérelmet jóváhagy, üzleti adatokat módosít, és a felhasználókat több szempont szerint szűri.
+
+- [ ] M12.01 Partnerlista és részletes adatlap: ID, cég/felhasználó, email, kapcsolattartó, számlázás, szállítás, regisztráció/jóváhagyás ideje, megjegyzések.
+- [ ] M12.02 Üzletileg szerkeszthető összes mező, címek és szerepkör kontrollált szerkesztése; jelszó helyett visszaállítási folyamat.
+- [ ] M12.03 Jóváhagyásra váró kérelmek külön lista és közvetlen elfogadás; elutasítás/tiltás okkal és auditnaplóval.
+- [ ] M12.04 Szűrők: aktív/tiltott/függő, admin/sima felhasználó/szerepkör, utolsó belépés, utolsó rendelés, rendelés nélküliek, dátum és cégadatok.
+- [ ] M12.05 Inaktivitás az utolsó rendelés alapján D10 szerint, állítható napküszöbbel; rendelés nélküli partner külön szűrő. Utolsó belépés további adat, nem az inaktivitás alapja; jogosultsági státusz külön fogalom.
+- [ ] M12.06 Kapcsolódó rendelések és partnerárak hivatkozásai; szerepkörváltás nem történhet partnerjóváhagyás mellékhatásaként.
+- [ ] M12.07 Saját adminjog és utolsó admin véletlen eltávolításának kezelése; partner törlés/archiválás üzleti adatok megőrzésével.
+
+Ellenőrzés: Jogosultságemelés tiltása; jóváhagyási folyamat; szűrők kombinációi; módosítás audit; partner történeti rendelései megmaradnak.
+Adat/deploy: Régi felhasználó/cég/cím mezők mappingje, státuszok és aktivitás kezdeti ismeretlen értékei dokumentálva.
+
+### M12 kiadási kapuk
+
+- [ ] M12.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [ ] M12.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
+- [ ] M12.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [ ] M12.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [ ] M12.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
+- [ ] M12.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+
+Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+
+## M13. Excel-import és minden üzleti táblázat exportja
+
+Állapot: TERVEZETT. Függőség: M06, M07, M11, M12.
+Forrás: Z: admin-transfer, import-validation; L: Excel export minden táblázathoz.
+Stagingen bemutatható eredmény: Sablonból ellenőrzött import készül, majd a teljes szűrt terméklista visszaimportálható XLSX-ként exportálható.
+
+- [ ] M13.01 Exportálható táblák nyilvántartása: rendelések, rendeléssorok, termékek, kategóriák, szűrők, partnerek, egységek, árak, kiemeltek; későbbi modulok saját exporttal záródnak.
+- [ ] M13.02 Export a teljes szűrt eredményhalmazból, nem csak aktuális oldalból/kijelölésből; műveletoszlopok nélkül, mentett szerveradatokból.
+- [ ] M13.03 Valódi XLSX és ZIP szerinti opcionális pontosvesszős UTF-8 BOM CSV; oszlopjogosultság és képletinjektálás elleni védelem.
+- [ ] M13.04 Nagy export háttérfeladat, állapot, privát lejáró letöltés, jogosultság újraellenőrzése, fájltakarítás.
+- [ ] M13.05 Import sablon, munkalapválasztás, oszloppárosítás, első 100 sor előnézete és teljes fájlvalidáció.
+- [ ] M13.06 ZIP alapkorlátok: 5 MB, 5000 adatsor, 50 oszlop; szerveroldali kibontási/memória/idő korlátok; XLS régi formátum konvertálási visszajelzés.
+- [ ] M13.07 Kötelező cikkszám/név/meglévő kategória/nettó egységár; opcionális jelenlegi egység/szorzó/csomag/gyártó/leírás/publikálási állapot és elérhetőségi státusz. Régi stock szám nem konvertálható önkényesen státusszá; mély fában kategóriaútvonal/azonosító oldja fel az azonos neveket.
+- [ ] M13.08 Vesszős tizedes, kis/nagybetűfüggetlen SKU, fájlon belüli duplikáció és képletcella ellenőrzés; üres opcionális cella nem töröl adatot.
+- [ ] M13.09 Kihagyás/frissítés mód; ismeretlen kategória hibás; bármely hibás sor blokkolja az alkalmazást, hibajegyzék exportálható.
+- [ ] M13.10 Kétlépcsős ellenőrzés/alkalmazás, tranzakció és ismétlésvédelem, konkurens változások újraellenőrzése; valódi DB és webshop frissül.
+- [ ] M13.11 Termékexport visszaimportálási próba; import/export audit és queuehiba kezelése.
+
+Ellenőrzés: Érvényes körút; duplikált SKU; hibás kategória; képlet; vesszős ár; limit; jogosulatlan oszlop/letöltés; teljes szűrt adathalmaz.
+Adat/deploy: Import job/hiba/export táblák; alkalmazás előtt előnézet; meglévő mezők megőrzése és visszakövethető módosítás.
+
+### M13 kiadási kapuk
+
+- [ ] M13.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [ ] M13.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
+- [ ] M13.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [ ] M13.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [ ] M13.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
+- [ ] M13.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+
+Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+
+## M14. Hero, úszó banner, tartalmi oldalak és PPT
+
+Állapot: TERVEZETT. Függőség: M04, M05, M08, M13; D08 tartalom/banner.
+Forrás: Z: hero, információs oldalak, emailminta; L: banner feltöltés három eszközre, PPT, úszó menü.
+Stagingen bemutatható eredmény: Adminból időzíthető banner jelenik meg a webshopban, a három képkivágás ellenőrizhető.
+
+- [ ] M14.01 Hero/úszó képek adminja: desktop/tablet/telefon kép, alt, cím, CTA/link, sorrend, aktív időszak és előnézet; aktuális akciókra és termékkategóriákra mutató elemek. Stagingen felhasználó által engedett próbaképek használhatók.
+- [ ] M14.02 Reszponzív képkiválasztás és vágás; a ZIP-hez illeszkedő úszó képek/menü, mobilon tartalom és vezérlők takarása nélkül. A képarányt a megvalósítás során rögzíteni; próbaképhez nem társulhat kitalált kedvezményígéret.
+- [ ] M14.03 Képfeltöltés és publikálás külön művelet, hibás formátum/arány és hiányzó változat kezelése; bannerlista export.
+- [ ] M14.04 ZIP szerinti kapcsolat, szállítás/fizetés, GYIK, katalógus/dokumentumtár, impresszum, ÁSZF, adatkezelés és elállás oldalak.
+- [ ] M14.05 Ellenőrzött cégadatok/címek és jóváhagyott szövegek; ZIP eltérő címei és jogi helykitöltői cserélendők.
+- [ ] M14.06 Kapcsolati űrlap validációval, próbálkozáskorláttal, háttérküldéssel és valós visszajelzéssel.
+- [ ] M14.07 Katalógus PDF tényleges fájllal, verzióval/dátummal/nyelvvel/mérettel; hiányzó fájlnál őszinte üres állapot.
+- [ ] M14.08 Bannerkészítési PPT: végleges px méretek/képarányok, szövegzónák, jó/rossz példák, exportbeállítások és feltöltési lépések; renderelve ellenőrizni.
+- [ ] M14.09 Tartalmi/üres/404 oldalak és footer linkek teljes körű ellenőrzése.
+
+Ellenőrzés: Három viewport és időzített publikálás; hibás feltöltés; kapcsolatküldés tesztcímzettre; dokumentumlinkek és PPT vizuális ellenőrzés.
+Adat/deploy: Banner és média metaadatok; korábbi képek megőrzése; szövegek verziója rögzítve.
+
+### M14 kiadási kapuk
+
+- [ ] M14.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [ ] M14.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
+- [ ] M14.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [ ] M14.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [ ] M14.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
+- [ ] M14.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+
+Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+
+## M15. Dashboard, top termékek, kosár- és aktivitásfigyelés
+
+Állapot: TERVEZETT. Függőség: M09, M11, M12, M13; D10 és D11.
+Forrás: Z: dashboard-definíciók; L: mutatók, top termékek, aktivitás, live tracking, kosárfigyelés.
+Stagingen bemutatható eredmény: Valós rendelésekből számolt dashboardból a megfelelő szűrt munkalistára lehet jutni.
+
+- [ ] M15.01 Nettó rendelési érték, nem törölt rendelésszám, átlagérték azonos időszakkal; nyitott rendelések külön teljes állományból.
+- [ ] M15.02 Jóváhagyandó partnerek, hiányos terméktörzs és feldolgozandó rendelések munkalistái.
+- [ ] M15.03 Top termék rangsor nettó termékforgalom alapján D10 szerint, kiválasztott időszakban, történeti rendelési árakból. Törölt/archivált rendelések kizárása a dashboard egységes szabályával; db/m nem adható össze.
+- [ ] M15.04 Kézzel kiemelt és számított top termékek külön kezelése; webshop top modul valós adatra kapcsolása.
+- [ ] M15.05 Kosárfigyelés: tulajdonos, utolsó aktivitás, tételek és összeg, aktív/elhagyott/rendeléssé vált állapot; adminmegtekintés ne frissítse az aktivitást.
+- [ ] M15.06 Utolsó rendelésen alapuló inaktivitás, külön last_seen/last_login és rendelés nélküli csoport; megőrzési szabályokkal.
+- [ ] M15.07 Valódi részletes tracking D11 szerint: aktív látogatók, oldalak, események, forrás/kampány, eszköz, keresés, termék/kosár/checkout útvonal; szolgáltatói késleltetés feltüntetése, terhelést korlátozó frissítés.
+- [ ] M15.08 Késést csak vállalt dátumból, számlázott árbevételt csak hiteles integrációból mutatni; elérhetőségi státusz darabszámként összesíthető, mennyiségi készletként nem.
+- [ ] M15.09 Dashboard és kosár/aktivitás táblák exportja; cache, lekérdezési terv és reprezentatív adatmennyiség mérése.
+- [ ] M15.10 Tracking eseményszótár: keresés/szűrés, termékmegtekintés, kosármódosítás, checkout lépések, vásárlás és regisztrációkérés; szerveroldali rendelés az igazságforrás, egyedi eseményazonosítóval duplázás ellen.
+- [ ] M15.11 Hozzájárulás-kezelő és adatkezelési/sütitájékoztató az éles tracking előtt: elfogadás/elutasítás/visszavonás működjön, visszajátszásban személyes és partnerár-adatok maszkolása, admin/belépési űrlap kizárása, megőrzés/hozzáférés rögzítése.
+- [ ] M15.12 Szolgáltatóválasztás a lent rögzített jelöltekből, külön staging projekt, tesztforgalom kizárása és tesztrendelés egyeztetése; blokkolt tracking mellett is működő webshop. A visszautasítások, böngészőblokkolók és szolgáltatói limitek miatt az analitika nem ígérhet teljes látogatólefedettséget.
+
+Ellenőrzés: Ismert tesztadatból nettó top rangsor és rendelésalapú inaktivitás; nulla/rendelés nélküli eset; státuszkizárás; kosárállapotok; eseményduplázás; elfogadás/elutasítás/visszavonás; maszkolás és mérési terhelés.
+Adat/deploy: Aktivitás és aggregátumok tárolása/megőrzése; visszamenőleges ismeretlen aktivitás nem kitalált.
+
+### M15 kiadási kapuk
+
+- [ ] M15.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [ ] M15.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
+- [ ] M15.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [ ] M15.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [ ] M15.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
+- [ ] M15.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+
+Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+
+## M16. Emailközpont és hírlevél
+
+Állapot: TERVEZETT. Függőség: M04, M10, M12, M13; D12 címzett/szolgáltató.
+Forrás: Z: emailminta, értesítési preferenciák; L: email admin, hírlevél, rendszeres hírlevél.
+Stagingen bemutatható eredmény: Admin tesztkampányt szerkeszt, előnéz, időzít, és tesztcímzetteken követi a kézbesítést.
+
+- [ ] M16.01 Email menüpont jogosultsággal: sablon, egyedi küldés, címzettlista/szegmens, előnézet és tesztküldés.
+- [ ] M16.02 V6 visszaigazoló email valódi levelezőkliens-kompatibilis HTML és szöveges változata; partner- és adminlevelek.
+- [ ] M16.03 Tranzakciós és marketing email szétválasztása; preferenciák, leiratkozás, kizárólista és címzettjogosultság.
+- [ ] M16.04 Hírlevél kampány szerkesztés, ütemezés, időzóna, megszakítás és kiküldés előtti címzettszám-ellenőrzés.
+- [ ] M16.05 Szolgáltatói limitek, domainhitelesítés, visszapattanás és panasz feldolgozása; státuszok pontos jelentése.
+- [ ] M16.06 Queue, küldési limit, retry/backoff és duplikációvédelem; admin tömeges küldés nem blokkol webkérést.
+- [ ] M16.07 Küldési napló és kampánytáblák exportja hozzáféréssel; privát emailtartalom és címzettadatok megőrzése.
+- [ ] M16.08 Stagingen minden küldés tesztkörnyezetbe terelve; valódi marketingindítás külön kiadási művelet.
+
+Ellenőrzés: Tesztküldés, időzítés, leiratkozás, kizárt címzett, szolgáltatóhiba és ismételt job; email kliens előnézet.
+Adat/deploy: Kampány/címzett/küldési napló migráció; régi felhasználókat nem szabad automatikusan feliratkozónak tekinteni.
+
+### M16 kiadási kapuk
+
+- [ ] M16.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [ ] M16.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
+- [ ] M16.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [ ] M16.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [ ] M16.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
+- [ ] M16.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+
+Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+
+## M17. Kosárelhagyás és időzített automatizmusok
+
+Állapot: TERVEZETT. Függőség: M09, M15, M16; D12.
+Forrás: L: emlékeztető email, automatikus és időzített értesítések.
+Stagingen bemutatható eredmény: Egy tesztkosár szabály szerint emlékeztetőt kap, vásárlás után pedig már nem.
+
+- [ ] M17.01 Elhagyott kosár küszöb, címzettkör, küldési ablak/időzóna és maximum emlékeztető meghatározása.
+- [ ] M17.02 Kosáraktivitásból időzített feladat; végrehajtáskor jogosultság/kosárállapot újbóli ellenőrzése.
+- [ ] M17.03 Új vásárlás, üres kosár, leiratkozás, tiltás vagy új aktivitás esetén emlékeztető megszüntetése/újraütemezése.
+- [ ] M17.04 Eseményértesítések: partnerjóváhagyás, rendelésállapot és ticket. Elérhetőségi státuszváltozás M19 után külön bekapcsolható; mennyiségi alacsony-készlet értesítés a későbbi készletbővítéshez tartozik.
+- [ ] M17.05 Admin automatizmusszabály, bekapcsolás/szünet, következő futás, futási napló és export.
+- [ ] M17.06 Scheduler és job idempotencia, küldési korlát, hibariasztás és ismételt futás kizárása.
+
+Ellenőrzés: Idővezérelt tesztek valódi várakozás nélkül; vásárlás/küldés versenyhelyzet; duplikált futás; tiltott címzett.
+Adat/deploy: Szabályok/futások/küldési kulcsok bővítő migrációi; kezdetben kikapcsolt automatizmusok.
+
+### M17 kiadási kapuk
+
+- [ ] M17.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [ ] M17.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
+- [ ] M17.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [ ] M17.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [ ] M17.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
+- [ ] M17.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+
+Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+
+## M18. Ticket, belső üzenőfal és chat
+
+Állapot: TERVEZETT. Függőség: M04, M11, M12, M16; D13 chat.
+Forrás: Z: Support; L: ticket, fejlesztői üzenőfal, chat továbbfejlesztés.
+Stagingen bemutatható eredmény: Hibajegy rendeléshez kapcsolható, felelőst kap, és belső megjegyzése ügyfélnek nem látható.
+
+- [ ] M18.01 ZIP supportlista és adatlap: típus, prioritás, felelős, kapcsolódó rendelés, keresés és szűrés.
+- [ ] M18.02 Új/Folyamatban/Válaszra vár/Megoldva/Lezárva állapotok, jogosult átmenetek és napló.
+- [ ] M18.03 Hozzászólások és biztonságos mellékletek, belső és ügyfélnek látható tartalom elkülönítése.
+- [ ] M18.04 Fejlesztői üzenőfal a közös ticket/üzenetmodellre, releváns technikai adatokkal, titkok nélkül.
+- [ ] M18.05 Értesítések és olvasottság; ticketlista export és megőrzési szabályok.
+- [ ] M18.06 Meglévő chat megoldás/integráció felmérése; D13 alapján thread és olvasatlan jelzések, szükséges real-time vagy korlátozott polling.
+- [ ] M18.07 Chat szolgáltatás kiesése és újracsatlakozás kezelése; szerepkörök és partnerenkénti izoláció.
+- [ ] M18.08 SLA prioritások/időpontok rögzítésének alapja; a vállalások M21-ben véglegesednek.
+
+Ellenőrzés: Belső komment és melléklet nem szivárog; idegen ticket/chat tiltott; állapot és értesítés; újratöltés/kapcsolatszakadás.
+Adat/deploy: Ticket/üzenet/melléklet migráció; meglévő chatadat csak feltárt mapping alapján vihető át.
+
+### M18 kiadási kapuk
+
+- [ ] M18.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [ ] M18.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
+- [ ] M18.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [ ] M18.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [ ] M18.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
+- [ ] M18.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+
+Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+
+## M19. Termékelérhetőségi státuszok
+
+Állapot: TERVEZETT. Függőség: M06, M08, M13; D06 eldöntve. A függőségek után előrehozható, nem kell M17-re várnia.
+Forrás: Z: készletjelzések; L: pontosítás a terméken állítható elérhetőségről.
+Stagingen bemutatható eredmény: Admin státuszt állít a terméken, és ugyanaz jelenik meg a katalógusban, adatlapon és exportban.
+
+- [ ] M19.01 Elérhetőségi státuszok: Készleten, Beszállítói készleten, Beszerzés alatt; szükség szerint bővíthető kódkészlet/megnevezés, ismeretlen érték validációval.
+- [ ] M19.02 Termékenkénti állítás és külön publikálási státusz; meglévő adat nélküli terméknek ismeretlen/egyeztetendő állapot, nem kitalált készletszám.
+- [ ] M19.03 Állapotváltás adminjogosultsággal és auditnaplóval; aktív állapot szűrés és egyértelmű szöveges/színes jelzés.
+- [ ] M19.04 Állapotváltás ne írja át automatikusan a jelenlegi rendelhetőségi szabályt; új vásárlási tiltás csak külön üzleti döntéssel. Készletfoglalás ebben a körben nincs.
+- [ ] M19.05 Webshop kártya/adatlap és mobil megjelenítés közös státuszforrásból, cache érvénytelenítéssel; beszállítói készlet nem állítható saját raktárkészletként.
+- [ ] M19.06 Státusz szerinti adminlista és XLSX/CSV export/import; numerikus készlet- vagy minimumküszöb-funkció most nem készül.
+- [ ] M19.07 Dashboard státuszcsoportok szerinti termékszám; teljes integráció ellenőrzése. Mennyiségi készletmozgás, szinkron és alacsony-készlet automatizmus későbbi igényként megőrizve.
+
+Ellenőrzés: Státusz mentése/újratöltése, import/export körút, publikálási állapottól függetlenség, jogosultság és mobil jelzés; mennyiségi készlet vagy új rendelési korlát nem keletkezik.
+Adat/deploy: M06 státuszmezőjére épülő integráció, meglévő állapotok dokumentált mappingje; audit megőrzése.
+
+### M19 kiadási kapuk
+
+- [ ] M19.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [ ] M19.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
+- [ ] M19.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [ ] M19.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [ ] M19.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
+- [ ] M19.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+
+Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+
+## M20. Aktuális akciók és partneri ajánlatok megjelenítése
+
+Állapot: TERVEZETT. Függőség: M07, M08, M09, M14; D07 eldöntve: meglévő árazás.
+Forrás: Z: akcióoldal; L: meglévő kedvezményrendszer megőrzése és aktuális akciók megjelenítése.
+Stagingen bemutatható eredmény: Kiemelt ajánlatból a termékhez jutunk; a megjelenített partnerár ugyanaz, mint a kosárban és rendelésben.
+
+- [ ] M20.01 Az ajánlatmegjelenítés és a D01 szerint változatlan árazás szétválasztása; a tartalmi kiemelés nem módosít speciális árat vagy kedvezményprioritást.
+- [ ] M20.02 Aktuális ajánlatok kézi kiválasztása termékre/termékkörre; ajánlat hiányában a ZIP üres állapota. Nincs új kupon- vagy kedvezményhalmozási motor.
+- [ ] M20.03 M14 banner-/tartalomadminra épülő kép, cím, link, sorrend, megjelenési időszak és előnézet; a megjelenési időszak vége nem töröl partnerár-megállapodást.
+- [ ] M20.04 M07 PricingService használata változtatás nélkül; egyedi és globális árak meglévő adminból szerkeszthetők, a lista/kosár/rendelés egyezés tesztelt.
+- [ ] M20.05 Akciós lista/kártya és termékkategória-link a ZIP arculatában; publikus nézetben nincs partnerár, belépés után saját ár és jelenlegi kiszerelés. Kitalált százalék/áthúzott ár nem jelenhet meg.
+- [ ] M20.06 Ajánlati tartalmak exportja, audit, cache invalidáció és időzített megjelenítés a közös bannerfunkcióval.
+
+Ellenőrzés: Megjelenési időszak és időzóna, kategórialink, vendég/partner állapot, meglévő speciális árak egyezése; banner lejárata nem változtat árat.
+Adat/deploy: Tartalmi termék/kategória kapcsolatok bővítő migrációja; meglévő ármegállapodások változatlanok.
+
+### M20 kiadási kapuk
+
+- [ ] M20.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [ ] M20.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
+- [ ] M20.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [ ] M20.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [ ] M20.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
+- [ ] M20.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+
+Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+
+## M21. Teljes átállás, teljesítmény és üzemeltetési átadás
+
+Állapot: TERVEZETT. Függőség: M01-M20; lezáratlan érintett döntések rendezve, a felhasználó által külön halasztott csomagok tételesen rögzítve.
+Forrás: Z: összes élesítendő nézet; L: teljesítmény, biztonság, SLA, karbantartás, tárhely.
+Stagingen bemutatható eredmény: A teljes új rendszer stagingen végigtesztelt, dokumentáltan élesítésre előkészített.
+
+- [ ] M21.01 Oldaljegyzék és igénylefedettség teljes ellenőrzése; minden demo/mintaadat/halott gomb/ellenőrizetlen tartalom eltávolítása.
+- [ ] M21.02 Bootstrap, jQuery és rájuk épülő UI-pluginek végleges eltávolítása csomagból, CDN-ből, layoutból és inline kódból; assetellenőrzés.
+- [ ] M21.03 Teljes vásárlói/admin E2E és negatív jogosultsági ellenőrzés, mobil/tablet/desktop összehasonlítás, hozzáférhetőség és böngészőkonzol.
+- [ ] M21.04 Reprezentatív adat- és terhelésmérés; p95 célok rögzítése/ellenőrzése, query/index/cache és képméret optimalizálás.
+- [ ] M21.05 Biztonsági csomagaudit, CSP, session/cookie, upload/download, email és log ellenőrzések, szükséges javítások.
+- [ ] M21.06 Éles adatok próbamigrációja: darabszámok, összegek, partnerárak, rendelések, címek és feltöltések egyeztetése; visszaállítás próbája.
+- [ ] M21.07 Stagingből azonos commit/build éles kiadási folyamat, release notes és rollback; éles deploy külön eseményként naplózandó.
+- [ ] M21.08 Tárhely/email/média/DB kapacitásfelmérés, worker/cron/mentés követelményei és bővítés ellenőrzése.
+- [ ] M21.09 SLA: heti 5 nap konkrét idősávval; kritikus aznapi kezelés, magas prioritás megkezdése 1 munkanapon belül; reakció/helyreállítás/javítás külön fogalom.
+- [ ] M21.10 Havi 1-2 személyes meeting és havi teljesítési riport sablonja; felelősök és hibabejelentési csatornák.
+- [ ] M21.11 Ismétlődő karbantartási rend: Laravel/csomagfrissítés, biztonsági ellenőrzés, backup-visszaállítás, logelemzés és teljesítményriport.
+- [ ] M21.12 Admin/bannerek/kiadás/hibakezelés kezelési dokumentáció; megszűnő régi felületek és URL-ek átvezetése.
+- [ ] M21.13 Nyitott hibák és halasztott funkciók átadási listája; monitoring, riasztás és üzemeltetési felelős rögzítése.
+
+Ellenőrzés: Teljes regresszió, vizuális összevetés, terhelési eredmények, próbamigráció, restore és működő riasztás bizonyítékkal.
+Adat/deploy: Végső eltávolító migráció csak a visszaállítási ablak után; kódrollback és adatrestore külön terv.
+
+### M21 kiadási kapuk
+
+- [ ] M21.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [ ] M21.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
+- [ ] M21.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [ ] M21.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [ ] M21.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
+- [ ] M21.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+
+Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+
+## Oldalak és vizuális elfogadás nyilvántartása
+
+A route-ok a ZIP-ből származó referenciaútvonalak, nem kötelező Laravel URL-ek. Minden csoport mellé a megvalósításkor rögzítendő a végleges route, referencia/Laravel képpár és ellenőrzés dátuma. A csoport csak az összes felsorolt nézet ellenőrzése után pipálható.
+
+- [ ] V01 Főoldal `/`, fejléc/footer, hero, kategóriák és terméksávok; M08/M14.
+- [ ] V02 `/termekek`: keresés/szűrés/rács/lista; `/termekek/[slug]`: adatlap és dokumentum; M08.
+- [ ] V03 `/gyorsrendeles`, `/kosar` üres/feltöltött, `/penztar` és ellenőrzés, `/siker`; M08/M09.
+- [ ] V04 `/belepes`, `/regisztracio`, `/jelszo`, visszajelzések és jóváhagyásra váró állapot; M10.
+- [ ] V05 `/fiok`, `/fiok/rendelesek`, `/fiok/rendelesek/[id]`, újrarendelés; M10.
+- [ ] V06 `/fiok/cimek` létrehozás/szerkesztés/törlés/alapértelmezés, `/fiok/kedvencek`, `/fiok/cegadatok`, `/fiok/beallitasok`; M10.
+- [ ] V07 `/admin` dashboard, időszak és valódi mutatók; M15.
+- [ ] V08 `/admin/rendelesek`, `/admin/rendelesek/uj`, `/admin/rendelesek/[id]`; M11.
+- [ ] V09 `/admin/termekek` lista és füles szerkesztő, import nézetek és export; M06/M13.
+- [ ] V10 `/admin/kategoriak`, `/admin/szurok`, `/admin/egysegek`; M06.
+- [ ] V11 `/admin/felhasznalok`, `/admin/felhasznalok/[id]`, jóváhagyás; M12.
+- [ ] V12 `/admin/arak` két nézete, globális kedvezmény előnézete; `/admin/kiemelt`; M07/M08.
+- [ ] V13 `/admin/support`, `/admin/support/[id]`; M18.
+- [ ] V14 `/kapcsolat`, `/info/szallitas`, `/info/gyik`, `/info/katalogus`; M14.
+- [ ] V15 `/info/impresszum`, `/info/aszf`, `/info/adatkezeles`, `/info/elallas`; M14.
+- [ ] V16 `/info/akciok`: aktuális ajánlatok D07 szerint, a meglévő partnerárazással; ajánlat nélkül üres állapot; M14/M20.
+- [ ] V17 `/allapotok`, not-found: üres, nincs találat, töltés, helyreállítható hiba, mezőhiba, 403/404; komponensgaléria védett, állapotok a tényleges oldalakon is; M05/M21.
+- [ ] V18 `/email-minta` vizuális alap -> valódi email HTML/text sablon; M16.
+- [ ] V19 `/telefon` bemutató helyett valódi reszponzív oldalak, `/dizajn` helyett belső komponens/oldaljegyzék; demo segédoldalak nem nyilvános éles funkciók; M05/M21.
+- [ ] V20 ZIP-ben hiányzó új nézetek: banneradmin, email/hírlevél, automatizmusok, kosárfigyelés, aktivitás, kibővített chat; ugyanaz a designrendszer; M14-M18.
+- [ ] V21 Terméken állítható elérhetőségi státusz, webshopjelzés és aktuális ajánlatok adminja; M19/M20. Mennyiségi készlet/foglalás és külön akció-árazómotor nem része a mostani scope-nak.
+
+Minden UI ellenőrzésnél: helyes magyar szöveg, olvasható ékezetek, pénz/mennyiség/dátum formázás, tartalomba férő hosszú címek, látható fókusz, betöltés/hiba/üres állapot, működő navigáció, konzolhiba-mentesség és hiánytalan képek. A ZIP nézetarányai megőrzendők, a szükséges eltéréseket indokolni kell.
+
+## Folyamatos üzemeltetés
+
+Az alábbi pontok ismétlődnek. Egy teljesített hónap nem jelenti, hogy a feladat örökre kész. M21-ben felelős, gyakoriság és konkrét vállalás készül; minden ciklus külön naplóbejegyzést kap. Ez a dokumentum nem hoz létre automatikus emlékeztetőt és nem vállal személyes rendelkezésre állást.
+
+| ID | Feladat | Rögzítendő eredmény |
+| --- | --- | --- |
+| U01 | Heti 5 nap megállapodás szerinti rendelkezésre állás | Idősáv, helyettesítés, bejelentések és válaszidők |
+| U02 | Kritikus hibák aznapi kezelése | Jelzés, megkezdés, enyhítés/helyreállítás és lezárás időpontja |
+| U03 | Magas prioritású hibák megkezdése 1 munkanapon belül | Prioritás, határidő és tényleges kezdés |
+| U04 | Havi 1-2 személyes meeting | Dátum, résztvevők, döntések és checklistre visszahivatkozás |
+| U05 | Havi teljesítési riport | Kiadások, hibák, SLA, mérések, kapacitás, következő feladatok |
+| U06 | Laravel és csomagfrissítés | Audit, változtatás, teszt, staging/éles kiadás |
+| U07 | Biztonsági ellenőrzés | Hozzáférések, függőségek, sérülékenységek és javítások |
+| U08 | Backup és visszaállítás ellenőrzés | Mentés állapota, próba dátuma, helyreállíthatóság |
+| U09 | Logok, worker, scheduler, email ellenőrzés | Hibák, késések, sikertelen feladatok és intézkedések |
+| U10 | Teljesítmény és tárhely | Válaszidő, adatbázis, képek, levelek, tároló és bővítési szükség |
+
+## Kiadási napló
+
+Kiadáskor új sor kerül ide. Nem szabad előre sikeresnek kitölteni.
+
+| Dátum | Mérföldkő | Állapot | Commit SHA | Workflow / futás | Staging próba / bizonyíték | Következő pont |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-13 | M00 | Dokumentáció elkészült, nincs deploy | Nincs | Nem futott | Nem alkalmazható | M01.01 |
+
+Kiadási bejegyzéshez szükséges részletek:
+
+- Dátum és felelős; mérföldkő és tényleges funkciók.
+- Feature branch, commit(ok), developra jutott SHA; workflow URL/azonosító és eredmény.
+- Staging URL és ellenőrzött SHA; tesztparancsok/eredmények, képernyőképek vagy más bizonyítékok útvonala.
+- Migráció, környezeti változó neve (titkos érték nélkül), worker/cron/feature flag változás.
+- Visszaállítás módja és utolsó használható kiadás.
+- Ismert hibák, halasztások és következő pontos feladatazonosító.
+
+## Folytatási napló
+
+### 2026-10-13: checklist létrehozása
+
+- Elvégzett: ZIP és igénylista egyesítése; funkciók forrása, eltérések, 21 fejlesztési mérföldkő és kiadási kapuk.
+- Alkalmazás módosítása: nincs. Git commit/push: nincs. Staging/éles deploy: nincs.
+- Ellenőrzés: forrásfájlok és meglévő develop workflow átnézve; 328 checkbox azonosítójának egyedisége, minden M01-M21 ponthoz hat kiadási kapu, explicit feladathivatkozások és helyi Markdown-linkek ellenőrizve. A listával való lefedettség kézzel összevetve. Alkalmazásteszt nem futott, alkalmazáskód nem változott.
+- Nyitott: D01-D13 üzleti döntések; ezek a megfelelő mérföldkő előtt kérendők, nem egyszerre és nem mind a kezdés előtt.
+- Következő: M01.01; a staging aktuális állapota, hozzáférése és izolációja felmérendő.
+- Meglévő untracked anyagok: docs/, .codex-inspect/, electrobusiness-v6-local.zip és electrobusiness-v6-local/. Célzott stage szükséges, a referenciaanyagok nem automatikusan részei a commitnak.
+
+### 2026-10-13: felhasználói döntések átvezetése
+
+- D01/D05: jelenlegi árazási, kedvezményes és mennyiségi működés megőrzése; teljes szerkesztési szabadság a meglévő felhasználó/termék/termékkör lehetőségekkel.
+- D02/D03: tetszőleges kategóriamélység és ZIP szerinti hozzáférés.
+- D04: tényleges munkakörök, konkrét névsor később; D08: hero/úszó képek, aktuális akciók és kategóriák, próbaképek használhatók.
+- D06/D07: M19 átírva kézi termékelérhetőségre; M20 ajánlatmegjelenítés, új árképzési motor nélkül. A korábbi mennyiségi készlet/akciómotor-feladatokat ez a döntés felváltja, azonosítóik a szűkített scope feladatait követik.
+- D09: ZIP-szerű egyszerű törlési UI felvetve, visszaállítható megoldás ajánlva; fizikai végleges törlés nem jóváhagyott.
+- D10 külön pontosítva: nettó forgalmi top termékek ÉS utolsó rendelésen alapuló inaktivitás.
+- D11: részletes tracking elfogadott terjedelem; szolgáltatóválasztás és megőrzés M15-ben, hozzájárulás/tájékoztatás az éles indulás előtt; három új M15 feladat.
+- D12/D13: később. Alkalmazáskód, commit, push és deploy most sem változott.
+- Ellenőrzés: 331 egyedi checkbox, ebből 179 fejlesztési feladat és változatlanul 126 kiadási kapu; minden M01-M21 kapu megvan, nincs duplikált/feloldatlan feladatazonosító vagy hibás helyi Markdown-link. Csak dokumentációs ellenőrzés, alkalmazásteszt nem futott.
+- Következő fejlesztési feladat változatlan: M01.01. A korábbi, M00 létrehozásánál rögzített checkbox-darabszám történeti adat.
+
+### 2026-10-13: projektbeli fejlesztési skill
+
+- Létrehozva: `.agents/skills/electrobusiness-development/SKILL.md`, a skill UI-metaadata és gyökér `AGENTS.md` a felismeréshez és közvetlen betöltéshez.
+- A skill a checklist aktuális állapotából és döntéseiből folytat, a releváns ZIP-forrást használja, végrehajtja az adott mérföldkövet, és frissíti a kiadási/folytatási naplót.
+- A generikus folytatás következő elkezdhető mérföldkőre szól. A Git/staging lépéseket a már megadott felhatalmazással végzi; éles deployt és ütemezett háttérmunkát önmagában nem indít.
+- Ellenőrzés: a skill-creator `quick_validate.py` ellenőrzése sikeres; az UI YAML érvényes és az implicit kiválasztás engedélyezett; a helyi fájlhivatkozások és mind a 21 mérföldkő kiadási kapui ellenőrizve. A validátor PyYAML-függősége elkülönített ideiglenes könyvtárba került, az alkalmazás függőségei nem változtak. Valódi fejlesztési/deploy próbát ez a dokumentációs feladat nem indított.
+- Nincs alkalmazáskód-változás, commit/push vagy deploy. Következő fejlesztési pont: M01.01.
+
+### 2026-10-13: M01 helyi staging-alap implementáció
+
+- Munkaág: `codex/m01-staging-foundation`, alap HEAD: `2eb0798`. A korábbi docs/skill/README változtatások megőrizve. Nincs stage, commit, push vagy távoli deploy.
+- Olvasási próba a meglévő stagingen: `/`, `/contact`, `/login` HTTP 200, Basic hozzáférés-védelem és X-Robots-Tag nélkül. Ez a korábbi szerverállapot, nem az új kód kiadása. PHP/web/DB/queue elkülönítés és tárhelykapacitás még nem igazolt.
+- Új `config/staging.php`, `StagingAccess` globális middleware és `RedirectStagingMail` listener: csak staging környezetben Basic belépőkapu, noindex/no-store, SHA-fejléc, illetve tesztcímzettre irányított Laravel levelek. Hiányzó beállításnál zárt hozzáférés/nincs levélküldés. Statikus média szerveroldali védelme külön előfeltétel.
+- Új `.env.staging.example`; izolált cookie/cache/session/queue elvárások a CLI deploy-ellenőrzésben. `.gitignore` kizárja a lokális ZIP-et, kibontást, inspect anyagot és környezetfájlokat. A már követett `.env.develop` ettől még követett marad, privát titokvizsgálata szükséges; tartalma nem került kimenetbe.
+- Workflow: külön verify job dev függőségekkel és tesztekkel; deploy no-dev PHP csomaggal és ugyanazon SHA frontend artifactjával. Rögzített SSH-hostkulcs szükséges. Staging environment, szerveroldali deploy-lock, csomag SHA256 és korábbi kódmentés. Új `package.sh`, `remote.sh`, `smoke.php`; shellfájlok LF sorvége rögzítve.
+- `STAGING_DEPLOY_ENABLED=true` nélkül az új workflow nem deployol. Kötelező új titoknevek: `SSH_KNOWN_HOSTS`, `STAGING_ACCESS_USER`, `STAGING_ACCESS_PASSWORD`; szerverenvben jelszóhash és `STAGING_MAIL_TO`. A meglévő `.env` nem íródik felül az `ENV_DEVELOP` titok módosításától. A teljes előfeltétellista és visszaállítás a DEPLOYMENT.md-ben.
+- Tesztizoláció: kényszerített SQLite `:memory:`, üres DATABASE_URL és külön config-cache útvonal; boot utáni ellenőrzés rossz DB esetén még a migráció előtt leáll. A meglévő kedvezményindex-migráció SQLite indexvizsgálatot kapott; MySQL ága és üzleti árazás változatlan. Nincs új adatbázisséma/migráció.
+- Ellenőrzés: `php -d extension=pdo_sqlite vendor/phpunit/phpunit/phpunit` sikeres, 24 teszt / 84 assertion. Lefedett: staging belépés/hiba/noindex, normál környezet változatlansága, mail sink és eredeti címzett megtartása stagingen kívül, vendég route-ok, ismételhető indexmigráció, csomagtartalom/kizárás/SHA256 és szintetikus kicsomagolás, korábbi entrypoint tesztek.
+- `npm run build` sikeres (Vite 5.4.19); meglévő Sass/Bootstrap deprecation figyelmeztetések, ezek M05/M21 témái. PHP lint, Bash `-n`, workflow YAML parse és verify-függőség, valamint `git diff --check` sikeres.
+- Korlát: helyi PHP 8.4.7, CI cél 8.2.31; a célverziós tiszta checkout/CI még nem futott. Helyi ShellCheck nincs telepítve, CI tartalmazza az ellenőrzést. MySQL migráció, valódi kód/DB/média-visszaállítás, partner/admin bejelentkezett staging próba és távoli titkok/jogosultságok ellenőrzése nem történt meg. A szintetikus csomagteszt nem helyettesíti a mentéspróbát.
+- Következő: M01.01/M01.02 szerveroldali felmérés és beállítás, M01.04 megbízható hostkulcs, M01.09 mentés-visszaállítás. Ezután célzott commit/CI és engedélyezett staging deploy, SHA + partner/admin ellenőrzés. M02 nem kezdődött el; M01 kiadási kapui nyitva maradtak.
+
+### 2026-10-13: hozzáférési diagnózis helyesbítése és másik feladat kiadása
+
+- A GitHub-hozzáférés működik. A mostani hibás próba `GIT_SSH_COMMAND` felülírással kihagyta a repó dedikált kulcsát és a korábban beállított Windows OpenSSH klienst. Ez tesztelési hiba volt, nem elveszett jogosultság; a tartós Git-config nem változott.
+- A működő beállítást a `git config --show-origin --get core.sshCommand` mutatja: Windows OpenSSH, repohoz rendelt `eb-webshop` kulcs és `IdentitiesOnly=yes`. Diagnózis előtt ezt kell megnézni; ne cseréld általános `ssh` parancsra. Privát kulcs tartalmát ne olvasd/naplózd.
+- Ellenőrzés: sima `git ls-remote origin refs/heads/develop` és `git fetch origin develop` sikeres. A GitHub Actions publikus API token nélkül visszaadta a #23 futás `completed / success` eredményét: https://github.com/sykolos/eb-webshop/actions/runs/38470167150 .
+- A „Javítsd a sikertelen deployt” feladat már kiadta a `936fd9ed31504833b63f9a7b5f7059735206b8de` commitot. Annak naplója sikeres buildet, 12 deploymenttesztet és három HTTP 200 próbát tartalmaz; most az Actions-eredményt ellenőriztük újra, nem az M01-et deployoltuk.
+- Az origin/develop egy committal előrébb jár a jelenlegi M01 ágnál: workflow-javítás, új `scripts/deploy/ensure-app-key.php` és két entrypoint teszt. A következő M01 kiadás ELŐTT ezeket össze kell vetni a helyi módosításokkal; a munkafa felülírása vagy vak develop push tilos.
+- Közvetlen staging SSH-hozzáférés és az M01 új titkainak beállítása külön kérdés a már működő Git push/Actions útvonaltól. A GitHub deploytitkok hiánya a helyi környezeti változók között nem bizonyítja a távoli titkok hiányát. Nem szükséges új GitHub-kulcsot kérni a felhasználótól.
+- Ebben a folytatásban nincs alkalmazáskód-változás, commit vagy push. A deploy előzetes konfiguráció-ellenőrzésének előrehozása még tervezett munka; nem készült el. Az izolált Linux-próbához Docker Desktop indítását kértük, konténeres teszt nem futott.
+- Következő: a `936fd9e` javítás összevetése és megőrzése, M01 helyi deploy-preflight és ellenőrzések folytatása, majd a még ténylegesen hiányzó staging előfeltételek rendezése a meglévő Actions útvonalon.
+
+### 2026-10-14: M01 preflight és kiadási hibaforgatókönyvek
+
+- A `936fd9e` diffjét összevetettük: az `ensure-app-key.php` segéd és két tesztje bekerült a munkafába. Az új workflow nem generál automatikusan kulcsot meglévő telepítéshez, és nem veszi át az ellenőrizetlen feltöltésmásolás utáni törlést. Érvényes meglévő kulcs és storage-symlink változatlanul használható; döntés indoklása a DEPLOYMENT.md-ben.
+- `remote.sh`: a csomag SHA/REVISION és a jelölt Laravel környezet ellenőrzése a karbantartás/kódcsere ELŐTT, privát ideiglenes könyvtárban történik. A tényleges szerverenv privát másolatát használja; a másolat és a feltöltött fallback kilépéskor eltűnik. Hibás konfiguráció nem állítja le az aktuális kódot. A preflight részletes naplója nem kerül CI-kimenetbe.
+- További védelem: megosztott/symlinkelt runtime storage és párhuzamos deploy elutasítása; explicit nem üres törlési gyökér. Előre renderelt karbantartási oldal, public entrypoint megőrzése takarításkor, a karbantartási válasz a vendor létezésvizsgálata elé került. A tanúsítványhoz tartozó `.well-known` nincs a release csomagban.
+- Új `tests/Deployment/remote.sh`: kilenc izolált Linux-forgatókönyv, köztük sikeres csere és snapshot-kicsomagolás, hibás env/path/checksum/revision, valódi public storage megőrzése, megosztott storage, lock és migrációhiba. PHP/Artisan szimulált, nem valódi DB-visszaállítás. CI-ba bekötve, új LF-szabály a shellteszthez.
+- Helyi ellenőrzés: PHPUnit 27 teszt / 94 assertion sikeres; Bash `-n` és ShellCheck v0.10.0 sikeres; `git diff --check` sikeres. A ShellCheck hivatalos GitHub-release Windows binárisa elkülönített TEMP könyvtárban futott, nem került alkalmazásfüggőségbe.
+- Helyi Linux-próba: Docker kezdetben válaszolt az info/image-list lekérdezésre, de a futtatás és a verziólekérdezés HTTP 500 engine hibával állt le. Konténeres teszt nem tekinthető lefutottnak; a Docker adatát/konfigurációját nem módosítottuk, nem reseteltük. Valódi GitHub CI és ShellCheck + Linux-teszt együtt még hátravan.
+- Nincs stage/commit/push/deploy. A munkaági commit/push jóváhagyását külön kérdésben kértük; válasz eddig nincs. A developot nem módosítottuk. A távoli javítás munkafabeli megőrzése nem Git-merge: a jóváhagyott commit után az origin/develop őstörténetét is integrálni kell, a workflow eltérését tudatosan feloldva.
+- Következő: a jóváhagyás után a célzott M00/M01 fájlok commitja, remote javítás integrációja és csak `codex/m01-staging-foundation` push/CI. Staging aktiválás csak az új környezeti előfeltételek és a tényleges DB/média-visszaállítási próba után. M01.K1-K6 továbbra sincs lezárva.
+
+### 2026-10-14: Git kiadás engedélyezése
+
+- A felhasználó engedélyezte a commit/push műveletet, a develop ágra is. Ezt ehhez az M01 kiadáshoz nem kell újra bekérni. Éles deployra ez nem felhatalmazás.
+- Sorrend: célzott commit, `936fd9e` előzmény integrációja, munkaági CI, siker esetén develop push és a tényleges workflow/deploy eredmény ellenőrzése. Az új staging kapcsoló és szerveroldali előfeltételek ettől még szükségesek; a kihagyott deploy nem sikeres telepítés.
+
+### Következő munkamenet sablonja
+
+- Dátum / aktív mérföldkő:
+- Elkészült feladatazonosítók:
+- Folyamatban / blokkolt / halasztott azonosítók és ok:
+- Változott fájlok és döntések:
+- Futott ellenőrzés és tényleges eredmény:
+- Commit / develop SHA / staging futás:
+- Migráció / rollback / ismert hiba:
+- Következő konkrét feladat:

@@ -1,6 +1,9 @@
 # ebtest deployment
 
-GitHub Actions deploys pushes to `develop`.
+GitHub Actions verifies `codex/**` pushes and pull requests targeting `develop`.
+Pushes to `develop` deploy only after verification and when the repository variable
+`STAGING_DEPLOY_ENABLED` is exactly `true`. Keep it unset until the checklist below
+is completed. A skipped deployment is not a staging release.
 
 Configure these GitHub repository secrets:
 
@@ -11,6 +14,20 @@ Configure these GitHub repository secrets:
 | `ENV_DEVELOP` | Complete test environment file, including the existing valid APP_KEY and test database credentials |
 
 Keep the existing `SSS_HOST`, `SSH_USER`, `SSH_PORT`, and `SSH_PASSWORD` secrets.
+Add `SSH_KNOWN_HOSTS` containing the server's trusted OpenSSH known_hosts entry
+(including `[host]:port` for a nonstandard port). Obtain and verify the fingerprint
+through the hosting provider or a trusted existing connection, not a blind scan
+inside CI. Unknown/changed keys fail deployment.
+
+Add `STAGING_ACCESS_USER` and `STAGING_ACCESS_PASSWORD` for the HTTP smoke test.
+The server stores only the corresponding `STAGING_ACCESS_PASSWORD_HASH`.
+Optional repository variable `DEPLOY_PHP_BIN` selects the server CLI binary;
+otherwise `php` is used. CI uses PHP 8.2.31 from the Composer platform setting.
+Check both the server CLI and web PHP version before release.
+
+Create a GitHub environment named `staging` with required reviewers and allow
+only `develop` deployments. Repository branch rules should require the `verify`
+job before merge. These are remote settings, not created by the workflow file.
 The cPanel document root for `ebtest.dekor26.hu` must be
 `/home/dekorhu/ebtest/public_html`.
 
@@ -50,10 +67,145 @@ up and identify any needed environment files or uploads before retiring them.
 Neither old root storage nor an existing real `public_html/storage` directory
 is automatically migrated into `myapp/storage`.
 
-The CLI deployment check validates the public application path, APP_KEY,
-required routes, views and writable runtime directories. Migrations run in
-`DEPLOY_PATH`. The final HTTP check requests `/`, `/contact`, and `/login`;
-an HTTP 500 fails the deployment even if Artisan succeeded.
+## First-release prerequisites
+
+1. Compare `.env.staging.example` with the server environment through a secure
+   session. Preserve the existing valid staging APP_KEY; never reuse production
+   credentials or rotate an existing key blindly. The example has no secrets.
+2. Set `APP_ENV=staging`, `APP_DEBUG=false`, the exact HTTPS staging APP_URL,
+   separate database credentials and staging-only filesystem/media. Verify the
+   database account cannot access production. Use anonymized test data.
+3. Set the host-only secure `electrobusiness_staging_session` cookie, file cache
+   and sessions, and synchronous queue as in the example. Review old workers and
+   cron jobs; do not let staging process production queues. M04 adds workers.
+4. Configure a long random staging access password and its PHP `password_hash`
+   value. Single-quote the hash in `.env` to preserve `$`. Transfer credentials
+   through a secret manager; never paste them into Git or project notes.
+5. Set `STAGING_MAIL_TO` to a dedicated test mailbox, with `MAIL_MAILER=log`
+   initially. Every Laravel mailer redirects To/Cc/Bcc to the sink; an invalid
+   sink blocks sending. Direct external email APIs are outside this guard.
+6. Arrange independent database and upload backups and test their restoration
+   into a separate disposable environment. Record backup ID, checksums, restored
+   row counts/media checks and date in M01.09 before enabling deployment.
+7. Configure the secrets/environment/branch rules above, inspect the diff and
+   enable `STAGING_DEPLOY_ENABLED=true` only after these checks are complete.
+
+The application adds HTTP Basic authentication, no-store and noindex headers
+only for `APP_ENV=staging`. Basic access is separate from partner/admin login.
+Missing credentials fail closed. This middleware does not protect static files
+or uploads served directly by Apache. For confidential media, configure protection
+at the staging virtual-host level too; do not rely on noindex as access control.
+Preserve that configuration outside the overwritten public directory. Ensure
+Authorization reaches PHP and retest the HTTP checks if proxy/server auth is added.
+
+The tracked legacy `.env.develop` is not deployed. `.gitignore` cannot remove
+already tracked files: review its history privately and rotate any real credentials
+found there as a separate controlled operation. Do not print its contents in logs.
+
+## Release flow
+
+- Work on `codex/mNN-description`, run tests/build and review only intended files.
+  Keep source ZIPs and inspection directories local. Commit documentation and
+  configuration with the corresponding change; avoid indiscriminate `git add .`.
+- CI installs development dependencies and builds from lockfiles, runs isolated
+  in-memory SQLite tests and shell checks. The deploy job installs no-dev PHP
+  dependencies and reuses that same SHA's frontend artifact.
+- `package.sh` packages an explicit runtime allowlist. No root `.env`, ZIP,
+  inspection material, tests or documentation enters the release. Both archives
+  have SHA256 checksums. GitHub keeps artifacts for 14 days.
+- SSH verification is mandatory. The remote script accepts only sibling app/public
+  directories directly below `/home/USER/ebtest/` and refuses symlinked targets.
+  Server tools required: Bash, GNU tar/find/coreutils, `flock`, compatible PHP.
+- A remote lock serializes deployment. The previous code/public assets are backed
+  up outside the public root, then the application enters prerendered maintenance. Runtime
+  code is replaced; `.env`, `storage` and `.well-known` are preserved. A real
+  `public_html/storage` directory is refused instead of silently deleting uploads.
+- Before any downtime or code replacement, the candidate is unpacked into a private
+  `preflight.*` directory under the incoming release. Its REVISION must match the
+  requested SHA. It boots with a private copy of the existing server `.env` (or
+  the first-install fallback), temporary storage and a candidate-only entrypoint.
+  The CLI check validates public/app binding, key, routes, views, writable paths
+  and staging configuration. Failure leaves live code unchanged. Diagnostic output
+  stays in the private `preflight.log`; the temporary environment copy and uploaded
+  fallback are removed by the exit trap. Never publish that log without review.
+- After successful preflight, the script takes the code snapshot, enters maintenance
+  and replaces runtime code. It repeats CLI checks, runs migrations, rebuilds caches and
+  leaves maintenance. Configuration errors fail the job; failures after maintenance
+  begins retain maintenance for diagnosis, not automatic repeated migration.
+- The existing front controller and binding are kept during public directory cleanup;
+  the maintenance response is loaded before checking for vendor/bootstrap files.
+  This reduces the in-place replacement failure window; it is not an atomic release.
+  Shared/symlinked runtime storage is rejected. `.well-known` is excluded from the
+  release archive as well as preserved on the server.
+- HTTP smoke checks require unauthenticated 401, authenticated staging access to
+  `/`, `/contact`, `/login`, and application-guest redirects on `/account` and
+  `/adminpanel`. Responses must have noindex and match `X-Release-Sha` to the
+  deployed SHA. This is NOT a partner/admin application-login test: perform those
+  separately using dedicated test users and record them in M01.08/K5.
+- Record commit, workflow URL, SHA and actual staging checks in the checklist.
+  Production has no automatic path in this workflow. A future production release
+  requires its own environment, secrets, approval and staging-tested revision.
+
+Local verification on Windows: `php -d extension=pdo_sqlite vendor/phpunit/phpunit/phpunit`
+and `npm run build`. Packaging tests use Git Bash on Windows and Bash on CI.
+SQLite tests do not prove MySQL migration compatibility; stage against the actual
+database version before promotion.
+
+The `936fd9e` APP_KEY helper and its two regression tests are retained. The new
+deployment deliberately does not regenerate keys for an existing installation:
+invalid/missing keys fail preflight. Use the helper only in an explicitly approved
+initial setup after verifying no encrypted data depends on a previous key. Similarly,
+the earlier copy-then-delete public storage migration is not automated here; a failed
+copy must never lead to deleting uploads. Existing valid keys and storage symlinks work
+unchanged.
+
+`sudo bash tests/Deployment/remote.sh` runs nine Linux filesystem scenarios in a
+new `/home/eb-deploy-test-*` directory and removes only that fixture. Run it on an
+isolated CI runner/container. It tests preflight ordering, invalid environment/path
+setup/checksum/revision, real public storage, shared runtime storage, concurrent
+deployment and migration failure, plus code snapshot unpacking. PHP/Artisan commands
+are simulated; it does not connect to or restore a real database. GitHub CI runs it
+alongside PHPUnit and ShellCheck. Local container alternative:
+
+```powershell
+docker run --rm --network none --mount type=bind,source=D:/projektek/Electrobusiness,target=/repo,readonly --entrypoint bash mariadb:11.4 /repo/tests/Deployment/remote.sh
+```
+
+That invocation uses only the image's Linux tools, starts no MariaDB server and
+mounts the repository read-only. No production data or credentials are used.
+
+## Recovery and backup verification
+
+Code snapshots live in `/home/USER/ebtest/.deploy-backups/TIMESTAMP-SHA/`.
+They include archive checksums, but exclude `.env`, uploads and runtime storage.
+They are NOT database backups. Keep an encrypted, access-controlled backup of the
+staging environment separately. No automatic retention deletion is configured;
+monitor disk usage and establish retention before repeated releases.
+
+On failure, stop further deployments, inspect logs and keep maintenance enabled.
+Acquire the same `.deploy.lock` for a manual restore. Record the failed and prior
+SHA and verify the chosen snapshot checksums and archive contents before extraction.
+Never restore into a path inferred from an unchecked variable.
+
+1. Determine whether migrations ran and whether the previous code is compatible
+   with the current schema. Do not blindly run `migrate:rollback` or redeploy.
+2. For a code-only restore, replace only the runtime allowlist documented in
+   `package.sh`, using the chosen app snapshot; replace public files except
+   `storage` and `.well-known` with the matching public snapshot. Keep the current
+   environment, uploads, runtime directories and maintenance marker intact.
+3. Recreate the storage symlink, verify the configured application path and
+   permissions, clear stale caches, rebuild config/views, then run CLI checks.
+   The first snapshot may predate M01 and have no REVISION/staging checks; validate
+   that version's requirements and keep server-level protection in place.
+4. If schema/data recovery is necessary, restore the matched DB/upload backups
+   into an isolated environment FIRST. Check row counts, sample orders, partner
+   prices and sample media; document any lost changes before touching staging.
+5. Bring staging up only after verification and run the HTTP and logged-in smoke
+   checks against the restored revision. Record outcome and continue from that SHA.
+
+The local package test checks archive contents, checksums and unpacking with
+synthetic files. It does not prove a real code/DB/upload restore on this host;
+M01.05/M01.09 remain open until that drill is documented.
 
 For HTTP 500 errors, inspect the latest exception in
 `/home/dekorhu/ebtest/myapp/storage/logs/laravel.log`, or the dated Laravel log

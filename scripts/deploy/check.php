@@ -29,6 +29,22 @@ $app = require $appPath.'/bootstrap/app.php';
 $app->instance('path.public', $publicPath);
 $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
+if (in_array('--staging', $argv, true)) {
+    $check($app->environment('staging') && config('staging.enabled'), 'Deployment requires APP_ENV=staging.');
+    $check(config('app.debug') === false, 'Staging APP_DEBUG must be false.');
+    $check(config('app.url') === 'https://ebtest.dekor26.hu', 'Unexpected staging APP_URL.');
+    $check(config('staging.username') !== '' && password_get_info((string) config('staging.password_hash'))['algoName'] !== 'unknown',
+        'Configure staging access username and a valid password hash.');
+    $check((bool) filter_var(config('staging.mail_to'), FILTER_VALIDATE_EMAIL), 'Configure a dedicated STAGING_MAIL_TO sink.');
+    $check(config('session.cookie') === 'electrobusiness_staging_session'
+        && config('session.domain') === null && config('session.secure') === true,
+        'Staging requires a host-only secure session cookie named electrobusiness_staging_session.');
+    $check(config('cache.default') === 'file' && config('session.driver') === 'file',
+        'M01 staging requires isolated file cache and sessions; shared Redis needs separate review.');
+    $check(config('queue.default') === 'sync', 'M01 staging uses sync; isolated workers are configured in M04.');
+    $check((bool) preg_match('/^[a-f0-9]{40}$/D', (string) config('staging.revision')), 'Missing build revision.');
+}
+
 try {
     $app->make('encrypter');
 } catch (Throwable $error) {

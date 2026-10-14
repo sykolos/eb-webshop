@@ -1,0 +1,6 @@
+interface:
+  display_name: "Electrobusiness Development"
+  short_description: "Continue the Laravel rebuild through staging checkpoints"
+  default_prompt: "Use $electrobusiness-development to continue the next eligible checklist milestone, verify the work, and update the handoff log."
+policy:
+  allow_implicit_invocation: true

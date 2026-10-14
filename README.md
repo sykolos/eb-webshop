@@ -7,6 +7,12 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## Electrobusiness fejlesztés
+
+Projektbeli skill: [electrobusiness-development](.agents/skills/electrobusiness-development/SKILL.md). A [gyökér AGENTS.md](AGENTS.md) segíti a betöltését. Használat: „Folytasd a következő mérföldkővel”, vagy célzottan `$electrobusiness-development` és a feladat.
+
+A ZIP-alapú új felület és a bővített igénylista megvalósítását a [fejlesztési checklist](docs/FEJLESZTESI-CHECKLIST.md) követi. Minden nagyobb pont önálló commit- és staging-kiadási feltételeket, ellenőrzést és folytatási naplót tartalmaz. Háttér: [átépítési terv](docs/ATEPITESI-TERV.md); jelenlegi telepítés: [DEPLOYMENT.md](DEPLOYMENT.md).
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
