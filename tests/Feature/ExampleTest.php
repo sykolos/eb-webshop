@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Models\Order;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -76,5 +77,24 @@ class ExampleTest extends TestCase
         ])->assertRedirect('/');
 
         $this->get('/adminpanel')->assertOk();
+    }
+
+    public function test_account_order_details_and_pdf_are_limited_to_the_order_owner(): void
+    {
+        $this->withoutVite();
+        $owner = User::factory()->create();
+        $otherUser = User::factory()->create();
+        $order = Order::create([
+            'user_id' => $owner->id,
+            'name' => $owner->name,
+            'email' => $owner->email,
+            'address' => 'Teszt utca 1.',
+            'total' => 1000,
+            'status' => 'függőben',
+        ]);
+
+        $this->actingAs($otherUser)->get('/account/details/'.$order->id)->assertForbidden();
+        $this->actingAs($otherUser)->get('/account/getpdf/'.$order->id)->assertForbidden();
+        $this->actingAs($owner)->get('/account/details/'.$order->id)->assertOk();
     }
 }

@@ -8,7 +8,7 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 | Mező | Aktuális érték |
 | --- | --- |
 | Aktív mérföldkő | M01: staging és Git kiadási alap, STAGINGEN; D14 szerinti deploy és nyilvános HTTP-próba sikeres |
-| Következő fejlesztési feladat | M01.08 élő staging felhasználói próba dedikált partner/admin adatokkal; alkalmazásszintű login- és jogosultságteszt már zöld. Utána M02.01 |
+| Következő fejlesztési feladat | M01.08 élő staging felhasználói próba dedikált partner/admin adatokkal; M02.01 kódja és helyi tesztje elkészült, staging kiadása folyamatban |
 | Alkalmazásfejlesztés ebből a checklistből | M01 elkezdve; stagingvédelem, tesztkapu és deploy megerősítése |
 | Utolsó igazolt staging kiadás | 74d54f5296531370873f9182d10ead0b003d86ea, GitHub Actions #36: verify/deploy/HTTP sikeres |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
@@ -150,7 +150,7 @@ A vásárlás backendben rögzített üzleti esemény és a külső viselkedési
 | --- | --- | --- |
 | M00 | ZIP/lista összevetés és követhető munkalista | DOKUMENTÁCIÓ ELKÉSZÜLT |
 | M01 | Staging és Git kiadási alap | STAGINGEN; nyilvános próba sikeres, bejelentkezett próba nyitott |
-| M02 | Kritikus biztonsági és rendelési javítások | TERVEZETT |
+| M02 | Kritikus biztonsági és rendelési javítások | FOLYAMATBAN; M02.01 elkészült, stagingkiadás alatt |
 | M03 | Laravel és futtatókörnyezet korszerűsítése | TERVEZETT |
 | M04 | Közös backend, jogosultság és háttérfeldolgozás | TERVEZETT |
 | M05 | ZIP-alapú designrendszer és három layout | TERVEZETT |
@@ -219,7 +219,7 @@ Kiadási rekord: commit = `74d54f5296531370873f9182d10ead0b003d86ea`; workflow =
 Forrás: L: biztonság; K: konkrét kódhiányok.
 Stagingen bemutatható eredmény: A régi felület a javított hozzáférésekkel és rendelésmentéssel tovább használható.
 
-- [ ] M02.01 OrderPolicy és tulajdonosszűrés a fiókbeli rendelésrészletnél és PDF-letöltésnél; cím- és kosárhozzáférések átvizsgálása.
+- [x] M02.01 OrderPolicy és tulajdonosszűrés a fiókbeli rendelésrészletnél és PDF-letöltésnél; cím- és kosárhozzáférések átvizsgálása.
 - [ ] M02.02 Nyilvános /clear eltávolítása; üzemeltetési cache-törlés csak CLI/deploy folyamatból.
 - [ ] M02.03 Kosármennyiség, termékazonosító és kiszerelés validációja; a kliens q/m paramétere ne dönthesse el az üzleti mennyiséget.
 - [ ] M02.04 Checkout tranzakció és ismételt beküldés elleni védelem; hiányzó számlázási adatok és megszűnt termék kezelése.
@@ -996,6 +996,13 @@ Kiadási bejegyzéshez szükséges részletek:
 - Helyi ellenőrzés: teljes PHPUnit `30 teszt / 105 assertion` sikeres. Frontend- és deployfájl nem változott; CI teljes ellenőrzése a commit után esedékes.
 - M01.08-at nem pipálom ki: a valódi stagingen dedikált partner/admin felhasználókkal végzett próba nem történt meg. Az alkalmazásszintű szerződés most automatikusan védett.
 - Következő: célzott commit és a már működő develop -> staging folyamaton kiadás; utána M02.01 csak az élő staging-próba lezárása után.
+
+### 2026-10-14: M02.01 rendelés-tulajdonosvédelem
+
+- A fiók `/account/details/{id}` és `/account/getpdf/{id}` végpontjai eddig bármely bejelentkezett felhasználónak betöltötték az azonosítóval megadott rendelést. Ez jogosulatlan rendelés- és PDF-hozzáférési kockázat volt.
+- Elkészült `OrderPolicy::view`, az explicit policy-regisztráció és mindkét controller-ágon az authorize ellenőrzés. A rendelés tulajdonosa továbbra hozzáfér, más partner 403-at kap; adminfelületi rendeléskezelés nem változott.
+- Új regresszióteszt: idegen rendelés részlete és PDF 403, tulajdonos részlete 200. Helyi teljes PHPUnit: 31 teszt / 108 assertion sikeres. Nincs migráció, meglévő rendelésadat nem változik.
+- M02.01 kód kész és helyben ellenőrzött; kiadása a már működő develop -> staging útvonalon következik. M01.08 valódi staging partner/admin belépése továbbra nyitott.
 
 ### Következő munkamenet sablonja
 

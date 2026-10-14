@@ -24,6 +24,7 @@ class AccountpageController extends Controller
     public function details($id){
         $status=['függőben','feldolgozás','kiszállítva','törölve'];
         $order = Order::with('user','items','items.product','user_shipping')->findOrFail($id);
+        $this->authorize('view', $order);
         return view('pages.components.account.details',['order'=>$order,'states'=>$status,'id'=>$id]);   
     }
     public function modify(){
@@ -79,6 +80,7 @@ class AccountpageController extends Controller
 
     public function getpdf($id){
         $order=Order::with('user','items','items.product')->findOrFail($id);
+        $this->authorize('view', $order);
         
         $status=['függőben','feldolgozás','kiszállítva','törölve'];
         $pdf =Pdf::loadView('myPDF',['order'=>$order,'states'=>$status,'id'=>$id]);
