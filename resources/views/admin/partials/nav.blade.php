@@ -20,6 +20,8 @@
         </li>               
         <li><a href="{{ route('adminpanel.recommended.edit') }}">Kiemelt Termékek</a>
         </li>
+        <li><a href="{{ route('adminpanel.design-system') }}">V6 komponensek</a>
+        </li>
     </ul>
 
     <div class="logout">

@@ -25,6 +25,7 @@ use App\Http\Controllers\ShippingAddressController;
 use App\Http\Controllers\ProductRecommend;
 use App\Http\Controllers\AdminTwoFactorController;
 use App\Http\Controllers\PrivateFileController;
+use App\Http\Controllers\DesignSystemController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 
@@ -112,6 +113,10 @@ Route::group(['prefix'=>'account','middleware'=>'auth'],function(){
     //adminpanel group
     Route::group(['prefix' =>'adminpanel','middleware'=>'admin'],function(){
         Route::get('/',[AdminController::class, 'dashboard'])->name('adminpanel');
+        Route::get('/design-system', [DesignSystemController::class, 'index'])->name('adminpanel.design-system');
+        Route::get('/design-system/shop', [DesignSystemController::class, 'shop'])->name('adminpanel.design-system.shop');
+        Route::get('/design-system/account', [DesignSystemController::class, 'account'])->name('adminpanel.design-system.account');
+        Route::get('/design-system/admin', [DesignSystemController::class, 'admin'])->name('adminpanel.design-system.admin');
         Route::get('/security/2fa', [AdminTwoFactorController::class, 'setup'])->name('admin.2fa.setup');
         Route::post('/security/2fa/confirm', [AdminTwoFactorController::class, 'confirm'])->name('admin.2fa.confirm');
         Route::post('/security/2fa/disable', [AdminTwoFactorController::class, 'disable'])->name('admin.2fa.disable');

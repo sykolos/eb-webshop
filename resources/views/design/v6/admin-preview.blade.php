@@ -1,0 +1,9 @@
+@extends('layouts.v6.admin')
+@section('title', 'Admin layout preview')
+@section('heading', 'Admin áttekintés')
+@section('intro', 'Sűrű, jól szkennelhető munkafelület a napi feladatokhoz.')
+@section('content')
+<div class="v6-stat-grid"><div class="v6-stat"><strong>280</strong><span>Elérhető termék</span></div><div class="v6-stat"><strong>2411</strong><span>Nem teljesített rendelés</span></div><div class="v6-stat"><strong>28</strong><span>Új partnerjelölt</span></div><div class="v6-stat"><strong>6</strong><span>Alacsony készlet</span></div></div>
+<section class="v6-panel" style="margin-top: 18px;"><div class="v6-panel__header"><div><h2>Mai munkalista</h2><p>Az állapotok színe és szövege együtt értelmezhető.</p></div><a class="v6-button v6-button--primary v6-button--small" href="{{ route('adminpanel.orders') }}">Rendelések</a></div><div class="v6-data-table-wrap"><table class="v6-data-table"><thead><tr><th>Feladat</th><th>Felelős</th><th>Prioritás</th><th>Állapot</th></tr></thead><tbody><tr><td>Új rendelés ellenőrzése</td><td>Értékesítés</td><td><span class="v6-status v6-status--danger">Magas</span></td><td><span class="v6-status v6-status--warning">Folyamatban</span></td></tr><tr><td>Partner jóváhagyása</td><td>Admin</td><td><span class="v6-status v6-status--neutral">Normál</span></td><td><span class="v6-status v6-status--success">Kész</span></td></tr></tbody></table></div></section>
+<section class="v6-panel"><div class="v6-panel__header"><div><h2>Hibaállapot példa</h2><p>A visszajelzés nem csak színnel, hanem szöveggel is megjelenik.</p></div></div><div class="v6-field has-error"><label for="admin-preview-field">Kapcsolattartó email</label><input id="admin-preview-field" value="hibas-email"><span class="v6-error">Adj meg érvényes email-címet.</span></div></section>
+@endsection
