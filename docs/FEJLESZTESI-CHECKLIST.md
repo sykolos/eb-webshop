@@ -7,15 +7,15 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M01: staging és Git kiadási alap, FOLYAMATBAN |
-| Következő fejlesztési feladat | D14: visszatérés a meglévő deploy-beállításokhoz, új titkok/kapcsoló nélkül; teszt, develop push és tényleges staging próba |
+| Aktív mérföldkő | M01: staging és Git kiadási alap, STAGINGEN; D14 szerinti deploy és nyilvános HTTP-próba sikeres |
+| Következő fejlesztési feladat | M01.08: bejelentkezett partner/admin próba és fennmaradó átadási ellenőrzések; utána M02. A D14-ben halasztott új infrastruktúra nem újabb deployblokkoló |
 | Alkalmazásfejlesztés ebből a checklistből | M01 elkezdve; stagingvédelem, tesztkapu és deploy megerősítése |
-| Utolsó igazolt staging kiadás | Korábbi deployjavítás: 936fd9e, GitHub Actions #23 sikeres; M01 változtatásai még nincsenek stagingen |
+| Utolsó igazolt staging kiadás | 74d54f5296531370873f9182d10ead0b003d86ea, GitHub Actions #36: verify/deploy/HTTP sikeres |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
-| Meglévő workflow | D14 szerint visszaállítás alatt: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
+| Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D09 törlés technikai javaslata, D11 szolgáltató; D12-D13 későbbre halasztva |
-| Mostani változtatás | D14 implementáció: új konfigurációaudit törölve, extra stagingvédelem inaktív, meglévő env megőrzése, régi SSH-opciók és HTTP 200 próbák visszaállítva; CI/kódmentés megmarad |
+| Mostani változtatás | D14 kiadva: új audit/gate nélkül sikeres staging deploy; utólagos kiadási napló a munkaágon, a következő develop integráció része |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -149,7 +149,7 @@ A vásárlás backendben rögzített üzleti esemény és a külső viselkedési
 | Pont | Téma | Állapot |
 | --- | --- | --- |
 | M00 | ZIP/lista összevetés és követhető munkalista | DOKUMENTÁCIÓ ELKÉSZÜLT |
-| M01 | Staging és Git kiadási alap | FOLYAMATBAN |
+| M01 | Staging és Git kiadási alap | STAGINGEN; nyilvános próba sikeres, bejelentkezett próba nyitott |
 | M02 | Kritikus biztonsági és rendelési javítások | TERVEZETT |
 | M03 | Laravel és futtatókörnyezet korszerűsítése | TERVEZETT |
 | M04 | Közös backend, jogosultság és háttérfeldolgozás | TERVEZETT |
@@ -181,7 +181,7 @@ A vásárlás backendben rögzített üzleti esemény és a külső viselkedési
 
 ## M01. Staging és Git kiadási alap
 
-Állapot: FOLYAMATBAN. Függőség: M00.
+Állapot: STAGINGEN (D14 szerinti kiadás). Függőség: M00. Nyilvános HTTP-próba sikeres, a teljes bejelentkezett próba még nyitott.
 Forrás: L: staging, deploy, infrastruktúra; K: meglévő develop workflow.
 Stagingen bemutatható eredmény: Az aktuális Laravel-verzió tiszta checkoutból ellenőrizhetően stagingre települ.
 
@@ -207,11 +207,11 @@ Adat/deploy: Csak staging próbaadat. Destruktív adatbázis-változás nincs.
 - [ ] M01.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
 - [ ] M01.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
 - [x] M01.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
-- [ ] M01.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [x] M01.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
 - [ ] M01.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
 - [ ] M01.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
 
-Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+Kiadási rekord: commit = `74d54f5296531370873f9182d10ead0b003d86ea`; workflow = [#36](https://github.com/sykolos/eb-webshop/actions/runs/38574327623); staging próba = három nyilvános GET HTTP 200; bejelentkezett próba és külön HTTP SHA-fejléc nincs igazolva.
 
 ## M02. Kritikus biztonsági és rendelési javítások
 
@@ -856,6 +856,7 @@ Kiadáskor új sor kerül ide. Nem szabad előre sikeresnek kitölteni.
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-10-13 | M00 | Dokumentáció elkészült, nincs deploy | Nincs | Nem futott | Nem alkalmazható | M01.01 |
 | 2026-10-14 | M00/M01 | Developra integrálva, CI sikeres; deploy kihagyva | 7ad56f6823a6c5e4a45b5fae79b4a4c2c0398a57 | [#26](https://github.com/sykolos/eb-webshop/actions/runs/38520202165) | Nincs új staging SHA; deploy=skipped | M01.01/M01.02/M01.04/M01.09 |
+| 2026-10-14 | M01 / D14 | STAGINGEN, meglévő deploybeállításokkal | 74d54f5296531370873f9182d10ead0b003d86ea | [#36](https://github.com/sykolos/eb-webshop/actions/runs/38574327623) | verify és deploy success; /, /contact, /login HTTP 200 CI-ban és külön helyi próbával | M01.08, majd M02; D14 halasztások megőrzése |
 
 Kiadási bejegyzéshez szükséges részletek:
 
@@ -978,6 +979,16 @@ Kiadási bejegyzéshez szükséges részletek:
 - HTTP próba visszaállítva a korábbi három nyilvános útvonal 200 válaszára, új credential/header-követelmény nélkül. AGENTS.md és DEPLOYMENT.md a tényleges D14 szerinti működést írja le, nem a visszavont követelményeket.
 - Helyi PHPUnit: 28 teszt / 97 assertion sikeres, külön regresszió igazolja az extra védelem inaktív kiadási alapértékét. Linux-fixture meglévő, nem staging nevű envvel és új titkok nélkül tesztel, érvénytelen kulcsot továbbra elutasít. Nincs új migráció és nincs szerverenv-/adatmódosítás előírva.
 - Következő: diff/szintaxisellenőrzés, engedélyezett commit/push és tényleges deploy megfigyelése. Ennek sikerét még nem állítjuk.
+
+### 2026-10-14: sikeres staging kiadás a meglévő beállításokkal
+
+- A `74d54f5` munkaági [#35](https://github.com/sykolos/eb-webshop/actions/runs/38574120283) ellenőrzése teljesen sikeres, utána fast-forward push developra. Develop [#36](https://github.com/sykolos/eb-webshop/actions/runs/38574327623): verify success, deploy success, a meglévő SSH-val telepítés és a Check deployed website lépés is sikeres. Nincs új secret/env/kapcsoló beállítva.
+- A workflow a csomag REVISION értékét a `74d54f5296531370873f9182d10ead0b003d86ea` SHA-val a szerveren összeveti, majd a telepítést befejezi. A nyilvános HTTP-próba ettől külön bizonyíték, nem állít HTTP-fejléces SHA-ellenőrzést.
+- Helyi PHPUnit 28 teszt / 97 assertion; CI-ban PHP 8.2.31, build, Bash/ShellCheck, kilenc Linux deployforgatókönyv és PHPUnit sikeres. YAML/deployfeltétel/új titkok hiánya helyben ellenőrizve.
+- Deploy után külön GET-próba: /, /contact, /login HTTP 200. A helyi PHP alapértelmezett CA-beállítása curl 60 hibát adott; a telepített Git ca-bundle.crt fájljával ugyanaz a smoke.php sikeres. TLS-ellenőrzést nem kapcsoltunk ki, rendszerbeállítást nem módosítottunk.
+- M01.K4 teljesült; M01 állapota STAGINGEN. A bejelentkezett partner/admin próba nincs lefuttatva, a D14-ben halasztott izoláció/hostkulcs/DB-média-visszaállítás nincs késznek jelölve. Éles deploy nem történt.
+- Az utólagos napló külön dokumentációs commit a munkaágon, és csak oda kerül pushra: nem indítunk pusztán naplózás miatt új staging deployt. Develop és a szerver marad `74d54f5`; a napló a következő rendes develop integrációval jut át.
+- Következő: M01.08 és fennmaradó átadási ellenőrzések, majd M02. Nem szükséges új GitHub-/tárhelybeállítást kérni a már működő kiadási út használatához.
 
 ### Következő munkamenet sablonja
 
