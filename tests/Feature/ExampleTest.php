@@ -6,6 +6,8 @@ use App\Models\User;
 use App\Models\Order;
 use App\Models\Products;
 use App\Models\product_unit;
+use App\Models\RecommendedProduct;
+use App\Models\Special_prices;
 use App\Models\User_invoce;
 use App\Models\User_shipping;
 use App\Services\CheckoutService;
@@ -87,6 +89,25 @@ class ExampleTest extends TestCase
         $this->get('/adminpanel')->assertOk();
     }
 
+    public function test_non_admin_users_cannot_reach_admin_read_routes(): void
+    {
+        $this->withoutVite();
+        $partner = User::factory()->create();
+
+        foreach ([
+            '/adminpanel',
+            '/adminpanel/products',
+            '/adminpanel/categories',
+            '/adminpanel/orders',
+            '/adminpanel/recommended',
+            '/adminpanel/special-prices',
+            '/adminpanel/units',
+            '/adminpanel/users',
+        ] as $path) {
+            $this->actingAs($partner)->get($path)->assertRedirect('/login');
+        }
+    }
+
     public function test_login_attempts_are_rate_limited_and_logout_invalidates_the_session(): void
     {
         $this->withoutVite();
@@ -146,6 +167,74 @@ class ExampleTest extends TestCase
         $this->actingAs($otherUser)->get('/account/details/'.$order->id)->assertForbidden();
         $this->actingAs($otherUser)->get('/account/getpdf/'.$order->id)->assertForbidden();
         $this->actingAs($owner)->get('/account/details/'.$order->id)->assertOk();
+    }
+
+    public function test_shipping_address_mutations_are_limited_to_the_owner(): void
+    {
+        $owner = User::factory()->create();
+        $otherUser = User::factory()->create();
+        $address = User_shipping::create([
+            'user_id' => $owner->id,
+            'address' => 'Teszt utca 1.',
+            'city' => 'Budapest',
+            'zipcode' => '1111',
+            'phone' => '0612345678',
+            'receiver' => 'Teszt Elek',
+        ]);
+
+        $this->actingAs($otherUser)->get(route('shipping.edit', $address))->assertForbidden();
+        $this->actingAs($otherUser)->put(route('shipping.update', $address), [
+            'receiver' => 'Jogosulatlan',
+            'phone' => '0612345678',
+            'zipcode' => '1111',
+            'city' => 'Budapest',
+            'address' => 'Masik utca 2.',
+        ])->assertForbidden();
+        $this->actingAs($otherUser)->delete(route('shipping.destroy', $address))->assertForbidden();
+
+        $this->assertDatabaseHas('user_shippings', [
+            'id' => $address->id,
+            'address' => 'Teszt utca 1.',
+        ]);
+    }
+
+    public function test_public_product_feeds_do_not_expose_special_prices(): void
+    {
+        $unit = product_unit::create([
+            'unit' => 'Darab',
+            'quantity' => 1,
+            'measure' => 'db',
+        ]);
+        $product = Products::create([
+            'serial_number' => 'PUBLIC-001',
+            'title' => 'Publikus feed teszttermek',
+            'description' => 'Teszt',
+            'price' => 1000,
+            'category_id' => 1,
+            'unit_id' => $unit->id,
+        ]);
+        RecommendedProduct::create(['product_id' => $product->id]);
+        $partner = User::factory()->create();
+        Special_prices::create([
+            'user_id' => $partner->id,
+            'product_id' => $product->id,
+            'price' => 777,
+            'extra_percent' => 0,
+        ]);
+
+        $recommended = $this->getJson(route('recommendations'))->assertOk();
+        $publicProduct = $recommended->json('recommended.0');
+        $this->assertArrayNotHasKey('price', $publicProduct);
+        $this->assertArrayNotHasKey('special_prices', $publicProduct);
+
+        $similar = $this->getJson(route('product.similar', $product->id))->assertOk();
+        $this->assertSame([], $similar->json('products'));
+
+        $authenticated = $this->actingAs($partner)
+            ->getJson(route('recommendations'))
+            ->assertOk();
+        $this->assertSame(777, $authenticated->json('recommended.0.price'));
+        $this->assertArrayNotHasKey('special_prices', $authenticated->json('recommended.0'));
     }
 
     public function test_cache_clear_is_not_exposed_as_a_public_route(): void

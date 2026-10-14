@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Products;
+use App\Models\RecommendedProduct;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -10,12 +12,12 @@ class ProductRecommend extends Controller
 {
     public function getRecommended()
     {
-        $recommended = DB::table('recommended_products')
-            ->join('products as source', 'recommended_products.product_id', '=', 'source.id')
-            ->join('products as target', 'recommended_products.recommended_id', '=', 'target.id')
-            ->select('target.id', 'target.title', 'target.thumbnail', 'target.price')
-            ->distinct()
-            ->get();
+        $recommended = Products::query()
+            ->with('product_unit')
+            ->whereIn('id', RecommendedProduct::query()->pluck('product_id'))
+            ->get()
+            ->map(fn (Products $product) => $this->productPayload($product))
+            ->values();
 
         return response()->json([
             'recommended' => $recommended,
@@ -36,10 +38,12 @@ class ProductRecommend extends Controller
 
     public function similarProducts($id)
     {
-        $recommended = $this->similarProductsRaw($id);
+        $recommended = $this->getSimilarProductsRaw($id);
 
         return response()->json([
             'products' => $recommended
+                ->map(fn (Products $product) => $this->productPayload($product))
+                ->values(),
         ]);
     }
 
@@ -56,8 +60,38 @@ class ProductRecommend extends Controller
     public function getLatestProducts()
     {
         return response()->json([
-            'latest_products' => $this->latestProductsRaw(),
+            'latest_products' => $this->latestProductsRaw()
+                ->map(fn (Products $product) => $this->productPayload($product))
+                ->values(),
         ]);
+    }
+
+    /**
+     * Keep product feeds free of every user's special prices.
+     * Authenticated shoppers receive only their own calculated price.
+     */
+    private function productPayload(Products $product): array
+    {
+        $payload = $product->only([
+            'id',
+            'title',
+            'serial_number',
+            'image',
+            'unit_id',
+        ]);
+
+        $payload['product_unit'] = $product->product_unit?->only([
+            'id',
+            'unit',
+            'quantity',
+            'measure',
+        ]);
+
+        if (auth()->check()) {
+            $payload['price'] = $product->getPriceForUser();
+        }
+
+        return $payload;
     }
     public function topCategoriesRaw()
     {

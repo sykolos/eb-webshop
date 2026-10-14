@@ -8,14 +8,14 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 | Mező | Aktuális érték |
 | --- | --- |
 | Aktív mérföldkő | M02: kritikus biztonsági és rendelési javítások, FOLYAMATBAN; M02.01-M02.07 stagingen |
-| Következő fejlesztési feladat | M02.08 kritikus biztonsági regressziós tesztek és további kockázatok felvétele; az M01.08 élő staging partner/admin próba külön nyitott átadási pont |
+| Következő fejlesztési feladat | M02.08 kritikus biztonsági regressziós tesztek és további kockázatok felvétele; az M01.08 élő staging partner/admin próba teljesült |
 | Alkalmazásfejlesztés ebből a checklistből | M01 elkezdve; stagingvédelem, tesztkapu és deploy megerősítése |
-| Utolsó igazolt staging kiadás | e1a6780ffe65118581a328672b372dbcf77006c6, GitHub Actions #72: verify/deploy/HTTP sikeres; M02.07 stagingen |
+| Utolsó igazolt staging kiadás | 0ef94f0, GitHub Actions #74: verify/deploy/HTTP sikeres; M02.07 stagingen |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D09 törlés technikai javaslata, D11 szolgáltató; D12-D13 későbbre halasztva |
-| Mostani változtatás | M02.07 kosár route-controller tisztítás stagingen ellenőrzött; a duplikált `cart.count` route megszűnt, a hívó JavaScript név szerinti route-adatokat használ; M02.08 következik |
+| Mostani változtatás | M01.08 staginges partner- és admin-belépési próba ellenőrizve; partner `/account` működik, `/adminpanel` tiltott, admin `/adminpanel` működik; M02.08 következik |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -132,7 +132,7 @@ A vásárlás backendben rögzített üzleti esemény és a külső viselkedési
 
 ## Kiadási rend minden nagyobb ponthoz
 
-**Fejlesztés -> ellenőrzés -> önálló commit -> develop integráció/push -> staging deploy -> staging próba -> naplózás -> következő pont.**
+**Fejlesztés -> ellenőrzés -> önálló commit -> develop integráció/push -> staging deploy -> staging próba -> checklist státuszfrissítés -> következő pont.**
 
 - A munkának egy új checkoutból telepíthető állapotban kell lezárulnia. Migráció, asset, lockfájl, környezeti előfeltétel és dokumentáció ugyanahhoz a kiadáshoz tartozik.
 - Az M01 előtti workflow már develop pushra deployol, de nincs külön tesztkapuja, SSH hostellenőrzése ki van kapcsolva, és nem igazolt a rollback. Ezek M01 feladatok, nem kész képességek.
@@ -141,7 +141,7 @@ A vásárlás backendben rögzített üzleti esemény és a külső viselkedési
 - A commit nem egyenlő a deployjal; a sikeres workflow nem egyenlő a működő felhasználói folyamattal.
 - A következő mérföldkő ne igényelje nem commitolt helyi fájl jelenlétét. Hiányzó titok/szerverhozzáférés esetén pontos blokk és folytatási pont rögzítendő.
 - Éles kiadás külön állapot és esemény. Egy stagingre kész csomag nem automatikus élesítési felhatalmazás.
-- Utólagos deploynapló a következő dokumentációs/fejlesztési commitban rögzíthető; ugyanannak a dokumentumnak a saját hashét nem kell önmagába írni. Ne indítsunk véletlen új deployt csak a napló mentéséért.
+- A checklist státuszát a következő tényleges fejlesztési commit részeként tartjuk naprakészen; külön dokumentációs ág, docs-only commit vagy kiadási napló nem készül.
 - A M00 dokumentációs pont, nincs hozzá alkalmazásdeploy. M19 termékelérhetőség és M20 ajánlatmegjelenítés a D06-D08 döntésekkel az elfogadott scope része. A korábban felvetett mennyiségi készletmotor és új akció-árazómotor későbbi bővítés; most nem készítendő.
 
 ## Mérföldkőjegyzék
@@ -149,7 +149,7 @@ A vásárlás backendben rögzített üzleti esemény és a külső viselkedési
 | Pont | Téma | Állapot |
 | --- | --- | --- |
 | M00 | ZIP/lista összevetés és követhető munkalista | DOKUMENTÁCIÓ ELKÉSZÜLT |
-| M01 | Staging és Git kiadási alap | STAGINGEN; nyilvános próba sikeres, bejelentkezett próba nyitott |
+| M01 | Staging és Git kiadási alap | STAGINGEN; nyilvános és partner/admin próba sikeres, D14 szerinti halasztások nyitva |
 | M02 | Kritikus biztonsági és rendelési javítások | FOLYAMATBAN; M02.01 elkészült, stagingkiadás alatt |
 | M03 | Laravel és futtatókörnyezet korszerűsítése | TERVEZETT |
 | M04 | Közös backend, jogosultság és háttérfeldolgozás | TERVEZETT |
@@ -194,7 +194,7 @@ D14 (2026-10-14) a korábbi aktiválási kaput felülírja: a már működő sta
 - [ ] M01.05 Deploy concurrency, félbeszakadt kiadás kezelése, előző build megőrzése és visszaállítási leírás; feltöltések és APP_KEY megőrzése.
 - [x] M01.06 Git/release folyamat rögzítése: codex/m01-... munkaág, ellenőrzés, develop integráció, staging deploy; védett éles kiadási út előkészítése.
 - [x] M01.07 Deploycsomagból ZIP-ek, .codex-inspect, lokális referenciák és nem szükséges fejlesztési anyagok kizárása; csak célzott fájlok stage-elése.
-- [ ] M01.08 Build/commit azonosító ellenőrizhető rögzítése; HTTP smoke tesztek mellett bejelentkezett tesztpartner/admin útvonalak ellenőrzése.
+- [x] M01.08 Build/commit azonosító ellenőrizhető rögzítése; HTTP smoke tesztek mellett bejelentkezett tesztpartner/admin útvonalak ellenőrzése.
 - [ ] M01.09 Adatbázis- és feltöltésmentés visszaállításának próbaköre külön tesztkörnyezetben; a siker dokumentálása.
 
 Ellenőrzés: Üres checkout build; kontrollált hibás teszt megállítja a deployt; staging nem küld ügyfélnek; mentés/visszaállítás és HTTP smoke ellenőrzés.

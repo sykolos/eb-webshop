@@ -64,9 +64,11 @@ Route::post('/cart/update', [CartController::class, 'updateQuantity'])->name('ca
 Route::delete('/cart/remove', [CartController::class, 'removeItem'])->name('cart.remove');
 
 //recommended products
-Route::get('/recommendations', [ProductRecommend::class, 'recommended']);
-Route::get('/top-categories', [ProductRecommend::class, 'topCategories']);
-Route::get('/product/{id}/similar', [ProductRecommend::class, 'similarProducts']);
+Route::get('/recommendations', [ProductRecommend::class, 'getRecommended'])->name('recommendations');
+Route::get('/top-categories', [ProductRecommend::class, 'getTopCategories'])->name('top-categories');
+Route::get('/product/{id}/similar', [ProductRecommend::class, 'similarProducts'])
+    ->whereNumber('id')
+    ->name('product.similar');
 
 
 //users
