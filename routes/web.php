@@ -28,6 +28,7 @@ use App\Http\Controllers\PrivateFileController;
 use App\Http\Controllers\DesignSystemController;
 use App\Http\Controllers\ProductMediaController;
 use App\Http\Controllers\FilterDefinitionController;
+use App\Http\Controllers\PricingController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 
@@ -181,16 +182,15 @@ Route::group(['prefix'=>'account','middleware'=>'auth'],function(){
 
         // special prices – új AJAX-os változat
         Route::group(['prefix' => 'special-prices'], function () {
-            Route::get('/', [AdminController::class, 'special_prices_show'])->name('adminpanel.special_prices');
-            Route::get('/ajax/{user}', [AdminController::class, 'ajaxProductList'])->name('adminpanel.special_prices.ajax');
-            Route::post('/set', [AdminController::class, 'ajaxSetPrice'])->name('adminpanel.special_prices.set');
-            Route::delete('/delete', [AdminController::class, 'ajaxDeletePrice'])->name('adminpanel.special_prices.delete');    
-            // Az új mátrix útvonalak elnevezve
-            Route::get('/matrix-ajax/{user}', [AdminController::class, 'matrixAjax'])->name('adminpanel.special_prices.matrix');
-            Route::get('/product-users-ajax/{product}', [AdminController::class, 'productUsersAjax'])->name('adminpanel.special_prices.product_users');
-            Route::get('/product-select-search', [AdminController::class, 'productSelectSearch'])->name('adminpanel.special_prices.product_select');
-            Route::post('/save-matrix', [AdminController::class, 'saveMatrix'])->name('adminpanel.special_prices.save_matrix');
-            Route::post('/global-category-update', [AdminController::class, 'bulkUpdateCategoryForAll']);
+            Route::get('/', [PricingController::class, 'index'])->name('adminpanel.special_prices');
+            Route::get('/ajax/{user}', [PricingController::class, 'matrix'])->name('adminpanel.special_prices.ajax');
+            Route::post('/set', [PricingController::class, 'set'])->name('adminpanel.special_prices.set');
+            Route::delete('/delete', [PricingController::class, 'delete'])->name('adminpanel.special_prices.delete');
+            Route::get('/matrix-ajax/{user}', [PricingController::class, 'matrix'])->name('adminpanel.special_prices.matrix');
+            Route::get('/product-users-ajax/{product}', [PricingController::class, 'productUsers'])->name('adminpanel.special_prices.product_users');
+            Route::get('/product-select-search', [PricingController::class, 'productSearch'])->name('adminpanel.special_prices.product_select');
+            Route::post('/save-matrix', [PricingController::class, 'saveMatrix'])->name('adminpanel.special_prices.save_matrix');
+            Route::post('/global-category-update', [PricingController::class, 'globalCategory'])->name('adminpanel.special_prices.global_category');
         });
 
         //recommended group

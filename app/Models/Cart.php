@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\PricingService;
 
 class Cart 
 {
@@ -11,39 +12,46 @@ class Cart
     
     public static function unitprice($item)
     {
-        $product = Products::with('special_prices')->find($item['product']['id']);
-        $price = $product->getPriceForUser();
+        $pricing = app(PricingService::class);
+        return $pricing->fromMinorUnits($pricing->toMinorUnits(self::unitnet($item)) * (int) $item['quantity']);
+    }
 
-        return $price * (int) $item['quantity'];
+    public static function unitnet($item)
+    {
+        $product = Products::with('product_unit')->findOrFail($item['product']['id']);
+
+        return app(PricingService::class)->priceForUser($product);
     }
 
     public static function totalamount(){
-        $total=0;
+        $totalMinor = 0;
         if(session()->has('cart')){
             foreach (session('cart') as $key => $item) {
-                $total+=self::unitprice($item)*$item['q'];
-    
+                $product = Products::findOrFail($item['product']['id']);
+                $quote = app(PricingService::class)->quote($product, (int) $item['quantity']);
+                $totalMinor += app(PricingService::class)->toMinorUnits($quote['line_net']);
             }
 
         }
         
-        return round($total);
+        return app(PricingService::class)->fromMinorUnits($totalMinor);
     }
     public static function gettotalvatprice(){
         $total=self::totalamount()+self::gettotalvat();
         return $total;
     }
     public static function gettotalvat(){
-        $totalvat=0;
+        $totalVatMinor = 0;
         if(session()->has('cart')){
             foreach (session('cart') as $key => $item) {
-                $totalvat+=self::unitprice($item)*$item['q']*0.27 ;
-                
+                $product = Products::findOrFail($item['product']['id']);
+                $quote = app(PricingService::class)->quote($product, (int) $item['quantity']);
+                $totalVatMinor += app(PricingService::class)->toMinorUnits($quote['vat']);
             }
 
         }
         
-        return round($totalvat);
+        return app(PricingService::class)->fromMinorUnits($totalVatMinor);
     }
 
 }

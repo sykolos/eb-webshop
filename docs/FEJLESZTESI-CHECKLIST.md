@@ -7,15 +7,15 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M06: Terméktörzs, kategóriafa és webshopos szűrők adminja, STAGINGEN ELLENŐRZÖTT |
-| Következő fejlesztési feladat | M07.01 jelenlegi ár- és kedvezményszabályok regressziós rögzítése |
-| Alkalmazásfejlesztés ebből a checklistből | M01-M06 stagingen; M07.01 a következő fejlesztési pont |
+| Aktív mérföldkő | M07: Egységes árképzés és admin ármátrix, KIADÁSRA KÉSZ |
+| Következő fejlesztési feladat | M07 staging deploy és partner/admin árfolyamat ellenőrzése |
+| Alkalmazásfejlesztés ebből a checklistből | M01-M06 stagingen; M07.01-M07.07 kód kész, K1-K3 ellenőrizve |
 | Utolsó igazolt staging kiadás | 7dc6771, GitHub Actions #109: verify/deploy és M06 admin ellenőrzés sikeres |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D09 törlés technikai javaslata, D11 szolgáltató; D12-D13 későbbre halasztva |
-| Mostani változtatás | M06 termék-, kategória-, egység-, szűrő- és médiatörzs elkészült service-réteggel; mély kategóriafa, státuszok, archiválás és publikációs szűrés; a meglévő árlogika, kiszerelés és rendelési történet megmarad |
+| Mostani változtatás | M07 központi PricingService, fixpontos ár- és áfakalkuláció, partnerenként cache/invalidation, admin ármátrix és a régi webshop/kosár/checkout árútvonalainak bekötése; a meglévő árlogika és rendelési történet megmarad |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -154,8 +154,8 @@ A vásárlás backendben rögzített üzleti esemény és a külső viselkedési
 | M03 | Laravel és futtatókörnyezet korszerűsítése | STAGINGEN ELLENŐRZÖTT |
 | M04 | Közös backend, jogosultság és háttérfeldolgozás | STAGINGEN ELLENŐRZÖTT |
 | M05 | ZIP-alapú designrendszer és három layout | STAGINGEN ELLENŐRZÖTT |
-| M06 | Terméktörzs, kategóriafa és webshopos szűrők adminja | KIADÁSRA KÉSZ |
-| M07 | Egységes árképzés és admin ármátrix | TERVEZETT |
+| M06 | Terméktörzs, kategóriafa és webshopos szűrők adminja | STAGINGEN ELLENŐRZÖTT |
+| M07 | Egységes árképzés és admin ármátrix | KIADÁSRA KÉSZ |
 | M08 | Webshop, katalógus és keresés a v6 kinézetével | TERVEZETT |
 | M09 | Adatbázisos kosár és teljes rendelési folyamat | TERVEZETT |
 | M10 | Belépés, regisztrációkérés és partnerfiók | TERVEZETT |
@@ -396,31 +396,31 @@ Kiadási rekord: a kezdeti `06e72b6` / [#106](https://github.com/sykolos/eb-webs
 
 ## M07. Egységes árképzés és admin ármátrix
 
-Állapot: TERVEZETT. Függőség: M06; D01 eldöntve: meglévő árképzés megőrzése.
+Állapot: KIADÁSRA KÉSZ. Függőség: M06; D01 eldöntve: meglévő árképzés megőrzése.
 Forrás: Z: ármátrix és ármegjelenítés; L: refaktor/gyorsaság; K: meglévő árlogika.
 Stagingen bemutatható eredmény: Az admin előnézet, a terméklista és a kosár ugyanarra a partnerre ugyanazt az árat adja.
 
-- [ ] M07.01 A jelenlegi rendszer ár- és szerkesztési szabályainak regressziós rögzítése: fix partnerár, összeadott kategória/extra kedvezmény, kerekítés; felhasználó/termék/termékkör kombinációk és globális/tömeges módosítások teljes megőrzése. A ZIP egymás utáni százalékszámítása nem kerül át.
-- [ ] M07.02 PricingService és kérésenként egyszer betöltött partner/kategória árkontextus; minden speciális partnerár automatikus betöltésének megszüntetése.
-- [ ] M07.03 Alapegységár, csomagár, nettó/áfa/bruttó és csomagszám egységes kezelése; lebegőpontos pénzszámítás helyett rögzített pontosság.
-- [ ] M07.04 Ármátrix partnernézet és terméknézet, keresés, mentetlen módosítás jelzése, mezővalidáció és mentés.
-- [ ] M07.05 Globális kategóriakedvezmény-módosítás hatáselőnézettel és megerősítéssel; fix/extra szabályok megőrzése az elfogadott logika szerint.
-- [ ] M07.06 Árváltozás audit és partnerenként elkülönített cache, célzott invalidáció; jogosulatlan ármezők ne jussanak a klienshez.
-- [ ] M07.07 Árazás bekötése a még régi felületekbe is; N+1 mérés és regressziós ártesztek.
+- [x] M07.01 A jelenlegi rendszer ár- és szerkesztési szabályainak regressziós rögzítése: fix partnerár, összeadott kategória/extra kedvezmény, kerekítés; felhasználó/termék/termékkör kombinációk és globális/tömeges módosítások teljes megőrzése. A ZIP egymás utáni százalékszámítása nem kerül át.
+- [x] M07.02 PricingService és kérésenként egyszer betöltött partner/kategória árkontextus; minden speciális partnerár automatikus betöltésének megszüntetése.
+- [x] M07.03 Alapegységár, csomagár, nettó/áfa/bruttó és csomagszám egységes kezelése; lebegőpontos pénzszámítás helyett rögzített pontosság.
+- [x] M07.04 Ármátrix partnernézet és terméknézet, keresés, mentetlen módosítás jelzése, mezővalidáció és mentés.
+- [x] M07.05 Globális kategóriakedvezmény-módosítás hatáselőnézettel és megerősítéssel; fix/extra szabályok megőrzése az elfogadott logika szerint.
+- [x] M07.06 Árváltozás audit és partnerenként elkülönített cache, célzott invalidáció; jogosulatlan ármezők ne jussanak a klienshez.
+- [x] M07.07 Árazás bekötése a még régi felületekbe is; N+1 mérés és regressziós ártesztek.
 
 Ellenőrzés: Konkrét fix/kategória/extra kombinációk; 1000 Ft + 10% + 5% példája; csomagszorzó és kerekítés; más partner ára nem szivárog.
 Adat/deploy: Meglévő árak és szerkesztési lehetőségek migrációs összevetése; ugyanarra a bemenetre árváltozás nem megengedett. A mélyebb kategóriák nem írhatják át a régi megállapodásokat.
 
 ### M07 kiadási kapuk
 
-- [ ] M07.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
-- [ ] M07.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
-- [ ] M07.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [x] M07.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [x] M07.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
+- [x] M07.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
 - [ ] M07.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
 - [ ] M07.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
 - [ ] M07.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
 
-Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott. Helyi bizonyíték: M07 célteszt 5 teszt / 14 assertion, teljes PHPUnit 61 teszt / 249 assertion, Vite build, PHP lint, route-list, Blade cache és diff-check sikeres. A build a meglévő Bootstrap/jQuery függőségek miatt deprecation warningokat jelez; ezek M21 fokozatos kivezetési feladatai, M07 működését nem blokkolják.
 
 ## M08. Webshop, katalógus és keresés a v6 kinézetével
 

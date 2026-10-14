@@ -335,12 +335,11 @@ $(document).ready(function() {
             $('#priceTableBody').empty();
 
             data.products.data.forEach(p => {
-                let catDisc = p.category_discount?.discount_percent || 0;
-                let specialData = p.special_prices.length > 0 ? p.special_prices[0] : null;
-                let extraDisc = specialData?.extra_percent || 0;
-                let fixPrice = specialData?.price || '';
-                let basePrice = parseFloat(p.price);
-                let calculated = Math.round(basePrice * (1 - ((parseFloat(catDisc) + parseFloat(extraDisc)) / 100)));
+                let catDisc = p.pricing?.category_discount ?? p.category_discount?.discount_percent ?? 0;
+                let specialData = p.special_price || null;
+                let extraDisc = p.pricing?.extra_discount ?? specialData?.extra_percent ?? 0;
+                let fixPrice = p.pricing?.fixed_price ?? specialData?.price ?? '';
+                let calculated = p.pricing?.calculated_price ?? p.price;
 
                 let row = `
                     <tr data-id="${p.id}" data-base-price="${p.price}" data-cat-id="${p.category_id}" class="${fixPrice ? 'table-info' : ''}">
@@ -350,7 +349,7 @@ $(document).ready(function() {
                         <td><input type="number" class="form-control form-control-sm extra-disc-input" value="${extraDisc}"></td>
                         <td class="calculated-price text-secondary">${calculated} Ft</td>
                         <td><div class="input-group input-group-sm"><input type="number" class="form-control fix-price-input" value="${fixPrice}"></div></td>
-                        <td class="fw-bold text-success final-display-price">${fixPrice ? fixPrice : calculated} Ft</td>
+                        <td class="fw-bold text-success final-display-price">${p.pricing?.final_price ?? (fixPrice ? fixPrice : calculated)} Ft</td>
                         <td><button class="btn btn-sm btn-success btn-save-row px-3 w-100"><i class="fas fa-save"></i> Mentés</button></td>
                     </tr>`;
                 $('#priceTableBody').append(row);

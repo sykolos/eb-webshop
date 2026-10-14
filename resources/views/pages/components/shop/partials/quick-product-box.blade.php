@@ -37,7 +37,7 @@
                         </div>
                         <div class="bg-light px-2 py-1 rounded border d-inline-flex align-items-center gap-1 text-danger fs-6 fw-bold unit-price-box">
                             <i class="bi bi-tag"></i>
-                            Egységár: <strong class="text-dark">{{ $product->getPriceForUser() }} Ft</strong>
+                            Egységár: <strong class="text-dark">{{ $product->pricing['final_price'] ?? $product->getPriceForUser() }} Ft</strong>
                         </div>
                     </div>
                 @endif

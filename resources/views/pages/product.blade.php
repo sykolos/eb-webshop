@@ -7,7 +7,7 @@
     $(document).ready(function(){
         let q = 1;
         const t = {{ $unit->quantity ?? 1 }}; 
-        const p = {{ $product->getPriceForUser() ?? 0 }};;
+        const p = {{ $product->pricing['final_price'] ?? $product->getPriceForUser() ?? 0 }};;
         const updatePrice = () => {
             const quantity = $('#quantity').val();
             const total = quantity * t * p;
@@ -63,7 +63,7 @@
                 <p class="text-light mb-1">Cikkszám: {{ $product->serial_number }}</p>
                 <p class="text-light mb-1">Kategória: {{ $product->category->name }}</p>
                 <p class="lead fw-bold">
-                    {{ $product->getPriceForUser() }} Ft 
+                    {{ $product->pricing['final_price'] ?? $product->getPriceForUser() }} Ft
                     <span class="text-light">+ Áfa / {{ $product->product_unit->measure }}</span>
                 </p>
 

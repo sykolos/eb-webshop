@@ -88,19 +88,11 @@
                                 <td>{{$item->quantity}}</td>            
                                 <td>{{$item->product->product_unit->measure}}</td>                    
                                 <td>
-                                    @if(substr($item->product->special_prices->pluck( 'price' ), 2, -2)!="" && substr($item->product->special_prices->pluck( 'user_id' ), 2, -2)==auth()->user()->id)
-                                    {{substr($item->product->special_prices->pluck( 'price' ), 2, -2)}}
-                                    @else
-                                    {{$item->product->price}}
-                                    @endif
+                                    {{$item->unit_price}}
                                     Ft
                                 </td>
                                 <td>
-                                    @if(substr($item->product->special_prices->pluck( 'price' ), 2, -2)!="" && substr($item->product->special_prices->pluck( 'user_id' ), 2, -2)==auth()->user()->id)
-                                    {{(int)substr($item->product->special_prices->pluck( 'price' ), 2, -2)*$item->quantity}}
-                                    @else
-                                    {{$item->product->price*$item->quantity}}
-                                    @endif
+                                    {{$item->unit_price * $item->quantity}}
                                      Ft
                                 </td>
                             </tr>
@@ -117,17 +109,10 @@
                                         <p><strong>🛒 Termék:</strong> {{ $item->product->title }}</p>
                                         <p><strong>Mennyiség:</strong> {{ $item->quantity }} {{ $item->product->product_unit->measure }}</p>
                                         <p><strong>Egységár:</strong>
-                                            @php
-                                                $specialPrice = substr($item->product->special_prices->pluck('price'), 2, -2);
-                                                $specialUser = substr($item->product->special_prices->pluck('user_id'), 2, -2);
-                                                $unitPrice = ($specialPrice && $specialUser == auth()->user()->id)
-                                                    ? (int) $specialPrice
-                                                    : $item->product->price;
-                                            @endphp
-                                            {{ number_format($unitPrice, 0, ',', ' ') }} Ft
+                                            {{ number_format($item->unit_price, 0, ',', ' ') }} Ft
                                         </p>
                                         <p><strong>Összesen:</strong>
-                                            {{ number_format($unitPrice * $item->quantity, 0, ',', ' ') }} Ft
+                                            {{ number_format($item->unit_price * $item->quantity, 0, ',', ' ') }} Ft
                                         </p>
                                     </div>
                                 </div>

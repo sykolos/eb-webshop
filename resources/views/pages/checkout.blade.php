@@ -54,7 +54,7 @@
                                                     <p>{{ $item['product']['title'] }}</p>
                                                 </td>
                                                 <td>
-                                                    {{ App\Models\Products::with('special_prices')->find($item['product']['id'])->getPriceForUser() }} Ft
+                                                    {{ App\Models\Cart::unitnet($item) }} Ft
                                                 </td>
                                                 <td>
                                                     {{ $item['quantity'] * $item['q'] }}
@@ -92,7 +92,7 @@
                                 @foreach (session()->get('cart') as $item)
                                     <div class="cart-item border-bottom py-2">
                                         <div data-label="Termék">{{ $item['product']['title'] }}</div>
-                                        <div data-label="Egységár">{{ App\Models\Products::with('special_prices')->find($item['product']['id'])->getPriceForUser() }} Ft</div>
+                                        <div data-label="Egységár">{{ App\Models\Cart::unitnet($item) }} Ft</div>
                                         <div data-label="Mennyiség">{{ $item['quantity'] * $item['q'] }}</div>
                                         <div data-label="M.egység">{{ $item['m'] }}</div>
                                         <div data-label="Összesen">{{ number_format(App\Models\Cart::unitprice($item) * $item['q'], 0, '', ' ') }} Ft</div>

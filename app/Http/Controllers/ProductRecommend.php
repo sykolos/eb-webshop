@@ -6,6 +6,7 @@ use App\Models\Products;
 use App\Models\RecommendedProduct;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Services\PricingService;
 
 
 class ProductRecommend extends Controller
@@ -17,11 +18,16 @@ class ProductRecommend extends Controller
             ->with('product_unit')
             ->whereIn('id', RecommendedProduct::query()->pluck('product_id'))
             ->get()
-            ->map(fn (Products $product) => $this->productPayload($product))
             ->values();
+        $prices = auth()->check()
+            ? app(PricingService::class)->priceMany($recommended, auth()->id())
+            : [];
 
         return response()->json([
-            'recommended' => $recommended,
+            'recommended' => $recommended->map(fn (Products $product) => $this->productPayload(
+                $product,
+                $prices[(int) $product->id] ?? null
+            )),
         ]);
     }
     
@@ -40,10 +46,16 @@ class ProductRecommend extends Controller
     public function similarProducts($id)
     {
         $recommended = $this->getSimilarProductsRaw($id);
+        $prices = auth()->check()
+            ? app(PricingService::class)->priceMany($recommended, auth()->id())
+            : [];
 
         return response()->json([
             'products' => $recommended
-                ->map(fn (Products $product) => $this->productPayload($product))
+                ->map(fn (Products $product) => $this->productPayload(
+                    $product,
+                    $prices[(int) $product->id] ?? null
+                ))
                 ->values(),
         ]);
     }
@@ -60,9 +72,17 @@ class ProductRecommend extends Controller
 
     public function getLatestProducts()
     {
+        $latest = $this->latestProductsRaw();
+        $prices = auth()->check()
+            ? app(PricingService::class)->priceMany($latest, auth()->id())
+            : [];
+
         return response()->json([
-            'latest_products' => $this->latestProductsRaw()
-                ->map(fn (Products $product) => $this->productPayload($product))
+            'latest_products' => $latest
+                ->map(fn (Products $product) => $this->productPayload(
+                    $product,
+                    $prices[(int) $product->id] ?? null
+                ))
                 ->values(),
         ]);
     }
@@ -71,7 +91,7 @@ class ProductRecommend extends Controller
      * Keep product feeds free of every user's special prices.
      * Authenticated shoppers receive only their own calculated price.
      */
-    private function productPayload(Products $product): array
+    private function productPayload(Products $product, ?array $pricing = null): array
     {
         $payload = $product->only([
             'id',
@@ -89,7 +109,8 @@ class ProductRecommend extends Controller
         ]);
 
         if (auth()->check()) {
-            $payload['price'] = $product->getPriceForUser();
+            $payload['price'] = $pricing['final_price']
+                ?? app(PricingService::class)->priceForUser($product, auth()->id());
         }
 
         return $payload;

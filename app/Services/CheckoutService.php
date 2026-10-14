@@ -7,6 +7,7 @@ use App\Models\Products;
 use App\Models\User_invoce;
 use App\Models\User_shipping;
 use App\Models\User;
+use App\Services\PricingService;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -94,7 +95,7 @@ class CheckoutService
     private function prepareLines(User $user, array $cart): array
     {
         $lines = [];
-        $total = 0;
+        $totalMinor = 0;
 
         foreach ($cart as $item) {
             $productId = $item['product']['id'] ?? null;
@@ -108,7 +109,7 @@ class CheckoutService
                 ]);
             }
 
-            $product = Products::with(['special_prices', 'product_unit'])->find($productId);
+            $product = Products::with('product_unit')->find($productId);
 
             if (!$product) {
                 throw ValidationException::withMessages([
@@ -117,7 +118,8 @@ class CheckoutService
             }
 
             $packagingQuantity = (int) ($product->product_unit?->quantity ?: 1);
-            $unitPrice = $product->getPriceForUser($user->id);
+            $pricing = app(PricingService::class);
+            $unitPrice = $pricing->priceForUser($product, $user->id);
             $lineQuantity = $quantity * $packagingQuantity;
 
             $lines[] = [
@@ -125,10 +127,10 @@ class CheckoutService
                 'quantity' => $lineQuantity,
                 'unit_price' => $unitPrice,
             ];
-            $total += $unitPrice * $lineQuantity;
+            $totalMinor += $pricing->toMinorUnits($unitPrice) * $lineQuantity;
         }
 
-        return [$lines, $total];
+        return [$lines, app(PricingService::class)->fromMinorUnits($totalMinor)];
     }
 
     private function findByToken(User $user, string $token): ?Order

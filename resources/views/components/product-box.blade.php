@@ -22,7 +22,7 @@
 			</div>
 			<div class="product-price">
 				@auth
-					{{ $product->getPriceForUser() }} Ft
+					{{ $product->pricing['final_price'] ?? $product->getPriceForUser() }} Ft
 					@if($product->product_unit)
 						/ {{ $product->product_unit->measure }}
 					@endif

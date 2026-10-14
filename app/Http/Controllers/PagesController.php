@@ -15,11 +15,12 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\ContactFormMail;
 use App\Http\Controllers\ProductRecommend;
 use App\Services\CategoryTreeService;
+use App\Services\PricingService;
 
 class PagesController extends Controller
 {
     //home
-    public function home()
+    public function home(PricingService $pricing)
     {
         $highlighted = RecommendedProduct::with([
             'product' => function ($query) {
@@ -31,6 +32,15 @@ class PagesController extends Controller
         $recommend = new ProductRecommend();
 
         $latestProducts = $recommend->latestProductsRaw();
+
+        if (auth()->check()) {
+            $homeProducts = $highlighted->pluck('product')->filter()->merge($latestProducts);
+            $priceMap = $pricing->priceMany($homeProducts, auth()->id());
+
+            $homeProducts->each(function (Products $product) use ($priceMap) {
+                $product->setAttribute('pricing', $priceMap[(int) $product->id] ?? null);
+            });
+        }
 
         $topCategories = $recommend->topCategoriesRaw(); // ezt is hozzuk létre
         foreach ($latestProducts as $i => $product) {
@@ -123,9 +133,9 @@ class PagesController extends Controller
         echo view('pages/checkout', compact('user_s', 'user_i', 'checkout_token'));
     }
     
-    public function orderpage(Request $request, CategoryTreeService $tree)
+    public function orderpage(Request $request, CategoryTreeService $tree, PricingService $pricing)
     {
-        $query = Products::published()->with('category', 'product_unit', 'special_prices');
+        $query = Products::published()->with('category', 'product_unit');
 
         // KIEMELT TERMÉKEK
         if ($request->get('category') === 'highlighted') {
@@ -263,11 +273,12 @@ class PagesController extends Controller
         }
 
         $products = $query->paginate(12)->onEachSide(0)->appends($request->query());
+        $this->attachPricing($products, $pricing);
         $categories = Category::all();
 
         return view('pages.orderpage', compact('products', 'categories'));
     }
-    public function quickProductsAjax(Request $request, CategoryTreeService $tree)
+    public function quickProductsAjax(Request $request, CategoryTreeService $tree, PricingService $pricing)
     {
         $query = Products::published()->with('product_unit');
 
@@ -305,6 +316,7 @@ class PagesController extends Controller
                         ->paginate(12)
                         ->onEachSide(0)
                         ->appends($request->all());
+        $this->attachPricing($products, $pricing);
 
         // HTML + lapozás
         $html = view('pages.components.shop.partials.quick-product-boxes', compact('products'))->render();
@@ -339,13 +351,15 @@ class PagesController extends Controller
         return "Sikeres megrendelés!";
     }
     
-    public function product($id)
+    public function product($id, PricingService $pricing)
     {
-        $product = Products::published()->with(['category', 'product_unit', 'special_prices'])->findOrFail($id);
+        $product = Products::published()->with(['category', 'product_unit'])->findOrFail($id);
+        $this->attachPricing(collect([$product]), $pricing);
         $unit = $product->product_unit;
 
         $recommendController = new \App\Http\Controllers\ProductRecommend();
         $similar = $recommendController->getSimilarProductsRaw($product->id);
+        $this->attachPricing($similar, $pricing);
 
         return view('pages.product', [
             'product' => $product,
@@ -354,16 +368,17 @@ class PagesController extends Controller
         ]);
     }
 
-    public function search(Request $request){
+    public function search(Request $request, PricingService $pricing){
         $request->validate(
             ['query'=>'required|min:3']
         );
 
         $query=$request->input('query');
 
-        $products=Products::published()->where(function ($products) use ($query) {
+        $products=Products::published()->with('product_unit')->where(function ($products) use ($query) {
             $products->where('title','like',"%$query%")->orWhere('serial_number','like',"%$query%");
         })->get();
+        $this->attachPricing($products, $pricing);
         if(request()->category){
             $categories=Category::all();
             
@@ -372,6 +387,22 @@ class PagesController extends Controller
         }
 
         return view('pages/search-result',['products'=>$products,'categories'=>$categories]);
+    }
+
+    private function attachPricing(iterable $products, PricingService $pricing): void
+    {
+        if (!auth()->check()) {
+            return;
+        }
+
+        $collection = method_exists($products, 'getCollection')
+            ? $products->getCollection()
+            : collect($products);
+        $priceMap = $pricing->priceMany($collection, auth()->id());
+
+        $collection->each(function (Products $product) use ($priceMap) {
+            $product->setAttribute('pricing', $priceMap[(int) $product->id] ?? null);
+        });
     }
 }
 

@@ -48,7 +48,7 @@
                                     <p class="m-0">{{$item['product']['title']}}</p>
                                 </a>
                             </td>
-                            <td data-label="Egység ár">{{ App\Models\Products::find($item['product']['id'])->getPriceForUser() }} Ft</td>
+                            <td data-label="Egység ár">{{ App\Models\Cart::unitnet($item) }} Ft</td>
                             <td data-label="Mennyiségi">
                                 <div class="d-flex gap-2">
                                     <button class="btn btn-sm btn-outline-secondary quantity-decrease" data-key="{{ $key }}" data-change="-1">−</button>
