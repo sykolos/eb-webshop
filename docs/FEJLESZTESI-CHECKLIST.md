@@ -7,15 +7,15 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M02: kritikus biztonsági és rendelési javítások, FOLYAMATBAN; M02.01-M02.03 stagingen, M02.04 kód kész |
-| Következő fejlesztési feladat | M02.04 célzott CI/staging kiadás; utána M01.08 élő staging felhasználói próba dedikált partner/admin adatokkal |
+| Aktív mérföldkő | M02: kritikus biztonsági és rendelési javítások, FOLYAMATBAN; M02.01-M02.04 stagingen |
+| Következő fejlesztési feladat | M01.08 élő staging felhasználói próba dedikált partner/admin adatokkal; utána M02.05 státuszátmenetek |
 | Alkalmazásfejlesztés ebből a checklistből | M01 elkezdve; stagingvédelem, tesztkapu és deploy megerősítése |
-| Utolsó igazolt staging kiadás | ee86f8ebe8c5b2e947ea2fc8c3fd7ab39a63394f, GitHub Actions #49: verify/deploy/HTTP sikeres; M02.03 stagingen |
+| Utolsó igazolt staging kiadás | a54ac7aceb605924e994874f754697b1801306b9, GitHub Actions #55: verify/deploy/HTTP sikeres; M02.04 stagingen |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D09 törlés technikai javaslata, D11 szolgáltató; D12-D13 későbbre halasztva |
-| Mostani változtatás | M02.04 checkout tranzakció, idempotens beküldési kulcs, hiányzó számlázási adatok és megszűnt termék kezelése elkészült; helyi adatbázisteszt PDO SQLite-driver hiányában nem futott, CI/staging kiadás még folyamatban |
+| Mostani változtatás | M02.04 checkout tranzakció, idempotens beküldési kulcs, hiányzó számlázási adatok és megszűnt termék kezelése stagingre kiadva; helyi adatbázisteszt PDO SQLite-driver hiányában nem futott, CI és staging deploy sikeres |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -215,14 +215,14 @@ Kiadási rekord: commit = `74d54f5296531370873f9182d10ead0b003d86ea`; workflow =
 
 ## M02. Kritikus biztonsági és rendelési javítások
 
-Állapot: FOLYAMATBAN. Függőség: M01; M02.01 elkészült és stagingen, további M02 pontok nyitva.
+Állapot: FOLYAMATBAN. Függőség: M01; M02.01-M02.04 stagingen, további M02 pontok nyitva.
 Forrás: L: biztonság; K: konkrét kódhiányok.
 Stagingen bemutatható eredmény: A régi felület a javított hozzáférésekkel és rendelésmentéssel tovább használható.
 
 - [x] M02.01 OrderPolicy és tulajdonosszűrés a fiókbeli rendelésrészletnél és PDF-letöltésnél; cím- és kosárhozzáférések átvizsgálása.
 - [x] M02.02 Nyilvános /clear eltávolítása; üzemeltetési cache-törlés csak CLI/deploy folyamatból.
 - [x] M02.03 Kosármennyiség, termékazonosító és kiszerelés validációja; a kliens q/m paramétere ne dönthesse el az üzleti mennyiséget.
-- [ ] M02.04 Checkout tranzakció és ismételt beküldés elleni védelem; hiányzó számlázási adatok és megszűnt termék kezelése.
+- [x] M02.04 Checkout tranzakció és ismételt beküldés elleni védelem; hiányzó számlázási adatok és megszűnt termék kezelése.
 - [ ] M02.05 Státuszmódosítás engedélyezett értékeinek és átmeneteinek validálása; a teljes új munkafolyamat M11-ben készül.
 - [ ] M02.06 Login, regisztrációkérés, jelszóreset, email és kapcsolat végpontok próbálkozáskorlátja; logout session-érvénytelenítés és egységes jelszóvalidáció.
 - [ ] M02.07 Duplikált cart.count és hibás/hiányzó kosár route-controller összerendelések rendezése a hívó felületekkel együtt.
@@ -241,6 +241,8 @@ Adat/deploy: Új egyedi beküldési kulcs esetén kompatibilis migráció; megl�
 - [ ] M02.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
 
 Kiadási rekord M02.03 részkiadás: commit = `ee86f8ebe8c5b2e947ea2fc8c3fd7ab39a63394f`; feature workflow = [#48](https://github.com/sykolos/eb-webshop/actions/runs/38588072011), verify sikeres; develop workflow = [#49](https://github.com/sykolos/eb-webshop/actions/runs/38588688231), verify/deploy sikeres; staging smoke = `/`, `/contact`, `/login` HTTP 200. A helyi PHPUnit a hiányzó PDO SQLite-driver miatt nem futott le, a CI izolált SQLite ellenőrzése volt az alkalmazásellenőrzés. M02 közös K1-K6 kapui a további M02 pontok miatt nyitva maradnak.
+
+Kiadási rekord M02.04: commit = `a54ac7aceb605924e994874f754697b1801306b9`; feature workflow = [#54](https://github.com/sykolos/eb-webshop/actions/runs/38591732597), sikeres; develop/staging workflow = [#55](https://github.com/sykolos/eb-webshop/actions/runs/38591973104), verify és deploy sikeres; staging smoke = `/`, `/contact`, `/login` HTTP 200. A migráció meglévő rendeléseket megőriz, új környezeti változó vagy deploy-kapcsoló nem kell. A helyi PHPUnit a hiányzó PDO SQLite-driver miatt nem futott le, a CI ellenőrizte a checkout regressziókat és a migrációt. M02 közös K1-K6 kapui M02.05-M02.08 miatt továbbra nyitva maradnak.
 
 M02.04 kód kész, kiadás előtt: a `CheckoutService` a rendelés- és tételmentést egy adatbázis-tranzakcióban végzi, a friss termékből és a meglévő felhasználói/termékköri árlogikából számol. A checkout űrlap UUID alapú, egyedi beküldési kulcsot kapott; ismételt beküldés ugyanazt a rendelést adja vissza, új email/PDF értesítés nélkül. A számlázási adatok és a szállítási cím felhasználói tulajdonosa kötelező; hiányzó számlázási adat vagy törölt termék validációs hibát ad rendelés létrehozása nélkül. A kiszerelés továbbra is a termék adatbázisából származik, nem a session/kliens q/m értékeiből.
 
@@ -863,6 +865,8 @@ Kiadáskor új sor kerül ide. Nem szabad előre sikeresnek kitölteni.
 | 2026-10-14 | M01 / D14 | STAGINGEN, meglévő deploybeállításokkal | 74d54f5296531370873f9182d10ead0b003d86ea | [#36](https://github.com/sykolos/eb-webshop/actions/runs/38574327623) | verify és deploy success; /, /contact, /login HTTP 200 CI-ban és külön helyi próbával | M01.08, majd M02; D14 halasztások megőrzése |
 | 2026-10-14 | M02.01 | Részkiadás stagingen; rendelés-tulajdonosvédelem | d9c0cc16393fd585beab8f52e8881448881357c0 | [#41](https://github.com/sykolos/eb-webshop/actions/runs/38585205515) | verify és deploy success; idegen részlet/PDF 403, saját részlet 200 a célzott tesztben | M02.02; M01.08 élő partner/admin próba tovább nyitott |
 | 2026-10-14 | M02.02 | Részkiadás stagingen; nyilvános `/clear` eltávolítva | 08e4d5102a1312a7a49a77f3c614e752c925e3ab | [#45](https://github.com/sykolos/eb-webshop/actions/runs/38586495639) | verify és deploy success; `/clear` 404 regressziótesztben | M02.03; M01.08 élő partner/admin próba tovább nyitott |
+| 2026-10-14 | M02.03 | Részkiadás stagingen; kosár- és kiszerelésvalidáció | ee86f8ebe8c5b2e947ea2fc8c3fd7ab39a63394f | [#49](https://github.com/sykolos/eb-webshop/actions/runs/38588688231) | verify és deploy success; `/`, `/contact`, `/login` HTTP 200 | M02.04; M01.08 élő partner/admin próba tovább nyitott |
+| 2026-10-14 | M02.04 | Stagingen; tranzakciós checkout és idempotens beküldés | a54ac7aceb605924e994874f754697b1801306b9 | [#55](https://github.com/sykolos/eb-webshop/actions/runs/38591973104) | verify és deploy success; `/`, `/contact`, `/login` HTTP 200; CI checkout-regressziók zöldek | M01.08 élő partner/admin próba, majd M02.05 |
 
 Kiadási bejegyzéshez szükséges részletek:
 
@@ -1041,14 +1045,15 @@ Kiadási bejegyzéshez szükséges részletek:
 - Az alkalmazáskód SHA-ja `ee86f8e`; a checklistet rögzítő docs-only kiadás `da04511`, amely mindkét távoli ágat és a staginget jelenleg vezeti. M02.03 stagingen ellenőrzött; M02 közös kapui nyitva maradnak, mert M02.04-M02.08 még nincs elkészítve. M01.08 valódi partner/admin staging-belépési próba külön nyitott elfogadási pont.
 - Következő konkrét fejlesztés: M02.04 checkout tranzakció, ismételt beküldés elleni védelem, hiányzó számlázási adatok és megszűnt termék kezelése; az M01.08 élő login-próba dedikált tesztadatot igényel.
 
-### 2026-10-14: M02.04 checkout védelem, kiadás előtt
+### 2026-10-14: M02.04 checkout védelem staging kiadás
 
 - A checkout folyamat `CheckoutService`-be került: a felhasználói szállítási cím, a számlázási adatok, a kosártermékek, az aktuális rugalmas partnerárak és a rendelési tételek ellenőrzése/mentése egy célzott üzleti rétegben történik.
 - Új `orders.checkout_token` nullable UUID mező és egyedi index készült. A checkout űrlap egy beküldéshez UUID kulcsot kap; azonos kulccsal ismételt vagy párhuzamos beküldés ugyanazt a rendelést használja, és nem küld új email/PDF értesítést. A régi rendelések migráció után is érvényesek maradnak.
 - A rendelés és minden tétele tranzakcióban készül. Hiányzó számlázási adat, idegen/nem létező szállítási cím, hibás kosártétel vagy törölt termék validációs hibával tér vissza; részleges rendelés nem marad az adatbázisban. A kiszerelés és mértékegység továbbra is az adatbázisból származik, a speciális ár- és termékköri kedvezmények változatlanok.
 - Új Feature tesztek készültek a hiányzó számlázásra, törölt termékre és token-idempotenciára. PHP lint és `git diff --check` sikeres; a helyi PHPUnit a hiányzó PDO SQLite-driver miatt nem indítható, a CI a kiadási ellenőrzés.
 - Módosított fájlok: `app/Services/CheckoutService.php`, `app/Http/Controllers/Checkout.php`, `app/Http/Controllers/PagesController.php`, `resources/views/pages/checkout.blade.php`, `database/migrations/2026_10_14_160000_add_checkout_token_to_orders_table.php`, `tests/Feature/ExampleTest.php`, ez a checklist.
-- Állapot: M02.04 kód kész, staging kiadás és CI ellenőrzés előtt. Következő lépés: feature branch commit/push, majd develop integráció és a meglévő staging deploy ellenőrzése.
+- A feature [#54](https://github.com/sykolos/eb-webshop/actions/runs/38591732597) és a develop/staging [#55](https://github.com/sykolos/eb-webshop/actions/runs/38591973104) workflow sikeres. A staging `/`, `/contact`, `/login` végpontjai HTTP 200-at adtak.
+- Állapot: M02.04 stagingen, M02 közös K1-K6 kapui a további M02 pontok miatt nyitva. Következő konkrét fejlesztési feladat: M01.08 élő staging partner/admin login-próba dedikált tesztadatokkal; utána M02.05.
 
 ### Következő munkamenet sablonja
 
