@@ -126,6 +126,15 @@ jobs:
             sshpass -e scp "${scp_args[@]}" "$RUNNER_TEMP/env.deploy" "$target:$incoming/env.deploy"
             rm -f "$RUNNER_TEMP/env.deploy"
           fi
-          sshpass -e ssh "${ssh_args[@]}" "$target" "bash '$incoming/remote.sh' '$DEPLOY_PATH' '$PUBLIC_PATH' '$GITHUB_SHA' '$PHP_BIN'"
+          set +e
+          remote_output=$(sshpass -e ssh "${ssh_args[@]}" "$target" "bash '$incoming/remote.sh' '$DEPLOY_PATH' '$PUBLIC_PATH' '$GITHUB_SHA' '$PHP_BIN'" 2>&1)
+          remote_status=$?
+          set -e
+          printf '%s\n' "$remote_output"
+          if [[ $remote_status -ne 0 ]]; then
+            remote_summary=${remote_output//$'\n'/ }
+            echo "::error title=Remote deploy failed::$remote_summary"
+          fi
+          exit "$remote_status"
       - name: Check deployed website
         run: php scripts/deploy/smoke.php
