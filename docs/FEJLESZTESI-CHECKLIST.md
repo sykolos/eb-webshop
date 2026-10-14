@@ -10,7 +10,7 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 | Aktív mérföldkő | M02: kritikus biztonsági és rendelési javítások, FOLYAMATBAN; M02.01-M02.05 stagingen |
 | Következő fejlesztési feladat | M02.07 duplikált cart.count és hibás/hiányzó kosár route-controller összerendelések; az M01.08 élő staging partner/admin próba külön nyitott átadási pont |
 | Alkalmazásfejlesztés ebből a checklistből | M01 elkezdve; stagingvédelem, tesztkapu és deploy megerősítése |
-| Utolsó igazolt staging kiadás | c641a9043ae825c3d178adc97afc7b904845dcc7, GitHub Actions #59: verify/deploy/HTTP sikeres; M02.05 stagingen |
+| Utolsó igazolt staging kiadás | cd0b7e316364f73fecf6722c12a25710602237e7, GitHub Actions #63: verify/deploy/HTTP sikeres; M02.06 stagingen |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
