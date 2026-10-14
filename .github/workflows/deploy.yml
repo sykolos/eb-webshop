@@ -134,6 +134,9 @@ jobs:
           if [[ $remote_status -ne 0 ]]; then
             remote_summary=${remote_output//$'\n'/ }
             echo "::error title=Remote deploy failed::$remote_summary"
+            diagnostics=$(sshpass -e ssh "${ssh_args[@]}" "$target" "printf '%s\n' '--- deploy diagnostics ---'; if [[ -f '$incoming/preflight.log' ]]; then cat '$incoming/preflight.log'; fi; printf '%s\n' '--- runtime markers ---'; ls -la '$incoming' '$DEPLOY_PATH/storage/framework' 2>&1" 2>&1)
+            diagnostics_summary=${diagnostics//$'\n'/ }
+            echo "::error title=Remote deploy diagnostics::$diagnostics_summary"
           fi
           exit "$remote_status"
       - name: Check deployed website
