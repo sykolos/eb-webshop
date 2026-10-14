@@ -35,12 +35,6 @@ import './cart';
 // Stílusok
 import '../sass/app.scss';
 
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.dropdown-toggle').forEach((el) => {
-        new bootstrap.Dropdown(el);
-    });
-});
-
 function closePopup() {
     const overlay = document.getElementById('popupOverlay');
     if (overlay) {
