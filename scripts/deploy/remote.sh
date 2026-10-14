@@ -71,7 +71,7 @@ install -m 600 "$environment" "$candidate/.env"
 if ! (
   cd "$candidate" || exit 1
   DEPLOY_PATH="$candidate" PUBLIC_PATH="$candidate/public" "$php_bin" scripts/deploy/configure-path.php || exit 1
-  "$php_bin" scripts/deploy/check.php "$candidate/public" --staging
+  "$php_bin" scripts/deploy/check.php "$candidate/public"
 ) >"$incoming/preflight.log" 2>&1; then
   echo 'Candidate validation failed; inspect the private preflight.log. Live code was not changed.' >&2
   exit 1
@@ -110,11 +110,10 @@ find "$public" -type f -exec chmod 644 {} +
 chmod 755 "$public"
 ln -sfn "$app/storage/app/public" "$public/storage"
 cd "$app"
-"$php_bin" scripts/deploy/check.php "$public" --staging
+"$php_bin" scripts/deploy/check.php "$public"
 "$php_bin" artisan optimize:clear
 "$php_bin" artisan migrate --force
 "$php_bin" artisan config:cache
 "$php_bin" artisan view:cache
-"$php_bin" artisan queue:restart
 "$php_bin" artisan up
 echo "Release $revision installed. Code backup: $backup"

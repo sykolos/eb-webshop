@@ -21,7 +21,8 @@ case "$1" in
     [[ ${FAIL_CONFIGURE:-0} != 1 ]] || exit 1
     printf '%s' "$DEPLOY_PATH" > public/.laravel-path.php ;;
   scripts/deploy/check.php)
-    grep -qx 'APP_ENV=staging' .env
+    grep -qx 'APP_KEY=unchanged-test-key' .env
+    [[ $# == 2 ]]
     [[ $(cat "$2/.laravel-path.php") == "$PWD" ]] ;;
   artisan)
     case "$2" in
@@ -44,7 +45,7 @@ prepare() {
   printf 'old-public' > "$public/old.js"
   printf 'keep-media' > "$app/storage/app/public/photo.jpg"
   printf 'keep-challenge' > "$public/.well-known/token"
-  printf 'APP_ENV=staging\nAPP_KEY=unchanged-test-key\n' > "$app/.env"
+  printf 'APP_ENV=local\nAPP_KEY=unchanged-test-key\n' > "$app/.env"
   touch "$app/artisan"
   ln -s "$app/storage/app/public" "$public/storage"
   mkdir -p "$home/release"/{app,bootstrap/cache,config,database,lang,resources,routes,scripts/deploy,vendor,public/build}

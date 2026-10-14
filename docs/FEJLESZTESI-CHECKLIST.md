@@ -8,14 +8,14 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 | Mező | Aktuális érték |
 | --- | --- |
 | Aktív mérföldkő | M01: staging és Git kiadási alap, FOLYAMATBAN |
-| Következő fejlesztési feladat | M01.01/M01.02/M01.04: SSH_KNOWN_HOSTS, STAGING_ACCESS_USER, STAGING_ACCESS_PASSWORD biztonságos beállítása és hozzájuk tartozó szerverenv; M01.09 visszaállítási próba, majd deploykapcsoló |
+| Következő fejlesztési feladat | D14: visszatérés a meglévő deploy-beállításokhoz, új titkok/kapcsoló nélkül; teszt, develop push és tényleges staging próba |
 | Alkalmazásfejlesztés ebből a checklistből | M01 elkezdve; stagingvédelem, tesztkapu és deploy megerősítése |
 | Utolsó igazolt staging kiadás | Korábbi deployjavítás: 936fd9e, GitHub Actions #23 sikeres; M01 változtatásai még nincsenek stagingen |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
-| Meglévő workflow | Új workflow developon: verify sikeres (#32), deploy skipped; külön konfigurációaudit #2 három hiányzó új titkot azonosított |
+| Meglévő workflow | D14 szerint visszaállítás alatt: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D09 törlés technikai javaslata, D11 szolgáltató; D12-D13 későbbre halasztva |
-| Mostani változtatás | M01 konfigurációaudit developon: 23739b8; a hat régi deploytitok elérhető, három új titok hiányzik. Nem Git-hozzáférési hiba; staging még nem frissült |
+| Mostani változtatás | D14 implementáció: új konfigurációaudit törölve, extra stagingvédelem inaktív, meglévő env megőrzése, régi SSH-opciók és HTTP 200 próbák visszaállítva; CI/kódmentés megmarad |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -112,6 +112,7 @@ A „nyitott” nem engedély automatikus üzleti szabályváltoztatásra. Techn
 | D11 | Részletes valódi tracking kell, külső szolgáltató is lehet | Látogatások, események, keresés, termék/kosár/checkout tölcsér, kampányok, élő aktivitás; hőtérkép/visszajátszás jelölt funkció. Szolgáltató és adatmegőrzés kiválasztása M15; hozzájárulás és tájékoztatás az éles indulás előtt | TERJEDELEM ELDÖNTVE, SZOLGÁLTATÓ KÉSŐBB |
 | D12 | Küldési szolgáltató, feliratkozások és automatizmusok | A felhasználó későbbre hagyta; az érintett M16/M17 előtt véglegesítendő | KÉSŐBB |
 | D13 | Meglévő chat megoldása és integrációja | A felhasználó későbbre hagyta; M18 előtt felmérendő | KÉSŐBB |
+| D14 | A már működő deploy-folyamatot kell használni új előfeltételek nélkül | Felhasználó: „nem kell bevezetni uj dolgokat ... ugy ahogy mar mukodott”. Meglévő hat SSH/path titok és opcionális ENV_DEVELOP; nincs új deploykapcsoló, environment-jóváhagyás, hostkulcstitok vagy Basic-belépő. A szerverenv nem módosul. A CI, csomagellenőrzés és adatmegőrző kódmentés megmarad; az új infrastruktúra/biztonsági előfeltételek halasztottak, nem késznek jelöltek | ELDÖNTVE, korábbi M01 aktiválási feltételeket felülírja |
 
 További kötelező különbségek: a ZIP admin- és webshopadatai részben külön demótárak; az éles rendszer közös adatbázist/árszámítást használ. A termékimport eredménye a webshopban is megjelenik. A helyi képelőnézetből tényleges feltöltés lesz. A prototípus 27%-os áfája nem igazolja minden termék adóbesorolását.
 
@@ -183,6 +184,8 @@ A vásárlás backendben rögzített üzleti esemény és a külső viselkedési
 Állapot: FOLYAMATBAN. Függőség: M00.
 Forrás: L: staging, deploy, infrastruktúra; K: meglévő develop workflow.
 Stagingen bemutatható eredmény: Az aktuális Laravel-verzió tiszta checkoutból ellenőrizhetően stagingre települ.
+
+D14 (2026-10-14) a korábbi aktiválási kaput felülírja: a már működő stagingre a meglévő beállításokkal szabad kiadni. M01.02 új izoláció/védelem, M01.04 rögzített hostkulcs és M01.09 valódi DB/média-visszaállítás külön halasztott munka, nem előfeltétele ennek a kiadásnak. Nem pipálhatók ki pusztán a sikeres deploy miatt. A kiadási kapuk ellenőrzési köre a mostani, D14 szerinti csomag; a halasztott munkák nem vezethetők be ismét automatikus blokkolóként.
 
 - [ ] M01.01 A jelenlegi develop deploy célkörnyezetének ellenőrzése: domain, public/app könyvtár, PHP CLI/web, adatbázis, build és titokkezelés; az éles környezet elkülönítése.
 - [ ] M01.02 Staging külön adatbázis, kulcs, session/cookie, média, queue; anonimizált tesztadat, tesztcímzettes email, hozzáférés-védelem és noindex.
@@ -965,6 +968,16 @@ Kiadási bejegyzéshez szükséges részletek:
 - A felhasználó ismét jogosan jelezte, hogy másik beszélgetésben már működött a push/deploy. Tisztázva: a #23 korábbi deploy sikeres volt; az M01 új védelmei és alapból kikapcsolt kapcsolója hozták létre az új előfeltételeket. Nem elveszett hozzáférés vagy új GitHub-kulcs szükséges.
 - Biztonságos egyszeri konfigurációhoz böngészős GitHub/tárhely bejelentkezést vagy felhasználói beállítást kértünk, jelszó/token chatbe küldése nélkül. Git SSH-jogosultság nem biztosít GitHub titok-/változószerkesztési API-hozzáférést. Titkos értékeket az audit nem ír ki és nem másol helyi gépre.
 - Következő: megbízható tárhelyi forrásból ellenőrzött SSH-hostkulcs, külön staging HTTP-belépő és megfelelő szerveroldali hash/email-sink/izoláció. A meglévő APP_KEY megőrzendő. M01.09 igazolt DB/média-visszaállítás után kapcsolható be a deploy; ennek hiányát az új audit nem helyettesíti. Éles rendszerhez nem nyúltunk.
+
+### 2026-10-14: D14, a meglévő deploy visszaállítása
+
+- A felhasználó nem kéri az új kiadási előfeltételeket, a korábbi működő utat választotta. Ez felülírja a megelőző napló aktiválási feltételeit és az egyszeri új GitHub/tárhely beállításra feltett kérdést; arra már nem szükséges válasz.
+- Workflow: csak a meglévő hat SSH/path titok, korábbi SSH-opciók, nincs STAGING_DEPLOY_ENABLED vagy staging environment-kapu. A konfigurációaudit workflow törölve. A verify job és a célzott release-csomag megmarad.
+- remote.sh a meglévő env mellett általános alkalmazásellenőrzést futtat, nem követeli meg a --staging paraméter szerinti új beállításokat. Nem indít queue:restart parancsot. Hash/REVISION, preflight, lock, kódmentés, env/média megőrzése és migrációhibánál maintenance változatlan.
+- config/staging.php enabled=false: nem lép működésbe új Basic-auth vagy email-sink az APP_ENV értékétől sem. A kód és a célzott tesztjei későbbi munkához megmaradnak. Az alkalmazás meglévő belépése/jogosultságai nem változnak.
+- HTTP próba visszaállítva a korábbi három nyilvános útvonal 200 válaszára, új credential/header-követelmény nélkül. AGENTS.md és DEPLOYMENT.md a tényleges D14 szerinti működést írja le, nem a visszavont követelményeket.
+- Helyi PHPUnit: 28 teszt / 97 assertion sikeres, külön regresszió igazolja az extra védelem inaktív kiadási alapértékét. Linux-fixture meglévő, nem staging nevű envvel és új titkok nélkül tesztel, érvénytelen kulcsot továbbra elutasít. Nincs új migráció és nincs szerverenv-/adatmódosítás előírva.
+- Következő: diff/szintaxisellenőrzés, engedélyezett commit/push és tényleges deploy megfigyelése. Ennek sikerét még nem állítjuk.
 
 ### Következő munkamenet sablonja
 

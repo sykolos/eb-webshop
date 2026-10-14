@@ -34,6 +34,14 @@ class StagingProtectionTest extends TestCase
             ->assertOk()->assertSee('protected')->assertHeader('X-Release-Sha', str_repeat('a', 40));
     }
 
+    public function test_additional_guards_are_not_enabled_by_the_release_configuration(): void
+    {
+        $settings = require config_path('staging.php');
+        $this->assertFalse($settings['enabled']);
+        config(['staging.enabled' => $settings['enabled']]);
+        $this->get('/__staging-test')->assertOk()->assertHeaderMissing('WWW-Authenticate');
+    }
+
     public function test_unconfigured_staging_fails_closed(): void
     {
         config(['staging.password_hash' => '']);
