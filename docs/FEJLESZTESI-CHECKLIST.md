@@ -7,7 +7,7 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M02: kritikus biztonsági és rendelési javítások, FOLYAMATBAN; M02.01-M02.05 stagingen |
+| Aktív mérföldkő | M02: kritikus biztonsági és rendelési javítások, FOLYAMATBAN; M02.01-M02.06 stagingen |
 | Következő fejlesztési feladat | M02.07 duplikált cart.count és hibás/hiányzó kosár route-controller összerendelések; az M01.08 élő staging partner/admin próba külön nyitott átadási pont |
 | Alkalmazásfejlesztés ebből a checklistből | M01 elkezdve; stagingvédelem, tesztkapu és deploy megerősítése |
 | Utolsó igazolt staging kiadás | cd0b7e316364f73fecf6722c12a25710602237e7, GitHub Actions #63: verify/deploy/HTTP sikeres; M02.06 stagingen |
