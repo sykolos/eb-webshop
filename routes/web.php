@@ -26,6 +26,8 @@ use App\Http\Controllers\ProductRecommend;
 use App\Http\Controllers\AdminTwoFactorController;
 use App\Http\Controllers\PrivateFileController;
 use App\Http\Controllers\DesignSystemController;
+use App\Http\Controllers\ProductMediaController;
+use App\Http\Controllers\FilterDefinitionController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 
@@ -124,8 +126,14 @@ Route::group(['prefix'=>'account','middleware'=>'auth'],function(){
         //products group
         Route::group(['prefix'=>'products',], function(){
             Route::get('/',[ProductController::class, 'index'])->name('adminpanel.products');
+            Route::get('/data-quality',[ProductController::class, 'dataQuality'])->name('adminpanel.products.data-quality');
             Route::get('/create',[ProductController::class, 'create'])->name('adminpanel.products.create');
             Route::post('/create',[ProductController::class, 'store'])->name('adminpanel.products.store');
+            Route::post('/{productId}/media',[ProductMediaController::class, 'store'])->name('adminpanel.products.media.store');
+            Route::put('/{productId}/media/{mediaId}',[ProductMediaController::class, 'update'])->name('adminpanel.products.media.update');
+            Route::delete('/{productId}/media/{mediaId}',[ProductMediaController::class, 'destroy'])->name('adminpanel.products.media.destroy');
+            Route::get('/{productId}/media/{mediaId}/download',[ProductMediaController::class, 'download'])->name('adminpanel.products.media.download');
+            Route::post('/{id}/restore',[ProductController::class, 'restore'])->name('adminpanel.products.restore');
             Route::get('/{id}',[ProductController::class, 'edit'])->name('adminpanel.products.edit');
             Route::put('/{id}',[ProductController::class, 'update'])->name('adminpanel.products.update');
             Route::delete('/{id}',[ProductController::class, 'destroy'])->name('adminpanel.products.destroy');
@@ -135,7 +143,14 @@ Route::group(['prefix'=>'account','middleware'=>'auth'],function(){
         Route::group(['prefix'=>'categories',], function(){
             Route::get('/',[CategoryController::class, 'index'])->name('adminpanel.categories');
             Route::post('/',[CategoryController::class, 'store'])->name('adminpanel.category.store');
+            Route::put('/{id}',[CategoryController::class, 'update'])->name('adminpanel.category.update');
             Route::delete('/{id}',[CategoryController::class, 'destroy'])->name('adminpanel.category.destroy');    
+        });
+
+        Route::group(['prefix' => 'filters'], function () {
+            Route::post('/', [FilterDefinitionController::class, 'store'])->name('adminpanel.filters.store');
+            Route::put('/{id}', [FilterDefinitionController::class, 'update'])->name('adminpanel.filters.update');
+            Route::delete('/{id}', [FilterDefinitionController::class, 'destroy'])->name('adminpanel.filters.destroy');
         });
 
         //order group
@@ -160,6 +175,7 @@ Route::group(['prefix'=>'account','middleware'=>'auth'],function(){
         Route::group(['prefix'=>'units',], function(){
             Route::get('/',[AdminController::class, 'units'])->name('adminpanel.units');
             Route::post('/',[AdminController::class, 'unit_store'])->name('adminpanel.units.unit_store');
+            Route::put('/{id}',[AdminController::class, 'unit_update'])->name('adminpanel.units.unit_update');
             Route::delete('/{id}',[AdminController::class, 'unit_destroy'])->name('adminpanel.units.unit_destroy');
             });
 

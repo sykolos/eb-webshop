@@ -7,15 +7,15 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M05: ZIP-alapú designrendszer és három layout, STAGINGEN ELLENŐRZÖTT |
-| Következő fejlesztési feladat | M06.01 terméktörzs, kategóriafa és elérhetőségi státuszok felmérése/implementációja |
-| Alkalmazásfejlesztés ebből a checklistből | M01-M05 stagingen; M06 a következő fejlesztési mérföldkő |
+| Aktív mérföldkő | M06: Terméktörzs, kategóriafa és webshopos szűrők adminja, KIADÁSRA KÉSZ |
+| Következő fejlesztési feladat | M06.K4 develop integráció, staging deploy és admin ellenőrzés |
+| Alkalmazásfejlesztés ebből a checklistből | M01-M05 stagingen; M06 lokálisan és CI-kompatibilis állapotban, stagingre vár |
 | Utolsó igazolt staging kiadás | bb4022d, GitHub Actions #103: verify/deploy és staging preview ellenőrzés sikeres |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D09 törlés technikai javaslata, D11 szolgáltató; D12-D13 későbbre halasztva |
-| Mostani változtatás | M05 stagingen ellenőrzött: V6 tokenelt CSS, Alpine CSP/Vite belépési pont, webshop/partnerfiók/admin layout, védett komponensgaléria és ZIP-ből átvett hero; a legacy oldalak és árlogika változatlanok |
+| Mostani változtatás | M06 termék-, kategória-, egység-, szűrő- és médiatörzs elkészült service-réteggel; mély kategóriafa, státuszok, archiválás és publikációs szűrés; a meglévő árlogika, kiszerelés és rendelési történet megmarad |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -154,7 +154,7 @@ A vásárlás backendben rögzített üzleti esemény és a külső viselkedési
 | M03 | Laravel és futtatókörnyezet korszerűsítése | STAGINGEN ELLENŐRZÖTT |
 | M04 | Közös backend, jogosultság és háttérfeldolgozás | STAGINGEN ELLENŐRZÖTT |
 | M05 | ZIP-alapú designrendszer és három layout | STAGINGEN ELLENŐRZÖTT |
-| M06 | Terméktörzs, kategóriafa és webshopos szűrők adminja | TERVEZETT |
+| M06 | Terméktörzs, kategóriafa és webshopos szűrők adminja | KIADÁSRA KÉSZ |
 | M07 | Egységes árképzés és admin ármátrix | TERVEZETT |
 | M08 | Webshop, katalógus és keresés a v6 kinézetével | TERVEZETT |
 | M09 | Adatbázisos kosár és teljes rendelési folyamat | TERVEZETT |
@@ -365,34 +365,34 @@ Kiadási rekord: commit = `bb4022dbcdf66b84ab14e74f49fae60a9deea339`; develop/st
 
 ## M06. Terméktörzs, kategóriafa és webshopos szűrők adminja
 
-Állapot: TERVEZETT. Függőség: M04, M05.
+Állapot: KIADÁSRA KÉSZ. Függőség: M04, M05.
 Forrás: Z: product-editor, taxonomy, admin-workflows; L: kategória/alkategória, termékek, szűrők.
 Stagingen bemutatható eredmény: Az adminban létrehozott vagy szerkesztett termék és kategória tartósan mentődik, a régi webshop kompatibilis marad.
 
-- [ ] M06.01 Termékmodell bővítése: cikkszám, slug, név, leírás, gyártó, kategória, alapegység, csomagszorzó, csomagnév, publikálási állapot.
-- [ ] M06.02 Tetszőleges mélységű kategóriafa D02 szerint, sorrenddel és aktív állapottal; nincs két szintre korlátozás, mély fában keresés/összecsukás/breadcrumb.
-- [ ] M06.03 Saját maga vagy leszármazottja alá mozgatás tiltása; terméket vagy gyermeket tartalmazó kategória törlése tiltott; teljes részfa áthelyezése konzisztens.
-- [ ] M06.04 Szűrődefiníciók, értékek, aktív állapot és kategória-hozzárendelés; minden ős releváns szűrőinek öröklődése, duplikáció nélkül. Ez nem vezet be új öröklődő kedvezményszabályt.
-- [ ] M06.05 Termékszerkesztő fülek: alapadatok, jelenlegi kiszerelés, műszaki adatok, képek/dokumentumok; külön publikálási állapot és D06 szerinti elérhetőségi státusz, mennyiségi készletmező nélkül.
-- [ ] M06.06 Valódi kép/PDF feltöltés, sorrend, előnézet, törlés és privát/publikus hozzáférés; a ZIP helyi előnézetének kiváltása.
-- [ ] M06.07 Mennyiségi egységek adminja; használt egység törlési védelme, db/m és egyéb meglévő egységek migrációs szabálya.
-- [ ] M06.08 Terméklista keresés/szűrés/lapozás, archiválás; törlés ne bontsa meg a történeti rendeléseket.
-- [ ] M06.09 Meglévő cikkszámok, kategóriák és csomagolások adatminőség-ellenőrzése; ismeretlen értékből ne legyen kitalált adat.
-- [ ] M06.10 Admin termék és későbbi webshop ugyanazt a terméktörzset használja; termék- és kategória-service a nagy controllerekből.
+- [x] M06.01 Termékmodell bővítése: cikkszám, slug, név, leírás, gyártó, kategória, alapegység, csomagszorzó, csomagnév, publikálási állapot.
+- [x] M06.02 Tetszőleges mélységű kategóriafa D02 szerint, sorrenddel és aktív állapottal; nincs két szintre korlátozás, mély fában keresés/összecsukás/breadcrumb.
+- [x] M06.03 Saját maga vagy leszármazottja alá mozgatás tiltása; terméket vagy gyermeket tartalmazó kategória törlése tiltott; teljes részfa áthelyezése konzisztens.
+- [x] M06.04 Szűrődefiníciók, értékek, aktív állapot és kategória-hozzárendelés; minden ős releváns szűrőinek öröklődése, duplikáció nélkül. Ez nem vezet be új öröklődő kedvezményszabályt.
+- [x] M06.05 Termékszerkesztő fülek: alapadatok, jelenlegi kiszerelés, műszaki adatok, képek/dokumentumok; külön publikálási állapot és D06 szerinti elérhetőségi státusz, mennyiségi készletmező nélkül.
+- [x] M06.06 Valódi kép/PDF feltöltés, sorrend, előnézet, törlés és privát/publikus hozzáférés; a ZIP helyi előnézetének kiváltása.
+- [x] M06.07 Mennyiségi egységek adminja; használt egység törlési védelme, db/m és egyéb meglévő egységek migrációs szabálya.
+- [x] M06.08 Terméklista keresés/szűrés/lapozás, archiválás; törlés ne bontsa meg a történeti rendeléseket.
+- [x] M06.09 Meglévő cikkszámok, kategóriák és csomagolások adatminőség-ellenőrzése; ismeretlen értékből ne legyen kitalált adat.
+- [x] M06.10 Admin termék és későbbi webshop ugyanazt a terméktörzset használja; termék- és kategória-service a nagy controllerekből.
 
 Ellenőrzés: Legalább öt szintű kategóriafa, részfamozgatás, ciklusvédelem és szűrőöröklés; tiltott törlés; fájlfeltöltés; elérhetőségi állapot mentése; régi katalógus regresszió.
 Adat/deploy: Bővítő migráció, visszakövethető kategória/egység mapping, SKU ütközési riport.
 
 ### M06 kiadási kapuk
 
-- [ ] M06.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
-- [ ] M06.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
-- [ ] M06.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [x] M06.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [x] M06.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
+- [x] M06.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
 - [ ] M06.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
 - [ ] M06.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
 - [ ] M06.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
 
-Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+Kiadási rekord: commit = előkészítés alatt; workflow = nincs; staging próba = nem futott. Helyi bizonyíték: M06 célteszt 6/6, teljes PHPUnit 57 teszt / 237 assertion, Vite build, PHP lint, route-list, Blade cache és diff-check sikeres. A SQLite PDO modult a helyi CLI explicit betöltésével kellett indítani; ez környezeti futtatási eltérés, nem alkalmazási függőség.
 
 ## M07. Egységes árképzés és admin ármátrix
 
@@ -1099,6 +1099,15 @@ Kiadási bejegyzéshez szükséges részletek:
 - Helyi PHPUnit: 46 teszt / 215 assertion sikeres; PHP lint és diff-check sikeres. A feature [#79](https://github.com/sykolos/eb-webshop/actions/runs/38627176724) és a develop/staging [#80](https://github.com/sykolos/eb-webshop/actions/runs/38627334532) verify/deploy sikeres.
 - Staging ellenőrzés: `/`, `/contact`, `/login` HTTP 200; a főoldal CSS/JavaScript build assetjei HTTP 200; az admin dashboard (`/adminpanel`) és navigáció betöltött a már bejelentkezett admin munkamenettel.
 - M03 állapota STAGINGEN ELLENŐRZÖTT. Nincs migráció, új környezeti előfeltétel vagy külön kiadási napló. Következő konkrét fejlesztés: M04.01 közös Form Request/Policy/Service/Controller minta.
+
+### 2026-10-14: M06 terméktörzs és kategóriafa kiadásra kész
+
+- Elkészült az M06 teljes admin csomagja: termékmodell-bővítés, publikációs és D06 szerinti elérhetőségi státuszok, archiválás, tetszőleges mélységű kategóriafa ciklusvédelemmel, kereséssel/összecsukható hierarchiával/breadcrumbdel, szűrődefiníciók és ősöröklés, egységvédelem, médiafeltöltés és régi főképek importja.
+- A termékszerkesztő V6 admin felületén külön alapadat, műszaki és kép/szűrő fülek készültek. A média sorrendje, előnézete, törlése, valamint kép publikus/privát tárolása adminból kezelhető. A régi speciális árak, csomagolási adatok és rendelési előzmények változatlanul megmaradnak.
+- Service-réteg: CategoryTreeService, FilterCatalogService, ProductCatalogService, UnitCatalogService; a termék- és kategóriaadmin a közös törzsadatot használja. A publikus katalógus csak publikált, nem archivált terméket ad vissza; kategóriaszűrés a teljes részfára működik.
+- Új migrációk: 2026_10_14_180000_expand_catalog_for_m06 és 2026_10_14_180100_create_catalog_filters_and_media; visszagörgetésük a bővített oszlopokat és M06 táblákat eltávolítja, a meglévő products.image értékeket a médiatárba importálják. Új környezeti változó vagy feature flag nincs.
+- Ellenőrzés: M06 célteszt 6/6; teljes PHPUnit 57 teszt / 237 assertion; npm run build, PHP lint, route-list, Blade view cache és git diff --check sikeres. A SQLite PDO modult explicit CLI kapcsolóval kellett betölteni, mert az alap PHP CLI konfigurációból hiányzik.
+- Állapot: M06 KIADÁSRA KÉSZ; M06.K1-K3 kész. M06.K4-K6 még nincs rögzítve: a következő lépés egyetlen develop integráció/push, a meglévő staging workflow megvárása, majd a bejelentkezett admin termék/kategória/egység/média ellenőrzése asztali és mobil nézetben.
 
 ### Következő munkamenet sablonja
 

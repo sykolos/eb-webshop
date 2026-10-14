@@ -13,6 +13,24 @@ class Products extends Model
 
     protected $with = ['special_prices'];
 
+    protected $casts = [
+        'is_published' => 'boolean',
+        'is_archived' => 'boolean',
+        'specifications' => 'array',
+    ];
+
+    public const AVAILABILITY_STATUSES = [
+        'in_stock' => 'Készleten',
+        'supplier_stock' => 'Beszállítói készleten',
+        'procurement' => 'Beszerzés alatt',
+        'out_of_stock' => 'Átmenetileg nem elérhető',
+    ];
+
+    public static function availabilityStatuses(): array
+    {
+        return array_keys(self::AVAILABILITY_STATUSES);
+    }
+
     public function category(){
         return $this->belongsTo(Category::class);
     }
@@ -25,6 +43,21 @@ class Products extends Model
 
     public function special_prices(){
         return $this->hasMany(Special_prices::class,'product_id','id');
+    }
+
+    public function media()
+    {
+        return $this->hasMany(ProductMedia::class, 'product_id')->orderBy('sort_order');
+    }
+
+    public function filterValues()
+    {
+        return $this->belongsToMany(FilterValue::class, 'product_filter_value', 'product_id', 'filter_value_id');
+    }
+
+    public function scopePublished($query)
+    {
+        return $query->where('is_published', true)->where('is_archived', false);
     }
     
 

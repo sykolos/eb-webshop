@@ -13,6 +13,7 @@ class ProductRecommend extends Controller
     public function getRecommended()
     {
         $recommended = Products::query()
+            ->published()
             ->with('product_unit')
             ->whereIn('id', RecommendedProduct::query()->pluck('product_id'))
             ->get()
@@ -28,7 +29,7 @@ class ProductRecommend extends Controller
     {
         $product = \App\Models\Products::findOrFail($id);
 
-        return \App\Models\Products::where('category_id', $product->category_id)
+        return \App\Models\Products::published()->where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
             ->with(['product_unit'])
             ->inRandomOrder()
@@ -50,7 +51,7 @@ class ProductRecommend extends Controller
     
     public function latestProductsRaw()
     {
-        return \App\Models\Products::with('product_unit:id,id,measure')
+        return \App\Models\Products::published()->with('product_unit:id,id,measure')
             ->select('id', 'title', 'serial_number', 'price', 'unit_id', 'image', 'created_at')
             ->orderByDesc('created_at')
             ->take(10)
@@ -98,6 +99,8 @@ class ProductRecommend extends Controller
         $categories = \App\Models\Item::select('categories.id', 'categories.name', DB::raw('SUM(items.quantity) as total'))
             ->join('products', 'items.product_id', '=', 'products.id')
             ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->where('products.is_published', true)
+            ->where('products.is_archived', false)
             ->groupBy('categories.id', 'categories.name')
             ->orderByDesc('total')
             ->limit(8)
@@ -109,7 +112,7 @@ class ProductRecommend extends Controller
             $image = null;
 
             while ($attempts < $maxAttempts) {
-                $randomProduct = \App\Models\Products::where('category_id', $category->id)
+                $randomProduct = \App\Models\Products::published()->where('category_id', $category->id)
                     ->whereNotNull('image')
                     ->inRandomOrder()
                     ->first();

@@ -14,6 +14,7 @@ use App\Models\RecommendedProduct;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ContactFormMail;
 use App\Http\Controllers\ProductRecommend;
+use App\Services\CategoryTreeService;
 
 class PagesController extends Controller
 {
@@ -22,7 +23,7 @@ class PagesController extends Controller
     {
         $highlighted = RecommendedProduct::with([
             'product' => function ($query) {
-                $query->select('id', 'title', 'serial_number', 'price', 'unit_id', 'image');
+                $query->published()->select('id', 'title', 'serial_number', 'price', 'unit_id', 'image');
             },
             'product.product_unit:id,id,measure'
         ])->get();
@@ -122,9 +123,9 @@ class PagesController extends Controller
         echo view('pages/checkout', compact('user_s', 'user_i', 'checkout_token'));
     }
     
-    public function orderpage(Request $request)
+    public function orderpage(Request $request, CategoryTreeService $tree)
     {
-        $query = Products::with('category', 'product_unit', 'special_prices');
+        $query = Products::published()->with('category', 'product_unit', 'special_prices');
 
         // KIEMELT TERMÉKEK
         if ($request->get('category') === 'highlighted') {
@@ -150,7 +151,7 @@ class PagesController extends Controller
         }
 
         elseif ($request->filled('category')) {
-            $query->where('category_id', $request->category);
+            $query->whereIn('category_id', $tree->categoryAndDescendantIds((int) $request->category));
         }
 
         if ($request->filled('search')) {
@@ -266,9 +267,9 @@ class PagesController extends Controller
 
         return view('pages.orderpage', compact('products', 'categories'));
     }
-    public function quickProductsAjax(Request $request)
+    public function quickProductsAjax(Request $request, CategoryTreeService $tree)
     {
-        $query = Products::with('product_unit');
+        $query = Products::published()->with('product_unit');
 
         // Kiemelt termékek
         if ($request->get('category') === 'highlighted') {
@@ -288,7 +289,7 @@ class PagesController extends Controller
 
         // Normál kategória ID
         elseif ($request->filled('category')) {
-            $query->where('category_id', $request->category);
+            $query->whereIn('category_id', $tree->categoryAndDescendantIds((int) $request->category));
         }
 
         // Keresés
@@ -340,7 +341,7 @@ class PagesController extends Controller
     
     public function product($id)
     {
-        $product = Products::with(['category', 'product_unit', 'special_prices'])->findOrFail($id);
+        $product = Products::published()->with(['category', 'product_unit', 'special_prices'])->findOrFail($id);
         $unit = $product->product_unit;
 
         $recommendController = new \App\Http\Controllers\ProductRecommend();
@@ -360,7 +361,9 @@ class PagesController extends Controller
 
         $query=$request->input('query');
 
-        $products=Products::where('title','like',"%$query%")->orWhere('serial_number','like',"%$query%")->get();
+        $products=Products::published()->where(function ($products) use ($query) {
+            $products->where('title','like',"%$query%")->orWhere('serial_number','like',"%$query%");
+        })->get();
         if(request()->category){
             $categories=Category::all();
             

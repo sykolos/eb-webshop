@@ -11,6 +11,6 @@ class product_unit extends Model
     protected $guarded=[];
 
     public function products(){
-        return $this->belongTo(Products::class,'unit_id');
+        return $this->hasMany(Products::class, 'unit_id');
     }
 }

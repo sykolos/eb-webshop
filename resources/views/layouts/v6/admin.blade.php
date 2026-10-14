@@ -16,6 +16,7 @@
                 <a href="{{ route('adminpanel') }}">Vezérlőpult</a>
                 <a href="{{ route('adminpanel.products') }}">Termékek</a>
                 <a href="{{ route('adminpanel.categories') }}">Kategóriák</a>
+                <a href="{{ route('adminpanel.units') }}">Mennyiségi egységek</a>
                 <a href="{{ route('adminpanel.orders') }}">Rendelések</a>
                 <a href="{{ route('adminpanel.users') }}">Felhasználók</a>
                 <a href="{{ route('adminpanel.special_prices') }}">Külön árak</a>

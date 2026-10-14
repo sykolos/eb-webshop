@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
 use App\Models\RecommendedProduct;
 use App\Services\AuditLogger;
+use App\Services\UnitCatalogService;
 
 
 class AdminController extends Controller
@@ -55,28 +56,39 @@ class AdminController extends Controller
         return back()->with('success','Sikeresen törölve');
     }
     public function units(){
-        $units = product_unit::all();
-        return view('admin.pages.units.index',['units'=>$units]);
+        $units = product_unit::withCount('products')->orderBy('unit')->get();
+        return view('admin.m06.units.index',['units'=>$units]);
     }
-    public function unit_store(Request $request)    {        
-        //validate
-        $request->validate([
-            'unit'=>'required||max:255',
-            'quantity'=>'required|numeric|min:1|max:500',
-            'measure'=>'required||max:255'
+    public function unit_store(Request $request, UnitCatalogService $units, AuditLogger $audit)    {
+        $data = $request->validate([
+            'unit' => ['required', 'string', 'max:255'],
+            'quantity' => ['required', 'integer', 'min:1', 'max:100000'],
+            'measure' => ['required', 'string', 'max:255'],
+            'is_active' => ['nullable', 'boolean'],
         ]);
-        //store
-        $unit= new product_unit();
-        $unit->unit=$request->unit;
-        $unit->quantity=$request->quantity;
-        $unit->measure=$request->measure;
-        $unit->save();
+        $unit = $units->create($data);
+        $audit->record('unit.created', $unit, ['unit' => $unit->unit, 'measure' => $unit->measure]);
 
-        //return response
         return back()->with('success','Mennyiségi egység létrehozva');
     }
-    public function unit_destroy($id){
-        product_unit::findOrFail($id)->delete();
+    public function unit_update(Request $request, int $id, UnitCatalogService $units, AuditLogger $audit){
+        $data = $request->validate([
+            'unit' => ['required', 'string', 'max:255'],
+            'quantity' => ['required', 'integer', 'min:1', 'max:100000'],
+            'measure' => ['required', 'string', 'max:255'],
+            'is_active' => ['nullable', 'boolean'],
+        ]);
+        $unit = $units->update(product_unit::findOrFail($id), $data);
+        $audit->record('unit.updated', $unit, ['unit' => $unit->unit, 'measure' => $unit->measure]);
+
+        return back()->with('success','Mennyiségi egység frissítve');
+    }
+    public function unit_destroy($id, UnitCatalogService $units, AuditLogger $audit){
+        $unit = product_unit::findOrFail($id);
+        $name = $unit->unit;
+        $units->delete($unit);
+        $audit->record('unit.deleted', $unit, ['unit' => $name]);
+
         return back()->with('success','Sikeresen törölve');
     }    
     

@@ -1,0 +1,7 @@
+@extends('layouts.v6.admin')
+@section('title', 'Termékadat-minőség')
+@section('heading', 'Termékadat-minőség')
+@section('intro', 'A javítandó termék-, kategória- és egységkapcsolatok gyors áttekintése.')
+@section('content')
+<div class="v6-section"><div class="v6-section__header"><div><span class="v6-eyebrow">M06.09</span><h2>Adatminőségi riport</h2></div><a class="v6-button v6-button--outline" href="{{ route('adminpanel.products') }}">Terméklista</a></div><div class="v6-stat-grid"><div><strong>{{ $report['duplicate_serials']->count() }}</strong><span>Duplikált cikkszám</span></div><div><strong>{{ $report['missing_category'] }}</strong><span>Hiányzó kategória</span></div><div><strong>{{ $report['missing_unit'] }}</strong><span>Hiányzó egység</span></div><div><strong>{{ $report['missing_slug'] }}</strong><span>Hiányzó slug</span></div><div><strong>{{ $report['archived'] }}</strong><span>Archivált termék</span></div></div>@if($report['duplicate_serials']->isNotEmpty())<div class="v6-table-wrap"><table class="v6-table"><thead><tr><th>Cikkszám</th><th>Darab</th></tr></thead><tbody>@foreach($report['duplicate_serials'] as $duplicate)<tr><td>{{ $duplicate->serial_number }}</td><td>{{ $duplicate->total }}</td></tr>@endforeach</tbody></table></div>@else<div class="v6-empty"><strong>Nem találtam duplikált cikkszámot.</strong><span>A riport a jelenlegi adatbázis állapotát mutatja.</span></div>@endif</div>
+@endsection
