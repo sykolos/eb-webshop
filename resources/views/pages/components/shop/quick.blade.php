@@ -7,8 +7,13 @@
         </div>
     </div>
 </div>
-<div class="col-lg-12">
-<div class="card bg-dark p-4 mb-4">
+<section class="col-12 quick-order-page" aria-label="Gyorsrendelés">
+<div class="quick-order-intro mb-4">
+    <p class="eyebrow mb-2">Gyorsrendelés</p>
+    <h2 class="h3 mb-2">Cikkszám alapján gyorsabban</h2>
+    <p class="text-muted mb-0">Keressen egy vagy több terméket, adja meg a csomagszámot, majd tegye a kosárba.</p>
+</div>
+<div class="card quick-search-panel p-4 mb-4">
     <div class="row g-3 align-items-end">
         <div class="col-md-6">
             <label for="quick-search" class="form-label fw-bold text-white">Keresés</label>
@@ -22,7 +27,7 @@
                 <option value="latest"> Új termékeink</option>
                 <option value="highlighted"> Kiemelt termékeink</option>
                 @foreach($categories as $cat)
-                    <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                    <option value="{{ $cat->id }}">{{ str_repeat('— ', min((int) ($cat->tree_level ?? 0), 5)) }}{{ $cat->name }}</option>
                 @endforeach
             </select>
         </div>
@@ -37,7 +42,7 @@
 <div id="quick-products-wrapper" class="d-grid gap-3"></div>
 
 
-</div>
+</section>
 <script>
 function loadQuickProducts() {
     $('#quick-spinner').removeClass('d-none');

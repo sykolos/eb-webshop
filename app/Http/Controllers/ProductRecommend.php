@@ -16,7 +16,7 @@ class ProductRecommend extends Controller
         $recommended = Products::query()
             ->published()
             ->with('product_unit')
-            ->whereIn('id', RecommendedProduct::query()->pluck('product_id'))
+            ->whereIn('id', RecommendedProduct::query()->orderBy('sort_order')->orderBy('id')->pluck('product_id'))
             ->get()
             ->values();
         $prices = auth()->check()
@@ -64,7 +64,7 @@ class ProductRecommend extends Controller
     public function latestProductsRaw()
     {
         return \App\Models\Products::published()->with('product_unit:id,id,measure')
-            ->select('id', 'title', 'serial_number', 'price', 'unit_id', 'image', 'created_at')
+            ->select('id', 'title', 'serial_number', 'price', 'unit_id', 'image', 'slug', 'availability_status', 'created_at')
             ->orderByDesc('created_at')
             ->take(10)
             ->get();

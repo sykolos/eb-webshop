@@ -92,7 +92,7 @@ class AdminController extends Controller
     public function recommendedEdit()
     {
         $products = Products::orderBy('id')->paginate(15);
-        $recommendedIds = RecommendedProduct::pluck('product_id')->toArray();
+        $recommendedIds = RecommendedProduct::orderBy('sort_order')->orderBy('id')->pluck('product_id')->toArray();
         $recommendedProducts = Products::whereIn('id', $recommendedIds)->get();
 
         // Itt készítjük elő a JS-ben használt adatokat
@@ -125,7 +125,7 @@ class AdminController extends Controller
         }
 
         $products = $query->orderBy('id')->paginate(15);
-        $recommendedIds = RecommendedProduct::pluck('product_id')->toArray();
+        $recommendedIds = RecommendedProduct::orderBy('sort_order')->orderBy('id')->pluck('product_id')->toArray();
 
         $html = view('admin.pages.recommended.table', compact('products', 'recommendedIds'))->render();
 
@@ -160,8 +160,11 @@ class AdminController extends Controller
             RecommendedProduct::whereIn('product_id', $idsToDelete)->delete();
         }
 
-        foreach ($incomingIds as $id) {
-            RecommendedProduct::firstOrCreate(['product_id' => $id]);
+        foreach ($incomingIds as $sortOrder => $id) {
+            RecommendedProduct::updateOrCreate(
+                ['product_id' => $id],
+                ['sort_order' => $sortOrder]
+            );
         }
 
         return redirect()->back()->with('success', 'Kiemelt termékek frissítve!');

@@ -81,7 +81,7 @@
             <div class="swiper-button-next latest-next"></div>
         </div>
         <div class="text-center mt-4">
-                <a href="#" class="btn btn-primary btn-lg px-4 me-sm-3 bg-gradient">
+                <a href="{{ route('orderpage', ['category' => 'latest']) }}" class="btn btn-primary btn-lg px-4 me-sm-3 bg-gradient">
                     Tovább az új termékekhez
                 </a>
             </div>

@@ -64,4 +64,14 @@ class ProductMediaController extends Controller
 
         return Storage::disk('private')->download($media->path, $media->original_name ?: basename($media->path));
     }
+
+    public function customerDownload(int $productId, int $mediaId)
+    {
+        Products::published()->findOrFail($productId);
+        $media = ProductMedia::where('product_id', $productId)->findOrFail($mediaId);
+        abort_unless($media->kind === 'document' && $media->disk === 'private', 404);
+        abort_unless(Storage::disk('private')->exists($media->path), 404);
+
+        return Storage::disk('private')->download($media->path, $media->original_name ?: basename($media->path));
+    }
 }

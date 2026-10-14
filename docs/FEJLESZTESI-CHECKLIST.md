@@ -1,21 +1,21 @@
 # Electrobusiness fejlesztési checklist
 
-Frissítve: 2026-10-14. Ez a megvalósítás és a folytatás elsődleges, Gitben verziózandó munkalistája.
+Frissítve: 2026-10-15. Ez a megvalósítás és a folytatás elsődleges, Gitben verziózandó munkalistája.
 Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés esetén a frissebb felhasználói döntés és ez a checklist irányadó.
 
 ## Aktuális állapot és folytatás
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M07: Egységes árképzés és admin ármátrix, STAGINGEN ELLENŐRZÖTT |
-| Következő fejlesztési feladat | M08.01 webshop főoldal és v6-alapú katalógusfolyamat |
-| Alkalmazásfejlesztés ebből a checklistből | M01-M07 stagingen ellenőrzött; M07.01-M07.07 kész |
+| Aktív mérföldkő | M08: Webshop, katalógus és keresés a v6 kinézetével, KIADÁSRA KÉSZ |
+| Következő fejlesztési feladat | M08.K4 develop push, staging workflow és M08.K5 UI átvétel |
+| Alkalmazásfejlesztés ebből a checklistből | M01-M07 stagingen ellenőrzött; M08.01-M08.09 kód kész és helyben ellenőrzött |
 | Utolsó igazolt staging kiadás | d5e7832, GitHub Actions #110: verify/deploy, admin ármátrix és partner webshop ellenőrzés sikeres |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D09 törlés technikai javaslata, D11 szolgáltató; D12-D13 későbbre halasztva |
-| Mostani változtatás | M07 központi PricingService, fixpontos ár- és áfakalkuláció, partnerenként cache/invalidation, admin ármátrix és a régi webshop/kosár/checkout árútvonalainak bekötése; a meglévő árlogika és rendelési történet megmarad |
+| Mostani változtatás | M08 v6-alapú hero, publikus ármentes katalógus, mély kategória/szűrés, partneri termékoldal, autocomplete, URL-állapot, gyorsrendelés, kiemelt sorrend és keresési indexek; az M07 meglévő árlogikája változatlan |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -156,7 +156,7 @@ A vásárlás backendben rögzített üzleti esemény és a külső viselkedési
 | M05 | ZIP-alapú designrendszer és három layout | STAGINGEN ELLENŐRZÖTT |
 | M06 | Terméktörzs, kategóriafa és webshopos szűrők adminja | STAGINGEN ELLENŐRZÖTT |
 | M07 | Egységes árképzés és admin ármátrix | STAGINGEN ELLENŐRZÖTT |
-| M08 | Webshop, katalógus és keresés a v6 kinézetével | TERVEZETT |
+| M08 | Webshop, katalógus és keresés a v6 kinézetével | KIADÁSRA KÉSZ |
 | M09 | Adatbázisos kosár és teljes rendelési folyamat | TERVEZETT |
 | M10 | Belépés, regisztrációkérés és partnerfiók | TERVEZETT |
 | M11 | Admin rendeléskezelés és kézi rendelésfelvitel | TERVEZETT |
@@ -426,33 +426,33 @@ Kiadási rekord: commit = `d5e783274a3a7fb138ca5fce9493f4e32626e857`; workflow =
 
 ## M08. Webshop, katalógus és keresés a v6 kinézetével
 
-Állapot: TERVEZETT. Függőség: M05, M06, M07; D03 eldöntve: ZIP szerinti nyilvános katalógus és partnerárak.
+Állapot: KIADÁSRA KÉSZ. Függőség: M05, M06, M07; D03 eldöntve: ZIP szerinti nyilvános katalógus és partnerárak.
 Forrás: Z: shop-experience; L: webshop, mobil, autocomplete, megtartott keresés, top termékek.
 Stagingen bemutatható eredmény: Főoldalról kereséssel vagy kategóriával valódi termékhez jutunk, mobilon is.
 
-- [ ] M08.01 Főoldal: ZIP ipari hero, főmenü, kategóriakártyák, terméksávok, partnerfelhívás és footer; a banneradmin M14-ben kapcsolódik.
-- [ ] M08.02 Katalógus rács/lista, találatszám, rendezés, lapozás, kategória/alkategória, breadcrumb és mobil szűrők.
-- [ ] M08.03 Termékkártya és termékadatlap: kép, cikkszám, műszaki adatok, dokumentumok, jelenlegi kiszerelés, elérhetőségi státusz; vendégnek ár nélküli katalógus és regisztrációkérés, jóváhagyott partnernek saját ár és vásárlás. Árak a publikus HTML/JSON-ban sem lehetnek.
-- [ ] M08.04 Főmenü autocomplete névre/cikkszámra: debounce, minimum keresési hossz, találati limit, régi válasz eldobása, billentyűzet.
-- [ ] M08.05 Keresés/szűrők/rendezés/lap az URL-ben; visszalépés és termékből listára visszatérés megőrzi az állapotot.
-- [ ] M08.06 Gyorsrendelés oldal a ZIP szerint, cikkszámkereséssel és csomagszámmal; meglévő kosárhívás kompatibilis bekötése M09-ig.
-- [ ] M08.07 Kiemelt termékek kézi szerkesztése/sorrendje; top termék modul csak valódi adatra, a végleges statisztika M15-ben.
-- [ ] M08.08 Nincs találat, hibás URL, inaktív/törölt termék, kép- vagy dokumentumhiány kezelése; régi publikus URL-ek leképezése.
-- [ ] M08.09 DB keresés/index/lapozás mérése; képek méretezése, helyi font és az oldalhoz szükséges JS.
+- [x] M08.01 Főoldal: ZIP ipari hero, főmenü, kategóriakártyák, terméksávok, partnerfelhívás és footer; a banneradmin M14-ben kapcsolódik.
+- [x] M08.02 Katalógus rács/lista, találatszám, rendezés, lapozás, kategória/alkategória, breadcrumb és mobil szűrők.
+- [x] M08.03 Termékkártya és termékadatlap: kép, cikkszám, műszaki adatok, dokumentumok, jelenlegi kiszerelés, elérhetőségi státusz; vendégnek ár nélküli katalógus és regisztrációkérés, jóváhagyott partnernek saját ár és vásárlás. Árak a publikus HTML/JSON-ban sem lehetnek.
+- [x] M08.04 Főmenü autocomplete névre/cikkszámra: debounce, minimum keresési hossz, találati limit, régi válasz eldobása, billentyűzet.
+- [x] M08.05 Keresés/szűrők/rendezés/lap az URL-ben; visszalépés és termékből listára visszatérés megőrzi az állapotot.
+- [x] M08.06 Gyorsrendelés oldal a ZIP szerint, cikkszámkereséssel és csomagszámmal; meglévő kosárhívás kompatibilis bekötése M09-ig.
+- [x] M08.07 Kiemelt termékek kézi szerkesztése/sorrendje; top termék modul csak valódi adatra, a végleges statisztika M15-ben.
+- [x] M08.08 Nincs találat, hibás URL, inaktív/törölt termék, kép- vagy dokumentumhiány kezelése; régi publikus URL-ek leképezése.
+- [x] M08.09 DB keresés/index/lapozás mérése; képek méretezése, helyi font és az oldalhoz szükséges JS.
 
 Ellenőrzés: Keresés -> szűrés -> adatlap -> vissza út; mobil navigáció; vendég/partner árjogosultság; kép/PDF linkek; teljesítménymérés.
 Adat/deploy: Slug és URL mapping bővítő migrációval, régi URL-ek átirányítási jegyzéke.
 
 ### M08 kiadási kapuk
 
-- [ ] M08.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
-- [ ] M08.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
-- [ ] M08.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [x] M08.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [x] M08.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
+- [x] M08.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
 - [ ] M08.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
 - [ ] M08.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
 - [ ] M08.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
 
-Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+Kiadási rekord: commit = készítés alatt; workflow = még nincs; staging próba = még nem futott. Helyi bizonyíték: M08 célteszt 4 teszt / 17 assertion, teljes PHPUnit 65 teszt / 265 assertion, `npm run build`, Blade cache, PHP lint, route-list és `git diff --check` sikeres. Új migrációk: `2026_10_15_130000_add_catalog_search_indexes`, `2026_10_15_140000_add_sort_order_to_recommended_products`; meglévő termék-, ár- és rendelési adatot nem törölnek. A buildben látható Sass/Bootstrap deprecation figyelmeztetések meglévő technikai adósságok, teljes Bootstrap/jQuery kivezetése M21.
 
 ## M09. Adatbázisos kosár és teljes rendelési folyamat
 
@@ -1124,6 +1124,13 @@ Kiadási bejegyzéshez szükséges részletek:
 - Reszponzív ellenőrzés: a termékűrlap 390x844, 768x1024 és 1440x900 viewporton betöltött, vízszintes túlcsordulás nélkül. Helyi ellenőrzés ismét sikeres: 57 PHPUnit teszt / 237 assertion, Blade cache, Vite build és diff-check.
 - M06 állapota STAGINGEN ELLENŐRZÖTT; M06.K1-K6 teljesült. Ismert korlát: a legacy azonosító-típusok miatt az új katalóguskapcsolatok adatbázis-idegenkulcs nélkül, explicit Eloquent-kapcsolatokkal működnek; mennyiségi raktárkönyvelés és alacsony készletfigyelés továbbra M19.
 - Következő konkrét feladat: M07.01, a jelenlegi partner-/termék-/termékköri speciális árak, kedvezménypreferencia, összeadás és kerekítés regressziós rögzítése.
+
+### 2026-10-15: M08 kód kész, staging kiadás előtt
+
+- Elkészült a v6 referencia szerinti főoldali hero és navigációs kereső, a publikus ármentes katalógus, a mély kategória- és szűrőfolyamat, a slugos termékoldal, partneri ár/vásárlás, elérhetőségi státusz, dokumentumletöltés, gyorsrendelés és üres állapotok.
+- A kereső URL-ben tartja az állapotot, az autocomplete natív JavaScriptet használ debounce-szal, stale-válasz eldobással és billentyűzetes navigációval. A publikus JSON és HTML nem ad partnerárat. A kiemelt termékek admin sorrendje `sort_order` mezővel és fel/le vezérléssel tartós.
+- Helyben ellenőrizve: M08 célteszt 4/17, teljes PHPUnit 65/265, Vite build, Blade cache, PHP lint, route-list és diff-check. A két új migráció visszagörgethető; nincs új környezeti változó vagy feature flag.
+- Állapot: M08 KIADÁSRA KÉSZ. Következő lépés: egy commit és develop push, meglévő staging workflow megvárása, majd `/`, `/shop`, autocomplete, vendég/partner termékoldal és admin kiemelt sorrend ellenőrzése 390/768/1440 px-en.
 
 ### Következő munkamenet sablonja
 

@@ -17,6 +17,7 @@
                             <th>#</th>
                             <th>Cikkszám</th>
                             <th>Megnevezés</th>
+                            <th class="text-end">Sorrend</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -97,11 +98,11 @@ $(document).ready(function () {
         $tbody.empty();
 
         if (selectedProductIds.size === 0) {
-            $tbody.append('<tr><td colspan="3" class="text-muted text-center">Nincs jelenleg kiemelt termék</td></tr>');
+            $tbody.append('<tr><td colspan="4" class="text-muted text-center">Nincs jelenleg kiemelt termék</td></tr>');
             return;
         }
 
-        selectedProductIds.forEach(id => {
+        Array.from(selectedProductIds).forEach((id, index, ids) => {
             let serial = '', title = '';
 
             // Asztali DOM-ból próbálja kiszedni
@@ -114,8 +115,20 @@ $(document).ready(function () {
                 title = window.recommendedData[id].title;
             }
 
-            $tbody.append(`<tr data-id="${id}"><td>${id}</td><td>${serial}</td><td>${title}</td></tr>`);
+            const $row = $(`<tr data-id="${id}"><td>${index + 1}</td><td>${serial}</td><td>${title}</td><td class="text-end"><button type="button" class="btn btn-sm btn-outline-secondary move-recommended-up" ${index === 0 ? 'disabled' : ''} aria-label="Fel" title="Fel">↑</button> <button type="button" class="btn btn-sm btn-outline-secondary move-recommended-down" ${index === ids.length - 1 ? 'disabled' : ''} aria-label="Le" title="Le">↓</button> <button type="button" class="btn btn-sm btn-outline-danger remove-recommended" aria-label="Eltávolítás" title="Eltávolítás">×</button></td></tr>`);
+            $tbody.append($row);
         });
+    }
+
+    function moveSelected(id, direction) {
+        const ids = Array.from(selectedProductIds);
+        const index = ids.indexOf(id);
+        const target = index + direction;
+        if (index < 0 || target < 0 || target >= ids.length) return;
+        [ids[index], ids[target]] = [ids[target], ids[index]];
+        selectedProductIds = new Set(ids);
+        renderLiveList();
+        updateUrl();
     }
 
     function bindCheckboxes() {
@@ -135,6 +148,25 @@ $(document).ready(function () {
             updateUrl();
         });
     }
+
+    $('#recommended-live-table tbody').on('click', '.remove-recommended', function (event) {
+        event.stopPropagation();
+        const id = $(this).closest('tr').data('id').toString();
+        selectedProductIds.delete(id);
+        $('.product-checkbox[value="' + id + '"]').prop('checked', false);
+        renderLiveList();
+        updateUrl();
+    });
+
+    $('#recommended-live-table tbody').on('click', '.move-recommended-up', function (event) {
+        event.stopPropagation();
+        moveSelected($(this).closest('tr').data('id').toString(), -1);
+    });
+
+    $('#recommended-live-table tbody').on('click', '.move-recommended-down', function (event) {
+        event.stopPropagation();
+        moveSelected($(this).closest('tr').data('id').toString(), 1);
+    });
 
     $('#recommended-live-table tbody').on('click', 'tr[data-id]', function () {
         const id = $(this).data('id').toString();

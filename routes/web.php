@@ -44,15 +44,18 @@ Route::get('contact/',[PagesController::class,'contact'])->name('contact');
 Route::get('cart/',[PagesController::class,'cart'])->name('cart')->middleware('auth');
 Route::get('checkout/',[PagesController::class,'checkout'])->name('checkout')->middleware('auth');
 Route::post('validcheckout/',[Checkout::class,'checkout'])->name('validcheckout')->middleware('auth');
-Route::get('products/{id}',[PagesController::class,'product'])->name('product')->middleware('auth');
-Route::get('shop/',[PagesController::class,'orderpage'])->name('orderpage')->middleware('auth');
+Route::get('products/{id}',[PagesController::class,'product'])->whereNumber('id')->name('product');
+Route::get('termekek/{slug}',[PagesController::class,'productBySlug'])->name('product.slug');
+Route::get('shop/',[PagesController::class,'orderpage'])->name('orderpage');
+Route::get('quick-order/',[PagesController::class,'quickOrder'])->name('quickorder');
 Route::post('/shop/view-mode', function (\Illuminate\Http\Request $request) {
     $request->validate(['view' => 'required|in:quick,normal']);
     session(['shop_view' => $request->view]);
     return back();
 })->name('shop.setViewMode');
 Route::get('/shop/quick-products', [PagesController::class, 'quickProductsAjax'])->name('shop.quick.products');
-Route::get('search/',[PagesController::class,'search'])->name('search')->middleware('auth');
+Route::get('search/autocomplete', [PagesController::class, 'autocomplete'])->name('search.autocomplete');
+Route::get('search/',[PagesController::class,'search'])->name('search');
 //cart
 
 Route::post('add-to-cart/{id}/{q}/{m}',[CartController::class,'addtocart'])
@@ -85,6 +88,8 @@ Route::post('/login',[AuthController::class,'postlogin'])->name('login.submit')-
 Route::post('logout/',[AuthController::class,'postlogout'])->name('logout')->middleware('auth');
 
 Route::middleware('auth')->group(function () {
+    Route::get('/products/{productId}/media/{mediaId}/download', [ProductMediaController::class, 'customerDownload'])
+        ->whereNumber('productId')->whereNumber('mediaId')->name('product.media.download');
     Route::get('/private-files/{path}', [PrivateFileController::class, 'download'])
         ->where('path', '.*')
         ->middleware('signed')

@@ -15,6 +15,69 @@
 .navbar-brand img
 	height: 45px
 	width: auto
+
+.site-search
+	position: relative
+	width: min(100%, 360px)
+	text-transform: none
+
+.site-search__control
+	display: flex
+	align-items: center
+	background: #fff
+	border: 1px solid rgba(17, 24, 32, .2)
+	border-radius: 4px
+	overflow: hidden
+
+	input
+		width: 100%
+	min-width: 0
+	padding: .55rem .75rem
+	border: 0
+	outline: 0
+	font-size: .9rem
+
+	button
+		width: 42px
+		height: 42px
+		flex: 0 0 42px
+		border: 0
+		background: $primary-color
+		color: #fff
+
+.search-suggestions
+	display: none
+	position: absolute
+	top: calc(100% + 4px)
+	left: 0
+	right: 0
+	z-index: 1100
+	background: #fff
+	border: 1px solid rgba(17, 24, 32, .16)
+	box-shadow: 0 8px 24px rgba(17, 24, 32, .16)
+
+	&.is-visible
+		display: block
+
+	a
+		display: block
+		padding: .7rem .8rem
+		color: var(--bs-heading-color)
+		text-decoration: none
+		text-transform: none
+
+		&:hover, &:focus, &.is-active
+			background: #f2f4f5
+
+	.search-suggestion-title
+		display: block
+		font-weight: 600
+
+	.search-suggestion-meta
+		display: block
+		margin-top: .15rem
+		color: #6c757d
+		font-size: .78rem
 footer a
 	text-decoration: none
 footer hr
@@ -70,6 +133,13 @@ footer hr
 	.navbar-nav .nav-item
 		width: 100%
 		text-align: center
+
+	.site-search
+		width: 100%
+		margin: .75rem 0
+
+	.site-search__control
+		width: 100%
 
 	#cart-icon-container
 		position: relative

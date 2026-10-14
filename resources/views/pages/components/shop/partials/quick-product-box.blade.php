@@ -16,8 +16,11 @@
 
             {{-- Szövegblokk --}}
             <div class="flex-grow-1" style="min-width: 0;">
+                @php
+                    $productUrl = $product->slug ? route('product.slug', $product->slug) : route('product', $product->id);
+                @endphp
                 <h5 class="mb-1" style="white-space: normal;">
-                    <a href="{{ route('product', $product->id) }}"
+                    <a href="{{ $productUrl }}"
                        class="text-decoration-none text-dark"
                        style="display: inline-block; max-width: 100%; white-space: normal; word-break: break-word; overflow-wrap: break-word; hyphens: auto;"
                        lang="hu">
@@ -29,16 +32,27 @@
                     {{ $product->description }}
                 </div>
 
+                <div class="small mb-2">
+                    <span class="availability-badge availability-{{ $product->availability_status ?? 'in_stock' }}">
+                        {{ \App\Models\Products::AVAILABILITY_STATUSES[$product->availability_status ?? 'in_stock'] ?? 'Elérhetőség egyeztetés alatt' }}
+                    </span>
+                    <span class="text-muted ms-2">Cikkszám: {{ $product->serial_number }}</span>
+                </div>
+
                 @if($product->product_unit)
                     <div class="d-flex align-items-center gap-3 small flex-wrap">
                         <div>
                             <strong>Kiszerelés:</strong>
                             {{ $product->product_unit->unit }} ({{ $product->product_unit->quantity }}{{ $product->product_unit->measure }})
                         </div>
-                        <div class="bg-light px-2 py-1 rounded border d-inline-flex align-items-center gap-1 text-danger fs-6 fw-bold unit-price-box">
-                            <i class="bi bi-tag"></i>
-                            Egységár: <strong class="text-dark">{{ $product->pricing['final_price'] ?? $product->getPriceForUser() }} Ft</strong>
-                        </div>
+                        @auth
+                            <div class="bg-light px-2 py-1 rounded border d-inline-flex align-items-center gap-1 text-danger fs-6 fw-bold unit-price-box">
+                                <i class="bi bi-tag" aria-hidden="true"></i>
+                                Egységár: <strong class="text-dark">{{ $product->pricing['final_price'] ?? $product->getPriceForUser() }} Ft</strong>
+                            </div>
+                        @else
+                            <span class="text-muted">Partnerár és vásárlás belépés után</span>
+                        @endauth
                     </div>
                 @endif
             </div>
@@ -46,7 +60,8 @@
 
         {{-- Jobb oldal: mennyiség + gomb --}}
         <div class="col-12 col-md-auto d-flex flex-column align-items-end align-items-md-center text-end quick-controls gap-2">
-            @if($product->product_unit)
+            @auth
+                @if($product->product_unit)
                 <div class="d-flex flex-column align-items-end align-items-md-center">
                     <div class="input-group input-group-sm" style="max-width: 150px;">
                         <input type="number" name="quantity"
@@ -61,19 +76,23 @@
                         <span class="text-muted small">+ Áfa</span>
                     </div>
                 </div>
-            @endif
+                @endif
 
-            <button class="btn btn-primary btn-lg w-100 w-md-auto bg-gradient add-to-cart"
-                    data-url="{{ route('addtocart', ['id' => $product->id, 'q' => $product->product_unit->quantity ?? 1, 'm' => $product->product_unit->measure ?? 'db']) }}"
-                    data-id="{{ $product->id }}"
-                    data-q="{{ $product->product_unit->quantity ?? 1 }}"
-                    data-m="{{ $product->product_unit->measure ?? 'db' }}">
-                Kosárba
-            </button>
+                <button class="btn btn-primary btn-lg w-100 w-md-auto bg-gradient add-to-cart"
+                        data-url="{{ route('addtocart', ['id' => $product->id, 'q' => $product->product_unit->quantity ?? 1, 'm' => $product->product_unit->measure ?? 'db']) }}"
+                        data-id="{{ $product->id }}"
+                        data-q="{{ $product->product_unit->quantity ?? 1 }}"
+                        data-m="{{ $product->product_unit->measure ?? 'db' }}">
+                    <i class="bi bi-cart-plus" aria-hidden="true"></i> Kosárba
+                </button>
+            @else
+                <a class="btn btn-outline-dark w-100" href="{{ route('login') }}">Partner belépés</a>
+            @endauth
         </div>
     </div>
 </div>
 
+@auth
 <script>
 $(document).ready(function () {
     $('.quick-quantity').each(function () {
@@ -97,3 +116,4 @@ $(document).ready(function () {
     
 });
 </script>
+@endauth

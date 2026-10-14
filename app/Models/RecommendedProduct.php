@@ -9,7 +9,11 @@ class RecommendedProduct extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['product_id'];
+    protected $fillable = ['product_id', 'sort_order'];
+
+    protected $casts = [
+        'sort_order' => 'integer',
+    ];
 
     public function product()
     {

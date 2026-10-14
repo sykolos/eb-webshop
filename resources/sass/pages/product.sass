@@ -23,6 +23,174 @@
     .product-list
         width: 100%
 
+.catalog-intro
+    padding: 7rem 0 2rem
+    background: #f2f4f5
+    border-bottom: 1px solid rgba(17, 24, 32, .1)
+
+.catalog-heading h1
+    font-size: 2.4rem
+    font-weight: 700
+
+.catalog-breadcrumb
+    font-size: .85rem
+
+.catalog-sidebar
+    position: sticky
+    top: 90px
+
+    .card
+        border: 1px solid rgba(17, 24, 32, .12)
+        border-radius: 4px
+        box-shadow: 0 4px 16px rgba(17, 24, 32, .05)
+
+    .card-header
+        background: #111820
+        color: #fff
+        font-weight: 700
+
+.catalog-category-list li
+    padding-left: calc(var(--category-level, 0) * .8rem)
+
+    a
+        display: block
+        padding: .35rem 0
+        color: #28323a
+        text-decoration: none
+
+        &:hover, &.is-active
+            color: $primary-color
+            font-weight: 700
+
+.catalog-empty
+    min-height: 300px
+    border: 1px dashed rgba(17, 24, 32, .25)
+    background: #f8f9fa
+
+.availability-badge
+    display: inline-flex
+    align-items: center
+    padding: .25rem .5rem
+    border-radius: 2px
+    font-size: .7rem
+    font-weight: 700
+    line-height: 1.2
+
+.availability-in_stock
+    background: #d9f1e2
+    color: #146c3a
+
+.availability-supplier_stock
+    background: #dcecff
+    color: #1559a6
+
+.availability-procurement
+    background: #fff0c7
+    color: #805b00
+
+.availability-out_of_stock
+    background: #f8d7da
+    color: #842029
+
+.quick-order-page
+    .quick-search-panel
+        border: 0
+        border-radius: 4px
+        background: #111820
+        color: #fff
+
+.product-detail
+    padding-top: 1rem
+
+.product-gallery
+    padding: 1rem
+    background: #f2f4f5
+    border-radius: 4px
+
+    &__main
+        display: block
+        width: 100%
+        max-height: 560px
+        object-fit: contain
+        aspect-ratio: 1 / 1
+
+    &__thumbs
+        display: flex
+        gap: .6rem
+        margin-top: .75rem
+        overflow-x: auto
+
+        img
+            width: 72px
+            height: 72px
+            flex: 0 0 72px
+            object-fit: cover
+            border: 1px solid rgba(17, 24, 32, .18)
+
+.product-detail__title
+    font-size: 2.4rem
+    font-weight: 700
+
+.product-purchase-panel, .partner-gate
+    padding: 1.25rem
+    border: 1px solid rgba(17, 24, 32, .15)
+    border-radius: 4px
+    background: #f8f9fa
+
+.product-price-large
+    margin-bottom: 1rem
+    font-size: 2rem
+    font-weight: 700
+
+    span
+        display: block
+        color: #6c757d
+        font-size: .9rem
+        font-weight: 400
+
+.product-detail-section
+    padding-top: 1.25rem
+    border-top: 2px solid #111820
+
+.specification-list
+    div
+        display: grid
+        grid-template-columns: minmax(8rem, 40%) 1fr
+        gap: 1rem
+        padding: .7rem 0
+        border-bottom: 1px solid rgba(17, 24, 32, .1)
+
+    dt, dd
+        margin: 0
+
+    dt
+        color: #6c757d
+
+.document-list li
+    padding: .55rem 0
+    border-bottom: 1px solid rgba(17, 24, 32, .1)
+
+    a
+        color: #111820
+        text-decoration: none
+
+        &:hover
+            color: $primary-color
+
+@media (max-width: 991px)
+    .catalog-sidebar
+        position: static
+
+@media (max-width: 576px)
+    .catalog-intro
+        padding-top: 6rem
+
+    .catalog-heading h1, .product-detail__title
+        font-size: 1.9rem
+
+    .products-row
+        gap: .7rem
+
 
 .swiper-slide 
     display: flex !important

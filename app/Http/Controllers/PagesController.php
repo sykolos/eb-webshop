@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\ContactFormMail;
 use App\Http\Controllers\ProductRecommend;
 use App\Services\CategoryTreeService;
+use App\Services\FilterCatalogService;
 use App\Services\PricingService;
 
 class PagesController extends Controller
@@ -22,9 +23,9 @@ class PagesController extends Controller
     //home
     public function home(PricingService $pricing)
     {
-        $highlighted = RecommendedProduct::with([
+        $highlighted = RecommendedProduct::query()->orderBy('sort_order')->orderBy('id')->with([
             'product' => function ($query) {
-                $query->published()->select('id', 'title', 'serial_number', 'price', 'unit_id', 'image');
+                $query->published()->select('id', 'title', 'serial_number', 'price', 'unit_id', 'image', 'slug', 'availability_status');
             },
             'product.product_unit:id,id,measure'
         ])->get();
@@ -133,9 +134,10 @@ class PagesController extends Controller
         echo view('pages/checkout', compact('user_s', 'user_i', 'checkout_token'));
     }
     
-    public function orderpage(Request $request, CategoryTreeService $tree, PricingService $pricing)
+    public function orderpage(Request $request, CategoryTreeService $tree, FilterCatalogService $filters, PricingService $pricing)
     {
         $query = Products::published()->with('category', 'product_unit');
+        $activeCategory = $this->resolveShopCategory($request->get('category'));
 
         // KIEMELT TERMÉKEK
         if ($request->get('category') === 'highlighted') {
@@ -160,19 +162,32 @@ class PagesController extends Controller
             }
         }
 
-        elseif ($request->filled('category')) {
-            $query->whereIn('category_id', $tree->categoryAndDescendantIds((int) $request->category));
+        elseif ($activeCategory) {
+                $query->whereIn('category_id', $tree->categoryAndDescendantIds((int) $activeCategory->id));
         }
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('title', 'like', "%{$request->search}%")
+                ->orWhere('serial_number', 'like', "%{$request->search}%")
+                ->orWhere('manufacturer', 'like', "%{$request->search}%")
                 ->orWhere('description', 'like', "%{$request->search}%");
             });
         }
 
+        if (in_array($request->get('availability'), Products::availabilityStatuses(), true)) {
+            $query->where('availability_status', $request->get('availability'));
+        }
+
+        foreach ((array) $request->get('filter', []) as $valueIds) {
+            $valueIds = array_values(array_filter(array_map('intval', (array) $valueIds)));
+            if ($valueIds !== []) {
+                $query->whereHas('filterValues', fn ($filterQuery) => $filterQuery->whereIn('filter_values.id', $valueIds));
+            }
+        }
+
        
-        $categoryId = $request->category;
+        $categoryId = $activeCategory?->id ?? $request->category;
 
         if ($categoryId == 11 && $request->filled('kapcsolo')) {
             $query->where(function ($q) use ($request) {
@@ -274,9 +289,12 @@ class PagesController extends Controller
 
         $products = $query->paginate(12)->onEachSide(0)->appends($request->query());
         $this->attachPricing($products, $pricing);
-        $categories = Category::all();
+        $categories = $tree->flatten($tree->roots(true));
+        $filterDefinitions = $filters->definitionsForCategory($activeCategory);
+        $breadcrumbs = $this->shopBreadcrumbs($activeCategory);
+        $viewMode = $request->get('view', session('shop_view', 'normal'));
 
-        return view('pages.orderpage', compact('products', 'categories'));
+        return view('pages.orderpage', compact('products', 'categories', 'filterDefinitions', 'activeCategory', 'breadcrumbs', 'viewMode'));
     }
     public function quickProductsAjax(Request $request, CategoryTreeService $tree, PricingService $pricing)
     {
@@ -307,6 +325,7 @@ class PagesController extends Controller
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('title', 'like', "%{$request->search}%")
+                ->orWhere('serial_number', 'like', "%{$request->search}%")
                 ->orWhere('description', 'like', "%{$request->search}%");
             });
         }
@@ -353,7 +372,9 @@ class PagesController extends Controller
     
     public function product($id, PricingService $pricing)
     {
-        $product = Products::published()->with(['category', 'product_unit'])->findOrFail($id);
+        $product = Products::published()->with([
+            'category', 'product_unit', 'media', 'filterValues.definition',
+        ])->findOrFail($id);
         $this->attachPricing(collect([$product]), $pricing);
         $unit = $product->product_unit;
 
@@ -368,25 +389,82 @@ class PagesController extends Controller
         ]);
     }
 
-    public function search(Request $request, PricingService $pricing){
+    public function productBySlug(string $slug, PricingService $pricing)
+    {
+        $product = Products::published()->where('slug', $slug)->firstOrFail();
+
+        return $this->product($product->id, $pricing);
+    }
+
+    public function search(Request $request){
         $request->validate(
             ['query'=>'required|min:3']
         );
 
         $query=$request->input('query');
 
-        $products=Products::published()->with('product_unit')->where(function ($products) use ($query) {
-            $products->where('title','like',"%$query%")->orWhere('serial_number','like',"%$query%");
-        })->get();
-        $this->attachPricing($products, $pricing);
-        if(request()->category){
-            $categories=Category::all();
-            
-        }
-        else{$categories=Category::all();
+        return redirect()->route('orderpage', ['search' => $query]);
+    }
+
+    public function autocomplete(Request $request)
+    {
+        $query = trim((string) $request->get('q', ''));
+        if (mb_strlen($query) < 2) {
+            return response()->json(['results' => []]);
         }
 
-        return view('pages/search-result',['products'=>$products,'categories'=>$categories]);
+        $results = Products::published()
+            ->where(fn ($builder) => $builder
+                ->where('title', 'like', '%'.$query.'%')
+                ->orWhere('serial_number', 'like', '%'.$query.'%'))
+            ->orderByRaw('CASE WHEN serial_number LIKE ? THEN 0 ELSE 1 END', [$query.'%'])
+            ->orderBy('title')
+            ->limit(8)
+            ->get(['id', 'slug', 'title', 'serial_number', 'image'])
+            ->map(fn (Products $product) => [
+                'id' => $product->id,
+                'title' => $product->title,
+                'serial_number' => $product->serial_number,
+                'image' => $product->image,
+                'url' => $product->slug
+                    ? route('product.slug', $product->slug)
+                    : route('product', $product->id),
+            ]);
+
+        return response()->json(['results' => $results]);
+    }
+
+    public function quickOrder(Request $request)
+    {
+        return redirect()->route('orderpage', ['view' => 'quick']);
+    }
+
+    private function resolveShopCategory(mixed $value): ?Category
+    {
+        if (!$value || in_array($value, ['latest', 'highlighted'], true)) {
+            return null;
+        }
+
+        return is_numeric($value)
+            ? Category::query()->active()->find((int) $value)
+            : Category::query()->active()->where('slug', $value)->first();
+    }
+
+    private function shopBreadcrumbs(?Category $category): array
+    {
+        if (!$category) {
+            return [];
+        }
+
+        $categories = Category::whereIn('id', app(CategoryTreeService::class)->ancestorIds($category->id))
+            ->get()->keyBy('id');
+
+        return collect(app(CategoryTreeService::class)->ancestorIds($category->id))
+            ->reverse()
+            ->map(fn ($id) => $categories->get($id))
+            ->filter()
+            ->values()
+            ->all();
     }
 
     private function attachPricing(iterable $products, PricingService $pricing): void
