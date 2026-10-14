@@ -16,6 +16,9 @@
 # Logok és cache
 /storage/framework/*
 !/storage/framework/.gitignore
+!/storage/framework/cache/
+!/storage/framework/sessions/
+!/storage/framework/views/
 
 
 # Laravel Mix / Vite build output
