@@ -1034,7 +1034,7 @@ Kiadási bejegyzéshez szükséges részletek:
 - A kosár +/- módosítása csak `-1` vagy `+1` lépést fogad el; hibás index és hibás lépés validációs hibát ad, a meglévő mennyiség nem módosul. Négy új Feature regresszióteszt fedi le a hozzáadást, hibás mennyiséget, ismeretlen terméket és léptetést.
 - Módosított fájlok: `app/Http/Controllers/CartController.php`, `routes/web.php`, `tests/Feature/ExampleTest.php`. Nincs migráció, árváltozás, session-struktúra-átállás vagy deploy-környezeti előfeltétel.
 - Helyben PHP lint és `git diff --check` sikeres. A helyi PHPUnit adatbázisteszt nem indult el, mert a gépen nincs PDO SQLite-driver; a feature [#48](https://github.com/sykolos/eb-webshop/actions/runs/38588072011) és develop/staging [#49](https://github.com/sykolos/eb-webshop/actions/runs/38588688231) verify/deploy sikeres. A staging `/`, `/contact`, `/login` végpontjai HTTP 200 választ adtak.
-- Az `ee86f8e` SHA mindkét távoli ágon azonos. M02.03 stagingen ellenőrzött; M02 közös kapui nyitva maradnak, mert M02.04-M02.08 még nincs elkészítve. M01.08 valódi partner/admin staging-belépési próba külön nyitott elfogadási pont.
+- Az alkalmazáskód SHA-ja `ee86f8e`; a checklistet rögzítő docs-only kiadás `da04511`, amely mindkét távoli ágat és a staginget jelenleg vezeti. M02.03 stagingen ellenőrzött; M02 közös kapui nyitva maradnak, mert M02.04-M02.08 még nincs elkészítve. M01.08 valódi partner/admin staging-belépési próba külön nyitott elfogadási pont.
 - Következő konkrét fejlesztés: M02.04 checkout tranzakció, ismételt beküldés elleni védelem, hiányzó számlázási adatok és megszűnt termék kezelése; az M01.08 élő login-próba dedikált tesztadatot igényel.
 
 ### Következő munkamenet sablonja
