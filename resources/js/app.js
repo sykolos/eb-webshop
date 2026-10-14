@@ -44,13 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-document.querySelectorAll('.dropdown-toggle').forEach((el) => {
-    el.addEventListener('click', function (e) {
-        e.preventDefault(); // ha kell
-        bootstrap.Dropdown.getOrCreateInstance(el).toggle();
-    });
-});
-
 function closePopup() {
     const overlay = document.getElementById('popupOverlay');
     if (overlay) {
