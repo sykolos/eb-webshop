@@ -97,4 +97,9 @@ class ExampleTest extends TestCase
         $this->actingAs($otherUser)->get('/account/getpdf/'.$order->id)->assertForbidden();
         $this->actingAs($owner)->get('/account/details/'.$order->id)->assertOk();
     }
+
+    public function test_cache_clear_is_not_exposed_as_a_public_route(): void
+    {
+        $this->get('/clear')->assertNotFound();
+    }
 }

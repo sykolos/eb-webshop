@@ -237,10 +237,3 @@ Route::post('/change-password', [AuthController::class, 'updatePassword'])->name
 
 //-------------sending emails
 Route::post('/send-contact',[PagesController::class,'sendContact'])->name('sendContact');
-
-
-
-Route::get('/clear', function() {
-    Artisan::call('optimize:clear');
-    return redirect()->back();
-});

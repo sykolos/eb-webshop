@@ -220,7 +220,7 @@ Forrás: L: biztonság; K: konkrét kódhiányok.
 Stagingen bemutatható eredmény: A régi felület a javított hozzáférésekkel és rendelésmentéssel tovább használható.
 
 - [x] M02.01 OrderPolicy és tulajdonosszűrés a fiókbeli rendelésrészletnél és PDF-letöltésnél; cím- és kosárhozzáférések átvizsgálása.
-- [ ] M02.02 Nyilvános /clear eltávolítása; üzemeltetési cache-törlés csak CLI/deploy folyamatból.
+- [x] M02.02 Nyilvános /clear eltávolítása; üzemeltetési cache-törlés csak CLI/deploy folyamatból.
 - [ ] M02.03 Kosármennyiség, termékazonosító és kiszerelés validációja; a kliens q/m paramétere ne dönthesse el az üzleti mennyiséget.
 - [ ] M02.04 Checkout tranzakció és ismételt beküldés elleni védelem; hiányzó számlázási adatok és megszűnt termék kezelése.
 - [ ] M02.05 Státuszmódosítás engedélyezett értékeinek és átmeneteinek validálása; a teljes új munkafolyamat M11-ben készül.
@@ -1005,6 +1005,12 @@ Kiadási bejegyzéshez szükséges részletek:
 - Helyi teljes PHPUnit: 31 teszt / 108 assertion. CI-ban build, ShellCheck, kilenc Linux deploy-forgatókönyv és PHPUnit sikeres. A kiadás a meglévő deploybeállításokkal történt.
 - M02.01 stagingen van, de M02 teljes mérföldköve és a kiadási kapui nyitva maradnak. M01.08 valódi staging partner/admin belépése továbbra nincs igazolva.
 - Következő fejlesztési pont: M02.02, a publikus `/clear` végpont eltávolítása; utána ismét célzott CI és staging kiadás.
+
+### 2026-10-14: M02.02 nyilvános cache-törlés eltávolítása
+
+- A `routes/web.php` nyilvános `/clear` útvonala törölve. Cache-törlés kizárólag a meglévő deploy CLI-folyamatban maradt.
+- Új regresszióteszt igazolja, hogy `/clear` 404-et ad. Helyi teljes teszt a változtatás után futtatandó; nincs migráció és nincs adatváltozás.
+- Következő: célzott CI, develop integráció és a működő staging kiadási út ellenőrzése. M02.03 a következő alkalmazásfeladat.
 
 ### 2026-10-14: M02.01 rendelés-tulajdonosvédelem
 
