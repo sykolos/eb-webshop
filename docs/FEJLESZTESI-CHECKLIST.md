@@ -8,7 +8,7 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 | Mező | Aktuális érték |
 | --- | --- |
 | Aktív mérföldkő | M06: Terméktörzs, kategóriafa és webshopos szűrők adminja, KIADÁSRA KÉSZ |
-| Következő fejlesztési feladat | M06.K4 develop integráció, staging deploy és admin ellenőrzés |
+| Következő fejlesztési feladat | M06.K4 javított migrációval új develop integráció, staging deploy és admin ellenőrzés |
 | Alkalmazásfejlesztés ebből a checklistből | M01-M05 stagingen; M06 lokálisan és CI-kompatibilis állapotban, stagingre vár |
 | Utolsó igazolt staging kiadás | bb4022d, GitHub Actions #103: verify/deploy és staging preview ellenőrzés sikeres |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
@@ -392,7 +392,7 @@ Adat/deploy: Bővítő migráció, visszakövethető kategória/egység mapping,
 - [ ] M06.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
 - [ ] M06.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
 
-Kiadási rekord: commit = előkészítés alatt; workflow = nincs; staging próba = nem futott. Helyi bizonyíték: M06 célteszt 6/6, teljes PHPUnit 57 teszt / 237 assertion, Vite build, PHP lint, route-list, Blade cache és diff-check sikeres. A SQLite PDO modult a helyi CLI explicit betöltésével kellett indítani; ez környezeti futtatási eltérés, nem alkalmazási függőség.
+Kiadási rekord: commit = 06e72b6; workflow = #106, verify sikeres, deploy sikertelen a legacy products.id és az új foreignId eltérése miatt; a deploy automatikusan visszaállította a korábbi kiadást. Staging próba = nem futott. Helyi bizonyíték: M06 célteszt 6/6, teljes PHPUnit 57 teszt / 237 assertion, Vite build, PHP lint, route-list, Blade cache és diff-check sikeres. Javítás: az M06 kapcsolati oszlopai idegenkulcs nélkül, az alkalmazás által kezelt legacy-kapcsolatként készülnek; nincs adatvesztés vagy új környezeti előfeltétel.
 
 ## M07. Egységes árképzés és admin ármátrix
 
@@ -1108,6 +1108,12 @@ Kiadási bejegyzéshez szükséges részletek:
 - Új migrációk: 2026_10_14_180000_expand_catalog_for_m06 és 2026_10_14_180100_create_catalog_filters_and_media; visszagörgetésük a bővített oszlopokat és M06 táblákat eltávolítja, a meglévő products.image értékeket a médiatárba importálják. Új környezeti változó vagy feature flag nincs.
 - Ellenőrzés: M06 célteszt 6/6; teljes PHPUnit 57 teszt / 237 assertion; npm run build, PHP lint, route-list, Blade view cache és git diff --check sikeres. A SQLite PDO modult explicit CLI kapcsolóval kellett betölteni, mert az alap PHP CLI konfigurációból hiányzik.
 - Állapot: M06 KIADÁSRA KÉSZ; M06.K1-K3 kész. M06.K4-K6 még nincs rögzítve: a következő lépés egyetlen develop integráció/push, a meglévő staging workflow megvárása, majd a bejelentkezett admin termék/kategória/egység/média ellenőrzése asztali és mobil nézetben.
+
+### 2026-10-14: M06 első staging deploy javítása
+
+- A 06e72b6 verify jobja sikeres volt, a staging deploy azonban a product_media.product_id idegenkulcs létrehozásánál megállt errno: 150 hibával. A deploy előtti preflight és a rollback működött: a staging szolgáltatás karbantartási mód nélkül, a korábbi kiadással maradt elérhető.
+- A javítás az új M06 pivot/média kapcsolati oszlopokat idegenkulcs nélkül hozza létre, mert a meglévő legacy táblák azonosító-típusa stagingenként eltérhet. A kapcsolatok Eloquent oldalon explicit kulcsokkal működnek, az adatbázis nem töröl történeti terméket/kategóriát kaszkáddal.
+- Következő: a javító commit developra pusholása, a workflow sikerének megvárása, majd az M06 admin staging ellenőrzése. Sikertelen #106 után új deploy futás szükséges; a korábbi kiadás visszaállítása megtörtént.
 
 ### Következő munkamenet sablonja
 

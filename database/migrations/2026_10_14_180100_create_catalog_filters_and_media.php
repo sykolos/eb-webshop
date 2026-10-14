@@ -12,7 +12,8 @@ return new class extends Migration
         if (!Schema::hasTable('product_media')) {
             Schema::create('product_media', function (Blueprint $table): void {
                 $table->id();
-                $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
+                // A legacy products.id típusa telepítésenként eltérhet; az alkalmazás kezeli a kapcsolatot.
+                $table->unsignedBigInteger('product_id');
                 $table->string('kind', 20)->default('image');
                 $table->string('disk', 20)->default('public');
                 $table->string('path');
@@ -71,7 +72,7 @@ return new class extends Migration
         if (!Schema::hasTable('filter_values')) {
             Schema::create('filter_values', function (Blueprint $table): void {
                 $table->id();
-                $table->foreignId('filter_definition_id')->constrained('filter_definitions')->cascadeOnDelete();
+                $table->unsignedBigInteger('filter_definition_id');
                 $table->string('label');
                 $table->string('slug');
                 $table->boolean('is_active')->default(true)->index();
@@ -83,16 +84,16 @@ return new class extends Migration
 
         if (!Schema::hasTable('category_filter_definition')) {
             Schema::create('category_filter_definition', function (Blueprint $table): void {
-                $table->foreignId('category_id')->constrained('categories')->cascadeOnDelete();
-                $table->foreignId('filter_definition_id')->constrained('filter_definitions')->cascadeOnDelete();
+                $table->unsignedBigInteger('category_id');
+                $table->unsignedBigInteger('filter_definition_id');
                 $table->primary(['category_id', 'filter_definition_id']);
             });
         }
 
         if (!Schema::hasTable('product_filter_value')) {
             Schema::create('product_filter_value', function (Blueprint $table): void {
-                $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
-                $table->foreignId('filter_value_id')->constrained('filter_values')->cascadeOnDelete();
+                $table->unsignedBigInteger('product_id');
+                $table->unsignedBigInteger('filter_value_id');
                 $table->primary(['product_id', 'filter_value_id']);
             });
         }
