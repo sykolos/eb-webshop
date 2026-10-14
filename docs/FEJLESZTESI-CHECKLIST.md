@@ -7,10 +7,10 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M06: Terméktörzs, kategóriafa és webshopos szűrők adminja, KIADÁSRA KÉSZ |
-| Következő fejlesztési feladat | M06.K4 javított migrációval új develop integráció, staging deploy és admin ellenőrzés |
-| Alkalmazásfejlesztés ebből a checklistből | M01-M05 stagingen; M06 lokálisan és CI-kompatibilis állapotban, stagingre vár |
-| Utolsó igazolt staging kiadás | bb4022d, GitHub Actions #103: verify/deploy és staging preview ellenőrzés sikeres |
+| Aktív mérföldkő | M06: Terméktörzs, kategóriafa és webshopos szűrők adminja, STAGINGEN ELLENŐRZÖTT |
+| Következő fejlesztési feladat | M07.01 jelenlegi ár- és kedvezményszabályok regressziós rögzítése |
+| Alkalmazásfejlesztés ebből a checklistből | M01-M06 stagingen; M07.01 a következő fejlesztési pont |
+| Utolsó igazolt staging kiadás | 7dc6771, GitHub Actions #109: verify/deploy és M06 admin ellenőrzés sikeres |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
@@ -365,7 +365,7 @@ Kiadási rekord: commit = `bb4022dbcdf66b84ab14e74f49fae60a9deea339`; develop/st
 
 ## M06. Terméktörzs, kategóriafa és webshopos szűrők adminja
 
-Állapot: KIADÁSRA KÉSZ. Függőség: M04, M05.
+Állapot: STAGINGEN ELLENŐRZÖTT. Függőség: M04, M05.
 Forrás: Z: product-editor, taxonomy, admin-workflows; L: kategória/alkategória, termékek, szűrők.
 Stagingen bemutatható eredmény: Az adminban létrehozott vagy szerkesztett termék és kategória tartósan mentődik, a régi webshop kompatibilis marad.
 
@@ -388,11 +388,11 @@ Adat/deploy: Bővítő migráció, visszakövethető kategória/egység mapping,
 - [x] M06.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
 - [x] M06.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
 - [x] M06.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
-- [ ] M06.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
-- [ ] M06.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
-- [ ] M06.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+- [x] M06.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [x] M06.K5 A kiadott SHA stagingen ellenőrizve: terméklista, kategóriafa, egységadmin és új termékűrlap betöltött; a három termékfül működött; a 390/768/1440px viewportokban nem volt vízszintes túlcsordulás.
+- [x] M06.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
 
-Kiadási rekord: commit = 06e72b6; workflow = #106, verify sikeres, deploy sikertelen a legacy products.id és az új foreignId eltérése miatt; a deploy automatikusan visszaállította a korábbi kiadást. Staging próba = nem futott. Helyi bizonyíték: M06 célteszt 6/6, teljes PHPUnit 57 teszt / 237 assertion, Vite build, PHP lint, route-list, Blade cache és diff-check sikeres. Javítás: az M06 kapcsolati oszlopai idegenkulcs nélkül, az alkalmazás által kezelt legacy-kapcsolatként készülnek; nincs adatvesztés vagy új környezeti előfeltétel.
+Kiadási rekord: a kezdeti `06e72b6` / [#106](https://github.com/sykolos/eb-webshop/actions/runs/38643592087) deploy a legacy `products.id` és az új `foreignId` eltérése miatt visszaállt. A kapcsolati oszlopok javítása után `17b6a67` / [#107](https://github.com/sykolos/eb-webshop/actions/runs/38644001602) sikeresen stagingre került, majd a Blade-kompatibilitási javítás `64c9fde` / [#108](https://github.com/sykolos/eb-webshop/actions/runs/38644448761) után a végleges `7dc67714bd621a42af1e970e8df524f1dbf68f7b` / [#109](https://github.com/sykolos/eb-webshop/actions/runs/38644876368) verify és deploy is sikeres lett. Helyi bizonyíték: M06 célteszt 6/6, teljes PHPUnit 57 teszt / 237 assertion, Vite build, PHP lint, route-list, Blade cache és diff-check sikeres. Stagingen a terméklista 280 termékkel, a 20 csomópontos kategóriafa, a 41 egység és az új termékűrlap betöltött; a termékfülek és az elérhetőségi státuszok láthatók, a reszponzív viewport-ellenőrzés nem talált vízszintes túlcsordulást. A legacy kapcsolatokat az alkalmazás explicit kezeli, nincs adatvesztés vagy új környezeti előfeltétel. Következő konkrét feladat: M07.01, a jelenlegi rugalmas partner-/termék-/termékköri árképzés regressziós rögzítése.
 
 ## M07. Egységes árképzés és admin ármátrix
 
@@ -1114,6 +1114,14 @@ Kiadási bejegyzéshez szükséges részletek:
 - A 06e72b6 verify jobja sikeres volt, a staging deploy azonban a product_media.product_id idegenkulcs létrehozásánál megállt errno: 150 hibával. A deploy előtti preflight és a rollback működött: a staging szolgáltatás karbantartási mód nélkül, a korábbi kiadással maradt elérhető.
 - A javítás az új M06 pivot/média kapcsolati oszlopokat idegenkulcs nélkül hozza létre, mert a meglévő legacy táblák azonosító-típusa stagingenként eltérhet. A kapcsolatok Eloquent oldalon explicit kulcsokkal működnek, az adatbázis nem töröl történeti terméket/kategóriát kaszkáddal.
 - Következő: a javító commit developra pusholása, a workflow sikerének megvárása, majd az M06 admin staging ellenőrzése. Sikertelen #106 után új deploy futás szükséges; a korábbi kiadás visszaállítása megtörtént. A #107 sikeres deploy után a terméklista, kategóriafa és egységadmin betöltött, a termék létrehozó nézet Blade-kompatibilitási hibája külön javítást igényel.
+
+### 2026-10-15: M06 staging ellenőrzés lezárva
+
+- A termékűrlap Laravel 12-kompatibilitási javítása elkészült: a rövid `@php(...)` helyett blokkos Blade-szintaxis került a nézetbe. A `7dc6771` commit developra került, a [#109](https://github.com/sykolos/eb-webshop/actions/runs/38644876368) verify és deploy jobja sikeres.
+- Stagingen cache-busteres új oldalbetöltéssel az `/adminpanel/products/create` 200-as admin nézetként betöltött; az Alapadatok, Műszaki adatok és Képek és szűrők fülek működtek. A terméklista 280 terméket, a kategóriaadmin 20 csomópontot, az egységadmin 41 egységet mutatott.
+- Reszponzív ellenőrzés: a termékűrlap 390x844, 768x1024 és 1440x900 viewporton betöltött, vízszintes túlcsordulás nélkül. Helyi ellenőrzés ismét sikeres: 57 PHPUnit teszt / 237 assertion, Blade cache, Vite build és diff-check.
+- M06 állapota STAGINGEN ELLENŐRZÖTT; M06.K1-K6 teljesült. Ismert korlát: a legacy azonosító-típusok miatt az új katalóguskapcsolatok adatbázis-idegenkulcs nélkül, explicit Eloquent-kapcsolatokkal működnek; mennyiségi raktárkönyvelés és alacsony készletfigyelés továbbra M19.
+- Következő konkrét feladat: M07.01, a jelenlegi partner-/termék-/termékköri speciális árak, kedvezménypreferencia, összeadás és kerekítés regressziós rögzítése.
 
 ### Következő munkamenet sablonja
 
