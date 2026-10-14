@@ -9,7 +9,9 @@ use App\Models\product_unit;
 use App\Models\User_invoce;
 use App\Models\User_shipping;
 use App\Services\CheckoutService;
+use App\Http\Controllers\CartController;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
@@ -236,6 +238,22 @@ class ExampleTest extends TestCase
         $this->post(route('cart.update'), ['key' => 0, 'change' => 1])
             ->assertNoContent();
         $this->assertSame(3, session('cart.0.quantity'));
+    }
+
+    public function test_cart_count_has_one_controller_route_and_returns_session_quantity(): void
+    {
+        $routes = collect(Route::getRoutes()->getRoutesByName('cart.count'));
+
+        $this->assertCount(1, $routes);
+        $this->assertSame(CartController::class, $routes->first()->getControllerClass());
+        $this->assertSame('cartCount', $routes->first()->getActionMethod());
+
+        $this->withSession(['cart' => [
+            ['quantity' => 2],
+            ['quantity' => 3],
+        ]])->get(route('cart.count'))
+            ->assertOk()
+            ->assertJson(['count' => 5]);
     }
 
     public function test_checkout_rejects_missing_billing_data_without_creating_an_order(): void

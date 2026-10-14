@@ -64,6 +64,7 @@
             @endif
 
             <button class="btn btn-primary btn-lg w-100 w-md-auto bg-gradient add-to-cart"
+                    data-url="{{ route('addtocart', ['id' => $product->id, 'q' => $product->product_unit->quantity ?? 1, 'm' => $product->product_unit->measure ?? 'db']) }}"
                     data-id="{{ $product->id }}"
                     data-q="{{ $product->product_unit->quantity ?? 1 }}"
                     data-m="{{ $product->product_unit->measure ?? 'db' }}">

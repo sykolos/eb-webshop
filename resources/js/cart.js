@@ -1,5 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
     const csrf = document.querySelector('meta[name="csrf-token"]').content;
+    const cartRoot = document.getElementById('cart-icon-container');
+    const cartRoutes = {
+        update: cartRoot?.dataset.updateUrl || '/cart/update',
+        remove: cartRoot?.dataset.removeUrl || '/cart/remove',
+    };
 
     function showSpinner() {
         document.getElementById('ajax-spinner').style.display = 'block';
@@ -50,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             showSpinner();
 
-            fetch("/cart/update", {
+            fetch(cartRoutes.update, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -91,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             showSpinner();
 
-            fetch("/cart/remove", {
+            fetch(cartRoutes.remove, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",

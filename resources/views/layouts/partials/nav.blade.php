@@ -28,7 +28,12 @@
                   <a class="nav-link" href="{{ route('orderpage') }}">Webshop</a>
                 </li>
 
-                <li class="nav-item" id="cart-icon-container" style="position: relative; z-index: 1050;">
+                <li class="nav-item" id="cart-icon-container"
+                    data-count-url="{{ route('cart.count') }}"
+                    data-preview-url="{{ route('cart.preview') }}"
+                    data-update-url="{{ route('cart.update') }}"
+                    data-remove-url="{{ route('cart.remove') }}"
+                    style="position: relative; z-index: 1050;">
                   <a class="nav-link position-relative" href="{{ route('cart') }}">
                     Kosár
                     <span id="cart-count" class="cart-badge badge-custom">
@@ -68,4 +73,3 @@
         </div>
       </nav>
 
-      

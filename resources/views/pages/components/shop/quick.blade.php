@@ -69,15 +69,13 @@ $(document).on('click', '#quick-products-wrapper .pagination a', function (e) {
 $(document).on('click', '.add-to-cart', function () {
     const $button = $(this);
     const card = $button.closest('.card');
-    const id = $button.data('id');
-    const q = $button.data('q');
-    const m = $button.data('m');
+    const url = $button.data('url');
     const quantity = card.find('.quick-quantity').val() || 1;
 
     const originalText = $button.html();
     $button.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1" role="status"></span>');
 
-    $.post('/add-to-cart/' + id + '/' + q + '/' + m, {
+    $.post(url, {
         _token: '{{ csrf_token() }}',
         quantity: quantity
     }).done(function () {

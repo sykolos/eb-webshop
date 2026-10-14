@@ -1,4 +1,11 @@
 let previewTimer = null;
+const cartRoot = document.getElementById('cart-icon-container');
+const cartRoutes = {
+	count: cartRoot?.dataset.countUrl || '/cart/count',
+	preview: cartRoot?.dataset.previewUrl || '/cart/preview',
+	update: cartRoot?.dataset.updateUrl || '/cart/update',
+	remove: cartRoot?.dataset.removeUrl || '/cart/remove',
+};
 
 // Mobilon nem aktiváljuk a hoveres előnézetet
 const isDesktop = window.innerWidth > 768;
@@ -13,7 +20,7 @@ if (isDesktop) {
 			.stop()
 			.fadeIn(150);
 
-		$.get("/cart/preview", function (data) {
+		$.get(cartRoutes.preview, function (data) {
 			$('#cart-preview').html(data);
 		});
 	});
@@ -42,7 +49,7 @@ $(document).on('click', '.btn-increase, .btn-decrease', function () {
 	//  Spinner jelenjen meg azonnal
 	$('#cart-preview').html('<div class="text-center py-3"><div class="spinner-border" role="status"></div></div>');
 
-	$.post('/cart/update', { key, change, _token: token }, function () {
+	$.post(cartRoutes.update, { key, change, _token: token }, function () {
 		reloadCartPreview();
 		updateCartCount();
 	});
@@ -57,7 +64,7 @@ $(document).on('click', '.btn-remove', function () {
 	$('#cart-preview').html('<div class="text-center py-3"><div class="spinner-border" role="status"></div></div>');
 
 	$.ajax({
-		url: '/cart/remove',
+		url: cartRoutes.remove,
 		type: 'DELETE',
 		data: { key, _token: token },
 		success: function () {
@@ -69,14 +76,14 @@ $(document).on('click', '.btn-remove', function () {
 
 // Kosár újratöltés
 function reloadCartPreview() {
-	$.get("/cart/preview", function (data) {
+	$.get(cartRoutes.preview, function (data) {
 		$('#cart-preview').html(data);
 	});
 }
 
 // Kosár badge frissítés
 window.updateCartCount = function updateCartCount() {
-	$.get('/cart/count', function (data) {
+	$.get(cartRoutes.count, function (data) {
 		$('.cart-badge').text(data.count);
 	});
 }

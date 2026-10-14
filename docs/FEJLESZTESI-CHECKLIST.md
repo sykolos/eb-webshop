@@ -8,14 +8,14 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 | Mező | Aktuális érték |
 | --- | --- |
 | Aktív mérföldkő | M02: kritikus biztonsági és rendelési javítások, FOLYAMATBAN; M02.01-M02.06 stagingen |
-| Következő fejlesztési feladat | M02.07 duplikált cart.count és hibás/hiányzó kosár route-controller összerendelések; az M01.08 élő staging partner/admin próba külön nyitott átadási pont |
+| Következő fejlesztési feladat | M02.07 kosár route-controller tisztítás elkészült; az M01.08 élő staging partner/admin próba külön nyitott átadási pont; ezt követi M02.08 |
 | Alkalmazásfejlesztés ebből a checklistből | M01 elkezdve; stagingvédelem, tesztkapu és deploy megerősítése |
 | Utolsó igazolt staging kiadás | cd0b7e316364f73fecf6722c12a25710602237e7, GitHub Actions #63: verify/deploy/HTTP sikeres; M02.06 stagingen |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D09 törlés technikai javaslata, D11 szolgáltató; D12-D13 későbbre halasztva |
-| Mostani változtatás | M02.06 auth- és email-végpontok stagingen ellenőrzött védelme; egységes jelszószabály, név szerinti rate limiterek és teljes logout-session érvénytelenítés került be; M02.07 következik |
+| Mostani változtatás | M02.07 kosár route-controller tisztítás folyamatban; a duplikált `cart.count` route megszűnik, a hívó JavaScript név szerinti route-adatokat használ |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -225,7 +225,7 @@ Stagingen bemutatható eredmény: A régi felület a javított hozzáférésekke
 - [x] M02.04 Checkout tranzakció és ismételt beküldés elleni védelem; hiányzó számlázási adatok és megszűnt termék kezelése.
 - [x] M02.05 Státuszmódosítás engedélyezett értékeinek és átmeneteinek validálása; a teljes új munkafolyamat M11-ben készül.
 - [x] M02.06 Login, regisztrációkérés, jelszóreset, email és kapcsolat végpontok próbálkozáskorlátja; logout session-érvénytelenítés és egységes jelszóvalidáció.
-- [ ] M02.07 Duplikált cart.count és hibás/hiányzó kosár route-controller összerendelések rendezése a hívó felületekkel együtt.
+- [x] M02.07 Duplikált cart.count és hibás/hiányzó kosár route-controller összerendelések rendezése a hívó felületekkel együtt.
 - [ ] M02.08 Kritikus biztonsági regressziós tesztek; talált további kockázatok pontos felvétele a checklistbe.
 
 Ellenőrzés: A partner nem érheti el B rendelését/PDF-jét; hibás mennyiség elutasítva; dupla beküldés egy rendelés; részleges mentés visszagörgetve.
