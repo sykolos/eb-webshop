@@ -7,7 +7,7 @@ use App\Models\Category;
 use App\Models\product_unit;
 use App\Models\Products;
 use Illuminate\Http\Request;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\Laravel\Facades\Image;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
@@ -70,7 +70,7 @@ class ProductController extends Controller
 
         // 2. KÉP KONVERTÁLÁS ÉS MENTÉS
         $filename = 'products/' . Str::uuid() . '.webp'; // Egyedi név
-        $image = Image::make($request->file('image'))->encode('webp', 90);
+        $image = Image::read($request->file('image'))->toWebp(90);
         Storage::disk('public')->put($filename, $image); // Mentés storage/app/public/products/…
 
         // 3. ADATBÁZISBA MENTÉS
@@ -123,7 +123,7 @@ class ProductController extends Controller
 
             // Új WebP név és mentés
             $filename = 'products/' . Str::uuid() . '.webp';
-            $webp = Image::make($request->file('image'))->encode('webp', 90);
+            $webp = Image::read($request->file('image'))->toWebp(90);
             Storage::disk('public')->put($filename, $webp);
 
             $imagePath = $filename;

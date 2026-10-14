@@ -41,6 +41,7 @@ Desktop.ini
 
 # tesztek
 /.phpunit.result.cache
+/.phpunit.cache/
 
 # Lokális adatbázismentés vagy dump fájlok
 *.sql

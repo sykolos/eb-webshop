@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Process\Process;
 
 class DeploymentEntryPointTest extends TestCase
@@ -80,7 +81,7 @@ class DeploymentEntryPointTest extends TestCase
         $this->assertSame('MAINTENANCE', $this->runEntryPoint()->getOutput());
     }
 
-    /** @dataProvider deploymentPaths */
+    #[DataProvider('deploymentPaths')]
     public function test_build_configuration_validates_server_layout(string $app, string $public, bool $valid): void
     {
         mkdir($this->directory.'/scripts/deploy', 0777, true);

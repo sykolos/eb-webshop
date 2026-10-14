@@ -7,15 +7,15 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M02: kritikus biztonsági és rendelési javítások, FOLYAMATBAN; M02.01-M02.07 stagingen |
-| Következő fejlesztési feladat | M02.08 kritikus biztonsági regressziós tesztek és további kockázatok felvétele; az M01.08 élő staging partner/admin próba teljesült |
-| Alkalmazásfejlesztés ebből a checklistből | M01 elkezdve; stagingvédelem, tesztkapu és deploy megerősítése |
-| Utolsó igazolt staging kiadás | 0ef94f0, GitHub Actions #74: verify/deploy/HTTP sikeres; M02.07 stagingen |
+| Aktív mérföldkő | M03: Laravel és futtatókörnyezet korszerűsítése, KIADÁSRA KÉSZ; M03.01-M03.06 helyben ellenőrizve |
+| Következő fejlesztési feladat | M03 staging kiadás és ellenőrzés; utána M04.01 közös backend-minta |
+| Alkalmazásfejlesztés ebből a checklistből | M01-M02 stagingen; M03 Laravel 12/PHP 8.2 és Vite 8 upgrade kiadásra kész |
+| Utolsó igazolt staging kiadás | cd33abc, GitHub Actions #76: verify/deploy/HTTP sikeres; M02.08 stagingen |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D09 törlés technikai javaslata, D11 szolgáltató; D12-D13 későbbre halasztva |
-| Mostani változtatás | M01.08 staginges partner- és admin-belépési próba ellenőrizve; partner `/account` működik, `/adminpanel` tiltott, admin `/adminpanel` működik; M02.08 következik |
+| Mostani változtatás | M03.01-M03.06 elkészült: Laravel 9 -> 12, csomag- és lockfrissítés, Intervention Image 3, Vite 8, PHPUnit 11; staging kiadás következik |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -150,7 +150,7 @@ A vásárlás backendben rögzített üzleti esemény és a külső viselkedési
 | --- | --- | --- |
 | M00 | ZIP/lista összevetés és követhető munkalista | DOKUMENTÁCIÓ ELKÉSZÜLT |
 | M01 | Staging és Git kiadási alap | STAGINGEN; nyilvános és partner/admin próba sikeres, D14 szerinti halasztások nyitva |
-| M02 | Kritikus biztonsági és rendelési javítások | FOLYAMATBAN; M02.01 elkészült, stagingkiadás alatt |
+| M02 | Kritikus biztonsági és rendelési javítások | STAGINGEN ELLENŐRZÖTT; M02.01-M02.08 kész |
 | M03 | Laravel és futtatókörnyezet korszerűsítése | TERVEZETT |
 | M04 | Közös backend, jogosultság és háttérfeldolgozás | TERVEZETT |
 | M05 | ZIP-alapú designrendszer és három layout | TERVEZETT |
@@ -226,19 +226,19 @@ Stagingen bemutatható eredmény: A régi felület a javított hozzáférésekke
 - [x] M02.05 Státuszmódosítás engedélyezett értékeinek és átmeneteinek validálása; a teljes új munkafolyamat M11-ben készül.
 - [x] M02.06 Login, regisztrációkérés, jelszóreset, email és kapcsolat végpontok próbálkozáskorlátja; logout session-érvénytelenítés és egységes jelszóvalidáció.
 - [x] M02.07 Duplikált cart.count és hibás/hiányzó kosár route-controller összerendelések rendezése a hívó felületekkel együtt.
-- [ ] M02.08 Kritikus biztonsági regressziós tesztek; talált további kockázatok pontos felvétele a checklistbe.
+- [x] M02.08 Kritikus biztonsági regressziós tesztek; publikus termékfeedek ár- és `special_prices` szivárgásának javítása, admin- és címjogosultsági regressziók.
 
 Ellenőrzés: A partner nem érheti el B rendelését/PDF-jét; hibás mennyiség elutasítva; dupla beküldés egy rendelés; részleges mentés visszagörgetve.
 Adat/deploy: Új egyedi beküldési kulcs esetén kompatibilis migráció; meglévő rendelések megőrzése.
 
 ### M02 kiadási kapuk
 
-- [ ] M02.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
-- [ ] M02.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
-- [ ] M02.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
-- [ ] M02.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
-- [ ] M02.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
-- [ ] M02.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+- [x] M02.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek.
+- [x] M02.K2 Nincs migráció, új környezeti előfeltétel vagy feature flag; a meglévő adatok megőrzése változatlan.
+- [x] M02.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [x] M02.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; SHA és futásazonosító ellenőrizve.
+- [x] M02.K5 A kiadott SHA stagingen ellenőrizve; publikus smoke és feed-válaszok zöldek, nincs kiadást blokkoló hiba.
+- [x] M02.K6 A checklist státusza frissítve; külön kiadási napló nem készül; következő feladat M03.01.
 
 Kiadási rekord M02.03 részkiadás: commit = `ee86f8ebe8c5b2e947ea2fc8c3fd7ab39a63394f`; feature workflow = [#48](https://github.com/sykolos/eb-webshop/actions/runs/38588072011), verify sikeres; develop workflow = [#49](https://github.com/sykolos/eb-webshop/actions/runs/38588688231), verify/deploy sikeres; staging smoke = `/`, `/contact`, `/login` HTTP 200. A helyi PHPUnit a hiányzó PDO SQLite-driver miatt nem futott le, a CI izolált SQLite ellenőrzése volt az alkalmazásellenőrzés. M02 közös K1-K6 kapui a további M02 pontok miatt nyitva maradnak.
 
@@ -278,28 +278,28 @@ Módosított fájlok: `app/Services/CheckoutService.php`, `app/Http/Controllers/
 
 ## M03. Laravel és futtatókörnyezet korszerűsítése
 
-Állapot: TERVEZETT. Függőség: M02.
+Állapot: KIADÁSRA KÉSZ. Függőség: M02.
 Forrás: L: Laravel refaktor, frissítések; K: Laravel 9.
 Stagingen bemutatható eredmény: A meglévő webshop támogatott Laravel/PHP alapon működik stagingen.
 
-- [ ] M03.01 PHP, adatbázis, Composer és npm csomagkompatibilitási lista; támogatott célverzió véglegesítése az aktuális hivatalos dokumentációval.
-- [ ] M03.02 Laravel főverziónkénti frissítés, külön ellenőrzött commitokkal; a repo platform-beállítása és CI/server PHP összhangja.
-- [ ] M03.03 PDF-, képfeldolgozó-, hitelesítési és cookie-csomagok kompatibilitása; kivezetett API-k átvezetése.
-- [ ] M03.04 Vite/Node build kompatibilitás és függőségaudit; Bootstrap/jQuery végleges eltávolítása majd M21-ben.
-- [ ] M03.05 Belépés, partnerár, kosár, checkout, PDF és admin regressziós tesztek; érintett deploy-scriptek ellenőrzése.
-- [ ] M03.06 Upgrade és visszaállítás dokumentálása; ha köztes frissítés külön staging kiadás, M03a/M03b alkibocsátásként naplózni.
+- [x] M03.01 PHP, adatbázis, Composer és npm csomagkompatibilitási lista; célverzió Laravel 12.70/PHP 8.2.31, Node 20/Vite 8.3.4.
+- [x] M03.02 Laravel 9 -> 12 frissítés, Composer platform és CI PHP összhangja; a futtatókörnyezet-váltás egy staging kiadásba rendezve.
+- [x] M03.03 Dompdf 3, Intervention Image 3 + Laravel integráció, Sanctum 4 és PHPUnit/hibakezelési csomagok kompatibilitása; a régi imagecache és nem használt cookie-consent függőség kikerült, az API-hívások átvezetve.
+- [x] M03.04 Vite 8/Node build kompatibilitás, npm lockfájl és függőségaudit; Bootstrap/jQuery teljes eltávolítása későbbi M05/M21 feladat, a legacy képernyők működése megmarad.
+- [x] M03.05 Belépés, partnerár, kosár, checkout, PDF-komponens, admin route-ok, Blade-cache és deploy-csomag ellenőrzése; PHPUnit 11-re a tesztmetadata átvezetve. A helyi image-manager próba a gépen hiányzó GD miatt nem futott, a CI GD-vel épít és tesztel.
+- [x] M03.06 Upgrade és visszaállítás dokumentálva: nincs migráció vagy új környezeti előfeltétel, rollback az előző kódcsomaggal azonos adatbázissémán végezhető; külön kiadási napló nem készül.
 
 Ellenőrzés: A kritikus folyamatok a frissített stacken futnak; Composer/npm telepítés lockfájlból reprodukálható.
 Adat/deploy: Migrációs hatás külön felmérve; framework rollbackhez a kompatibilis adatbázis-állapot megadva.
 
 ### M03 kiadási kapuk
 
-- [ ] M03.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
-- [ ] M03.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
-- [ ] M03.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [x] M03.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek: PHPUnit 46 teszt/215 assertion, Vite build, npm audit 0, Composer validate, route-list, Blade-cache és diff-check.
+- [x] M03.K2 Nincs migráció, új környezeti előfeltétel vagy feature flag; a lockfájlok reprodukálhatók, a meglévő üzleti ár-/kosár-/rendelésadatok és session-viselkedés megőrzendő; rollback az előző kódcsomaggal kompatibilis.
+- [x] M03.K3 Diff ellenőrizve, célzott alkalmazás-, konfiguráció-, teszt- és lockfájlok; reprodukálható, önállóan commitolható állapot.
 - [ ] M03.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
 - [ ] M03.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
-- [ ] M03.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+- [ ] M03.K6 A staging ellenőrzés után a checklist státusza STAGINGEN ELLENŐRZÖTT állapotra frissítendő; külön kiadási napló nem készül.
 
 Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
 

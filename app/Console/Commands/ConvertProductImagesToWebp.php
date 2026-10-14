@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\Laravel\Facades\Image;
 use Illuminate\Support\Str;
 use App\Models\Products;
 
@@ -35,7 +35,7 @@ class ConvertProductImagesToWebp extends Command
 
             // fájl betöltése
             $imageData = Storage::disk('public')->get($oldPath);
-            $image = Image::make($imageData)->encode('webp', 90);
+            $image = Image::read($imageData)->toWebp(90);
 
             // új fájlnév
             $newPath = 'products/' . Str::uuid() . '.webp';
