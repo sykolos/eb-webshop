@@ -7,10 +7,10 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M08: Webshop, katalógus és keresés a v6 kinézetével, KIADÁSRA KÉSZ |
-| Következő fejlesztési feladat | M08.K4 develop push, staging workflow és M08.K5 UI átvétel |
-| Alkalmazásfejlesztés ebből a checklistből | M01-M07 stagingen ellenőrzött; M08.01-M08.09 kód kész és helyben ellenőrzött |
-| Utolsó igazolt staging kiadás | d5e7832, GitHub Actions #110: verify/deploy, admin ármátrix és partner webshop ellenőrzés sikeres |
+| Aktív mérföldkő | M08: Webshop, katalógus és keresés a v6 kinézetével, STAGINGEN ELLENŐRZÖTT |
+| Következő fejlesztési feladat | M09.01 CartService és adatbázisos kosár alapmodell |
+| Alkalmazásfejlesztés ebből a checklistből | M01-M08 stagingen ellenőrzött; M09 a következő fejlesztési mérföldkő |
+| Utolsó igazolt staging kiadás | f9f3a39, GitHub Actions #117: verify/deploy, fiókmenü, autocomplete és M08 UI átvétel sikeres |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
@@ -156,7 +156,7 @@ A vásárlás backendben rögzített üzleti esemény és a külső viselkedési
 | M05 | ZIP-alapú designrendszer és három layout | STAGINGEN ELLENŐRZÖTT |
 | M06 | Terméktörzs, kategóriafa és webshopos szűrők adminja | STAGINGEN ELLENŐRZÖTT |
 | M07 | Egységes árképzés és admin ármátrix | STAGINGEN ELLENŐRZÖTT |
-| M08 | Webshop, katalógus és keresés a v6 kinézetével | KIADÁSRA KÉSZ |
+| M08 | Webshop, katalógus és keresés a v6 kinézetével | STAGINGEN ELLENŐRZÖTT |
 | M09 | Adatbázisos kosár és teljes rendelési folyamat | TERVEZETT |
 | M10 | Belépés, regisztrációkérés és partnerfiók | TERVEZETT |
 | M11 | Admin rendeléskezelés és kézi rendelésfelvitel | TERVEZETT |
@@ -448,11 +448,11 @@ Adat/deploy: Slug és URL mapping bővítő migrációval, régi URL-ek átirán
 - [x] M08.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
 - [x] M08.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
 - [x] M08.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
-- [ ] M08.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
-- [ ] M08.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
-- [ ] M08.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+- [x] M08.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [x] M08.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
+- [x] M08.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
 
-Kiadási rekord: commit = készítés alatt; workflow = még nincs; staging próba = még nem futott. Helyi bizonyíték: M08 célteszt 4 teszt / 17 assertion, teljes PHPUnit 65 teszt / 265 assertion, `npm run build`, Blade cache, PHP lint, route-list és `git diff --check` sikeres. Új migrációk: `2026_10_15_130000_add_catalog_search_indexes`, `2026_10_15_140000_add_sort_order_to_recommended_products`; meglévő termék-, ár- és rendelési adatot nem törölnek. A buildben látható Sass/Bootstrap deprecation figyelmeztetések meglévő technikai adósságok, teljes Bootstrap/jQuery kivezetése M21.
+Kiadási rekord: commit = `f9f3a39`; workflow = [GitHub Actions #117](https://github.com/sykolos/eb-webshop/actions/runs/38651616855), verify/deploy sikeres; staging = `https://ebtest.dekor26.hu`. Helyi bizonyíték: korábbi M08 célteszt 4 teszt / 17 assertion és teljes PHPUnit 66 teszt / 268 assertion sikeres; a legutóbbi JS-javítás után `npm run build`, PHP lint és `git diff --check` sikeres. A helyi PHPUnit újrafuttatása ezen a gépen blokkolt, mert a PHP CLI-ben nincs PDO SQLite driver; a #117 CI verify ezt a teljes tesztlépést sikeresen lefuttatta. Stagingen igazolva: menü egyszeri nyitása, 5 autocomplete találat ár nélkül, vendég termékoldal/JSON ár nélkül, partner termékoldal árral és kosárgombbal, főoldali hero, admin kiemelt sorrend, 390/768/1440 px vízszintes túlcsordulás nélkül. Új migrációk: `2026_10_15_130000_add_catalog_search_indexes`, `2026_10_15_140000_add_sort_order_to_recommended_products`; meglévő termék-, ár- és rendelési adatot nem törölnek. A buildben látható Sass/Bootstrap deprecation figyelmeztetések meglévő technikai adósságok, teljes Bootstrap/jQuery kivezetése M21.
 
 ## M09. Adatbázisos kosár és teljes rendelési folyamat
 
@@ -1125,12 +1125,14 @@ Kiadási bejegyzéshez szükséges részletek:
 - M06 állapota STAGINGEN ELLENŐRZÖTT; M06.K1-K6 teljesült. Ismert korlát: a legacy azonosító-típusok miatt az új katalóguskapcsolatok adatbázis-idegenkulcs nélkül, explicit Eloquent-kapcsolatokkal működnek; mennyiségi raktárkönyvelés és alacsony készletfigyelés továbbra M19.
 - Következő konkrét feladat: M07.01, a jelenlegi partner-/termék-/termékköri speciális árak, kedvezménypreferencia, összeadás és kerekítés regressziós rögzítése.
 
-### 2026-10-15: M08 kód kész, staging kiadás előtt
+### 2026-10-15: M08 stagingen ellenőrzött
 
 - Elkészült a v6 referencia szerinti főoldali hero és navigációs kereső, a publikus ármentes katalógus, a mély kategória- és szűrőfolyamat, a slugos termékoldal, partneri ár/vásárlás, elérhetőségi státusz, dokumentumletöltés, gyorsrendelés és üres állapotok.
 - A kereső URL-ben tartja az állapotot, az autocomplete natív JavaScriptet használ debounce-szal, stale-válasz eldobással és billentyűzetes navigációval. A publikus JSON és HTML nem ad partnerárat. A kiemelt termékek admin sorrendje `sort_order` mezővel és fel/le vezérléssel tartós.
-- Helyben ellenőrizve: M08 célteszt 4/17, teljes PHPUnit 65/265, Vite build, Blade cache, PHP lint, route-list és diff-check. A két új migráció visszagörgethető; nincs új környezeti változó vagy feature flag.
-- Állapot: M08 KIADÁSRA KÉSZ. Következő lépés: egy commit és develop push, meglévő staging workflow megvárása, majd `/`, `/shop`, autocomplete, vendég/partner termékoldal és admin kiemelt sorrend ellenőrzése 390/768/1440 px-en.
+- A `f9f3a39` commit tartalmazza a végső frontend runtime-javításokat is: a Bootstrap csak egyszer inicializálódik, a kosár-előnézet saját jQuery modult importál, így az autocomplete betöltése nem függ a globális változó sorrendjétől.
+- Helyben ellenőrizve: Vite build, PHP lint és diff-check. A PHPUnit újrafuttatása PDO SQLite driver hiányában nem indult el; a #117 CI verify sikeres. A két új migráció visszagörgethető; nincs új környezeti változó vagy feature flag.
+- Develop/staging: `f9f3a39`, [#117](https://github.com/sykolos/eb-webshop/actions/runs/38651616855) verify/deploy sikeres. Élő staging átvétel: menü, autocomplete, vendég/partner árjogosultság, főoldali hero, admin kiemelt sorrend és 390/768/1440 px nézetek rendben.
+- Állapot: M08 STAGINGEN ELLENŐRZÖTT. Következő konkrét fejlesztés: M09.01 `CartService` és `carts/cart_items` adatmodell; meglévő ár-, mennyiség- és partnerjogosultsági szabályok megőrzésével.
 
 ### Következő munkamenet sablonja
 
