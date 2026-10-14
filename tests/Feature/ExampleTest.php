@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use App\Models\Order;
+use App\Models\Products;
+use App\Models\product_unit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -101,5 +103,92 @@ class ExampleTest extends TestCase
     public function test_cache_clear_is_not_exposed_as_a_public_route(): void
     {
         $this->get('/clear')->assertNotFound();
+    }
+
+    public function test_cart_add_validates_quantity_and_uses_the_product_packaging(): void
+    {
+        $unit = product_unit::create([
+            'unit' => 'Doboz',
+            'quantity' => 12,
+            'measure' => 'db',
+        ]);
+        $product = Products::create([
+            'serial_number' => 'CART-001',
+            'title' => 'Kosár teszttermék',
+            'description' => 'Teszt',
+            'price' => 1000,
+            'category_id' => 1,
+            'unit_id' => $unit->id,
+        ]);
+
+        $this->post(route('addtocart', [
+            'id' => $product->id,
+            'q' => '999999',
+            'm' => 'tampered',
+        ]), ['quantity' => '2'])->assertRedirect();
+
+        $item = session('cart.0');
+        $this->assertSame(2, $item['quantity']);
+        $this->assertSame(12, $item['q']);
+        $this->assertSame('db', $item['m']);
+    }
+
+    public function test_cart_add_rejects_invalid_quantities(): void
+    {
+        $unit = product_unit::create([
+            'unit' => 'Darab',
+            'quantity' => 1,
+            'measure' => 'db',
+        ]);
+        $product = Products::create([
+            'serial_number' => 'CART-002',
+            'title' => 'Érvénytelen mennyiség teszttermék',
+            'description' => 'Teszt',
+            'price' => 1000,
+            'category_id' => 1,
+            'unit_id' => $unit->id,
+        ]);
+
+        foreach (['0', '-1', '1.5', 'not-a-number'] as $quantity) {
+            $this->from('/shop')->post(route('addtocart', [
+                'id' => $product->id,
+                'q' => '1',
+                'm' => 'db',
+            ]), ['quantity' => $quantity])
+                ->assertRedirect('/shop')
+                ->assertSessionHasErrors('quantity');
+        }
+
+        $this->assertNull(session('cart'));
+    }
+
+    public function test_cart_add_returns_not_found_for_an_unknown_product(): void
+    {
+        $this->post(route('addtocart', [
+            'id' => 999999,
+            'q' => '1',
+            'm' => 'db',
+        ]), ['quantity' => 1])->assertNotFound();
+
+        $this->post('/add-to-cart/not-a-product/1/db', ['quantity' => 1])
+            ->assertNotFound();
+    }
+
+    public function test_cart_quantity_update_only_accepts_single_step_changes(): void
+    {
+        session(['cart' => [[
+            'product' => ['id' => 1],
+            'quantity' => 2,
+            'q' => 1,
+            'm' => 'db',
+        ]]]);
+
+        $this->post(route('cart.update'), ['key' => 0, 'change' => 5])
+            ->assertSessionHasErrors('change');
+        $this->assertSame(2, session('cart.0.quantity'));
+
+        $this->post(route('cart.update'), ['key' => 0, 'change' => 1])
+            ->assertNoContent();
+        $this->assertSame(3, session('cart.0.quantity'));
     }
 }

@@ -10,13 +10,20 @@ class CartController extends Controller
 {
     public function addtocart(Request $request, $id, $q, $m)
     {
-        $product = Products::with('special_prices')->findOrFail($id); // árak betöltése itt
+        $validated = $request->validate([
+            'quantity' => ['required', 'integer', 'min:1'],
+        ]);
 
+        $product = Products::with(['special_prices', 'product_unit'])->findOrFail($id);
+        $quantity = (int) $validated['quantity'];
+        $unit = $product->product_unit;
+
+        // Keep the legacy route shape, but source packaging from the product record.
         $item = [
             'product' => $product->toArray(),
-            'quantity' => $request->quantity,
-            'q' => $q,
-            'm' => $m,
+            'quantity' => $quantity,
+            'q' => (int) ($unit?->quantity ?: 1),
+            'm' => $unit?->measure ?: 'db',
         ];
 
         if (session()->has('cart')) {
@@ -24,7 +31,7 @@ class CartController extends Controller
             $key = $this->checkItemInCart($item);
 
             if ($key != -1) {
-                $cart[$key]['quantity'] += $request->quantity;
+                $cart[$key]['quantity'] += $quantity;
                 session()->put('cart', $cart);
             } else {
                 session()->push('cart', $item);
@@ -79,8 +86,13 @@ class CartController extends Controller
     }  
     public function updateQuantity(Request $request)
     {
-        $key = $request->input('key');
-        $change = (int) $request->input('change'); // +1 vagy -1
+        $validated = $request->validate([
+            'key' => ['required', 'integer', 'min:0'],
+            'change' => ['required', 'integer', 'in:-1,1'],
+        ]);
+
+        $key = (int) $validated['key'];
+        $change = (int) $validated['change'];
 
         $cart = session('cart', []);
         if (isset($cart[$key])) {
@@ -93,7 +105,11 @@ class CartController extends Controller
 
     public function removeItem(Request $request)
     {
-        $key = $request->input('key');
+        $validated = $request->validate([
+            'key' => ['required', 'integer', 'min:0'],
+        ]);
+
+        $key = (int) $validated['key'];
         $cart = session('cart', []);
         if (isset($cart[$key])) {
             unset($cart[$key]);

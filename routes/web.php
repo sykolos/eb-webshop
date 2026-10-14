@@ -48,8 +48,12 @@ Route::get('/shop/quick-products', [PagesController::class, 'quickProductsAjax']
 Route::get('search/',[PagesController::class,'search'])->name('search')->middleware('auth');
 //cart
 
-Route::post('add-to-cart/{id}/{q}/{m}',[CartController::class,'addtocart'])->name('addtocart');
-Route::post('remove-from-cart/{id}',[CartController::class,'removefromcart'])->name('removefromcart');
+Route::post('add-to-cart/{id}/{q}/{m}',[CartController::class,'addtocart'])
+    ->whereNumber('id')
+    ->name('addtocart');
+Route::post('remove-from-cart/{id}',[CartController::class,'removefromcart'])
+    ->whereNumber('id')
+    ->name('removefromcart');
 //cart count
 Route::get('/cart/count', [CartController::class, 'cartCount'])->name('cart.count');
 //cart preview
