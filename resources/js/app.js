@@ -1,6 +1,4 @@
 // 1. jQuery – csak ha szükséges a kosár preview-hoz
-import * as bootstrap from 'bootstrap';
-window.bootstrap = bootstrap;
 import $ from 'jquery';
 window.$ = $;
 window.jQuery = $;
