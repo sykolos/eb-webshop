@@ -30,7 +30,7 @@
                 </div>
                 <div class="field">
                     <label for="password-confirm">Jelszó újra</label>
-                    <input type="password" id="password-confirm" name="password-confirm" placeholder="*********">
+                    <input type="password" id="password-confirm" name="password_confirmation" placeholder="*********">
                 </div>
                 <div class="field">
                     <button type="submit" class="btn btn-primary btn-block">Regisztráció</button>

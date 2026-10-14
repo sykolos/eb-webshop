@@ -16,6 +16,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\RecommendedController;
 use App\Http\Controllers\PagesController;
 use Illuminate\Auth\Events\PasswordReset;
+use App\Support\PasswordRules;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\AccountpageController;
@@ -76,9 +77,9 @@ Route::get('/product/{id}/similar', [ProductRecommend::class, 'similarProducts']
 
 //users
 Route::get('login/',[AuthController::class,'showlogin'])->name('login')->middleware('guest');
-Route::get('register/',[AuthController::class,'showregister'])->name('register')->middleware('admin');
-Route::post('register',[AuthController::class,'postregister'])->name('register.submit')->middleware('admin');
-Route::post('/login',[AuthController::class,'postlogin'])->name('login.submit')->middleware('guest');
+Route::get('register/',[AuthController::class,'showregister'])->name('register')->middleware(['admin', 'throttle:registration']);
+Route::post('register',[AuthController::class,'postregister'])->name('register.submit')->middleware(['admin', 'throttle:registration']);
+Route::post('/login',[AuthController::class,'postlogin'])->name('login.submit')->middleware(['guest', 'throttle:login']);
 Route::post('logout/',[AuthController::class,'postlogout'])->name('logout')->middleware('auth');
 
 Route::group(['prefix'=>'account','middleware'=>'auth'],function(){
@@ -186,7 +187,7 @@ Route::post('/verification-notification', function (Request $request) {
     $request->user()->sendEmailVerificationNotification();
  
     return back()->with('message', 'Verification link sent!');
-})->middleware('auth')->name('verification.send');
+})->middleware(['auth', 'throttle:verification-resend'])->name('verification.send');
 
 //password reset 
 Route::get('/forgot-password', function () {
@@ -196,7 +197,7 @@ Route::get('/forgot-password', function () {
 
  
 Route::post('/forgot-password', function (Request $request) {
-    $request->validate(['email' => 'required|email']);
+    $request->validate(['email' => 'required|email|max:255']);
  
     $status = Password::sendResetLink(
         $request->only('email')
@@ -205,7 +206,7 @@ Route::post('/forgot-password', function (Request $request) {
     return $status === Password::RESET_LINK_SENT
                 ? back()->with(['status' => __($status)])
                 : back()->withErrors(['email' => __($status)]);
-})->middleware('guest')->name('password.email');
+})->middleware(['guest', 'throttle:password-reset-request'])->name('password.email');
 
 Route::get('/reset-password/{token}', function (string $token) {
     return view('auth.passwords.reset', ['token' => $token]);
@@ -214,7 +215,7 @@ Route::post('/reset-password', function (Request $request) {
     $request->validate([
         'token' => 'required',
         'email' => 'required|email',
-        'password' => 'required|min:8|confirmed',
+        'password' => PasswordRules::required(),
     ]);
  
     $status = Password::reset(
@@ -233,11 +234,11 @@ Route::post('/reset-password', function (Request $request) {
     return $status === Password::PASSWORD_RESET
                 ? redirect()->route('login')->with('status', __($status))
                 : back()->withErrors(['email' => [__($status)]]);
-})->middleware('guest')->name('password.update');
+})->middleware(['guest', 'throttle:password-reset'])->name('password.update');
 
 //password change by user
 Route::get('/change-password', [AuthController::class, 'changePassword'])->name('change-password')->middleware('auth');;
-Route::post('/change-password', [AuthController::class, 'updatePassword'])->name('update-password')->middleware('auth');;
+Route::post('/change-password', [AuthController::class, 'updatePassword'])->name('update-password')->middleware(['auth', 'throttle:password-change']);
 
 //-------------sending emails
-Route::post('/send-contact',[PagesController::class,'sendContact'])->name('sendContact');
+Route::post('/send-contact',[PagesController::class,'sendContact'])->name('sendContact')->middleware('throttle:contact');

@@ -85,6 +85,48 @@ class ExampleTest extends TestCase
         $this->get('/adminpanel')->assertOk();
     }
 
+    public function test_login_attempts_are_rate_limited_and_logout_invalidates_the_session(): void
+    {
+        $this->withoutVite();
+        $email = 'limit-'.Str::uuid().'@example.test';
+
+        for ($attempt = 0; $attempt < 5; $attempt++) {
+            $this->post('/login', [
+                'email' => $email,
+                'password' => 'wrong-password',
+            ])->assertSessionHasErrors('email');
+        }
+
+        $this->post('/login', [
+            'email' => $email,
+            'password' => 'wrong-password',
+        ])->assertStatus(429);
+
+        $user = User::factory()->create(['password' => bcrypt('valid-password')]);
+        $this->post('/login', [
+            'email' => $user->email,
+            'password' => 'valid-password',
+        ])->assertRedirect('/');
+
+        $this->post('/logout')->assertRedirect('/');
+        $this->assertGuest();
+    }
+
+    public function test_registration_rejects_passwords_below_the_common_minimum(): void
+    {
+        $this->withoutVite();
+        $admin = User::factory()->create(['is_admin' => true]);
+
+        $this->actingAs($admin)
+            ->post('/register', [
+                'name' => 'Rövid jelszó',
+                'email' => 'short-password-'.Str::uuid().'@example.test',
+                'password' => 'short',
+                'password_confirmation' => 'short',
+            ])
+            ->assertSessionHasErrors('password');
+    }
+
     public function test_account_order_details_and_pdf_are_limited_to_the_order_owner(): void
     {
         $this->withoutVite();

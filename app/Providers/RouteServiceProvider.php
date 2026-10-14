@@ -7,6 +7,7 @@ use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvi
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -59,5 +60,38 @@ class RouteServiceProvider extends ServiceProvider
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
+
+        RateLimiter::for('login', function (Request $request) {
+            return Limit::perMinute(5)->by($this->identityKey($request));
+        });
+
+        RateLimiter::for('registration', function (Request $request) {
+            return Limit::perMinute(5)->by($request->ip());
+        });
+
+        RateLimiter::for('verification-resend', function (Request $request) {
+            return Limit::perMinute(6)->by(($request->user()?->id ?: 'guest').'|'.$request->ip());
+        });
+
+        RateLimiter::for('password-reset-request', function (Request $request) {
+            return Limit::perMinute(3)->by($this->identityKey($request));
+        });
+
+        RateLimiter::for('password-reset', function (Request $request) {
+            return Limit::perMinute(5)->by($this->identityKey($request));
+        });
+
+        RateLimiter::for('password-change', function (Request $request) {
+            return Limit::perMinute(5)->by(($request->user()?->id ?: 'guest').'|'.$request->ip());
+        });
+
+        RateLimiter::for('contact', function (Request $request) {
+            return Limit::perMinute(3)->by($this->identityKey($request));
+        });
+    }
+
+    private function identityKey(Request $request): string
+    {
+        return Str::lower((string) $request->input('email')).'|'.$request->ip();
     }
 }

@@ -9,6 +9,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Support\PasswordRules;
 
 class AuthController extends Controller
 {
@@ -31,7 +32,7 @@ class AuthController extends Controller
         $request->validate([
             'name'=>'required|min:3|max:225',            
             'email'=>'required|email|max:225|unique:users',            
-            'password'=>'required|min:8|same:password-confirm',
+            'password' => PasswordRules::required(),
         ]);
         //registration
         $user = User::create([
@@ -59,8 +60,12 @@ class AuthController extends Controller
         return back()->with('success','Sikeres bejelentkezés');
     }
     //logout
-    public function postlogout(){
+    public function postlogout(Request $request){
         Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
         return back();
     }
 
@@ -95,7 +100,7 @@ class AuthController extends Controller
         # Validation
         $request->validate([
             'old_password' => 'required',
-            'new_password' => 'required|confirmed',
+            'new_password' => PasswordRules::required(),
         ]);
 
 
