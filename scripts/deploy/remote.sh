@@ -58,7 +58,11 @@ tar -tzf public.tgz >/dev/null
 }
 if [[ -f "$app/storage/framework/down" ]]; then
   echo 'Stale maintenance state detected; restoring the current release before preflight.'
-  (cd "$app" && "$php_bin" artisan up)
+  if [[ -f "$app/artisan" ]]; then
+    (cd "$app" && "$php_bin" artisan up) || rm -f -- "$app/storage/framework/down"
+  else
+    rm -f -- "$app/storage/framework/down"
+  fi
 fi
 test ! -f "$app/storage/framework/down" || { echo 'Existing maintenance state; inspect before deploying.' >&2; exit 1; }
 
