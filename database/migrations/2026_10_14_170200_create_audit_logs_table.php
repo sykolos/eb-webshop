@@ -8,6 +8,13 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // A korábbi, megszakadt kiadás már létrehozhatta ezt a táblát a
+        // migration rekord mentése előtt. Ilyenkor a meglévő auditadatot
+        // megőrizzük, és a következő migrációkra engedjük tovább a kiadást.
+        if (Schema::hasTable('audit_logs')) {
+            return;
+        }
+
         Schema::create('audit_logs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
