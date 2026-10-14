@@ -31,9 +31,7 @@ if (!is_file($appPath.'/vendor/autoload.php') || !is_file($appPath.'/bootstrap/a
 require $appPath.'/vendor/autoload.php';
 $app = require_once $appPath.'/bootstrap/app.php';
 
-$app->bind('path.public', function() {
-    return __DIR__;
-});
+$app->usePublicPath(__DIR__);
 
 $kernel = $app->make(Kernel::class);
 

@@ -167,6 +167,7 @@ if (realpath($_ENV['APP_BASE_PATH']) !== realpath(dirname(__DIR__))) {
 }
 return new class {
     public function bind($key, $factory) {}
+    public function usePublicPath($path) {}
     public function make($class) { return $this; }
     public function handle($request) { return $this; }
     public function send() { echo LABEL; return $this; }
