@@ -7,15 +7,15 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M02: kritikus biztonsági és rendelési javítások, FOLYAMATBAN; M02.01-M02.06 stagingen |
-| Következő fejlesztési feladat | M02.07 kosár route-controller tisztítás elkészült; az M01.08 élő staging partner/admin próba külön nyitott átadási pont; ezt követi M02.08 |
+| Aktív mérföldkő | M02: kritikus biztonsági és rendelési javítások, FOLYAMATBAN; M02.01-M02.07 stagingen |
+| Következő fejlesztési feladat | M02.08 kritikus biztonsági regressziós tesztek és további kockázatok felvétele; az M01.08 élő staging partner/admin próba külön nyitott átadási pont |
 | Alkalmazásfejlesztés ebből a checklistből | M01 elkezdve; stagingvédelem, tesztkapu és deploy megerősítése |
-| Utolsó igazolt staging kiadás | cd0b7e316364f73fecf6722c12a25710602237e7, GitHub Actions #63: verify/deploy/HTTP sikeres; M02.06 stagingen |
+| Utolsó igazolt staging kiadás | e1a6780ffe65118581a328672b372dbcf77006c6, GitHub Actions #72: verify/deploy/HTTP sikeres; M02.07 stagingen |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D09 törlés technikai javaslata, D11 szolgáltató; D12-D13 későbbre halasztva |
-| Mostani változtatás | M02.07 kosár route-controller tisztítás folyamatban; a duplikált `cart.count` route megszűnik, a hívó JavaScript név szerinti route-adatokat használ |
+| Mostani változtatás | M02.07 kosár route-controller tisztítás stagingen ellenőrzött; a duplikált `cart.count` route megszűnt, a hívó JavaScript név szerinti route-adatokat használ; M02.08 következik |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -248,6 +248,8 @@ Kiadási rekord M02.05: commit = `c641a9043ae825c3d178adc97afc7b904845dcc7`; fea
 
 Kiadási rekord M02.06: commit = `cd0b7e316364f73fecf6722c12a25710602237e7`; feature workflow = [#62](https://github.com/sykolos/eb-webshop/actions/runs/38616756365), sikeres; develop/staging workflow = [#63](https://github.com/sykolos/eb-webshop/actions/runs/38616911958), verify és deploy sikeres; staging smoke = `/`, `/contact`, `/login` HTTP 200. Nincs migráció, új környezeti változó vagy üzleti adatváltozás. A célzott helyi PHPUnit a hiányzó PDO SQLite-driver miatt nem tudott adatbázist indítani, a CI ellenőrzése sikeres. M01.08 élő partner/admin staging-belépési próba továbbra külön nyitott átadási pont.
 
+Kiadási rekord M02.07: commit = `e1a6780ffe65118581a328672b372dbcf77006c6`; feature workflow = [#71](https://github.com/sykolos/eb-webshop/actions/runs/38619870845), sikeres; develop/staging workflow = [#72](https://github.com/sykolos/eb-webshop/actions/runs/38620052459), verify és deploy sikeres; staging smoke = `/`, `/contact`, `/login` HTTP 200. Nincs migráció, új környezeti változó vagy üzleti adatváltozás. A Vite production build és a route-list sikeres; a célzott helyi PHPUnit a hiányzó PDO SQLite-driver miatt nem tudott adatbázist indítani, a CI ellenőrzése sikeres. M01.08 élő partner/admin staging-belépési próba továbbra külön nyitott átadási pont.
+
 M02.05 stagingen: az admin rendelés-státusz végpontja csak a négy meglévő magyar státuszt és a régi `pending` adatértéket fogadja el. Az engedélyezett átmenetek: `függőben` -> `feldolgozás` vagy `törölve`; `feldolgozás` -> `kiszállítva` vagy `törölve`; a lezárt állapotokból nincs visszalépés. Az aktuális státusz változatlanra küldése idempotens marad. Az admin nézet csak a megengedett következő státuszokat kínálja, de a végső ellenőrzés a controllerben történik.
 
 Módosított fájlok: `app/Models/Order.php`, `app/Http/Controllers/OrderController.php`, `tests/Feature/ExampleTest.php`, ez a checklist. Nincs migráció, környezeti változás vagy új üzleti státusz; a teljes rendeléskezelési workflow továbbra M11 feladata. PHP lint és `git diff --check` sikeres. A célzott PHPUnit a gépen hiányzó PDO SQLite-driver miatt adatbázis-inicializálásnál megállt; a feature és staging CI ellenőrzése sikeres.
@@ -265,6 +267,14 @@ Módosított fájlok: `app/Services/CheckoutService.php`, `app/Http/Controllers/
 - Módosított fájlok: `app/Support/PasswordRules.php`, `app/Providers/RouteServiceProvider.php`, `app/Http/Controllers/AuthController.php`, `routes/web.php`, `resources/views/pages/register.blade.php`, `tests/Feature/ExampleTest.php`, ez a checklist. Nincs migráció, új környezeti változó vagy üzleti adatváltozás.
 - A feature [#62](https://github.com/sykolos/eb-webshop/actions/runs/38616756365) és a develop/staging [#63](https://github.com/sykolos/eb-webshop/actions/runs/38616911958) workflow sikeres. A staging `/`, `/contact`, `/login` végpontjai HTTP 200-at adtak.
 - Állapot: M02.06 stagingen ellenőrzött; M02 közös K1-K6 kapui a további M02 pontok miatt nyitva. Következő konkrét fejlesztési feladat: M02.07 duplikált cart.count és hibás/hiányzó kosár route-controller összerendelések. M01.08 élő partner/admin login-próba dedikált tesztadatokkal továbbra nyitott.
+
+### 2026-10-14: M02.07 kosár route-controller tisztítás staging kiadás
+
+- A duplikált `/cart/count` route megszűnt; a név most kizárólag a `CartController::cartCount` metódusra mutat. A régi `remove-from-cart/{key}` paraméterneve összhangba került a controllerrel.
+- A kosár és gyorskosár JavaScriptjei a layout által kiadott route-adatokat használják, a gyorskosár hozzáadás pedig a Blade-ben generált named route URL-jét kapja. A jelenlegi URL-formátumok kompatibilitás miatt megmaradtak.
+- Új Feature teszt ellenőrzi az egyetlen controlleres `cart.count` route-ot és a sessionben tárolt mennyiségek összegét. PHP lint, route-list, `git diff --check` és Vite production build sikeres. A helyi PHPUnit a hiányzó PDO SQLite-driver miatt nem tudott adatbázist indítani.
+- A feature CI [#71](https://github.com/sykolos/eb-webshop/actions/runs/38619870845) sikeres; az első #70 futás a Laravel 9 route-gyűjtemény tesztben hibázott, javítás után újra zöld lett. A develop/staging [#72](https://github.com/sykolos/eb-webshop/actions/runs/38620052459) verify/deploy sikeres, a három smoke URL HTTP 200.
+- Állapot: M02.07 stagingen ellenőrzött; M02 közös K1-K6 kapui a további M02.08 miatt nyitva. Következő konkrét fejlesztési feladat: M02.08 kritikus biztonsági regressziós tesztek és további kockázatok felvétele. M01.08 élő partner/admin login-próba dedikált tesztadatokkal továbbra nyitott.
 
 ## M03. Laravel és futtatókörnyezet korszerűsítése
 
