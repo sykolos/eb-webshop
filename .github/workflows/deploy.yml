@@ -115,8 +115,8 @@ jobs:
           [[ $PHP_BIN =~ ^[a-zA-Z0-9_./-]+$ ]] || exit 1
           export SSHPASS="$SSH_PASSWORD"
           # Preserve the established connection settings; pinned host keys are deferred.
-          ssh_args=(-p "$SSH_PORT" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=15)
-          scp_args=(-P "$SSH_PORT" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=15)
+          ssh_args=(-p "$SSH_PORT" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR -o ConnectTimeout=15 -o ServerAliveInterval=15 -o ServerAliveCountMax=4)
+          scp_args=(-P "$SSH_PORT" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR -o ConnectTimeout=15 -o ServerAliveInterval=15 -o ServerAliveCountMax=4)
           target="$SSH_USER@$SSS_HOST"
           incoming="$(dirname "$DEPLOY_PATH")/.deploy-incoming/$GITHUB_SHA"
           sshpass -e ssh "${ssh_args[@]}" "$target" "umask 077; mkdir -p '$incoming'"

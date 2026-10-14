@@ -64,7 +64,12 @@ remote.sh retains checks that need no new credentials:
   running the new preflight.
 - Refuse to delete a real public/storage directory; existing symlinks are supported.
 - Use prerendered maintenance, run migrations and rebuild config/view caches.
-- Leave maintenance in place if a failure occurs after it starts.
+- If a failure occurs after maintenance starts, clear the maintenance marker and
+  bring the current release back online so a failed staging deploy does not
+  leave the site at 503. The backup remains available for manual diagnosis and
+  restoration.
+- Emit phase markers during remote deployment so a failed SSH run identifies
+  the last completed phase without exposing environment values.
 - After the release is live, signal the existing supervised queue worker to
   restart when supported; a sync queue or unavailable cache must not turn a
   successful release into a maintenance-mode outage. This does not create a

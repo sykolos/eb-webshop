@@ -40,7 +40,12 @@ cleanup() {
   if [[ $code -ne 0 ]]; then
     echo "Deployment failed; backup: $backup" >&2
     if $maintenance_started; then
-      echo 'Maintenance retained. Inspect the failure before restoring code or migrating again.' >&2
+      echo 'Deployment failed after maintenance; restoring service mode for the current release.' >&2
+      if [[ -f "$app/artisan" ]]; then
+        (cd "$app" && "$php_bin" artisan up) || true
+      fi
+      rm -f -- "$app/storage/framework/down"
+      echo 'Maintenance marker cleared; the current release is available for diagnosis.' >&2
     elif $replacement_started; then
       echo 'Initial installation is incomplete; inspect before retrying.' >&2
     else
@@ -53,6 +58,7 @@ trap cleanup EXIT
 sha256sum --check SHA256SUMS
 tar -tzf app.tgz >/dev/null
 tar -tzf public.tgz >/dev/null
+echo 'Release archives validated.'
 [[ ! -e "$public/storage" || -L "$public/storage" ]] || {
   echo 'public/storage is a real directory; migrate uploads before deployment.' >&2; exit 1;
 }
@@ -65,6 +71,7 @@ if [[ -f "$app/storage/framework/down" ]]; then
   fi
 fi
 test ! -f "$app/storage/framework/down" || { echo 'Existing maintenance state; inspect before deploying.' >&2; exit 1; }
+echo 'Existing maintenance state cleared.'
 
 # Boot the candidate with a private copy of the actual environment before downtime.
 environment="$app/.env"
@@ -88,6 +95,7 @@ echo 'Candidate environment and application validated before maintenance.'
 
 backup="$base/.deploy-backups/$(date -u +%Y%m%dT%H%M%SZ)-$revision"
 mkdir "$backup"
+echo 'Creating the previous-release backup.'
 # These are code snapshots. DB/uploads require the independent backup/restore procedure.
 tar -C "$app" -czf "$backup/app.tgz" --exclude='./.env*' --exclude='./storage' --exclude='./bootstrap/cache/*.php' .
 tar -C "$public" -czf "$backup/public.tgz" --exclude='./storage' --exclude='./.well-known' .
@@ -97,12 +105,14 @@ if [[ ! -f "$app/.env" ]]; then
   install -m 600 "$candidate/.env" "$app/.env"
 fi
 if [[ -f "$app/artisan" ]]; then
+  echo 'Entering maintenance mode.'
   (cd "$app" && "$php_bin" artisan down --render=errors::503 --retry=60)
   maintenance_started=true
 fi
 
 # Remove stale runtime code, but never environment, uploads or runtime storage.
 replacement_started=true
+echo 'Replacing application and public files.'
 for entry in app bootstrap config database lang resources routes scripts/deploy vendor artisan composer.json composer.lock REVISION; do
   rm -rf -- "${app:?}/$entry"
 done
@@ -118,11 +128,14 @@ find "$public" -type f -exec chmod 644 {} +
 chmod 755 "$public"
 ln -sfn "$app/storage/app/public" "$public/storage"
 cd "$app"
+echo 'Running post-deploy validation and migrations.'
 "$php_bin" scripts/deploy/check.php "$public"
 "$php_bin" artisan optimize:clear
 "$php_bin" artisan migrate --force
+echo 'Rebuilding application caches.'
 "$php_bin" artisan config:cache
 "$php_bin" artisan view:cache
+echo 'Restoring live mode.'
 "$php_bin" artisan up
 # Ask an existing supervised worker to reload the deployed code. A server using
 # sync queues or another cache backend must not turn a successful release into

@@ -150,8 +150,9 @@ echo 'PASS: concurrent deploy is refused'
 
 prepare
 if FAIL_MIGRATION=1 deploy; then exit 1; fi
-[[ -f "$app/storage/framework/down" ]]
+[[ ! -f "$app/storage/framework/down" ]]
+[[ $(cat "$app/app/new.php") == new-code && ! -e "$app/app/old.php" ]]
 [[ -n $(find "$base/.deploy-backups" -name app.tgz -print) ]]
 [[ $(cat "$app/storage/app/public/photo.jpg") == keep-media ]]
 assert_private_cleanup
-echo 'PASS: failed migration retains maintenance and the code snapshot'
+echo 'PASS: failed migration restores service mode and retains the code snapshot'
