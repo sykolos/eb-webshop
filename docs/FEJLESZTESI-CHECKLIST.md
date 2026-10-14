@@ -7,15 +7,15 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M04: közös backend, jogosultság és háttérfeldolgozás, KIADÁSRA KÉSZ |
+| Aktív mérföldkő | M04: közös backend, jogosultság és háttérfeldolgozás, STAGINGEN ELLENŐRZÖTT |
 | Következő fejlesztési feladat | M05.01 ZIP-alapú designrendszer és három layout |
-| Alkalmazásfejlesztés ebből a checklistből | M01-M03 stagingen; M04 helyben kész, egy develop kiadásra vár |
-| Utolsó igazolt staging kiadás | c82965a, GitHub Actions #80: verify/deploy/HTTP és build asset ellenőrzés sikeres; M03 stagingen |
+| Alkalmazásfejlesztés ebből a checklistből | M01-M04 stagingen; M05 a következő fejlesztési mérföldkő |
+| Utolsó igazolt staging kiadás | ec5da27, GitHub Actions #99: verify/deploy és staging smoke sikeres; M04 stagingen ellenőrzött |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D09 törlés technikai javaslata, D11 szolgáltató; D12-D13 későbbre halasztva |
-| Mostani változtatás | M04 helyben kész: Form Request/Gate minta, admin 2FA, audit/request-id logging, adatbázis queue és idempotens rendelési értesítés, scheduler heartbeat, privát fájltárolás és worker restart jelzés |
+| Mostani változtatás | M04 stagingen ellenőrzött: Form Request/Gate minta, admin 2FA, audit/request-id logging, adatbázis queue és idempotens rendelési értesítés, scheduler heartbeat, privát fájltárolás és worker restart jelzés |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -305,7 +305,7 @@ Kiadási rekord: commit = `c82965abf24753c309450710534fcdfae1e2abcc`; feature wo
 
 ## M04. Közös backend, jogosultság és háttérfeldolgozás
 
-Állapot: KIADÁSRA KÉSZ. Függőség: M03.
+Állapot: STAGINGEN ELLENŐRZÖTT. Függőség: M03.
 Forrás: L: service layer, logging, queue, scheduler, jogosultság.
 Stagingen bemutatható eredmény: Működő szerepkör-ellenőrzés, háttérben küldött tesztértesítés és ellenőrzött időzítő.
 
@@ -327,11 +327,11 @@ Adat/deploy: Jogosultságok és audit/queue táblák bővítő migrációi, megl
 - [x] M04.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
 - [x] M04.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
 - [x] M04.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
-- [ ] M04.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
-- [ ] M04.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
-- [ ] M04.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+- [x] M04.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [x] M04.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; a publikus smoke útvonalak és az admin biztonsági felület betöltött, nincs nyitott kiadást blokkoló hiba.
+- [x] M04.K6 A checklist státusza STAGINGEN ELLENŐRZÖTT; külön kiadási napló nem készült, következő feladat M05.01.
 
-Kiadási rekord: commit = `b3c2e61` első staging próbája a queue restart jelzés miatt sikertelen lett és karbantartási módot hagyott; a `94ccb84` javítás még a stale maintenance marker védelmén, a `3900620` recovery pedig az alkalmazás `artisan up` bootján állt meg. A recovery most közvetlen marker-helyreállítással készül; staging továbbra 503, ezért K4-K6 nyitva.
+Kiadási rekord: a korábbi M04 staging-próbák közben a deploy recovery és a legacy migrációs kompatibilitás javítása több lépésben történt (`94ccb84`, `3900620`, `7e69fa0`, `9cc6ffa`, `55b737a`, `b5e40ff`, `5772047`, `e23b9fe`). A végleges M04 kiadás commitja = `ec5da27f95a1d3832231d5d9402354c1ce934aa6`; develop/staging workflow = [#99](https://github.com/sykolos/eb-webshop/actions/runs/38636655012), verify és deploy sikeres. Helyi ellenőrzés: PHPUnit 51 teszt / 225 assertion, Vite build, PHP lint és diff-check sikeres. A staging `/`, `/contact`, `/login` útvonalai HTTP 200-at adtak; a bejelentkezett `/adminpanel` dashboard, admin navigáció és `/adminpanel/security/2fa` oldal betöltött. A legacy `audit_logs` és `order_notification_deliveries` migrációk meglévő/eltérő sémára kompatibilisek lettek; a meglévő rendelési adatok megőrzése és a staging szolgáltatás helyreállása ellenőrzött. Következő konkrét feladat: M05.01 ZIP-alapú designrendszer és három layout.
 
 ## M05. ZIP-alapú designrendszer és három layout
 
