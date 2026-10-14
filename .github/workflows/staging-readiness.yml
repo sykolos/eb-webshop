@@ -24,59 +24,60 @@ jobs:
     steps:
       - name: Required secret - SSS_HOST
         id: sss_host
-        continue-on-error: true
+        if: ${{ !cancelled() }}
         env:
           VALUE: ${{ secrets.SSS_HOST }}
         run: test -n "$VALUE"
       - name: Required secret - SSH_USER
         id: ssh_user
-        continue-on-error: true
+        if: ${{ !cancelled() }}
         env:
           VALUE: ${{ secrets.SSH_USER }}
         run: test -n "$VALUE"
       - name: Required secret - SSH_PORT
         id: ssh_port
-        continue-on-error: true
+        if: ${{ !cancelled() }}
         env:
           VALUE: ${{ secrets.SSH_PORT }}
         run: test -n "$VALUE"
       - name: Required secret - SSH_PASSWORD
         id: ssh_password
-        continue-on-error: true
+        if: ${{ !cancelled() }}
         env:
           VALUE: ${{ secrets.SSH_PASSWORD }}
         run: test -n "$VALUE"
       - name: Required secret - DEPLOY_PATH
         id: deploy_path
-        continue-on-error: true
+        if: ${{ !cancelled() }}
         env:
           VALUE: ${{ secrets.DEPLOY_PATH }}
         run: test -n "$VALUE"
       - name: Required secret - PUBLIC_PATH
         id: public_path
-        continue-on-error: true
+        if: ${{ !cancelled() }}
         env:
           VALUE: ${{ secrets.PUBLIC_PATH }}
         run: test -n "$VALUE"
       - name: Required secret - SSH_KNOWN_HOSTS
         id: ssh_known_hosts
-        continue-on-error: true
+        if: ${{ !cancelled() }}
         env:
           VALUE: ${{ secrets.SSH_KNOWN_HOSTS }}
         run: test -n "$VALUE"
       - name: Required secret - STAGING_ACCESS_USER
         id: staging_access_user
-        continue-on-error: true
+        if: ${{ !cancelled() }}
         env:
           VALUE: ${{ secrets.STAGING_ACCESS_USER }}
         run: test -n "$VALUE"
       - name: Required secret - STAGING_ACCESS_PASSWORD
         id: staging_access_password
-        continue-on-error: true
+        if: ${{ !cancelled() }}
         env:
           VALUE: ${{ secrets.STAGING_ACCESS_PASSWORD }}
         run: test -n "$VALUE"
       - name: Report deploy switch without changing it
+        if: ${{ !cancelled() }}
         env:
           ENABLED: ${{ vars.STAGING_DEPLOY_ENABLED }}
         run: |

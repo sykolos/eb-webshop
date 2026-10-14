@@ -955,6 +955,8 @@ Kiadási bejegyzéshez szükséges részletek:
 - Ez az audit csak jelenlétet igazolhat, nem a hostkulcs hitelességét, a hitelesítő adatok helyességét, a környezet izolációját vagy a mentések visszaállíthatóságát. Az ENV_DEVELOP csak első telepítési fallback, nem kötelező egy meglévő szerverenv mellett.
 - Következő: ellenőrzött audit commit/push a már engedélyezett M01 körben, futáseredményből pontos hiánylista; a szerveroldali kapuk továbbra nyitva.
 - Helyi ellenőrzés: YAML parse, develop trigger és staging environment, kilenc egyedi step ID és hibagyűjtés; minden inline parancs Bash szintaxisa sikeres. Üres érték hibás, tesztérték és parancsszerű literál sikeres, kimenetük üres. Alkalmazáskód nem változott; távoli build/CI eredménye push után ellenőrizendő.
+- Audit első commitja developon: `cf28e33`. [Első futás](https://github.com/sykolos/eb-webshop/actions/runs/38572610564) hiányzó beállítást jelzett, de a continue-on-error miatt az API a részlépések conclusion értékét successre módosította. A hibás részlépések láthatóságát javítottuk: nincs continue-on-error, minden ellenőrzés explicit nem-megszakított feltétellel lefut az előző hibája után is. Az első futásból pontos hiánylista nem állítható.
+- Friss külső HEAD próba: `/`, `/contact`, `/login` HTTP 200; nincs X-Robots-Tag, X-Release-Sha vagy Basic challenge. Nincs M01 staging kiadás, nincs szerveroldali változtatás.
 
 ### Következő munkamenet sablonja
 
