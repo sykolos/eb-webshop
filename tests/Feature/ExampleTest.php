@@ -6,7 +6,11 @@ use App\Models\User;
 use App\Models\Order;
 use App\Models\Products;
 use App\Models\product_unit;
+use App\Models\User_invoce;
+use App\Models\User_shipping;
+use App\Services\CheckoutService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class ExampleTest extends TestCase
@@ -190,5 +194,139 @@ class ExampleTest extends TestCase
         $this->post(route('cart.update'), ['key' => 0, 'change' => 1])
             ->assertNoContent();
         $this->assertSame(3, session('cart.0.quantity'));
+    }
+
+    public function test_checkout_rejects_missing_billing_data_without_creating_an_order(): void
+    {
+        $this->withoutVite();
+        $user = User::factory()->create();
+        $shipping = User_shipping::create([
+            'user_id' => $user->id,
+            'address' => 'Teszt utca 1.',
+            'city' => 'Budapest',
+            'zipcode' => '1111',
+            'phone' => '0612345678',
+            'receiver' => 'Teszt Elek',
+        ]);
+        $token = (string) Str::uuid();
+
+        $this->actingAs($user)
+            ->from('/checkout')
+            ->withSession(['cart' => [[
+                'product' => ['id' => 999999],
+                'quantity' => 1,
+                'q' => 1,
+                'm' => 'db',
+            ]]])
+            ->post(route('validcheckout'), [
+                'shipping_address_id' => $shipping->id,
+                'payment_method' => 0,
+                'checkout_token' => $token,
+            ])
+            ->assertRedirect('/checkout')
+            ->assertSessionHasErrors('billing');
+
+        $this->assertDatabaseCount('orders', 0);
+    }
+
+    public function test_checkout_rejects_a_deleted_cart_product_without_creating_an_order(): void
+    {
+        $this->withoutVite();
+        $user = User::factory()->create();
+        User_invoce::create([
+            'user_id' => $user->id,
+            'company_name' => 'Teszt Kft.',
+            'address' => 'Számla utca 1.',
+            'city' => 'Budapest',
+            'state' => 'Budapest',
+            'zipcode' => '1111',
+            'country' => 'Magyarország',
+            'vatnumber' => '12345678-1-42',
+        ]);
+        $shipping = User_shipping::create([
+            'user_id' => $user->id,
+            'address' => 'Teszt utca 1.',
+            'city' => 'Budapest',
+            'zipcode' => '1111',
+            'phone' => '0612345678',
+            'receiver' => 'Teszt Elek',
+        ]);
+
+        $this->actingAs($user)
+            ->from('/checkout')
+            ->withSession(['cart' => [[
+                'product' => ['id' => 999999],
+                'quantity' => 1,
+                'q' => 1,
+                'm' => 'db',
+            ]]])
+            ->post(route('validcheckout'), [
+                'shipping_address_id' => $shipping->id,
+                'payment_method' => 0,
+                'checkout_token' => (string) Str::uuid(),
+            ])
+            ->assertRedirect('/checkout')
+            ->assertSessionHasErrors('cart');
+
+        $this->assertDatabaseCount('orders', 0);
+    }
+
+    public function test_checkout_service_reuses_an_order_for_the_same_submission_token(): void
+    {
+        $user = User::factory()->create();
+        User_invoce::create([
+            'user_id' => $user->id,
+            'company_name' => 'Teszt Kft.',
+            'address' => 'Számla utca 1.',
+            'city' => 'Budapest',
+            'state' => 'Budapest',
+            'zipcode' => '1111',
+            'country' => 'Magyarország',
+            'vatnumber' => '12345678-1-42',
+        ]);
+        $shipping = User_shipping::create([
+            'user_id' => $user->id,
+            'address' => 'Teszt utca 1.',
+            'city' => 'Budapest',
+            'zipcode' => '1111',
+            'phone' => '0612345678',
+            'receiver' => 'Teszt Elek',
+        ]);
+        $unit = product_unit::create([
+            'unit' => 'Doboz',
+            'quantity' => 6,
+            'measure' => 'db',
+        ]);
+        $product = Products::create([
+            'serial_number' => 'CHECKOUT-001',
+            'title' => 'Checkout teszttermék',
+            'description' => 'Teszt',
+            'price' => 1000,
+            'category_id' => 1,
+            'unit_id' => $unit->id,
+        ]);
+        $data = [
+            'shipping_address_id' => $shipping->id,
+            'payment_method' => 0,
+            'checkout_token' => (string) Str::uuid(),
+        ];
+        $cart = [[
+            'product' => ['id' => $product->id],
+            'quantity' => 2,
+            'q' => 999,
+            'm' => 'tampered',
+        ]];
+
+        $first = app(CheckoutService::class)->createOrder($user, $data, $cart);
+        $second = app(CheckoutService::class)->createOrder($user, $data, $cart);
+
+        $this->assertSame($first->id, $second->id);
+        $this->assertDatabaseCount('orders', 1);
+        $this->assertDatabaseHas('items', [
+            'order_id' => $first->id,
+            'product_id' => $product->id,
+            'quantity' => 12,
+            'unit_price' => 1000,
+        ]);
     }
 }

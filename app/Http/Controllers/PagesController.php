@@ -9,6 +9,7 @@ use App\Models\User_invoce;
 use App\Models\User_shipping;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use App\Models\RecommendedProduct;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ContactFormMail;
@@ -116,7 +117,9 @@ class PagesController extends Controller
         $id=auth()->user()->id;
         $user_s=User_shipping::where('user_id','=',$id)->first();
         $user_i=User_invoce::where('user_id','=',$id)->first();
-        echo view('pages/checkout',['user_s'=>$user_s,'user_i'=>$user_i]);
+        $checkout_token = session()->get('checkout_token') ?: (string) Str::uuid();
+        session()->put('checkout_token', $checkout_token);
+        echo view('pages/checkout', compact('user_s', 'user_i', 'checkout_token'));
     }
     
     public function orderpage(Request $request)

@@ -21,9 +21,9 @@
                                     <div class="row">
                                             <div class="col-md-12">
                                                 <ul class="list-group list-group-flush bg-dark">
-                                                    <li class="list-group-item bg-dark text-white d-flex">Megrendelő:&nbsp;&nbsp;&nbsp;{{$user_i->company_name}}</li>
-                                                    <li class="list-group-item bg-dark text-white">Számlázási cím:&nbsp;&nbsp;&nbsp;{{$user_i->address}}</li>
-                                                    <li class="list-group-item bg-dark text-white">Adószám:&nbsp;&nbsp;&nbsp;{{$user_i->vatnumber}}</li>                                                    
+                                                    <li class="list-group-item bg-dark text-white d-flex">Megrendelő:&nbsp;&nbsp;&nbsp;{{optional($user_i)->company_name ?? 'Nincs megadva'}}</li>
+                                                    <li class="list-group-item bg-dark text-white">Számlázási cím:&nbsp;&nbsp;&nbsp;{{optional($user_i)->address ?? 'Nincs megadva'}}</li>
+                                                    <li class="list-group-item bg-dark text-white">Adószám:&nbsp;&nbsp;&nbsp;{{optional($user_i)->vatnumber ?? 'Nincs megadva'}}</li>
                                                     <li class="list-group-item bg-dark text-white">Kiszállítási cím:&nbsp;&nbsp;&nbsp;<span id="preview-address"></span></li>
                                                     <li class="list-group-item bg-dark text-white">Átvevő:&nbsp;&nbsp;&nbsp;<span id="preview-receiver"></span></li>
                                                     <li class="list-group-item bg-dark text-white">Elérhetőség:&nbsp;&nbsp;&nbsp;<span id="preview-phone"></span></li>
@@ -116,6 +116,7 @@
             <div class="col-md-10">
                 <form action="{{ route('validcheckout') }}" id="payment-form" method="post">
                     @csrf
+                    <input type="hidden" name="checkout_token" value="{{ $checkout_token }}">
                     <div class="row">
                         {{-- Bal oszlop --}}
                         <div class="col-md-6">
