@@ -115,7 +115,9 @@ cd "$app"
 "$php_bin" artisan migrate --force
 "$php_bin" artisan config:cache
 "$php_bin" artisan view:cache
-# Tell a supervised queue worker to reload the deployed code after migrations.
-"$php_bin" artisan queue:restart
 "$php_bin" artisan up
+# Ask an existing supervised worker to reload the deployed code. A server using
+# sync queues or another cache backend must not turn a successful release into
+# a maintenance-mode outage.
+"$php_bin" artisan queue:restart || echo 'Queue restart signal skipped; existing worker configuration unchanged.'
 echo "Release $revision installed. Code backup: $backup"
