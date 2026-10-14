@@ -8,14 +8,14 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 | Mező | Aktuális érték |
 | --- | --- |
 | Aktív mérföldkő | M01: staging és Git kiadási alap, STAGINGEN; D14 szerinti deploy és nyilvános HTTP-próba sikeres |
-| Következő fejlesztési feladat | M01.08 élő staging felhasználói próba dedikált partner/admin adatokkal; M02.01 kódja és helyi tesztje elkészült, staging kiadása folyamatban |
+| Következő fejlesztési feladat | M01.08 élő staging felhasználói próba dedikált partner/admin adatokkal; M02.02 nyilvános `/clear` eltávolítása |
 | Alkalmazásfejlesztés ebből a checklistből | M01 elkezdve; stagingvédelem, tesztkapu és deploy megerősítése |
-| Utolsó igazolt staging kiadás | 74d54f5296531370873f9182d10ead0b003d86ea, GitHub Actions #36: verify/deploy/HTTP sikeres |
+| Utolsó igazolt staging kiadás | d9c0cc16393fd585beab8f52e8881448881357c0, GitHub Actions #41: verify/deploy/HTTP sikeres; M02.01 stagingen |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D09 törlés technikai javaslata, D11 szolgáltató; D12-D13 későbbre halasztva |
-| Mostani változtatás | M01.08 alkalmazásszintű partner/admin login- és hozzáférésteszt hozzáadva; 30 PHPUnit teszt / 105 assertion zöld. Élő staging felhasználói próba még nyitott |
+| Mostani változtatás | M02.01 OrderPolicy és rendeléstulajdonos-védelem kiadva stagingre; 31 PHPUnit teszt / 108 assertion, CI és deploy sikeres |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -215,7 +215,7 @@ Kiadási rekord: commit = `74d54f5296531370873f9182d10ead0b003d86ea`; workflow =
 
 ## M02. Kritikus biztonsági és rendelési javítások
 
-Állapot: TERVEZETT. Függőség: M01.
+Állapot: FOLYAMATBAN. Függőség: M01; M02.01 elkészült és stagingen, további M02 pontok nyitva.
 Forrás: L: biztonság; K: konkrét kódhiányok.
 Stagingen bemutatható eredmény: A régi felület a javított hozzáférésekkel és rendelésmentéssel tovább használható.
 
@@ -857,6 +857,7 @@ Kiadáskor új sor kerül ide. Nem szabad előre sikeresnek kitölteni.
 | 2026-10-13 | M00 | Dokumentáció elkészült, nincs deploy | Nincs | Nem futott | Nem alkalmazható | M01.01 |
 | 2026-10-14 | M00/M01 | Developra integrálva, CI sikeres; deploy kihagyva | 7ad56f6823a6c5e4a45b5fae79b4a4c2c0398a57 | [#26](https://github.com/sykolos/eb-webshop/actions/runs/38520202165) | Nincs új staging SHA; deploy=skipped | M01.01/M01.02/M01.04/M01.09 |
 | 2026-10-14 | M01 / D14 | STAGINGEN, meglévő deploybeállításokkal | 74d54f5296531370873f9182d10ead0b003d86ea | [#36](https://github.com/sykolos/eb-webshop/actions/runs/38574327623) | verify és deploy success; /, /contact, /login HTTP 200 CI-ban és külön helyi próbával | M01.08, majd M02; D14 halasztások megőrzése |
+| 2026-10-14 | M02.01 | Részkiadás stagingen; rendelés-tulajdonosvédelem | d9c0cc16393fd585beab8f52e8881448881357c0 | [#41](https://github.com/sykolos/eb-webshop/actions/runs/38585205515) | verify és deploy success; idegen részlet/PDF 403, saját részlet 200 a célzott tesztben | M02.02; M01.08 élő partner/admin próba tovább nyitott |
 
 Kiadási bejegyzéshez szükséges részletek:
 
@@ -996,6 +997,14 @@ Kiadási bejegyzéshez szükséges részletek:
 - Helyi ellenőrzés: teljes PHPUnit `30 teszt / 105 assertion` sikeres. Frontend- és deployfájl nem változott; CI teljes ellenőrzése a commit után esedékes.
 - M01.08-at nem pipálom ki: a valódi stagingen dedikált partner/admin felhasználókkal végzett próba nem történt meg. Az alkalmazásszintű szerződés most automatikusan védett.
 - Következő: célzott commit és a már működő develop -> staging folyamaton kiadás; utána M02.01 csak az élő staging-próba lezárása után.
+
+### 2026-10-14: M02.01 staging kiadás
+
+- A `d9c0cc1` munkaági [#40](https://github.com/sykolos/eb-webshop/actions/runs/38585050763) verify teljesen sikeres; develop push után [#41](https://github.com/sykolos/eb-webshop/actions/runs/38585205515) verify és deploy is sikeres.
+- A stagingre kiadott SHA `d9c0cc16393fd585beab8f52e8881448881357c0`. Az M02.01 policy és controller-ellenőrzés benne van; adatbázis-migráció nem futott, meglévő rendeléseket nem módosított.
+- Helyi teljes PHPUnit: 31 teszt / 108 assertion. CI-ban build, ShellCheck, kilenc Linux deploy-forgatókönyv és PHPUnit sikeres. A kiadás a meglévő deploybeállításokkal történt.
+- M02.01 stagingen van, de M02 teljes mérföldköve és a kiadási kapui nyitva maradnak. M01.08 valódi staging partner/admin belépése továbbra nincs igazolva.
+- Következő fejlesztési pont: M02.02, a publikus `/clear` végpont eltávolítása; utána ismét célzott CI és staging kiadás.
 
 ### 2026-10-14: M02.01 rendelés-tulajdonosvédelem
 
