@@ -1,3 +1,5 @@
+import $ from 'jquery';
+
 let previewTimer = null;
 const cartRoot = document.getElementById('cart-icon-container');
 const cartRoutes = {
