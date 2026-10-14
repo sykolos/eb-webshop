@@ -25,6 +25,17 @@ return new class extends Migration
             return;
         }
 
+        if (DB::getDriverName() === 'mysql') {
+            $column = $columns[0];
+            DB::statement(sprintf(
+                'CREATE INDEX `%s` ON `%s` (`%s`(100), `is_published`, `is_archived`)',
+                $name,
+                $table,
+                $column
+            ));
+            return;
+        }
+
         Schema::table($table, function (Blueprint $blueprint) use ($columns, $name): void {
             $blueprint->index($columns, $name);
         });
