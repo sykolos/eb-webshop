@@ -7,15 +7,15 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M02: kritikus biztonsági és rendelési javítások, FOLYAMATBAN; M02.01-M02.04 stagingen |
-| Következő fejlesztési feladat | M02.05 célzott CI/staging kiadás; az M01.08 élő staging partner/admin próba külön nyitott átadási pont |
+| Aktív mérföldkő | M02: kritikus biztonsági és rendelési javítások, FOLYAMATBAN; M02.01-M02.05 stagingen |
+| Következő fejlesztési feladat | M02.06 készletállapotok és elérhetőség modellje; az M01.08 élő staging partner/admin próba külön nyitott átadási pont |
 | Alkalmazásfejlesztés ebből a checklistből | M01 elkezdve; stagingvédelem, tesztkapu és deploy megerősítése |
-| Utolsó igazolt staging kiadás | a54ac7aceb605924e994874f754697b1801306b9, GitHub Actions #55: verify/deploy/HTTP sikeres; M02.04 stagingen |
+| Utolsó igazolt staging kiadás | c641a9043ae825c3d178adc97afc7b904845dcc7, GitHub Actions #59: verify/deploy/HTTP sikeres; M02.05 stagingen |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D09 törlés technikai javaslata, D11 szolgáltató; D12-D13 későbbre halasztva |
-| Mostani változtatás | M02.05 státuszérték- és átmenetvédelem elkészült; a meglévő státuszok megmaradnak, a visszalépő/érvénytelen módosítás szerveroldalon elutasított; CI/staging kiadás folyamatban |
+| Mostani változtatás | M02.05 státuszérték- és átmenetvédelem stagingen; a meglévő státuszok megmaradnak, a visszalépő/érvénytelen módosítás szerveroldalon elutasított; M02.06 következik |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -223,7 +223,7 @@ Stagingen bemutatható eredmény: A régi felület a javított hozzáférésekke
 - [x] M02.02 Nyilvános /clear eltávolítása; üzemeltetési cache-törlés csak CLI/deploy folyamatból.
 - [x] M02.03 Kosármennyiség, termékazonosító és kiszerelés validációja; a kliens q/m paramétere ne dönthesse el az üzleti mennyiséget.
 - [x] M02.04 Checkout tranzakció és ismételt beküldés elleni védelem; hiányzó számlázási adatok és megszűnt termék kezelése.
-- [ ] M02.05 Státuszmódosítás engedélyezett értékeinek és átmeneteinek validálása; a teljes új munkafolyamat M11-ben készül.
+- [x] M02.05 Státuszmódosítás engedélyezett értékeinek és átmeneteinek validálása; a teljes új munkafolyamat M11-ben készül.
 - [ ] M02.06 Login, regisztrációkérés, jelszóreset, email és kapcsolat végpontok próbálkozáskorlátja; logout session-érvénytelenítés és egységes jelszóvalidáció.
 - [ ] M02.07 Duplikált cart.count és hibás/hiányzó kosár route-controller összerendelések rendezése a hívó felületekkel együtt.
 - [ ] M02.08 Kritikus biztonsági regressziós tesztek; talált további kockázatok pontos felvétele a checklistbe.
@@ -244,9 +244,11 @@ Kiadási rekord M02.03 részkiadás: commit = `ee86f8ebe8c5b2e947ea2fc8c3fd7ab39
 
 Kiadási rekord M02.04: commit = `a54ac7aceb605924e994874f754697b1801306b9`; feature workflow = [#54](https://github.com/sykolos/eb-webshop/actions/runs/38591732597), sikeres; develop/staging workflow = [#55](https://github.com/sykolos/eb-webshop/actions/runs/38591973104), verify és deploy sikeres; staging smoke = `/`, `/contact`, `/login` HTTP 200. A migráció meglévő rendeléseket megőriz, új környezeti változó vagy deploy-kapcsoló nem kell. A helyi PHPUnit a hiányzó PDO SQLite-driver miatt nem futott le, a CI ellenőrizte a checkout regressziókat és a migrációt. M02 közös K1-K6 kapui M02.05-M02.08 miatt továbbra nyitva maradnak.
 
-M02.05 kód kész, kiadás előtt: az admin rendelés-státusz végpontja csak a négy meglévő magyar státuszt és a régi `pending` adatértéket fogadja el. Az engedélyezett átmenetek: `függőben` -> `feldolgozás` vagy `törölve`; `feldolgozás` -> `kiszállítva` vagy `törölve`; a lezárt állapotokból nincs visszalépés. Az aktuális státusz változatlanra küldése idempotens marad. Az admin nézet csak a megengedett következő státuszokat kínálja, de a végső ellenőrzés a controllerben történik.
+Kiadási rekord M02.05: commit = `c641a9043ae825c3d178adc97afc7b904845dcc7`; feature workflow = [#58](https://github.com/sykolos/eb-webshop/actions/runs/38614946203), sikeres; develop/staging workflow = [#59](https://github.com/sykolos/eb-webshop/actions/runs/38615137385), verify és deploy sikeres; staging smoke = `/`, `/contact`, `/login` HTTP 200. A státuszgráf nem módosít adatbázissémát vagy környezeti beállítást. A helyi célzott PHPUnit a hiányzó PDO SQLite-driver miatt nem tudott adatbázist indítani, a CI ellenőrzése sikeres. M01.08 élő partner/admin staging-belépési próba továbbra külön nyitott átadási pont.
 
-Módosított fájlok: `app/Models/Order.php`, `app/Http/Controllers/OrderController.php`, `tests/Feature/ExampleTest.php`, ez a checklist. Nincs migráció, környezeti változás vagy új üzleti státusz; a teljes rendeléskezelési workflow továbbra M11 feladata. PHP lint és `git diff --check` sikeres. A célzott PHPUnit elindult, de a gépen hiányzó PDO SQLite-driver miatt adatbázis-inicializálásnál megállt; CI-ellenőrzés szükséges.
+M02.05 stagingen: az admin rendelés-státusz végpontja csak a négy meglévő magyar státuszt és a régi `pending` adatértéket fogadja el. Az engedélyezett átmenetek: `függőben` -> `feldolgozás` vagy `törölve`; `feldolgozás` -> `kiszállítva` vagy `törölve`; a lezárt állapotokból nincs visszalépés. Az aktuális státusz változatlanra küldése idempotens marad. Az admin nézet csak a megengedett következő státuszokat kínálja, de a végső ellenőrzés a controllerben történik.
+
+Módosított fájlok: `app/Models/Order.php`, `app/Http/Controllers/OrderController.php`, `tests/Feature/ExampleTest.php`, ez a checklist. Nincs migráció, környezeti változás vagy új üzleti státusz; a teljes rendeléskezelési workflow továbbra M11 feladata. PHP lint és `git diff --check` sikeres. A célzott PHPUnit a gépen hiányzó PDO SQLite-driver miatt adatbázis-inicializálásnál megállt; a feature és staging CI ellenőrzése sikeres.
 
 M02.04 kód kész, kiadás előtt: a `CheckoutService` a rendelés- és tételmentést egy adatbázis-tranzakcióban végzi, a friss termékből és a meglévő felhasználói/termékköri árlogikából számol. A checkout űrlap UUID alapú, egyedi beküldési kulcsot kapott; ismételt beküldés ugyanazt a rendelést adja vissza, új email/PDF értesítés nélkül. A számlázási adatok és a szállítási cím felhasználói tulajdonosa kötelező; hiányzó számlázási adat vagy törölt termék validációs hibát ad rendelés létrehozása nélkül. A kiszerelés továbbra is a termék adatbázisából származik, nem a session/kliens q/m értékeiből.
 
@@ -1059,13 +1061,14 @@ Kiadási bejegyzéshez szükséges részletek:
 - A feature [#54](https://github.com/sykolos/eb-webshop/actions/runs/38591732597) és a develop/staging [#55](https://github.com/sykolos/eb-webshop/actions/runs/38591973104) workflow sikeres. A staging `/`, `/contact`, `/login` végpontjai HTTP 200-at adtak.
 - Állapot: M02.04 stagingen, M02 közös K1-K6 kapui a további M02 pontok miatt nyitva. Következő konkrét fejlesztési feladat: M01.08 élő staging partner/admin login-próba dedikált tesztadatokkal; utána M02.05.
 
-### 2026-10-14: M02.05 státuszátmenetek, kiadás előtt
+### 2026-10-14: M02.05 státuszátmenetek staging kiadás
 
 - Az admin rendelés-státusz módosítása eddig közvetlenül mentette a kliensből érkező szöveget. Az `Order` modell most központi státuszlistát, kompatibilis régi `pending` értéket és átmeneti gráfot ad; az `OrderController` validálja az értéket és az aktuális állapotból engedélyezett következő lépést.
 - A lezárt `kiszállítva` és `törölve` állapotokból nincs visszalépés. A meglévő üzleti státuszok és a változatlanra küldött státuszfrissítés megmaradnak. Az admin részletező nézet a megengedett következő értékeket mutatja.
 - Új Feature regresszióteszt fedi le a `függőben` -> `feldolgozás` átmenetet, a tiltott visszalépést és az ismeretlen státuszt. PHP lint és `git diff --check` sikeres; a helyi PHPUnit a hiányzó PDO SQLite-driver miatt nem tudott adatbázist indítani.
 - M01.08 valódi staging partner/admin próba továbbra nincs végrehajtva, mert dedikált staging hitelesítő adatok nem állnak rendelkezésre ebben a környezetben. Az alkalmazásszintű login-szerződés korábbi CI-tesztje megmarad, de ez nem helyettesíti az élő fiókos átvételt.
-- Állapot: M02.05 kód kész, feature CI és staging kiadás szükséges. Következő lépés: célzott commit/push, sikeres CI után `develop` integráció, staging smoke, majd M02.06.
+- A feature [#58](https://github.com/sykolos/eb-webshop/actions/runs/38614946203) és a develop/staging [#59](https://github.com/sykolos/eb-webshop/actions/runs/38615137385) workflow sikeres. A staging `/`, `/contact`, `/login` végpontjai HTTP 200-at adtak.
+- Állapot: M02.05 stagingen ellenőrzött; M02 közös K1-K6 kapui a további M02 pontok miatt nyitva. Következő konkrét fejlesztési feladat: M02.06 készletállapotok és elérhetőség modellje. M01.08 élő partner/admin login-próba dedikált tesztadatokkal továbbra nyitott.
 
 ### Következő munkamenet sablonja
 
