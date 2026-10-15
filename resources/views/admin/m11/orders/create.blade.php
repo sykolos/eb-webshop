@@ -44,7 +44,7 @@
 </div>
 <script>
 (() => {
-    const partners = @json($partners->mapWithKeys(fn ($partner) => [$partner->id => $partner->user_shipping->map(fn ($address) => ['id' => $address->id, 'label' => trim(($address->receiver ?: 'Cím').' · '.$address->zipcode.' '.$address->city.' · '.$address->address), 'receiver' => $address->receiver, 'phone' => $address->phone, 'zipcode' => $address->zipcode, 'city' => $address->city, 'address' => $address->address]) ]));
+    const partners = @json($partnerAddresses);
     const partner = document.getElementById('partner-select');
     const address = document.getElementById('shipping-address');
     const fields = ['shipping_receiver','shipping_phone','shipping_zipcode','shipping_city','shipping_address'];

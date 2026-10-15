@@ -31,9 +31,22 @@ class OrderController extends Controller
 
     public function create()
     {
+        $partners = User::query()->with(['user_invoice', 'user_shipping'])
+            ->where('is_admin', false)->where('account_status', 'active')->orderBy('name')->get();
+
         return view('admin.m11.orders.create', [
-            'partners' => User::query()->with(['user_invoice', 'user_shipping'])
-                ->where('is_admin', false)->where('account_status', 'active')->orderBy('name')->get(),
+            'partners' => $partners,
+            'partnerAddresses' => $partners->mapWithKeys(fn (User $partner) => [
+                $partner->id => $partner->user_shipping->map(fn ($address) => [
+                    'id' => $address->id,
+                    'label' => trim(($address->receiver ?: 'Cím').' · '.$address->zipcode.' '.$address->city.' · '.$address->address),
+                    'receiver' => $address->receiver,
+                    'phone' => $address->phone,
+                    'zipcode' => $address->zipcode,
+                    'city' => $address->city,
+                    'address' => $address->address,
+                ])->values()->all(),
+            ])->all(),
             'products' => Products::query()->where('is_archived', false)->with('product_unit')->orderBy('title')->get(),
             'states' => array_diff(Order::statuses(), ['törölve']),
             'idempotencyKey' => (string) Str::uuid(),
