@@ -1,204 +1,108 @@
 @extends('layouts.master')
-@section('title','Checkout Page')
+@section('title', 'Rendelés véglegesítése')
 @section('content')
 
 <div class="row justify-content-center align-items-center page-header-title">
     <div class="col-md-6 text-center mb-5">
-        <h2 class="heading-section section-header ">Véglegesités</h2>
+        <h2 class="heading-section section-header">Rendelés véglegesítése</h2>
     </div>
 </div>
 
 <main class="checkout-page">
     <div class="container">
-        <div class="row justify-content-center align-items-center">
-            <div class="col-md-12">
-                <div class="wrapper bg-dark rounded-3 ">
-                    <div class="row no-gutters mb-5 checkout-row">
-                        <div class="col-md-5 left-side">
-                            <div class="contact-leftside-wrap w-100 p-md-5 p-4">
-                                    <h4 class="mb-4 text-light">Megrendelő adatai</h4>
-                                    
-                                    <div class="row">
-                                            <div class="col-md-12">
-                                                <ul class="list-group list-group-flush bg-dark">
-                                                    <li class="list-group-item bg-dark text-white d-flex">Megrendelő:&nbsp;&nbsp;&nbsp;{{optional($user_i)->company_name ?? 'Nincs megadva'}}</li>
-                                                    <li class="list-group-item bg-dark text-white">Számlázási cím:&nbsp;&nbsp;&nbsp;{{optional($user_i)->address ?? 'Nincs megadva'}}</li>
-                                                    <li class="list-group-item bg-dark text-white">Adószám:&nbsp;&nbsp;&nbsp;{{optional($user_i)->vatnumber ?? 'Nincs megadva'}}</li>
-                                                    <li class="list-group-item bg-dark text-white">Kiszállítási cím:&nbsp;&nbsp;&nbsp;<span id="preview-address"></span></li>
-                                                    <li class="list-group-item bg-dark text-white">Átvevő:&nbsp;&nbsp;&nbsp;<span id="preview-receiver"></span></li>
-                                                    <li class="list-group-item bg-dark text-white">Elérhetőség:&nbsp;&nbsp;&nbsp;<span id="preview-phone"></span></li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-7 d-flex bg-light right-side">
-                            <div class="cart-mini w-100 p-md-5 p-4">
-                            <h3 class="mb-4">Termék összesítő</h3>
-                            <table class="table d-none d-md-table">
-                                <thead class="bg-dark text-white ">
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach
+                </ul>
+            </div>
+        @endif
+
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="card p-4">
+                    <h3 class="h4 mb-3">Termékösszesítő</h3>
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr><th>Termék</th><th>Csomag</th><th>Egység</th><th class="text-end">Nettó</th></tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($lines as $line)
+                                    @php $quote = $line['quote']; @endphp
                                     <tr>
-                                        <th>Termék</th>
-                                        <th>Egység ár</th>
-                                        <th>Mennyiség</th>
-                                        <th>M.egység</th>
-                                        <th>Összesen</th>
+                                        <td>
+                                            <strong>{{ $line['product']?->title ?? 'Ismeretlen termék' }}</strong>
+                                            <small class="d-block text-muted">{{ $line['product']?->serial_number }}</small>
+                                            @if (!$line['available'])<small class="text-danger">{{ $line['warning'] }}</small>@endif
+                                        </td>
+                                        <td>{{ $line['quantity'] }}</td>
+                                        <td>{{ $line['pack_quantity'] }}{{ $line['measure'] }}</td>
+                                        <td class="text-end">{{ $quote ? number_format($quote['line_net'], 0, ',', ' ') . ' Ft' : 'Nem elérhető' }}</td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    @if(session()->has('cart') && count(session()->get('cart')) > 0)
-                                        @foreach (session()->get('cart') as $key => $item)
-                                            <tr>
-                                                <td>
-                                                    <p>{{ $item['product']['title'] }}</p>
-                                                </td>
-                                                <td>
-                                                    {{ App\Models\Cart::unitnet($item) }} Ft
-                                                </td>
-                                                <td>
-                                                    {{ $item['quantity'] * $item['q'] }}
-                                                </td>
-                                                <td>
-                                                    {{ $item['m'] }}
-                                                </td>
-                                                <td>
-                                                    {{ number_format(App\Models\Cart::unitprice($item) * $item['q'], 0, '', ' ') }} Ft
-                                                </td>
-                                            </tr>
-                                        @endforeach
-
-                                        {{-- Összesítés --}}
-                                        <tr class="cart-total">
-                                            <td colspan="4" class="text-end fw-bold">Összesen nettó:</td>
-                                            <td>{{ number_format(App\Models\Cart::totalamount(), 0, '', ' ') }} Ft</td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="4" class="text-end fw-bold">Bruttó végösszeg:</td>
-                                            <td>{{ number_format(App\Models\Cart::gettotalvatprice(), 0, '', ' ') }} Ft</td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="4" class="text-end fw-bold">Áfa összesen:</td>
-                                            <td>{{ number_format(App\Models\Cart::gettotalvat(), 0, '', ' ') }} Ft</td>
-                                        </tr>
-                                    @else
-                                        <tr>
-                                            <td colspan="5" class="empty-cart text-center">Üres a kosarad</td>
-                                        </tr>
-                                    @endif
-                                </tbody>
-                            </table>
-                            <div class="responsive-cart d-md-none">
-                                @foreach (session()->get('cart') as $item)
-                                    <div class="cart-item border-bottom py-2">
-                                        <div data-label="Termék">{{ $item['product']['title'] }}</div>
-                                        <div data-label="Egységár">{{ App\Models\Cart::unitnet($item) }} Ft</div>
-                                        <div data-label="Mennyiség">{{ $item['quantity'] * $item['q'] }}</div>
-                                        <div data-label="M.egység">{{ $item['m'] }}</div>
-                                        <div data-label="Összesen">{{ number_format(App\Models\Cart::unitprice($item) * $item['q'], 0, '', ' ') }} Ft</div>
-                                    </div>
                                 @endforeach
-                                <div class="cart-total text-end mt-3">
-                                    <div><strong>Összesen nettó:</strong> {{ number_format(App\Models\Cart::totalamount(), 0, '', ' ') }} Ft</div>
-                                    <div><strong>Bruttó végösszeg:</strong> {{ number_format(App\Models\Cart::gettotalvatprice(), 0, '', ' ') }} Ft</div>
-                                    <div><strong>Áfa összesen:</strong> {{ number_format(App\Models\Cart::gettotalvat(), 0, '', ' ') }} Ft</div>
-                                </div>
-                            </div>
-
-                        </div>
-                        </div>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="border-top pt-3 text-end">
+                        <div>Nettó: <strong>{{ number_format($summary['net'], 0, ',', ' ') }} Ft</strong></div>
+                        <div>Áfa: <strong>{{ number_format($summary['vat'], 0, ',', ' ') }} Ft</strong></div>
+                        <div class="fs-5">Bruttó: <strong>{{ number_format($summary['gross'], 0, ',', ' ') }} Ft</strong></div>
                     </div>
                 </div>
             </div>
-            
-        </div>
-        <div class="row justify-content-center">
-            <div class="col-md-10">
-                <form action="{{ route('validcheckout') }}" id="payment-form" method="post">
+
+            <div class="col-lg-5">
+                <form action="{{ route('validcheckout') }}" id="payment-form" method="post" class="card p-4">
                     @csrf
                     <input type="hidden" name="checkout_token" value="{{ $checkout_token }}">
-                    <div class="row">
-                        {{-- Bal oszlop --}}
-                        <div class="col-md-6">
-                            <div class="form-group mb-3">
-                                <label for="payment_method">Fizetési mód:</label>
-                                <select name="payment_method" id="payment_method" class="form-control" required>
-                                    <option value="0">Átutalás</option>
-                                    <option value="1">Készpénz</option>
-                                </select>
-                            </div>
-                            @if(auth()->user()->user_shipping && auth()->user()->user_shipping->count())
-                                <div class="form-group mb-3">
-                                    <label for="shipping_address_id">Válaszd ki a szállítási címet:</label>
-                                    <select name="shipping_address_id" id="shipping_address_id" class="form-control" required onchange="updateShippingPreview(this)">
-                                        @foreach(auth()->user()->user_shipping as $address)
-                                            <option 
-                                                value="{{ $address->id }}"
-                                                data-address="{{ $address->address }}"
-                                                data-receiver="{{ $address->receiver }}"
-                                                data-phone="{{ $address->phone }}"
-                                            >
-                                                {{ $address->zipcode }} {{ $address->city }}, {{ $address->address }} ({{ $address->receiver }})
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            @else
-                                <div class="alert alert-warning">
-                                    Nincs megadott szállítási címed. <a href="{{ route('shipping.create') }}">Adj hozzá egyet itt.</a>
-                                </div>
-                            @endif
-                            <div class="form-group form-check mb-3">
-                                <input type="checkbox" class="form-check-input" id="is_direct_shipping" name="is_direct_shipping" value="1">
-                                <label class="form-check-label" for="is_direct_shipping">
-                                    Árazatlan szállító (közvetlen partneri szállítás)
-                                </label>
-                            </div>
-                        </div>
+                    <h3 class="h4 mb-3">Szállítás és véglegesítés</h3>
 
-                        {{-- Jobb oszlop --}}
-                        <div class="col-md-6 d-flex flex-column justify-content-between">
-                            
-                            <div class="form-group mb-3">
-                                <label for="note">Megjegyzés a rendeléshez (opcionális):</label>
-                                <textarea name="note" id="note" class="form-control" rows="4" placeholder="Ha bármit szeretnél jelezni a rendeléshez...">{{ old('note') }}</textarea>
-                            </div>
-
-                            <div class="form-group d-flex align-items-start mb-3">
-                                <input class="form-check-input me-2 mt-1" type="checkbox" value="" id="flexCheckDefault" required>
-                                <label class="form-check-label" for="flexCheckDefault">
-                                    Elolvastam és elfogadom az <a href="{{ route('aszf') }}">ÁSZF-et</a> és az <a href="{{ route('adatkezelesi-nyilatkozat') }}">Adatkezelési nyilatkozatot</a>.
-                                </label>
-                            </div>
-                        </div>
+                    <div class="mb-3">
+                        <label for="payment_method" class="form-label">Fizetési mód</label>
+                        <select name="payment_method" id="payment_method" class="form-control" required>
+                            <option value="0" @selected(old('payment_method', '0') === '0')>Átutalás</option>
+                            <option value="1" @selected(old('payment_method') === '1')>Készpénz</option>
+                        </select>
                     </div>
 
-                    {{-- Véglegesítés gomb középen --}}
-                    <div class="row">
-                        <div class="col-12 text-center mt-4">
-                            <button type="submit" class="btn btn-primary bg-gradient mt-3">Véglegesítés</button>
+                    @if (auth()->user()->user_shipping->count())
+                        <div class="mb-3">
+                            <label for="shipping_address_id" class="form-label">Szállítási cím</label>
+                            <select name="shipping_address_id" id="shipping_address_id" class="form-control" required>
+                                @foreach(auth()->user()->user_shipping as $address)
+                                    <option value="{{ $address->id }}" @selected((string) old('shipping_address_id', $user_s?->id) === (string) $address->id)>
+                                        {{ $address->zipcode }} {{ $address->city }}, {{ $address->address }} ({{ $address->receiver }})
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
+                    @else
+                        <div class="alert alert-warning">Nincs megadott szállítási címed. <a href="{{ route('shipping.create') }}">Adj hozzá egyet.</a></div>
+                    @endif
+
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" id="is_direct_shipping" name="is_direct_shipping" value="1" @checked(old('is_direct_shipping'))>
+                        <label class="form-check-label" for="is_direct_shipping">Árazatlan szállító, közvetlen partneri szállítással</label>
                     </div>
+
+                    <div class="mb-3">
+                        <label for="note" class="form-label">Megjegyzés</label>
+                        <textarea name="note" id="note" class="form-control" rows="4" maxlength="500">{{ old('note') }}</textarea>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="terms" required>
+                        <label class="form-check-label" for="terms">Elfogadom az <a href="{{ route('aszf') }}">ÁSZF-et</a> és az <a href="{{ route('adatkezelesi-nyilatkozat') }}">Adatkezelési nyilatkozatot</a>.</label>
+                    </div>
+
+                    @if ($summary['has_unavailable'])
+                        <div class="alert alert-danger">A nem elérhető tételeket távolítsd el a kosárból a rendelés előtt.</div>
+                    @endif
+                    <button type="submit" class="btn btn-primary btn-lg" @disabled($summary['has_unavailable'] || !auth()->user()->user_shipping->count())>Rendelés leadása</button>
                 </form>
             </div>
         </div>
     </div>
 </main>
-
-<script>
-function updateShippingPreview(select) {
-    const selected = select.options[select.selectedIndex];
-
-    document.getElementById('preview-address').textContent = selected.dataset.address;
-    document.getElementById('preview-receiver').textContent = selected.dataset.receiver;
-    document.getElementById('preview-phone').textContent = selected.dataset.phone;
-}
-
-// Frissítjük elsőként betöltéskor is
-document.addEventListener('DOMContentLoaded', function () {
-    const select = document.getElementById('shipping_address_id');
-    if (select) updateShippingPreview(select);
-});
-</script>
-
 @endsection

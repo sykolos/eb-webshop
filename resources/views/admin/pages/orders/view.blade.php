@@ -1,7 +1,7 @@
 @extends('layouts.admin')
-@section('title','Rendelés #'.$order->id)
+@section('title','Rendelés '.$order->displayNumber())
 @section('content')
-<div class="page-title">Rendelés # {{$order->id}}</div>
+<div class="page-title">Rendelés {{$order->displayNumber()}}</div>
 <div class="container">
     <div class="row">
         <div class="col-12">
@@ -19,7 +19,7 @@
                             <tbody>
                                 <tr>
                                     <td>Rendelés száma:</td>
-                                    <td>{{$order->id}}</td>
+                                    <td>{{$order->displayNumber()}}</td>
                                 </tr>
                                 <tr>
                                     <td>Sátusz</td>

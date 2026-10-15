@@ -1,6 +1,6 @@
 <h2>Új rendelés érkezett a webshopon keresztül!</h2>
 
-<p><strong>Rendelésszám:</strong> EBR-2025-{{ $order->id }}<br>
+<p><strong>Rendelésszám:</strong> {{ $order->displayNumber() }}<br>
 <strong>Rendelés dátuma:</strong> {{ \Carbon\Carbon::parse($order->created_at)->format('Y.m.d H:i') }}<br>
 <strong>Közvetlen szállítás:</strong> {{ $order->is_direct_shipping ? 'Igen' : 'Nem' }}<br>
 <strong>Fizetési mód:</strong> {{ $order->payment_method ? 'Készpénz' : 'Átutalás' }}</p>

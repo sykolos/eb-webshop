@@ -13,7 +13,7 @@
             <a href="{{ route('home') }}">Főoldal</a>
             @auth
                 <a href="{{ route('orderpage') }}">Webshop</a>
-                <a class="v6-header-action" href="{{ route('cart') }}">Kosár <span class="v6-badge">{{ session('cart') ? collect(session('cart'))->sum('quantity') : 0 }}</span></a>
+                <a class="v6-header-action" href="{{ route('cart') }}">Kosár <span class="v6-badge">{{ auth()->user()->cart?->items()->sum('quantity') ?? 0 }}</span></a>
                 <a href="{{ route('account') }}">Fiók</a>
             @else
                 <a href="{{ route('login') }}">Belépés</a>

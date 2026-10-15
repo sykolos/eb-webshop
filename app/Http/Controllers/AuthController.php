@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Support\PasswordRules;
 use App\Http\Requests\LoginRequest;
 use App\Services\AuditLogger;
+use App\Services\CartService;
 
 class AuthController extends Controller
 {
@@ -58,6 +59,8 @@ class AuthController extends Controller
         $user->sendEmailVerificationNotification();
         //login
         Auth::login($user);
+        app(CartService::class)->migrateSession($user, (array) $request->session()->get('cart', []));
+        $request->session()->forget('cart');
 
         return back()->with('success','Sikeres bejelentkezés');
     }
@@ -86,6 +89,8 @@ class AuthController extends Controller
             $request->session()->regenerate();
 
             $user = $request->user();
+            app(CartService::class)->migrateSession($user, (array) $request->session()->get('cart', []));
+            $request->session()->forget('cart');
             $user->forceFill(['last_login_at' => now()])->save();
             $audit->record('auth.login', $user);
 

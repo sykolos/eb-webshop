@@ -60,17 +60,19 @@ Route::get('search/',[PagesController::class,'search'])->name('search');
 
 Route::post('add-to-cart/{id}/{q}/{m}',[CartController::class,'addtocart'])
     ->whereNumber('id')
+    ->middleware('auth')
     ->name('addtocart');
 Route::post('remove-from-cart/{key}',[CartController::class,'removefromcart'])
     ->whereNumber('key')
+    ->middleware('auth')
     ->name('removefromcart');
 //cart count
-Route::get('/cart/count', [CartController::class, 'cartCount'])->name('cart.count');
+Route::get('/cart/count', [CartController::class, 'cartCount'])->middleware('auth')->name('cart.count');
 //cart preview
-Route::get('/cart/preview', [CartController::class, 'previewcart'])->name('cart.preview');
+Route::get('/cart/preview', [CartController::class, 'previewcart'])->middleware('auth')->name('cart.preview');
 //-cart preview gyorsgombok
-Route::post('/cart/update', [CartController::class, 'updateQuantity'])->name('cart.update');
-Route::delete('/cart/remove', [CartController::class, 'removeItem'])->name('cart.remove');
+Route::post('/cart/update', [CartController::class, 'updateQuantity'])->middleware('auth')->name('cart.update');
+Route::delete('/cart/remove', [CartController::class, 'removeItem'])->middleware('auth')->name('cart.remove');
 
 //recommended products
 Route::get('/recommendations', [ProductRecommend::class, 'getRecommended'])->name('recommendations');

@@ -7,7 +7,7 @@
         <table class="table table-striped align-middle">
             <thead>
                 <tr>
-                    <th>#</th>
+                    <th>Rendelésszám</th>
                     <th>Megrendelő</th>
                     <th>Tételek</th>
                     <th>Összeg</th>                         
@@ -19,7 +19,7 @@
             <tbody>
                 @foreach ($orders as $order)
                 <tr>
-                    <td>{{ $order->id }}</td>
+                    <td>{{ $order->displayNumber() }}</td>
                     <td>
                         @if($order->user && $order->user->user_invoice)
                             {{ $order->user->user_invoice->company_name }}
@@ -61,7 +61,7 @@
         <div class="col">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <h5 class="card-title mb-2">#{{ $order->id }} – 
+                    <h5 class="card-title mb-2">{{ $order->displayNumber() }} –
                         <small class="text-muted">
                             {{ \Carbon\Carbon::parse($order->created_at)->format('Y-m-d') }}
                         </small>

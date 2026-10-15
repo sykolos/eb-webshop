@@ -65,4 +65,9 @@ class Order extends Model
     {
         return $this->hasOne(User_invoce::class, 'user_id', 'user_id');
     }
+
+    public function displayNumber(): string
+    {
+        return $this->order_number ?: 'EBR-LEGACY-'.$this->id;
+    }
 }

@@ -70,7 +70,7 @@
 <table class="meta-table">
     <tr>
         <td>Rendelésszám:</td>
-        <td>EBR-2025-{{ $order->id }}</td>
+        <td>{{ $order->displayNumber() }}</td>
         <td>Rendelési dátum:</td>
         <td>{{ \Carbon\Carbon::parse($order->created_at)->format('Y.m.d') }}</td>
     </tr>
@@ -97,50 +97,60 @@
             <th>Termék neve</th>
             <th>Mennyiség</th>
             <th>Egység</th>
-            <th>Egységár</th>
-            <th>Összeg</th>
+            @unless($order->is_direct_shipping)
+                <th>Egységár</th>
+                <th>Összeg</th>
+            @endunless
         </tr>
     </thead>
     <tbody>
         @php $netTotal = 0; @endphp
         @foreach ($order->items as $index => $item)
             @php
-                $lineTotal = $item->unit_price * $item->quantity;
-                $netTotal += $lineTotal;
+                $lineTotal = $item->line_net ?? ($item->unit_price * $item->quantity);
+                if (!$order->is_direct_shipping) {
+                    $netTotal += $lineTotal;
+                }
             @endphp
             <tr>
                 <td>{{ $index + 1 }}</td>
-                <td>{{ $item->product->title }}</td>
+                <td>{{ $item->product_title ?: ($item->product?->title ?: 'Történeti termék') }}</td>
                 <td>{{ $item->quantity }}</td>
-                <td>{{ $item->product->product_unit->measure }}</td>
-                <td>{{ number_format($item->unit_price, 0, ',', ' ') }} Ft</td>
-                <td>{{ number_format($lineTotal, 0, ',', ' ') }} Ft</td>
+                <td>{{ $item->unit_measure ?: ($item->product?->product_unit?->measure ?: 'db') }}</td>
+                @unless($order->is_direct_shipping)
+                    <td>{{ number_format($item->unit_price, 0, ',', ' ') }} Ft</td>
+                    <td>{{ number_format($lineTotal, 0, ',', ' ') }} Ft</td>
+                @endunless
             </tr>
         @endforeach
     </tbody>
 </table>
 
-@php
-    $vat = $netTotal * 0.27;
-    $grossTotal = $netTotal + $vat;
-@endphp
+@unless($order->is_direct_shipping)
+    @php
+        $vat = $order->vat_total ?: ($netTotal * 0.27);
+        $grossTotal = $order->gross_total ?: ($netTotal + $vat);
+    @endphp
 
-<table>
-    <tbody>
-        <tr>
-            <td colspan="5" class="text-right"><strong>Nettó végösszeg:</strong></td>
-            <td>{{ number_format($netTotal, 0, ',', ' ') }} Ft</td>
-        </tr>
-        <tr>
-            <td colspan="5" class="text-right"><strong>Áfa tartalom (27%):</strong></td>
-            <td>{{ number_format($vat, 0, ',', ' ') }} Ft</td>
-        </tr>
-        <tr>
-            <td colspan="5" class="text-right"><strong>Bruttó végösszeg:</strong></td>
-            <td><strong>{{ number_format($grossTotal, 0, ',', ' ') }} Ft</strong></td>
-        </tr>
-    </tbody>
-</table>
+    <table>
+        <tbody>
+            <tr>
+                <td colspan="5" class="text-right"><strong>Nettó végösszeg:</strong></td>
+                <td>{{ number_format($netTotal, 0, ',', ' ') }} Ft</td>
+            </tr>
+            <tr>
+                <td colspan="5" class="text-right"><strong>Áfa tartalom (27%):</strong></td>
+                <td>{{ number_format($vat, 0, ',', ' ') }} Ft</td>
+            </tr>
+            <tr>
+                <td colspan="5" class="text-right"><strong>Bruttó végösszeg:</strong></td>
+                <td><strong>{{ number_format($grossTotal, 0, ',', ' ') }} Ft</strong></td>
+            </tr>
+        </tbody>
+    </table>
+@else
+    <p><strong>Árazatlan szállítólevél:</strong> az árak és összegek ezen a dokumentumon nem szerepelnek.</p>
+@endunless
 
 </body>
 </html>

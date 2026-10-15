@@ -1,12 +1,3 @@
-<div id="ajax-cart-popup" class="pop-up-overlay d-none">
-    <div class="pop-up-box">
-        <div class="pop-up-title">Sikeres kosárba helyezés</div>
-        <div class="pop-up-actions">
-            <button type="button" class="btn btn-outlined" id="closePopup">Tovább vásárlok</button>
-            <a href="{{ route('cart') }}" class="btn btn-primary">Irány a kosár</a>
-        </div>
-    </div>
-</div>
 <section class="col-12 quick-order-page" aria-label="Gyorsrendelés">
 <div class="quick-order-intro mb-4">
     <p class="eyebrow mb-2">Gyorsrendelés</p>
@@ -39,6 +30,7 @@
     </div>
 </div>
 <div id="quick-info" class="mb-3 text-muted small"></div>
+<div id="quick-cart-status" class="small text-success mb-3" role="status" aria-live="polite"></div>
 <div id="quick-products-wrapper" class="d-grid gap-3"></div>
 
 
@@ -84,17 +76,7 @@ $(document).on('click', '.add-to-cart', function () {
         _token: '{{ csrf_token() }}',
         quantity: quantity
     }).done(function () {
-        // Kosár visszajelző popup megjelenítése
-        const ajaxPopup = document.getElementById('ajax-cart-popup');
-        if (ajaxPopup) {
-            ajaxPopup.classList.remove('d-none');
-            ajaxPopup.style.display = 'flex';
-
-            setTimeout(() => {
-                ajaxPopup.classList.add('d-none');
-                ajaxPopup.style.display = 'none';
-            }, 4000);
-        }
+        $('#quick-cart-status').text('A termék a kosárba került.');
 
         // Kosár mennyiség frissítése
         if (typeof updateCartCount === 'function') {

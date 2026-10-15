@@ -42,7 +42,7 @@
 
         <p>Örömmel értesítünk, hogy rendelésed sikeresen megérkezett hozzánk.</p>
 
-        <p><strong>Rendelésszám:</strong> EBR-2025-{{ $order->id }}<br>
+        <p><strong>Rendelésszám:</strong> {{ $order->displayNumber() }}<br>
         <strong>Rendelés dátuma:</strong> {{ \Carbon\Carbon::parse($order->created_at)->format('Y.m.d') }}</p>
 
         <p>A rendelés részleteit a csatolt rendelés részletezőben találod.</p>

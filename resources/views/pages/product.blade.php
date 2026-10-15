@@ -11,15 +11,7 @@
 @endphp
 
 @if (session()->has('addedtocart'))
-    <section class="pop-up-overlay" id="popupOverlay">
-        <div class="pop-up-box">
-            <div class="pop-up-title">{{ session()->get('addedtocart') }}</div>
-            <div class="pop-up-actions">
-                <button type="button" class="btn btn-outlined" id="closePopup">Tovább vásárlok</button>
-                <a href="{{ route('cart') }}" class="btn btn-primary">Irány a kosár</a>
-            </div>
-        </div>
-    </section>
+    <div class="container pt-3"><div class="alert alert-success" role="status">{{ session()->get('addedtocart') }}</div></div>
 @endif
 
 <main class="product-page">
@@ -91,7 +83,7 @@
                                         <span class="input-group-text">x {{ $unit->quantity }}{{ $unit->measure }}</span>
                                     </div>
                                 @endif
-                                <button type="submit" class="btn btn-primary btn-lg">
+                                <button type="submit" class="btn btn-primary btn-lg" @disabled($availability === 'out_of_stock')>
                                     <i class="bi bi-cart-plus" aria-hidden="true"></i> Kosárba
                                 </button>
                             </form>

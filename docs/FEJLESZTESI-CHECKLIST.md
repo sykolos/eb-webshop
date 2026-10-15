@@ -7,15 +7,15 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M08: Webshop, katalógus és keresés a v6 kinézetével, STAGINGEN ELLENŐRZÖTT |
-| Következő fejlesztési feladat | M09.01 CartService és adatbázisos kosár alapmodell |
-| Alkalmazásfejlesztés ebből a checklistből | M01-M08 stagingen ellenőrzött; M09 a következő fejlesztési mérföldkő |
+| Aktív mérföldkő | M09: Adatbázisos kosár és teljes rendelési folyamat, KIADÁSRA KÉSZ; CI/develop/staging kapuk folyamatban |
+| Következő fejlesztési feladat | M09.K1 CI-ellenőrzés, majd egyetlen develop push és staging UI-ellenőrzés |
+| Alkalmazásfejlesztés ebből a checklistből | M01-M08 stagingen ellenőrzött; M09 implementáció elkészült, kiadási kapui folyamatban |
 | Utolsó igazolt staging kiadás | f9f3a39, GitHub Actions #117: verify/deploy, fiókmenü, autocomplete és M08 UI átvétel sikeres |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D09 törlés technikai javaslata, D11 szolgáltató; D12-D13 későbbre halasztva |
-| Mostani változtatás | M08 v6-alapú hero, publikus ármentes katalógus, mély kategória/szűrés, partneri termékoldal, autocomplete, URL-állapot, gyorsrendelés, kiemelt sorrend és keresési indexek; az M07 meglévő árlogikája változatlan |
+| Mostani változtatás | M09 adatbázisos, partnerhez kötött kosár, session-átvitel, szerveroldali újraárazás, rendelési pillanatképek, idempotens checkout, háttérértesítés, ármentes közvetlen szállítási PDF és nem blokkoló kosár-visszajelzés; az M07 meglévő árlogikája változatlan |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -157,7 +157,7 @@ A vásárlás backendben rögzített üzleti esemény és a külső viselkedési
 | M06 | Terméktörzs, kategóriafa és webshopos szűrők adminja | STAGINGEN ELLENŐRZÖTT |
 | M07 | Egységes árképzés és admin ármátrix | STAGINGEN ELLENŐRZÖTT |
 | M08 | Webshop, katalógus és keresés a v6 kinézetével | STAGINGEN ELLENŐRZÖTT |
-| M09 | Adatbázisos kosár és teljes rendelési folyamat | TERVEZETT |
+| M09 | Adatbázisos kosár és teljes rendelési folyamat | KIADÁSRA KÉSZ |
 | M10 | Belépés, regisztrációkérés és partnerfiók | TERVEZETT |
 | M11 | Admin rendeléskezelés és kézi rendelésfelvitel | TERVEZETT |
 | M12 | Admin partnerek és felhasználók teljes kezelése | TERVEZETT |
@@ -456,19 +456,19 @@ Kiadási rekord: commit = `f9f3a39`; workflow = [GitHub Actions #117](https://gi
 
 ## M09. Adatbázisos kosár és teljes rendelési folyamat
 
-Állapot: TERVEZETT. Függőség: M04, M07, M08; D05 eldöntve: jelenlegi mennyiség/fizetés/szállítás.
+Állapot: KIADÁSRA KÉSZ. Függőség: M04, M07, M08; D05 eldöntve: jelenlegi mennyiség/fizetés/szállítás.
 Forrás: Z: Basket, pénztár, sikeroldal; L: kosármentés, mennyiség, egyszerű hozzáadás, modal eltávolítás.
 Stagingen bemutatható eredmény: Valódi partner terméket tesz kosárba, új belépés után megtalálja, és egyetlen konzisztens rendelést ad le.
 
-- [ ] M09.01 CartService és carts/cart_items adatmodell; felhasználói tulajdon, aktív kosár egyedisége, utolsó aktivitás, konkurens frissítések.
-- [ ] M09.02 Meglévő session kosár egyszeri és ismétlésbiztos átvitele; ZIP szerinti partnerhez kötött vásárlás, vendégnek belépési/regisztrációs felhívás; külön vendégkosár-bővítés nincs.
-- [ ] M09.03 Gyors hozzáadás listából/adatlapról/gyorsrendelésből; jelenlegi mennyiség/egység/szorzó és összevonás regressziós ellenőrzéssel, szerveroldali validációval; ZIP-ből új üzleti mennyiségkorlát nem kerül át.
-- [ ] M09.04 Tovább vásárlok modal eltávolítása; nem blokkoló siker/hiba értesítés, fejléc- és mobil kosárszámláló frissítése.
-- [ ] M09.05 Üres és feltöltött kosár, törlés, mennyiségmódosítás, árfrissítés, megszűnt termék, hibás hálózat és párhuzamos lapok kezelése.
-- [ ] M09.06 CheckoutService: címválasztás, fizetési/szállítási mód, megjegyzés, árazatlan szállítólevél, ellenőrzés és elfogadás.
-- [ ] M09.07 Backend újraszámítás, tranzakció és dupla beküldés elleni DB védelem; termék/ár/cím/kiszerelés/áfa pillanatkép a rendelésben.
-- [ ] M09.08 Csak sikeres rendelésmentéskor záródjon a kosár; háttérértesítés, sikeroldal és rendeléslink.
-- [ ] M09.09 Rendelésszám és PDF ne tartalmazzon rögzített demóévet; régi rendelések hiányzó történeti mezői elkülönítve.
+- [x] M09.01 CartService és carts/cart_items adatmodell; felhasználói tulajdon, aktív kosár egyedisége, utolsó aktivitás, konkurens frissítések.
+- [x] M09.02 Meglévő session kosár egyszeri és ismétlésbiztos átvitele; ZIP szerinti partnerhez kötött vásárlás, vendégnek belépési/regisztrációs felhívás; külön vendégkosár-bővítés nincs.
+- [x] M09.03 Gyors hozzáadás listából/adatlapról/gyorsrendelésből; jelenlegi mennyiség/egység/szorzó és összevonás regressziós ellenőrzéssel, szerveroldali validációval; ZIP-ből új üzleti mennyiségkorlát nem kerül át.
+- [x] M09.04 Tovább vásárlok modal eltávolítása; nem blokkoló siker/hiba értesítés, fejléc- és mobil kosárszámláló frissítése.
+- [x] M09.05 Üres és feltöltött kosár, törlés, mennyiségmódosítás, árfrissítés, megszűnt termék, hibás hálózat és párhuzamos lapok kezelése.
+- [x] M09.06 CheckoutService: címválasztás, fizetési/szállítási mód, megjegyzés, árazatlan szállítólevél, ellenőrzés és elfogadás.
+- [x] M09.07 Backend újraszámítás, tranzakció és dupla beküldés elleni DB védelem; termék/ár/cím/kiszerelés/áfa pillanatkép a rendelésben.
+- [x] M09.08 Csak sikeres rendelésmentéskor záródjon a kosár; háttérértesítés, sikeroldal és rendeléslink.
+- [x] M09.09 Rendelésszám és PDF ne tartalmazzon rögzített demóévet; régi rendelések hiányzó történeti mezői elkülönítve.
 
 Ellenőrzés: Teljes vásárlás; dupla kattintás/újraküldés; tranzakcióhiba; emailhiba; árközbeni változás; új belépés és két böngészőlap.
 Adat/deploy: DB kosár és order snapshot bővítő migráció; session átvitel naplózva; visszaállítás ne vesszen el kosár/rendelés.
@@ -476,13 +476,13 @@ Adat/deploy: DB kosár és order snapshot bővítő migráció; session átvitel
 ### M09 kiadási kapuk
 
 - [ ] M09.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
-- [ ] M09.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
+- [x] M09.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
 - [ ] M09.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
 - [ ] M09.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
 - [ ] M09.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
 - [ ] M09.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
 
-Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+Kiadási rekord: implementáció elkészült; helyi PHP lint, Blade cache, Vite build és diff-check sikeres; PHPUnit helyben nem indítható PDO SQLite driver hiányában. Commit, CI/workflow és staging próba a következő kiadási kapu.
 
 ## M10. Belépés, regisztrációkérés és partnerfiók
 

@@ -54,7 +54,7 @@
                         <a class="nav-link position-relative" href="{{ route('cart') }}">
                             Kosár
                             <span id="cart-count" class="cart-badge badge-custom">
-                                {{ session('cart') ? collect(session('cart'))->sum('quantity') : 0 }}
+                                {{ auth()->user()->cart?->items()->sum('quantity') ?? 0 }}
                             </span>
                         </a>
                         <div id="cart-preview" class="dropdown-menu p-2" style="display: none;"></div>

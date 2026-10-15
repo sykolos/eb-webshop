@@ -82,7 +82,8 @@
                         data-url="{{ route('addtocart', ['id' => $product->id, 'q' => $product->product_unit->quantity ?? 1, 'm' => $product->product_unit->measure ?? 'db']) }}"
                         data-id="{{ $product->id }}"
                         data-q="{{ $product->product_unit->quantity ?? 1 }}"
-                        data-m="{{ $product->product_unit->measure ?? 'db' }}">
+                        data-m="{{ $product->product_unit->measure ?? 'db' }}"
+                        @disabled(($product->availability_status ?? 'in_stock') === 'out_of_stock')>
                     <i class="bi bi-cart-plus" aria-hidden="true"></i> Kosárba
                 </button>
             @else

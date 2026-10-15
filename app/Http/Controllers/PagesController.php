@@ -17,6 +17,7 @@ use App\Http\Controllers\ProductRecommend;
 use App\Services\CategoryTreeService;
 use App\Services\FilterCatalogService;
 use App\Services\PricingService;
+use App\Services\CartService;
 
 class PagesController extends Controller
 {
@@ -54,7 +55,7 @@ class PagesController extends Controller
 
 
     //cart
-    public function cart() {
+    public function cart(CartService $carts) {
         
         $user = auth()->user();
 
@@ -83,8 +84,12 @@ class PagesController extends Controller
             return view('pages/no-cart');
         }
 
-        // Minden OK
-        return view('pages/cart');
+        $lines = $carts->lines($user);
+
+        return view('pages/cart', [
+            'lines' => $lines,
+            'summary' => $carts->summary($user, $lines),
+        ]);
     }
 
     public function contact(){
@@ -125,13 +130,23 @@ class PagesController extends Controller
     public function eny(){
         return view('pages.eny');
     }
-    public function checkout(){
+    public function checkout(CartService $carts){
         $id=auth()->user()->id;
         $user_s=User_shipping::where('user_id','=',$id)->first();
         $user_i=User_invoce::where('user_id','=',$id)->first();
+        $lines = $carts->lines(auth()->user());
+        if ($lines === []) {
+            return redirect()->route('cart')->with('error', 'A kosarad üres.');
+        }
         $checkout_token = session()->get('checkout_token') ?: (string) Str::uuid();
         session()->put('checkout_token', $checkout_token);
-        echo view('pages/checkout', compact('user_s', 'user_i', 'checkout_token'));
+        return view('pages/checkout', [
+            'user_s' => $user_s,
+            'user_i' => $user_i,
+            'checkout_token' => $checkout_token,
+            'lines' => $lines,
+            'summary' => $carts->summary(auth()->user(), $lines),
+        ]);
     }
     
     public function orderpage(Request $request, CategoryTreeService $tree, FilterCatalogService $filters, PricingService $pricing)

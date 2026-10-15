@@ -19,7 +19,7 @@
                             </tr>
                             <tr>
                                 <td>Rendelésazonosító</td>
-                                <td>EBR-2025-{{ $order->id }}</td>
+                                <td>{{ $order->displayNumber() }}</td>
                             </tr>
                             <tr>
                                 <td>Rendelési dátum</td>
@@ -51,15 +51,15 @@
                             </tr>
                             <tr>
                                 <td>Teljes összeg (nettó)</td>
-                                <td>{{ number_format($order->total, 0, ',', ' ') }} Ft</td>
+                                <td>{{ $order->is_direct_shipping ? 'Árazatlan' : number_format($order->subtotal_net ?: $order->total, 0, ',', ' ') . ' Ft' }}</td>
                             </tr>
                             <tr>
                                 <td>Áfa (27%)</td>
-                                <td>{{ number_format($order->total * 0.27, 0, ',', ' ') }} Ft</td>
+                                <td>{{ $order->is_direct_shipping ? 'Árazatlan' : number_format($order->vat_total ?: ($order->total * 0.27), 0, ',', ' ') . ' Ft' }}</td>
                             </tr>
                             <tr>
                                 <td>Teljes összeg (bruttó)</td>
-                                <td>{{ number_format($order->total * 1.27, 0, ',', ' ') }} Ft</td>
+                                <td>{{ $order->is_direct_shipping ? 'Árazatlan' : number_format($order->gross_total ?: ($order->total * 1.27), 0, ',', ' ') . ' Ft' }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -78,23 +78,21 @@
                             <th>Termék neve</th>
                             <th>Mennyiség</th>
                             <th>Menny.egység</th>
-                            <th>Egység ár</th>
-                            <th>Ár</th>
+                            @unless($order->is_direct_shipping)
+                                <th>Egység ár</th>
+                                <th>Ár</th>
+                            @endunless
                         </thead>
                         <tbody>
                             @foreach ($order->items as $item)
                             <tr>
-                                <td>{{$item->product->title}}</td>                                
-                                <td>{{$item->quantity}}</td>            
-                                <td>{{$item->product->product_unit->measure}}</td>                    
-                                <td>
-                                    {{$item->unit_price}}
-                                    Ft
-                                </td>
-                                <td>
-                                    {{$item->unit_price * $item->quantity}}
-                                     Ft
-                                </td>
+                                <td>{{$item->product_title ?: ($item->product?->title ?: 'Történeti termék')}}</td>
+                                <td>{{$item->quantity}}</td>
+                                <td>{{$item->unit_measure ?: ($item->product?->product_unit?->measure ?: 'db')}}</td>
+                                @unless($order->is_direct_shipping)
+                                    <td>{{ number_format($item->unit_price, 0, ',', ' ') }} Ft</td>
+                                    <td>{{ number_format($item->line_net ?? ($item->unit_price * $item->quantity), 0, ',', ' ') }} Ft</td>
+                                @endunless
                             </tr>
                             @endforeach
                         </tbody>
@@ -106,14 +104,12 @@
                             @foreach ($order->items as $item)
                                 <div class="col-md-6 col-lg-4 mb-4">
                                     <div class="product-card border rounded p-3 bg-white shadow-sm h-100">
-                                        <p><strong>🛒 Termék:</strong> {{ $item->product->title }}</p>
-                                        <p><strong>Mennyiség:</strong> {{ $item->quantity }} {{ $item->product->product_unit->measure }}</p>
-                                        <p><strong>Egységár:</strong>
-                                            {{ number_format($item->unit_price, 0, ',', ' ') }} Ft
-                                        </p>
-                                        <p><strong>Összesen:</strong>
-                                            {{ number_format($item->unit_price * $item->quantity, 0, ',', ' ') }} Ft
-                                        </p>
+                                        <p><strong>Termék:</strong> {{ $item->product_title ?: ($item->product?->title ?: 'Történeti termék') }}</p>
+                                        <p><strong>Mennyiség:</strong> {{ $item->quantity }} {{ $item->unit_measure ?: ($item->product?->product_unit?->measure ?: 'db') }}</p>
+                                        @unless($order->is_direct_shipping)
+                                            <p><strong>Egységár:</strong> {{ number_format($item->unit_price, 0, ',', ' ') }} Ft</p>
+                                            <p><strong>Összesen:</strong> {{ number_format($item->line_net ?? ($item->unit_price * $item->quantity), 0, ',', ' ') }} Ft</p>
+                                        @endunless
                                     </div>
                                 </div>
                             @endforeach

@@ -31,7 +31,7 @@
                                             <td data-label="Végösszeg" class="align-middle">{{ $order->total }}</td>
                                             
                                             <td data-label="Státusz" class="align-middle">{{ $order->status }}</td>
-                                            <td data-label="Azonosító" class="align-middle">EBR-2025-{{ $order->id }}</td>
+                                            <td data-label="Azonosító" class="align-middle">{{ $order->displayNumber() }}</td>
                                             <td data-label="Részletek" class="align-middle">
                                                 <a href="{{ route('account.details', $order->id) }}" class="btn btn-secondary">Részletek</a> 
                                             </td>

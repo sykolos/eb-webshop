@@ -2,121 +2,91 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Special_prices;
-use App\Models\Products;
+use App\Services\CartService;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
 {
-    public function addtocart(Request $request, $id, $q, $m)
+    public function addtocart(Request $request, int $id, int $q, string $m, CartService $carts)
     {
         $validated = $request->validate([
             'quantity' => ['required', 'integer', 'min:1'],
         ]);
 
-        $product = Products::with(['special_prices', 'product_unit'])->findOrFail($id);
-        $quantity = (int) $validated['quantity'];
-        $unit = $product->product_unit;
+        $carts->add($request->user(), $id, (int) $validated['quantity']);
 
-        // Keep the legacy route shape, but source packaging from the product record.
-        $item = [
-            'product' => $product->toArray(),
-            'quantity' => $quantity,
-            'q' => (int) ($unit?->quantity ?: 1),
-            'm' => $unit?->measure ?: 'db',
-        ];
-
-        if (session()->has('cart')) {
-            $cart = session()->get('cart');
-            $key = $this->checkItemInCart($item);
-
-            if ($key != -1) {
-                $cart[$key]['quantity'] += $quantity;
-                session()->put('cart', $cart);
-            } else {
-                session()->push('cart', $item);
-            }
-        } else {
-            session()->push('cart', $item);
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => 'A termék a kosárba került.',
+                'count' => $carts->count($request->user()),
+            ]);
         }
 
-        return back()->with('addedtocart', 'Hozzáadva a kosárhoz');
+        return back()->with('addedtocart', 'A termék a kosárba került.');
     }
 
-    public function checkItemInCart($item){
-
-        foreach(session()->get('cart') as $key =>$val)
-        {
-            if($val['product']['id'] == $item['product']['id']){
-                return $key;
-            }
-        }
-        return -1;
-
-    }
-    public function removefromcart($key){
-        if(session()->has('cart')){
-            $cart=session()->get('cart');
-            array_splice($cart,$key,1);
-            session()->put('cart',$cart);
-            return back()->with('success','Termék törölve.');
-        }
-        return back();
-    }
-    public function cartCount()
+    public function removefromcart(Request $request, int $key, CartService $carts)
     {
-        $count = collect(session('cart', []))->sum('quantity');
-        return response()->json(['count' => $count]);
+        $carts->remove($request->user(), $key);
+
+        return back()->with('success', 'Termék törölve.');
     }
-    public function previewcart()
+
+    public function cartCount(Request $request, CartService $carts)
     {
-        $cart = session('cart', []);
-        $totalNet = 0;
+        return response()->json(['count' => $carts->count($request->user())]);
+    }
 
-        foreach ($cart as $item) {
-            $netUnitPrice = floatval($item['product']['price'] ?? 0);
-            $totalNet += $netUnitPrice * (int) $item['quantity'];
-        }
-
+    public function previewcart(Request $request, CartService $carts)
+    {
+        $lines = $carts->lines($request->user());
 
         return view('pages.components.cart.cart-preview', [
-            'cart' => $cart,
-            'totalNet' => $totalNet,
-        ]);  
-    }  
-    public function updateQuantity(Request $request)
+            'lines' => $lines,
+            'summary' => $carts->summary($request->user(), $lines),
+        ]);
+    }
+
+    public function updateQuantity(Request $request, CartService $carts)
     {
         $validated = $request->validate([
-            'key' => ['required', 'integer', 'min:0'],
+            'key' => ['required', 'integer', 'min:1'],
             'change' => ['required', 'integer', 'in:-1,1'],
         ]);
 
-        $key = (int) $validated['key'];
-        $change = (int) $validated['change'];
+        $carts->update($request->user(), (int) $validated['key'], (int) $validated['change']);
+        $lines = $carts->lines($request->user());
+        $line = collect($lines)->first(fn ($line) => (int) $line['item']->id === (int) $validated['key']);
 
-        $cart = session('cart', []);
-        if (isset($cart[$key])) {
-            $cart[$key]['quantity'] = max(1, $cart[$key]['quantity'] + $change);
-            session()->put('cart', $cart);
+        if ($request->expectsJson()) {
+            return response()->json([
+                'count' => $carts->count($request->user()),
+                'line' => $line ? [
+                    'item_id' => $line['item']->id,
+                    'quantity' => $line['quantity'],
+                    'line_net' => $line['quote']['line_net'] ?? null,
+                ] : null,
+                'summary' => $carts->summary($request->user(), $lines),
+            ]);
         }
 
         return response()->noContent();
     }
 
-    public function removeItem(Request $request)
+    public function removeItem(Request $request, CartService $carts)
     {
         $validated = $request->validate([
-            'key' => ['required', 'integer', 'min:0'],
+            'key' => ['required', 'integer', 'min:1'],
         ]);
 
-        $key = (int) $validated['key'];
-        $cart = session('cart', []);
-        if (isset($cart[$key])) {
-            unset($cart[$key]);
-            session()->put('cart', array_values($cart)); // újraindexelés
+        $carts->remove($request->user(), (int) $validated['key']);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'count' => $carts->count($request->user()),
+            ]);
         }
 
         return response()->noContent();
     }
-
 }

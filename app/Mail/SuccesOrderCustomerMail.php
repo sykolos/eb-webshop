@@ -31,7 +31,7 @@ class SuccesOrderCustomerMail extends Mailable
             'id' => $this->id,
         ]);
 
-        $filename = 'EBR-2025-' . $this->order->id . '.pdf';
+        $filename = $this->order->displayNumber() . '.pdf';
 
         return $this->view('emails.SuccesOrderCustomer')
             ->subject('Sikeres Rendelés')

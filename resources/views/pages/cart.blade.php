@@ -1,25 +1,19 @@
 @extends('layouts.master')
-@section('title','Cart Page')
+@section('title', 'Kosár')
 @section('content')
-
 
 <div class="row justify-content-center align-items-center page-header-title">
     <div class="col-md-6 text-center mb-5">
-        <h2 class="heading-section section-header ">Kosár</h2>
+        <h2 class="heading-section section-header">Kosár</h2>
     </div>
 </div>
 
-@if (session()->has('success'))
-<section class="pop-up">
-    <div class="pop-up-box">
-        <div class="pop-up-title">
-            {{session()->get('success')}}
-        </div>
-        <div class="pop-up-actions">
-            <a href="{{route('home')}}" class="btn btn-outlined">Continue Shopping</a>
+@if (session('success') || session('error'))
+    <div class="container mb-3">
+        <div class="alert {{ session('error') ? 'alert-warning' : 'alert-success' }}">
+            {{ session('success') ?: session('error') }}
         </div>
     </div>
-</section>
 @endif
 
 <main class="cart-page">
@@ -29,47 +23,61 @@
                 <thead class="bg-dark text-white">
                     <tr>
                         <th>Termék</th>
-                        <th>Egység ár</th>
-                        <th>Mennyiség</th>
-                        <th>Menny.Egység</th>
+                        <th>Csomagár</th>
+                        <th>Csomag</th>
+                        <th>Mennyiségi egység</th>
                         <th>Összesen</th>
                         <th>Törlés</th>
                     </tr>
                 </thead>
                 <tbody id="cart-body">
-                    
-                    @if(session()->has('cart')&&count(session()->get('cart'))>0)
-                        
-                            @foreach (session()->get('cart') as $key => $item)
-                            <tr data-key="{{$key}}" class="cart-row">
+                    @forelse ($lines as $line)
+                        @php
+                            $product = $line['product'];
+                            $quote = $line['quote'];
+                            $item = $line['item'];
+                        @endphp
+                        <tr data-key="{{ $item->id }}" class="cart-row {{ $line['available'] ? '' : 'cart-row-unavailable' }}">
                             <td data-label="Termék" class="px-2">
-                                <a href="{{route('product',$item['product']['id'])}}" class="cart-item-title d-flex align-items-center gap-2">
-                                    <img src="{{ asset('storage/' . $item['product']['image']) }}" alt="" style="width:60px; height:auto">
-                                    <p class="m-0">{{$item['product']['title']}}</p>
-                                </a>
+                                @if ($product)
+                                    <a href="{{ route('product', $product->id) }}" class="cart-item-title d-flex align-items-center gap-2">
+                                        @if ($product->image)
+                                            <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->title }}" style="width:60px; height:auto">
+                                        @endif
+                                        <p class="m-0">{{ $product->title }}</p>
+                                    </a>
+                                @else
+                                    <span>Ismeretlen termék</span>
+                                @endif
+                                @if (!$line['available'])
+                                    <small class="d-block text-danger mt-1">{{ $line['warning'] }}</small>
+                                @endif
                             </td>
-                            <td data-label="Egység ár">{{ App\Models\Cart::unitnet($item) }} Ft</td>
-                            <td data-label="Mennyiségi">
-                                <div class="d-flex gap-2">
-                                    <button class="btn btn-sm btn-outline-secondary quantity-decrease" data-key="{{ $key }}" data-change="-1">−</button>
-                                    <span class="cart-quantity">{{ $item['quantity'] }}</span>
-                                    <button class="btn btn-sm btn-outline-secondary quantity-increase" data-key="{{ $key }}" data-change="1">+</button>
+                            <td data-label="Csomagár">{{ $quote ? number_format($quote['pack_net'], 0, ',', ' ') . ' Ft' : 'Nem elérhető' }}</td>
+                            <td data-label="Csomag">
+                                <div class="d-flex gap-2 align-items-center">
+                                    <button class="btn btn-sm btn-outline-secondary quantity-decrease" data-key="{{ $item->id }}" data-change="-1" aria-label="Mennyiség csökkentése">−</button>
+                                    <span class="cart-quantity">{{ $line['quantity'] }}</span>
+                                    <button class="btn btn-sm btn-outline-secondary quantity-increase" data-key="{{ $item->id }}" data-change="1" aria-label="Mennyiség növelése">+</button>
                                 </div>
                             </td>
-                            <td data-label="Menny. egység">{{$item['q'] }}{{ $item['m']}}</td>
-                            <td data-label="Összesen" class="cart-subtotal">{{ App\Models\Cart::unitprice($item) * $item['q'] }} Ft</td>
+                            <td data-label="Mennyiségi egység">{{ $line['pack_quantity'] }}{{ $line['measure'] }}</td>
+                            <td data-label="Összesen" class="cart-subtotal" data-line-net="{{ $quote['line_net'] ?? '' }}">
+                                {{ $quote ? number_format($quote['line_net'], 0, ',', ' ') . ' Ft' : 'Nem elérhető' }}
+                            </td>
                             <td data-label="Törlés">
-                                <button class="btn btn-danger btn-sm cart-remove" data-key="{{ $key }}">x</button>
+                                <button class="btn btn-danger btn-sm cart-remove" data-key="{{ $item->id }}" aria-label="Termék törlése">×</button>
                             </td>
                         </tr>
-                            @endforeach
+                    @empty
+                        <tr><td colspan="6" class="empty-cart">A kosarad üres.</td></tr>
+                    @endforelse
+                    @if ($lines)
                         <tr class="cart-total">
                             <td colspan="6" class="text-center">
-                                Összesen: <strong>{{ App\Models\Cart::totalamount() }} Ft + Áfa</strong>
+                                Összesen nettó: <strong>{{ number_format($summary['net'], 0, ',', ' ') }} Ft</strong>
                             </td>
                         </tr>
-                    @else
-                        <tr><td colspan="6" class="empty-cart">A kosarad üres</td></tr>
                     @endif
                 </tbody>
             </table>
@@ -77,12 +85,13 @@
                 <div class="spinner-border text-danger" role="status" style="width: 3rem; height: 3rem;"></div>
             </div>
         </div>
-            <div class="cart-actions">
-                <a href="{{route('checkout')}}" class="btn btn-primary btn-lg px-4 me-sm-3 bg-gradient">Tovább a véglegesítéshez</a>
-            </div>
+        <div class="cart-actions">
+            @if ($lines && !$summary['has_unavailable'])
+                <a href="{{ route('checkout') }}" class="btn btn-primary btn-lg px-4 me-sm-3 bg-gradient">Tovább a véglegesítéshez</a>
+            @elseif ($lines)
+                <p class="text-danger mb-0">A rendelés folytatásához távolítsd el a már nem elérhető terméket.</p>
+            @endif
+        </div>
     </div>
 </main>
-
-
-
 @endsection

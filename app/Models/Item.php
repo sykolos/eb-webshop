@@ -10,6 +10,11 @@ class Item extends Model
     use HasFactory;
     protected $guarded =[];
 
+    protected $casts = [
+        'quantity' => 'integer',
+        'pack_quantity' => 'integer',
+    ];
+
     public function product(){
         return $this->belongsTo(Products::class, 'product_id');
     }
