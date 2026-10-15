@@ -7,15 +7,15 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M20: Aktuális akciók és partneri ajánlatok, KIADÁSRA KÉSZ |
-| Következő fejlesztési feladat | M20.K4: commit, develop push és a staging workflow megfigyelése |
-| Alkalmazásfejlesztés ebből a checklistből | M01-M19 stagingen ellenőrzött; M20 ajánlati törzs, termék/kategória-kapcsolat, időzítés, banner-link, export és meglévő árazási integráció lokálisan ellenőrizve; külön chat nem része a rendszernek |
-| Utolsó igazolt staging kiadás | `ba9c203`, GitHub Actions [run 38813030720](https://github.com/sykolos/eb-webshop/actions/runs/38813030720): M19 verify/deploy sikeres; staging átvétel megtörtént |
+| Aktív mérföldkő | M21: Teljes átállás, teljesítmény és üzemeltetési átadás, TERVEZETT |
+| Következő fejlesztési feladat | M21.01: oldaljegyzék, igénylefedettség és végleges átállási ellenőrzés |
+| Alkalmazásfejlesztés ebből a checklistből | M01-M20 stagingen ellenőrzött; M20 ajánlati törzs, termék/kategória-kapcsolat, időzítés, banner-link, export és meglévő árazási integráció stagingen ellenőrizve; külön chat nem része a rendszernek |
+| Utolsó igazolt staging kiadás | `780a9a7c5195249885073f2bb92f47726645cbb2`, GitHub Actions [run 38819191813](https://github.com/sykolos/eb-webshop/actions/runs/38819191813): M20 verify/deploy sikeres; staging átvétel megtörtént |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D11 szolgáltató; D12 későbbre halasztva |
-| Mostani változtatás | M20: időzített, kézzel kiválasztott aktuális ajánlatok termék- és kategóriakörrel, M14 bannerkapcsolattal és meglévő PricingService-ármegjelenítéssel; új kedvezmény- vagy árprioritási motor nincs |
+| Mostani változtatás | M20 lezárva: időzített, kézzel kiválasztott aktuális ajánlatok termék- és kategóriakörrel, M14 bannerkapcsolattal és meglévő PricingService-ármegjelenítéssel; új kedvezmény- vagy árprioritási motor nincs |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -790,7 +790,7 @@ Kiadási rekord: commit = `ba9c2033880a52a39c012278b37f0f8a3e05ce56`; GitHub Act
 
 ## M20. Aktuális akciók és partneri ajánlatok megjelenítése
 
-Állapot: KIADÁSRA KÉSZ. Függőség: M07, M08, M09, M14; D07 eldöntve: meglévő árazás.
+Állapot: STAGINGEN ELLENŐRZÖTT. Függőség: M07, M08, M09, M14; D07 eldöntve: meglévő árazás.
 Forrás: Z: akcióoldal; L: meglévő kedvezményrendszer megőrzése és aktuális akciók megjelenítése.
 Stagingen bemutatható eredmény: Kiemelt ajánlatból a termékhez jutunk; a megjelenített partnerár ugyanaz, mint a kosárban és rendelésben.
 
@@ -809,11 +809,11 @@ Adat/deploy: Tartalmi termék/kategória kapcsolatok bővítő migrációja; meg
 - [x] M20.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
 - [x] M20.K2 Két új, idempotens kapcsolatot védő migráció készült: az ajánlati törzs/pivotok és a nullable banner-ajánlatkapcsolat; meglévő ár- és rendelési adathoz nem nyúl, visszaállítás csak az új táblákat/oszlopot érinti, új környezeti változó nem kell.
 - [x] M20.K3 Diff ellenőrizve, csak célzott ajánlati, banner-, export-, route-, nézet-, stílus-, migráció-, teszt- és checklist-fájlok; reprodukálható, önállóan commitolható állapot.
-- [ ] M20.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
-- [ ] M20.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
-- [ ] M20.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+- [x] M20.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [x] M20.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
+- [x] M20.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
 
-Kiadási rekord: commit = előkészítés alatt; workflow = nincs; staging próba = nem futott. M20 célteszt: 3 teszt / 24 assertion; kapcsolódó M07/M08/M13/M14 regressziós kör: 17 teszt / 81 assertion, 1 skip; teljes PHPUnit: 115 teszt / 520 assertion, 2 skip; Vite build, PHP lint, Blade cache, route-list és diff-check sikeres. A build meglévő Sass/Bootstrap deprecation és hero asset runtime figyelmeztetéseket tartalmaz.
+Kiadási rekord: commit = `780a9a7c5195249885073f2bb92f47726645cbb2`; workflow = [GitHub Actions #38819191813](https://github.com/sykolos/eb-webshop/actions/runs/38819191813), verify/deploy sikeres; staging = `https://ebtest.dekor26.hu`. M20 célteszt: 3 teszt / 24 assertion; kapcsolódó M07/M08/M13/M14 regressziós kör: 17 teszt / 81 assertion; teljes PHPUnit: 115 teszt / 529 assertion, hibamentes futás; Vite build, PHP lint, Blade cache, route-list és diff-check sikeres. Staging QA: `/adminpanel/offers`, `/info/akciok`, `/adminpanel/exports` és `/adminpanel/banners` betöltött; a publikus oldal ármentes üres állapota, az ajánlati export és a kapcsolt ajánlat mező látható; 390x844, 768x1024 és 1440x900 méreten nem volt vízszintes túlcsordulás. Stagingen nem mentettem ajánlatot, bannert, exportot vagy más üzleti adatot. A build meglévő Sass/Bootstrap deprecation és hero asset runtime figyelmeztetéseket tartalmaz.
 
 ## M21. Teljes átállás, teljesítmény és üzemeltetési átadás
 
@@ -1283,8 +1283,16 @@ Kiadási bejegyzéshez szükséges részletek:
 - Elkészült az M20.01-M20.06 technikai köre: időzített ajánlati törzs, termék- és kategóriaág-kapcsolat, admin szerkesztés/publikálás/visszavonás, M14 bannerkapcsolat, publikus `/info/akciok` oldal és kezdőoldali aktuális ajánlatlista.
 - A vendég ajánlati oldala ármentes; a bejelentkezett partner saját árát a változatlan `PricingService` számolja. Az ajánlat nem módosít kedvezményprioritást, speciális árat, kosár- vagy rendelési logikát, és nem jelenít meg kitalált akciós százalékot vagy áthúzott árat.
 - Az ajánlati törzs exportálható, a mentés/publikálás auditált, a publikus cache verziózottan érvényteleníthető, a kezdő- és lejárati időszak szűrése szerveroldali. A két migráció idempotens, a meglévő ár-, rendelés- és banneradatokat megőrzi.
-- Helyi ellenőrzés: M20 célteszt **3 teszt / 24 assertion**, kapcsolódó M07/M08/M13/M14 regressziós kör **17 teszt / 81 assertion**, 1 korábbi skip; teljes PHPUnit **115 teszt / 520 assertion**, 2 skip; Vite build, PHP lint, Blade cache, route-list és `git diff --check` sikeres. A meglévő Sass/Bootstrap deprecation és hero asset runtime figyelmeztetések megmaradtak.
+- Helyi ellenőrzés: M20 célteszt **3 teszt / 24 assertion**, kapcsolódó M07/M08/M13/M14 regressziós kör **17 teszt / 81 assertion**; teljes PHPUnit **115 teszt / 529 assertion**, hibamentes futás; Vite build, PHP lint, Blade cache, route-list és `git diff --check` sikeres. A meglévő Sass/Bootstrap deprecation és hero asset runtime figyelmeztetések megmaradtak.
 - M20.K1-K3 teljesült. Következő konkrét lépés: célzott commit, `develop` push, a meglévő verify/deploy workflow megfigyelése, majd admin ajánlatkezelő és publikus ajánlati oldal QA 390/768/1440 px-en.
+
+### 2026-10-16: M20 stagingen ellenőrzött
+
+- A `780a9a7c5195249885073f2bb92f47726645cbb2` commit a `develop` ágra került; a [38819191813](https://github.com/sykolos/eb-webshop/actions/runs/38819191813) verify és deploy sikeres.
+- Admin staging QA: az `/adminpanel/offers` ajánlatkezelő betöltött a termék-/kategóriakapcsolatokkal, időzítéssel és publikációs listával; az `/adminpanel/banners` oldalon látszik a kapcsolt ajánlat mező; az `/adminpanel/exports` alatt az Aktuális ajánlatok adatkör bekerült a 19 exportálható körbe.
+- Publikus QA: az `/info/akciok` oldal betöltött, és adat hiányában ármentes, őszinte üres állapotot mutat. Stagingen nem mentettem ajánlatot, bannert, exportot vagy más üzleti adatot.
+- Reszponzív QA: az ajánlatkezelő 390x844, 768x1024 és 1440x900 méreten betöltött; a mért dokumentumszélesség mindhárom méreten a viewporton belül maradt, vízszintes túlcsordulás nem volt.
+- M20.K1-K6 teljesült. Következő konkrét fejlesztési feladat: M21.01 oldaljegyzék, igénylefedettség és teljes átállási ellenőrzés. Ismert, nem blokkoló korlát: a Bootstrap/jQuery teljes kivezetése, teljesítmény- és biztonsági audit, valamint az üzemeltetési/éles átadási csomag M21 feladata.
 
 ### Következő munkamenet sablonja
 
