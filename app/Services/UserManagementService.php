@@ -70,7 +70,7 @@ final class UserManagementService
         $this->applyDateFilter($query, 'created_at', $filters['created_from'] ?? null, $filters['created_to'] ?? null);
         $this->applyDateFilter($query, 'last_login_at', $filters['login_from'] ?? null, $filters['login_to'] ?? null);
 
-        if (($filters['without_orders'] ?? false) === true) {
+        if (filter_var($filters['without_orders'] ?? false, FILTER_VALIDATE_BOOLEAN)) {
             $query->whereDoesntHave('orders');
         }
 
