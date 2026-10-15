@@ -318,7 +318,7 @@ body.v6-body a { color: inherit; }
     .v6-filter-bar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
     .v6-header-row { min-height: 68px; }
     .v6-nav-toggle { display: inline-flex; }
     .v6-main-nav { position: absolute; top: 68px; left: 0; right: 0; display: none; gap: 0; padding: 8px 16px 16px; border-bottom: 1px solid var(--eb-line); background: var(--eb-white); box-shadow: var(--eb-shadow); }
