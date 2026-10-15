@@ -7,15 +7,15 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M11: Admin rendeléskezelés és kézi rendelésfelvitel, STAGINGEN ELLENŐRZÖTT |
-| Következő fejlesztési feladat | M12.01: admin partnerlista és teljes partneradatlap |
-| Alkalmazásfejlesztés ebből a checklistből | M01-M11 stagingen ellenőrzött; M11 K1-K6 teljesült |
-| Utolsó igazolt staging kiadás | 822094a, GitHub Actions run 38717403164: verify/deploy sikeres; admin rendeléslista, kézi rendelésfelvitel, rendelésadatlap és reszponzív ellenőrzés rendben |
+| Aktív mérföldkő | M12: Admin partnerek és felhasználók teljes kezelése, STAGING KIADÁS FOLYAMATBAN |
+| Következő fejlesztési feladat | M12 `develop` újradeploy a felszabadított staging tárhellyel; utána admin lista/adatlap átvétel |
+| Alkalmazásfejlesztés ebből a checklistből | M01-M11 stagingen ellenőrzött; M12.01-M12.07 kód elkészült, M12 K1-K3 teljesült |
+| Utolsó igazolt staging kiadás | 822094a, GitHub Actions run 38717403164: M11 verify/deploy sikeres; az M12 deploy a távoli tárhelykvóta miatt rollbackolt |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D11 szolgáltató; D12-D13 későbbre halasztva |
-| Mostani változtatás | M11 V6 admin rendeléslista és URL-szűrés, soros/tömeges státuszkezelés, státuszelőzmény/audit/értesítés, visszaállítható törlés és közös PricingService-t használó idempotens kézi rendelésrögzítés; az M09 kosár- és az M07 árlogikája változatlan |
+| Mostani változtatás | M12 V6 partnerlista, aktivitási szűrések, teljes partneradatlap, cím/számlázás/jogosultság módosítás, jóváhagyási nézet, audit, jelszó-reset és visszaállítható archiválás; az M09 kosár-, M07 ár- és M11 rendeléslogika változatlan |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -544,31 +544,31 @@ Kiadási rekord: commit = `822094a`; workflow = [38717403164](https://github.com
 
 ## M12. Admin partnerek és felhasználók teljes kezelése
 
-Állapot: TERVEZETT. Függőség: M04, M10, M11.
+Állapot: KÓD KÉSZ / STAGING BLOKKOLVA. Függőség: M04, M10, M11.
 Forrás: Z: Partners és részletes adatlap; L: összes adat, inaktív/sima felhasználó szűrés.
 Stagingen bemutatható eredmény: Admin kérelmet jóváhagy, üzleti adatokat módosít, és a felhasználókat több szempont szerint szűri.
 
-- [ ] M12.01 Partnerlista és részletes adatlap: ID, cég/felhasználó, email, kapcsolattartó, számlázás, szállítás, regisztráció/jóváhagyás ideje, megjegyzések.
-- [ ] M12.02 Üzletileg szerkeszthető összes mező, címek és szerepkör kontrollált szerkesztése; jelszó helyett visszaállítási folyamat.
-- [ ] M12.03 Jóváhagyásra váró kérelmek külön lista és közvetlen elfogadás; elutasítás/tiltás okkal és auditnaplóval.
-- [ ] M12.04 Szűrők: aktív/tiltott/függő, admin/sima felhasználó/szerepkör, utolsó belépés, utolsó rendelés, rendelés nélküliek, dátum és cégadatok.
-- [ ] M12.05 Inaktivitás az utolsó rendelés alapján D10 szerint, állítható napküszöbbel; rendelés nélküli partner külön szűrő. Utolsó belépés további adat, nem az inaktivitás alapja; jogosultsági státusz külön fogalom.
-- [ ] M12.06 Kapcsolódó rendelések és partnerárak hivatkozásai; szerepkörváltás nem történhet partnerjóváhagyás mellékhatásaként.
-- [ ] M12.07 Saját adminjog és utolsó admin véletlen eltávolításának kezelése; partner törlés/archiválás üzleti adatok megőrzésével.
+- [x] M12.01 Partnerlista és részletes adatlap: ID, cég/felhasználó, email, kapcsolattartó, számlázás, szállítás, regisztráció/jóváhagyás ideje, megjegyzések.
+- [x] M12.02 Üzletileg szerkeszthető összes mező, címek és szerepkör kontrollált szerkesztése; jelszó helyett visszaállítási folyamat.
+- [x] M12.03 Jóváhagyásra váró kérelmek külön lista és közvetlen elfogadás; elutasítás/tiltás okkal és auditnaplóval.
+- [x] M12.04 Szűrők: aktív/tiltott/függő, admin/sima felhasználó/szerepkör, utolsó belépés, utolsó rendelés, rendelés nélküliek, dátum és cégadatok.
+- [x] M12.05 Inaktivitás az utolsó rendelés alapján D10 szerint, állítható napküszöbbel; rendelés nélküli partner külön szűrő. Utolsó belépés további adat, nem az inaktivitás alapja; jogosultsági státusz külön fogalom.
+- [x] M12.06 Kapcsolódó rendelések és partnerárak hivatkozásai; szerepkörváltás nem történhet partnerjóváhagyás mellékhatásaként.
+- [x] M12.07 Saját adminjog és utolsó admin véletlen eltávolításának kezelése; partner törlés/archiválás üzleti adatok megőrzésével.
 
 Ellenőrzés: Jogosultságemelés tiltása; jóváhagyási folyamat; szűrők kombinációi; módosítás audit; partner történeti rendelései megmaradnak.
 Adat/deploy: Régi felhasználó/cég/cím mezők mappingje, státuszok és aktivitás kezdeti ismeretlen értékei dokumentálva.
 
 ### M12 kiadási kapuk
 
-- [ ] M12.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
-- [ ] M12.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
-- [ ] M12.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [x] M12.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [x] M12.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
+- [x] M12.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
 - [ ] M12.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
 - [ ] M12.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
 - [ ] M12.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
 
-Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+Kiadási rekord: kód commitok = `7d0da75`, `039aa00`, `9d63951`; verify sikeres = [38721498975](https://github.com/sykolos/eb-webshop/actions/runs/38721498975), [38721808476](https://github.com/sykolos/eb-webshop/actions/runs/38721808476); staging deploy sikertelen = a távoli kibontás `Disk quota exceeded` hibával rollbackolt; staging próba = az M12 még nem érhető el.
 
 ## M13. Excel-import és minden üzleti táblázat exportja
 
@@ -1159,6 +1159,19 @@ Kiadási bejegyzéshez szükséges részletek:
 - Reszponzív ellenőrzés az adatlap végső kiadásán: 390x844, 768x1024 és 1440x900 méreten betöltés rendben, vízszintes túlcsordulás nélkül. A hosszú partner email tablet-tördelése célzott CSS-javítást kapott.
 - Helyben a Vite build és `git diff --check` sikeres. A teljes PHPUnit újrafuttatása ezen a gépen a hiányzó `pdo_sqlite` driver miatt nem indítható; a korábbi M11 baseline 4 célteszt / 23 assertion és teljes PHPUnit 81 teszt / 335 assertion volt, a staging CI verify sikeres.
 - M11.K1-K6 teljesült. Következő konkrét fejlesztési feladat: M12.01 partnerlista és teljes partneradatlap; a D04 végleges munkakörlista továbbra is nyitott döntés.
+
+### 2026-10-15: M12 kód kész, staging retry tárhelyfelszabadítás után
+
+- Elkészült az M12.01-M12.07 teljes kódcsomagja: `UserManagementService`, V6 partnerlista és adatlap, kombinálható aktivitási/szerep/státusz/cég/dátum szűrők, cím- és számlázásmódosítás, admin megjegyzés, kontrollált admin/partner szerepváltás, jelszó-visszaállító link, partnerkérelmi V6 nézet, audit, utolsó-admin védelem és SoftDeletes-alapú partnerarchiválás.
+- A staging kiadásra kész commitok: `7d0da75` (M12), `039aa00` (checkbox-normalizálás), `9d63951` (MySQL-kompatibilisebb, külön oszlopműveletes migráció). A develop push megtörtént.
+- Helyi ellenőrzés a projekt SQLite extensionnel: teljes PHPUnit **84 teszt / 351 assertion** sikeres; M12 célteszt **3 / 16 assertion** sikeres; Blade cache, route cache, PHP lint, Vite build és diff-check sikeres. A Vite meglévő Sass/Bootstrap deprecation figyelmeztetései megmaradtak.
+- A `38721498975` és `38721808476` workflow verify része sikeres, de a deploy mindkét alkalommal visszaállt. A GitHub annotation konkrét oka: `tar: ... Cannot write: Disk quota exceeded`; a stagingen ezért továbbra is az M11 kiadás látható, M12 admin átvétel nem történt.
+- A felhasználó jelezte, hogy a staging tárhelyén felszabadította a szükséges helyet. A korábbi kvótablokkoló elhárítottnak tekintendő; a `develop` újrapusholása és a meglévő workflow újrafuttatása következik. Nem töröltem távoli backupot és nem változtattam a deployfolyamat biztonsági szabályain.
+- M12.K1-K3 teljesült; M12.K4-K6 nyitva marad a retry és az admin lista/adatlap reszponzív átvételéig. Következő konkrét lépés: workflow eredményének megvárása, majd staging ellenőrzés.
+
+### 2026-10-15: M12 staging retry indítva
+
+- A staging tárhely felszabadítása után az M12 kiadási folyamatot újraindítom a meglévő `develop` -> GitHub Actions -> staging úton. M12.K4-K6 csak sikeres workflow és helyszíni admin/reszponzív ellenőrzés után zárható.
 
 ### Következő munkamenet sablonja
 
