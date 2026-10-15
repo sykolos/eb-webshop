@@ -7,15 +7,15 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M18: Ticket, belső üzenőfal és chat, TERVEZETT |
-| Következő fejlesztési feladat | M18.01: supportlista és ticket-adatlap mezői, kapcsolódó rendelés és szűrés |
-| Alkalmazásfejlesztés ebből a checklistből | M01-M17 stagingen ellenőrzött; M17 kosárelhagyás, eseményautomatizmus, admin szabálykezelés és futási export lezárva |
-| Utolsó igazolt staging kiadás | `eac8964`, GitHub Actions run 38775259789: M17 verify/deploy sikeres; staging átvétel megtörtént |
+| Aktív mérföldkő | M19: Termékelérhetőségi státuszok, TERVEZETT |
+| Következő fejlesztési feladat | M19.01: elérhetőségi státuszkódok és megnevezések a termékhez |
+| Alkalmazásfejlesztés ebből a checklistből | M01-M18 stagingen ellenőrzött; M18 ticket, belső üzenőfal, biztonságos melléklet, olvasottság, export és retention scope lezárva; a D13 chatintegráció halasztva |
+| Utolsó igazolt staging kiadás | `454da2a`, GitHub Actions [run 38781343141](https://github.com/sykolos/eb-webshop/actions/runs/38781343141): M18 verify/deploy sikeres; staging átvétel megtörtént |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D11 szolgáltató; D12-D13 későbbre halasztva |
-| Mostani változtatás | M17 stagingen ellenőrzött: kikapcsolt alapértelmezett automatizmus-szabályok, kosárelhagyási queue, idempotens futási napló, partner/rendelés eseményhorgok, admin szabálykezelés és export; a meglévő ár-, kosár-, rendelés- és partnerlogika változatlan |
+| Mostani változtatás | M18 stagingen ellenőrzött: közös ticket/üzenetmodell, partnerenkénti izoláció, státuszátmenet- és SLA-alap, admin belső üzenőfal, privát csatolmány, olvasatlan-jelzés, export és 24 hónapos lezárt-ticket retention cleanup; a D13 chatintegráció és reconnect scope későbbre halasztva |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -733,32 +733,32 @@ Kiadási rekord: commit = `eac8964`; workflow = [GitHub Actions run 38775259789]
 
 ## M18. Ticket, belső üzenőfal és chat
 
-Állapot: TERVEZETT. Függőség: M04, M11, M12, M16; D13 chat.
+Állapot: STAGINGEN ELLENŐRZÖTT. Függőség: M04, M11, M12, M16; D13 chat későbbre halasztva.
 Forrás: Z: Support; L: ticket, fejlesztői üzenőfal, chat továbbfejlesztés.
 Stagingen bemutatható eredmény: Hibajegy rendeléshez kapcsolható, felelőst kap, és belső megjegyzése ügyfélnek nem látható.
 
-- [ ] M18.01 ZIP supportlista és adatlap: típus, prioritás, felelős, kapcsolódó rendelés, keresés és szűrés.
-- [ ] M18.02 Új/Folyamatban/Válaszra vár/Megoldva/Lezárva állapotok, jogosult átmenetek és napló.
-- [ ] M18.03 Hozzászólások és biztonságos mellékletek, belső és ügyfélnek látható tartalom elkülönítése.
-- [ ] M18.04 Fejlesztői üzenőfal a közös ticket/üzenetmodellre, releváns technikai adatokkal, titkok nélkül.
-- [ ] M18.05 Értesítések és olvasottság; ticketlista export és megőrzési szabályok.
-- [ ] M18.06 Meglévő chat megoldás/integráció felmérése; D13 alapján thread és olvasatlan jelzések, szükséges real-time vagy korlátozott polling.
-- [ ] M18.07 Chat szolgáltatás kiesése és újracsatlakozás kezelése; szerepkörök és partnerenkénti izoláció.
-- [ ] M18.08 SLA prioritások/időpontok rögzítésének alapja; a vállalások M21-ben véglegesednek.
+- [x] M18.01 ZIP supportlista és adatlap: típus, prioritás, felelős, kapcsolódó rendelés, keresés és szűrés.
+- [x] M18.02 Új/Folyamatban/Válaszra vár/Megoldva/Lezárva állapotok, jogosult átmenetek és napló.
+- [x] M18.03 Hozzászólások és biztonságos mellékletek, belső és ügyfélnek látható tartalom elkülönítése.
+- [x] M18.04 Fejlesztői üzenőfal a közös ticket/üzenetmodellre, releváns technikai adatokkal, titkok nélkül.
+- [x] M18.05 Értesítések és olvasottság; ticketlista export és megőrzési szabályok.
+- [ ] M18.06 Meglévő chat megoldás/integráció felmérése; **Halasztva D13 alapján**, meglévő chat/integráció nincs véglegesítve.
+- [ ] M18.07 Chat szolgáltatás kiesése és újracsatlakozás kezelése; **Halasztva D13 alapján**, a chat-szolgáltató és thread-modell döntésre vár.
+- [x] M18.08 SLA prioritások/időpontok rögzítésének alapja; a végleges vállalások M21-ben kerülnek rögzítésre.
 
 Ellenőrzés: Belső komment és melléklet nem szivárog; idegen ticket/chat tiltott; állapot és értesítés; újratöltés/kapcsolatszakadás.
 Adat/deploy: Ticket/üzenet/melléklet migráció; meglévő chatadat csak feltárt mapping alapján vihető át.
 
 ### M18 kiadási kapuk
 
-- [ ] M18.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
-- [ ] M18.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
-- [ ] M18.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
-- [ ] M18.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
-- [ ] M18.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
-- [ ] M18.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+- [x] M18.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek: M18 célteszt 5 teszt / 27 assertion, teljes CI PHPUnit 108 teszt / 484 assertion, Vite build, PHP lint, Blade cache, route-list és diff-check.
+- [x] M18.K2 A ticket-migráció legacy `users.id` szélességet és félbemaradt első futást is kezelő, idempotens; privát fájl, audit, retention és rollback-viselkedés dokumentált, új környezeti változó nem kell.
+- [x] M18.K3 Diff ellenőrizve, csak célzott M18 alkalmazás-, konfiguráció-, migráció-, nézet- és tesztfájlok; reprodukálható, önálló commitolható állapot.
+- [x] M18.K4 A `1319f8b`, `be66379` és végső `454da2a` commitok developra kerültek; a végső [38781343141](https://github.com/sykolos/eb-webshop/actions/runs/38781343141) workflow verify/deploy sikeres.
+- [x] M18.K5 A `454da2a` stagingen ellenőrizve: `/adminpanel/tickets` adminnal betöltött, a szűrők és partnerenkénti izolációs felület látszik, az exportkatalógusban a két ticket-adatkör elérhető; 390/768/1440 px-en nincs vízszintes túlcsordulás.
+- [x] M18.K6 A checklist és a folytatási handoff frissítve; következő feladat M19.01, ismert korlátként D13 chatdöntés és M21 SLA-vállalás marad.
 
-Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+Kiadási rekord: végső commit = `454da2ae7bc33a3534ea960d4fd5ccaa0199129d`; GitHub Actions [#144 / 38781343141](https://github.com/sykolos/eb-webshop/actions/runs/38781343141), verify/deploy sikeres; staging próba = `/adminpanel/tickets`, `/adminpanel/exports`, 390/768/1440 px; stagingen valódi ticketet, üzenetet és csatolmányt nem hoztam létre. Az első két deploy-kísérlet migrációs legacy-állapot miatt visszaállt, a végső idempotens migráció adatvesztés nélkül sikeres.
 
 ## M19. Termékelérhetőségi státuszok
 
@@ -1251,6 +1251,17 @@ Kiadási bejegyzéshez szükséges részletek:
 - Ellenőrzés: M17 célteszt **5 teszt / 23 assertion**, teljes PHPUnit **103 teszt / 462 assertion**, Vite build, Composer validate, Blade/route/config cache, PHP lint és `git diff --check` sikeres. A korábbi Sass/Bootstrap deprecation és hero asset runtime figyelmeztetések megmaradtak.
 - Kiadás: `eac8964` commit, [38775259789](https://github.com/sykolos/eb-webshop/actions/runs/38775259789) verify/deploy sikeres. A korrekció a partnerjóváhagyási értesítést rendszerüzenetként kezeli, ezért nem kötődik a marketingfeliratkozáshoz; a rendelésállapot a `order_updates`, a kosárelhagyás a `marketing_notifications` preferenciát követi. Stagingen az Automatizmusok oldal adminnal 390/768/1440 px-en betöltött, túlcsordulás nélkül; a négy szabály szünetelt, a futási napló üres, az exportkatalógusban mindkét új adatkör megjelent. Működési emailt és szabálybekapcsolást nem indítottam.
 - M17.K1-K6 teljesült. Következő konkrét feladat: M18.01 supportlista és ticket-adatlap mezői, kapcsolódó rendelés és szűrés. D12 provider-döntés és M18 ticket domain továbbra is nyitott.
+
+### 2026-10-15: M18 stagingen ellenőrzött
+
+- Elkészült az M18.01-M18.05 és M18.08 technikai köre: partneri ticketlétrehozás saját rendeléskapcsolattal, admin supportlista szerveroldali kereséssel és szűréssel, felelős- és állapotkezelés átmenetnaplóval, partner/admin üzenetek, belső fejlesztői megjegyzések és privát, MIME-ellenőrzött csatolmányok.
+- A közös ticket/üzenetmodell partnerenként izolált; az admin belső tartalom nem kerül partneri lekérdezésbe. Az olvasottság `ticket_reads` táblában és listajelzéssel működik, a publikus adminválasz M17 `ticket_update` queue-horogot használja, amely alapértelmezetten kikapcsolt.
+- Elkészült a ticket és ticket-üzenet export metaadatköre, valamint a konfigurálható 24 hónapos retention: a napi `tickets:cleanup` csak lezárt, lejárt ticketet töröl, és a privát csatolmányfájlokat is eltávolítja. Az SLA-válasz- és megoldási határidő a prioritásból számolódik; a végleges üzleti vállalás M21-ben marad.
+- A D13 miatt nincs kitalált külső chatintegráció: M18.06-M18.07 halasztva maradt, amíg a meglévő chat megoldása, providerje és thread-modellje nincs jóváhagyva.
+- Helyi ellenőrzés: M18 célteszt **5 teszt / 27 assertion**, teljes PHPUnit a CI-ben **108 teszt / 484 assertion**, 1 korábbi importteszt skip; Vite build, PHP lint, Blade cache, route-list és `git diff --check` sikeres. A meglévő Sass/Bootstrap deprecation és hero asset runtime figyelmeztetések megmaradtak.
+- A staging első deployja a legacy `users.id` idegenkulcs-méreteltérése miatt visszaállt; a második a félbemaradt `tickets` tábla miatt állt meg. A végső `454da2a` idempotens, user-FK nélküli indexelt migrációval a [38781343141](https://github.com/sykolos/eb-webshop/actions/runs/38781343141) workflow verify/deploy sikeres lett.
+- Admin staging átvétel: `/adminpanel/tickets` betöltött, a ticketlista, állapot/prioritás/típus/felelős szűrők és üres állapot megjelent; `/adminpanel/exports` alatt a Ticketek és Ticket üzenetek adatkör látható. Reszponzív QA 390/768/1440 px-en túlcsordulás nélkül ment. Stagingen nem hoztam létre valódi ticketet, üzenetet vagy fájlt.
+- M18.K1-K6 teljesült. Következő konkrét fejlesztés: M19.01 elérhetőségi státuszkódok és megnevezések; D13 chat és M21 végleges SLA-vállalás későbbi döntési pont.
 
 ### Következő munkamenet sablonja
 
