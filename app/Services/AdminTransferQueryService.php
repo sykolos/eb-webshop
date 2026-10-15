@@ -17,6 +17,8 @@ use App\Models\EmailCampaign;
 use App\Models\EmailDelivery;
 use App\Models\AutomationRule;
 use App\Models\AutomationRun;
+use App\Models\Ticket;
+use App\Models\TicketMessage;
 use App\Models\product_unit;
 use Illuminate\Support\LazyCollection;
 
@@ -41,6 +43,8 @@ final class AdminTransferQueryService
             'email_deliveries' => ['id' => 'ID', 'campaign_id' => 'Kampány ID', 'email' => 'Email', 'type' => 'Típus', 'status' => 'Állapot', 'attempts' => 'Próbálkozás', 'last_error' => 'Hiba', 'sent_at' => 'Elküldve', 'created_at' => 'Létrehozva'],
             'automation_rules' => ['id' => 'ID', 'key' => 'Kulcs', 'name' => 'Név', 'event' => 'Esemény', 'enabled' => 'Aktív', 'delay_minutes' => 'Késleltetés perc', 'timezone' => 'Időzóna', 'max_per_user' => 'Maximum/felhasználó', 'cooldown_minutes' => 'Cooldown perc', 'next_run_at' => 'Következő futás'],
             'automation_runs' => ['id' => 'ID', 'rule' => 'Szabály', 'event' => 'Esemény', 'email' => 'Email', 'status' => 'Állapot', 'attempts' => 'Próbálkozás', 'scheduled_for' => 'Ütemezve', 'executed_at' => 'Végrehajtva', 'last_error' => 'Hiba', 'created_at' => 'Létrehozva'],
+            'tickets' => ['id' => 'ID', 'ticket_number' => 'Ticket', 'partner' => 'Partner', 'email' => 'Email', 'order_number' => 'Rendelés', 'type' => 'Típus', 'priority' => 'Prioritás', 'status' => 'Állapot', 'assignee' => 'Felelős', 'response_due_at' => 'Válasz határideje', 'resolution_due_at' => 'Megoldási határidő', 'last_reply_at' => 'Utolsó válasz', 'created_at' => 'Létrehozva'],
+            'ticket_messages' => ['id' => 'ID', 'ticket_number' => 'Ticket', 'author' => 'Szerző', 'email' => 'Email', 'is_internal' => 'Belső', 'body_length' => 'Üzenethossz', 'attachment_count' => 'Csatolmányok', 'created_at' => 'Létrehozva'],
             default => throw new \InvalidArgumentException('Ismeretlen export adatkör: '.$dataset),
         };
     }
@@ -64,6 +68,8 @@ final class AdminTransferQueryService
             'email_deliveries' => $this->emailDeliveries(),
             'automation_rules' => $this->automationRules(),
             'automation_runs' => $this->automationRuns(),
+            'tickets' => $this->tickets(),
+            'ticket_messages' => $this->ticketMessages(),
             default => throw new \InvalidArgumentException('Ismeretlen export adatkör: '.$dataset),
         };
     }
@@ -256,6 +262,24 @@ final class AdminTransferQueryService
         return LazyCollection::make(function (): \Generator {
             foreach (AutomationRun::query()->with(['rule', 'user'])->orderBy('id')->cursor() as $run) {
                 yield [$run->id, $run->rule?->key, $run->event, $run->user?->email, $run->status, $run->attempts, $run->scheduled_for?->toDateTimeString(), $run->executed_at?->toDateTimeString(), $run->last_error, $run->created_at?->toDateTimeString()];
+            }
+        });
+    }
+
+    private function tickets(): LazyCollection
+    {
+        return LazyCollection::make(function (): \Generator {
+            foreach (Ticket::query()->with(['user', 'order', 'assignee'])->orderBy('id')->cursor() as $ticket) {
+                yield [$ticket->id, $ticket->ticket_number, $ticket->user?->name, $ticket->user?->email, $ticket->order?->displayNumber(), $ticket->type, $ticket->priority, $ticket->status, $ticket->assignee?->name, $ticket->response_due_at?->toDateTimeString(), $ticket->resolution_due_at?->toDateTimeString(), $ticket->last_reply_at?->toDateTimeString(), $ticket->created_at?->toDateTimeString()];
+            }
+        });
+    }
+
+    private function ticketMessages(): LazyCollection
+    {
+        return LazyCollection::make(function (): \Generator {
+            foreach (TicketMessage::query()->with(['ticket', 'author'])->orderBy('id')->cursor() as $message) {
+                yield [$message->id, $message->ticket?->ticket_number, $message->author?->name, $message->author?->email, $message->is_internal ? 'Igen' : 'Nem', mb_strlen($message->body), $message->attachments()->count(), $message->created_at?->toDateTimeString()];
             }
         });
     }

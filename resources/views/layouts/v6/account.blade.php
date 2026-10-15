@@ -18,6 +18,7 @@
             <a href="{{ route('account.orders') }}">Rendeléseim</a>
             <a href="{{ route('account.userinfo') }}">Cégadatok</a>
             <a href="{{ route('account.modify') }}">Beállítások</a>
+            <a href="{{ route('account.tickets') }}">Ügyfélszolgálat</a>
         </aside>
         <section>@yield('content')</section>
     </main>

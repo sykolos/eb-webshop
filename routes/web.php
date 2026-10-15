@@ -36,6 +36,8 @@ use App\Http\Controllers\ActivityTrackingController;
 use App\Http\Controllers\EmailAdminController;
 use App\Http\Controllers\EmailPublicController;
 use App\Http\Controllers\AutomationAdminController;
+use App\Http\Controllers\TicketController;
+use App\Http\Controllers\AdminTicketController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 
@@ -133,6 +135,12 @@ Route::group(['prefix'=>'account','middleware'=>'auth'],function(){
     Route::get('/favorites',[AccountpageController::class,'favorites'])->name('account.favorites');
     Route::post('/favorites/{productId}',[AccountpageController::class,'addFavorite'])->whereNumber('productId')->name('account.favorite.store');
     Route::post('/shipping/{address}/default',[AccountpageController::class,'setDefaultShipping'])->name('shipping.default');
+    Route::get('/tickets', [TicketController::class, 'index'])->name('account.tickets');
+    Route::get('/tickets/create', [TicketController::class, 'create'])->name('account.tickets.create');
+    Route::post('/tickets', [TicketController::class, 'store'])->name('account.tickets.store');
+    Route::get('/tickets/{ticket}', [TicketController::class, 'show'])->name('account.tickets.show');
+    Route::post('/tickets/{ticket}/messages', [TicketController::class, 'message'])->name('account.tickets.messages.store');
+    Route::get('/tickets/attachments/{attachment}', [TicketController::class, 'download'])->name('account.tickets.attachments.download');
 
     // 💡 Szállítási címek kezelése (csak új/létrehoz/szerkeszt/töröl)
     Route::get('/shipping/create', [ShippingAddressController::class, 'create'])->name('shipping.create');
@@ -151,6 +159,11 @@ Route::group(['prefix'=>'account','middleware'=>'auth'],function(){
         Route::get('/automations', [AutomationAdminController::class, 'index'])->name('adminpanel.automations');
         Route::post('/automations/{rule}', [AutomationAdminController::class, 'update'])->name('adminpanel.automations.update');
         Route::post('/automations/{rule}/run', [AutomationAdminController::class, 'run'])->name('adminpanel.automations.run');
+        Route::get('/tickets', [AdminTicketController::class, 'index'])->name('adminpanel.tickets');
+        Route::get('/tickets/{ticket}', [AdminTicketController::class, 'show'])->name('adminpanel.tickets.show');
+        Route::put('/tickets/{ticket}', [AdminTicketController::class, 'update'])->name('adminpanel.tickets.update');
+        Route::post('/tickets/{ticket}/messages', [AdminTicketController::class, 'message'])->name('adminpanel.tickets.messages.store');
+        Route::get('/tickets/attachments/{attachment}', [AdminTicketController::class, 'download'])->name('adminpanel.tickets.attachments.download');
         Route::post('/emails/campaigns', [EmailAdminController::class, 'campaign'])->name('adminpanel.emails.campaigns.store');
         Route::post('/emails/test', [EmailAdminController::class, 'test'])->name('adminpanel.emails.test');
         Route::post('/emails/campaigns/{campaign}/send', [EmailAdminController::class, 'send'])->name('adminpanel.emails.campaigns.send');

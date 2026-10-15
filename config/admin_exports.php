@@ -132,5 +132,21 @@ return [
             'scope' => 'Adminisztrátori futási napló, levéltartalom nélkül.',
             'status' => 'available',
         ],
+        [
+            'key' => 'tickets',
+            'label' => 'Ticketek',
+            'description' => 'Ticketek partner-, rendelés-, prioritás- és állapotadatai.',
+            'source' => 'tickets',
+            'scope' => 'A ticketlista metaadatai és állapotnaplója; üzenet- és csatolmányszerű tartalom nélkül.',
+            'status' => 'available',
+        ],
+        [
+            'key' => 'ticket_messages',
+            'label' => 'Ticket üzenetek',
+            'description' => 'Ticket üzenetek audit- és láthatósági adatai.',
+            'source' => 'ticket_messages',
+            'scope' => 'Adminisztrátori export; csatolmány bináris tartalma nélkül.',
+            'status' => 'available',
+        ],
     ],
 ];
