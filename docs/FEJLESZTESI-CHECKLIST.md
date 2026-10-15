@@ -7,15 +7,15 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M13: Excel-import és minden üzleti táblázat exportja, FOLYAMATBAN |
-| Következő fejlesztési feladat | M13.02: teljes szűrt eredményhalmazra épülő exportút előkészítése |
-| Alkalmazásfejlesztés ebből a checklistből | M01-M12 stagingen ellenőrzött; M13.01 stagingen ellenőrzött, M13.K1-K3 teljesült |
-| Utolsó igazolt staging kiadás | `e257ec0`, GitHub Actions run 38727685489: verify/deploy sikeres; M13.01 exportkatalógus és reszponzív ellenőrzés megtörtént |
+| Aktív mérföldkő | M14: Hero, úszó banner, tartalmi oldalak és PPT, TERVEZETT |
+| Következő fejlesztési feladat | M14.01: hero/úszó képek adminja eszközönkénti képekkel, alt, CTA/link, sorrend és időzítés |
+| Alkalmazásfejlesztés ebből a checklistből | M01-M13 stagingen ellenőrzött; M13 teljes export/import és reszponzív átvétel lezárva |
+| Utolsó igazolt staging kiadás | `1623206`, GitHub Actions run 38738575391: verify/deploy sikeres; M13 export/import felület és reszponzív ellenőrzés megtörtént |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D11 szolgáltató; D12-D13 későbbre halasztva |
-| Mostani változtatás | M12 V6 partnerlista, aktivitási szűrések, teljes partneradatlap, cím/számlázás/jogosultság módosítás, jóváhagyási nézet, audit, jelszó-reset és visszaállítható archiválás; az M09 kosár-, M07 ár- és M11 rendeléslogika változatlan |
+| Mostani változtatás | M13 teljes XLSX/CSV export, háttérfeldolgozás, lejáró privát fájl, termékimport előnézet/validáció/tranzakció/audit; a meglévő M07 ár-, M09 kosár-, M11 rendelés- és M12 partnerlogika változatlan |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -572,21 +572,21 @@ Kiadási rekord: kód commitok = `7d0da75`, `039aa00`, `9d63951`; retry/release 
 
 ## M13. Excel-import és minden üzleti táblázat exportja
 
-Állapot: FOLYAMATBAN. Függőség: M06, M07, M11, M12.
+Állapot: STAGINGEN ELLENŐRZÖTT. Függőség: M06, M07, M11, M12.
 Forrás: Z: admin-transfer, import-validation; L: Excel export minden táblázathoz.
 Stagingen bemutatható eredmény: Sablonból ellenőrzött import készül, majd a teljes szűrt terméklista visszaimportálható XLSX-ként exportálható.
 
 - [x] M13.01 Exportálható táblák nyilvántartása: rendelések, rendeléssorok, termékek, kategóriák, szűrők, partnerek, egységek, árak, kiemeltek; későbbi modulok saját exporttal záródnak.
-- [ ] M13.02 Export a teljes szűrt eredményhalmazból, nem csak aktuális oldalból/kijelölésből; műveletoszlopok nélkül, mentett szerveradatokból.
-- [ ] M13.03 Valódi XLSX és ZIP szerinti opcionális pontosvesszős UTF-8 BOM CSV; oszlopjogosultság és képletinjektálás elleni védelem.
-- [ ] M13.04 Nagy export háttérfeladat, állapot, privát lejáró letöltés, jogosultság újraellenőrzése, fájltakarítás.
-- [ ] M13.05 Import sablon, munkalapválasztás, oszloppárosítás, első 100 sor előnézete és teljes fájlvalidáció.
-- [ ] M13.06 ZIP alapkorlátok: 5 MB, 5000 adatsor, 50 oszlop; szerveroldali kibontási/memória/idő korlátok; XLS régi formátum konvertálási visszajelzés.
-- [ ] M13.07 Kötelező cikkszám/név/meglévő kategória/nettó egységár; opcionális jelenlegi egység/szorzó/csomag/gyártó/leírás/publikálási állapot és elérhetőségi státusz. Régi stock szám nem konvertálható önkényesen státusszá; mély fában kategóriaútvonal/azonosító oldja fel az azonos neveket.
-- [ ] M13.08 Vesszős tizedes, kis/nagybetűfüggetlen SKU, fájlon belüli duplikáció és képletcella ellenőrzés; üres opcionális cella nem töröl adatot.
-- [ ] M13.09 Kihagyás/frissítés mód; ismeretlen kategória hibás; bármely hibás sor blokkolja az alkalmazást, hibajegyzék exportálható.
-- [ ] M13.10 Kétlépcsős ellenőrzés/alkalmazás, tranzakció és ismétlésvédelem, konkurens változások újraellenőrzése; valódi DB és webshop frissül.
-- [ ] M13.11 Termékexport visszaimportálási próba; import/export audit és queuehiba kezelése.
+- [x] M13.02 Export a teljes szűrt eredményhalmazból, nem csak aktuális oldalból/kijelölésből; műveletoszlopok nélkül, mentett szerveradatokból.
+- [x] M13.03 Valódi XLSX és ZIP szerinti opcionális pontosvesszős UTF-8 BOM CSV; oszlopjogosultság és képletinjektálás elleni védelem.
+- [x] M13.04 Nagy export háttérfeladat, állapot, privát lejáró letöltés, jogosultság újraellenőrzése, fájltakarítás.
+- [x] M13.05 Import sablon, munkalapválasztás, oszloppárosítás, első 100 sor előnézete és teljes fájlvalidáció.
+- [x] M13.06 ZIP alapkorlátok: 5 MB, 5000 adatsor, 50 oszlop; szerveroldali kibontási/memória/idő korlátok; XLS régi formátum konvertálási visszajelzés.
+- [x] M13.07 Kötelező cikkszám/név/meglévő kategória/nettó egységár; opcionális jelenlegi egység/szorzó/csomag/gyártó/leírás/publikálási állapot és elérhetőségi státusz. Régi stock szám nem konvertálható önkényesen státusszá; mély fában kategóriaútvonal/azonosító oldja fel az azonos neveket.
+- [x] M13.08 Vesszős tizedes, kis/nagybetűfüggetlen SKU, fájlon belüli duplikáció és képletcella ellenőrzés; üres opcionális cella nem töröl adatot.
+- [x] M13.09 Kihagyás/frissítés mód; ismeretlen kategória hibás; bármely hibás sor blokkolja az alkalmazást, hibajegyzék exportálható.
+- [x] M13.10 Kétlépcsős ellenőrzés/alkalmazás, tranzakció és ismétlésvédelem, konkurens változások újraellenőrzése; valódi DB és webshop frissül.
+- [x] M13.11 Termékexport visszaimportálási próba; import/export audit és queuehiba kezelése.
 
 Ellenőrzés: Érvényes körút; duplikált SKU; hibás kategória; képlet; vesszős ár; limit; jogosulatlan oszlop/letöltés; teljes szűrt adathalmaz.
 Adat/deploy: Import job/hiba/export táblák; alkalmazás előtt előnézet; meglévő mezők megőrzése és visszakövethető módosítás.
@@ -596,9 +596,9 @@ Adat/deploy: Import job/hiba/export táblák; alkalmazás előtt előnézet; meg
 - [x] M13.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
 - [x] M13.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
 - [x] M13.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
-- [ ] M13.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
-- [ ] M13.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
-- [ ] M13.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+- [x] M13.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [x] M13.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
+- [x] M13.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
 
 Kiadási rekord: M13.01 commit = `e257ec0`; workflow = [38727685489](https://github.com/sykolos/eb-webshop/actions/runs/38727685489) (`verify: success`, `deploy: success`); staging próba = `/adminpanel/exports`, 9 adatkör, 390x844/768x1024/1440x900; M13.K4-K6 a teljes M13 mérföldkő további export/import pontjai miatt nyitva.
 
@@ -1193,6 +1193,16 @@ Kiadási bejegyzéshez szükséges részletek:
 - Admin staging átvétel: `/adminpanel/exports` betöltött, a közös navigációban az Exportok menüpont látható, mind a kilenc nyilvántartott adatkör és a forrása megjelent. A nézet szándékosan nem indít még fájlletöltést.
 - Reszponzív ellenőrzés: 390x844, 768x1024 és 1440x900; a dokumentum szélessége minden méreten a viewporton belül maradt, 9 táblázatsor töltődött be.
 - M13.01 stagingen ellenőrzött. M13.K4-K6 a teljes M13 mérföldkő végéig nyitva marad; következő konkrét feladat: M13.02 teljes szűrt eredményhalmazra épülő exportút.
+
+### 2026-10-15: M13 teljes mérföldkő stagingen ellenőrzött
+
+- Elkészült az M13.02-M13.11 teljes köre: minden nyilvántartott adatkörből teljes, szerveroldali szűrt XLSX/CSV export készül; a CSV pontosvesszős UTF-8 BOM-os és képletinjektálás ellen védett.
+- Az export háttérfeladatként fut, állapotot és hibatörténetet tárol, a fájl privát és két óra után takarítható. A termékimport XLSX előnézetet, munkalap- és oszloppárosítást, 5 MB/5000 sor/50 oszlop korlátot, teljes validációt, hibajegyzéket, kihagyás/frissítés módot és tranzakciós, ismétlésvédett alkalmazást kapott.
+- A termékimport megőrzi az üres opcionális mezők meglévő adatait, a mély kategóriafában teljes útvonalat vagy azonosítót kér, a készlet számot nem alakítja át önkényesen státusszá, és auditbejegyzést ír. A meglévő speciális ár- és termékkörös árazás nem változott.
+- Ellenőrzés: M13 célteszt **4 teszt / 27 assertion**, teljes PHPUnit **88 teszt / 378 assertion**, Vite build, PHP lint, Blade/route cache és `git diff --check` sikeres. A helyi PHP futtatás a CI-vel egyező SQLite/ZIP/GD modulokkal történt.
+- Kiadás: végleges deployolt SHA `162320699d0ec97d0e4f9fbf131d45a085cd6510`; GitHub Actions [38738575391](https://github.com/sykolos/eb-webshop/actions/runs/38738575391) verify és deploy sikeres. Az első deploy-kísérlet a staging legacy `users.id` méreteltérése miatt megállt; a migráció ezt idegenkulcs-kényszer nélküli, indexelt nullable owner mezővel kezeli.
+- Staging átvétel adminnal: `/adminpanel/exports`; a 9 adatkör, exportindító, import-előnézet és import-sablon vezérlői látszanak. A 390x844, 768x1024 és 1440x900 ellenőrzéseken nem volt vízszintes overflow; a két táblában összesen 10 sor jelent meg. Valódi exportot/importot nem indítottam stagingen.
+- M13.K1-K6 teljesült. Következő konkrét feladat: M14.01 hero/úszóképek adminja.
 
 ### Következő munkamenet sablonja
 
