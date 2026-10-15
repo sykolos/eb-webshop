@@ -7,10 +7,10 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M16: Emailközpont és hírlevél, STAGINGRE KÉSZ |
-| Következő fejlesztési feladat | M16 staging kiadás, admin Emailközpont reszponzív átvétele és staging sink-ellenőrzés |
-| Alkalmazásfejlesztés ebből a checklistből | M01-M15 stagingen ellenőrzött; M16 emailközpont, kampány queue, leiratkozás és export elkészült |
-| Utolsó igazolt staging kiadás | `67c4da0`, GitHub Actions run 38746941405: M15 verify/deploy sikeres; M16 helyi kiadásra kész |
+| Aktív mérföldkő | M17: Kosárelhagyás és időzített automatizmusok, TERVEZETT |
+| Következő fejlesztési feladat | M17.01: kosárelhagyási küszöb, címzettkör, küldési ablak és maximum emlékeztető meghatározása |
+| Alkalmazásfejlesztés ebből a checklistből | M01-M16 stagingen ellenőrzött; M16 emailközpont, kampány queue, leiratkozás és export lezárva |
+| Utolsó igazolt staging kiadás | `c93c74f`, GitHub Actions run 38749992983: M16 verify/deploy sikeres; staging átvétel megtörtént |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
@@ -164,7 +164,7 @@ A vásárlás backendben rögzített üzleti esemény és a külső viselkedési
 | M13 | Excel-import és minden üzleti táblázat exportja | STAGINGEN ELLENŐRZÖTT |
 | M14 | Hero, úszó banner, tartalmi oldalak és PPT | STAGINGEN ELLENŐRZÖTT |
 | M15 | Dashboard, top termékek, kosár- és aktivitásfigyelés | STAGINGEN ELLENŐRZÖTT |
-| M16 | Emailközpont és hírlevél | STAGINGRE KÉSZ |
+| M16 | Emailközpont és hírlevél | STAGINGEN ELLENŐRZÖTT |
 | M17 | Kosárelhagyás és időzített automatizmusok | TERVEZETT |
 | M18 | Ticket, belső üzenőfal és chat | TERVEZETT |
 | M19 | Termékelérhetőségi státuszok | TERVEZETT |
@@ -698,11 +698,11 @@ Adat/deploy: Kampány/címzett/küldési napló migráció; régi felhasználók
 - [x] M16.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
 - [x] M16.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; régi felhasználók nem lettek automatikusan feliratkoztatva.
 - [x] M16.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
-- [ ] M16.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
-- [ ] M16.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
-- [ ] M16.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+- [x] M16.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [x] M16.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI 390/768/1440 px-en ellenőrizve; nincs nyitott kiadást blokkoló hiba.
+- [x] M16.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
 
-Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+Kiadási rekord: commit = `c93c74f`; workflow = [GitHub Actions run 38749992983](https://github.com/sykolos/eb-webshop/actions/runs/38749992983), verify/deploy sikeres; staging próba = `/adminpanel/emails`, admin navigáció, HTML előnézet, 390/768/1440 px és vízszintes túlcsordulás ellenőrzése; küldés/kampánymentés nem történt. Ismert korlát: D12 provider/domainhitelesítés, bounce/complaint webhook és valódi marketingindítás későbbi döntés.
 
 ## M17. Kosárelhagyás és időzített automatizmusok
 
@@ -1233,6 +1233,14 @@ Kiadási bejegyzéshez szükséges részletek:
 - Külső szolgáltató, domainhitelesítés, bounce/complaint webhook és provider-fiók D12 szerint nincs kitalálva vagy aktiválva; a lokális státuszok pontosan queue/sending/sent/failed/skipped állapotot jelentenek.
 - Ellenőrzés: M16 célteszt **4 teszt / 17 assertion**, teljes PHPUnit **98 teszt / 439 assertion**, Vite build, Composer validate, PHP lint, Blade/route/config cache és `git diff --check` sikeres. A meglévő Sass/Bootstrap deprecation és hero asset runtime figyelmeztetések megmaradtak.
 - M16.K1-K3 teljesült. Következő konkrét lépés: egy funkciós commit, `develop` push, meglévő workflow megvárása, majd staging `/adminpanel/emails` átvétel 390/768/1440 px-en és küldés nélkül végzett sink/preview ellenőrzés.
+
+### 2026-10-15: M16 stagingen ellenőrzött
+
+- A `c93c74f` commit a `develop` ágra került; a [38749992983](https://github.com/sykolos/eb-webshop/actions/runs/38749992983) verify és deploy sikeres.
+- Adminnal a `/adminpanel/emails` oldal betöltött, az Emailközpont menüpont látszik, a hírlevél/marketing címzettszámok, kampányszerkesztő, ütemezés, szegmens, tesztküldés, kampány- és kézbesítési napló vezérlői megjelentek.
+- A HTML előnézet stagingen ténylegesen megnyitható. Reszponzív ellenőrzés 390x844, 768x1024 és 1440x900 méreten történt, a dokumentum szélessége minden méreten a viewporton belül maradt.
+- Kampány mentést, tesztküldést, tömeges küldést és leiratkozást stagingen nem indítottam, mert ezek külső levél/üzleti állapotváltozást okozhatnak; a sink-védelem a kódban és a céltesztekben ellenőrzött. A külső provider és domainhitelesítés D12 alapján nyitott.
+- M16.K1-K6 teljesült. Következő konkrét feladat: M17.01 kosárelhagyási szabályok és küldési korlátok meghatározása.
 
 ### Következő munkamenet sablonja
 
