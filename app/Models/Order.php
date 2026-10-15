@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Order extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     protected $guarded =[];
 
     public static function statuses(): array
@@ -64,6 +65,21 @@ class Order extends Model
     public function user_invoice()
     {
         return $this->hasOne(User_invoce::class, 'user_id', 'user_id');
+    }
+
+    public function statusHistories()
+    {
+        return $this->hasMany(OrderStatusHistory::class)->latest();
+    }
+
+    public function statusResponsible()
+    {
+        return $this->belongsTo(User::class, 'status_responsible_id');
+    }
+
+    public function createdByAdmin()
+    {
+        return $this->belongsTo(User::class, 'created_by_admin_id');
     }
 
     public function displayNumber(): string

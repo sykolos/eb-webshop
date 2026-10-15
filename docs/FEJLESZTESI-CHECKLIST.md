@@ -7,15 +7,15 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M10: Belépés, regisztrációkérés és partnerfiók, STAGINGEN ELLENŐRZÖTT |
-| Következő fejlesztési feladat | M11.01 admin rendeléskezelés és kézi rendelésfelvitel |
-| Alkalmazásfejlesztés ebből a checklistből | M01-M10 stagingen ellenőrzött; M10 K1-K6 teljesült |
+| Aktív mérföldkő | M11: Admin rendeléskezelés és kézi rendelésfelvitel, KIADÁSRA KÉSZ |
+| Következő fejlesztési feladat | M11 K4: commit, develop push, staging workflow és admin átvétel |
+| Alkalmazásfejlesztés ebből a checklistből | M01-M10 stagingen ellenőrzött; M11 K1-K3 teljesült, K4-K6 nyitott |
 | Utolsó igazolt staging kiadás | 30304d9, GitHub Actions run 38699613557: M10 verify/deploy sikeres; partnerfiók, admin partnerkérelmek és cím-default ellenőrzött |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D09 törlés technikai javaslata, D11 szolgáltató; D12-D13 későbbre halasztva |
-| Mostani változtatás | M10 partnerkérelem és jóváhagyási állapotok, aktív/pending/tiltott belépés, fiókösszegző, rendelés-szűrés és újrarendelés, cím-alapértelmezés, adatbázisos kedvencek, email-újraellenőrzés és tartós értesítési beállítások; az M09 kosár- és az M07 árlogikája változatlan |
+| Mostani változtatás | M11 V6 admin rendeléslista és URL-szűrés, soros/tömeges státuszkezelés, státuszelőzmény/audit/értesítés, visszaállítható törlés és közös PricingService-t használó idempotens kézi rendelésrögzítés; az M09 kosár- és az M07 árlogikája változatlan |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -159,7 +159,7 @@ A vásárlás backendben rögzített üzleti esemény és a külső viselkedési
 | M08 | Webshop, katalógus és keresés a v6 kinézetével | STAGINGEN ELLENŐRZÖTT |
 | M09 | Adatbázisos kosár és teljes rendelési folyamat | STAGINGEN ELLENŐRZÖTT |
 | M10 | Belépés, regisztrációkérés és partnerfiók | KIADÁSRA KÉSZ |
-| M11 | Admin rendeléskezelés és kézi rendelésfelvitel | TERVEZETT |
+| M11 | Admin rendeléskezelés és kézi rendelésfelvitel | KIADÁSRA KÉSZ |
 | M12 | Admin partnerek és felhasználók teljes kezelése | TERVEZETT |
 | M13 | Excel-import és minden üzleti táblázat exportja | TERVEZETT |
 | M14 | Hero, úszó banner, tartalmi oldalak és PPT | TERVEZETT |
@@ -515,27 +515,27 @@ Kiadási rekord: commit = `30304d9` (funkciós alap: `a4ad200`); workflow = [Git
 
 ## M11. Admin rendeléskezelés és kézi rendelésfelvitel
 
-Állapot: TERVEZETT. Függőség: M04, M05, M09.
+Állapot: KIADÁSRA KÉSZ. Függőség: M04, M05, M09.
 Forrás: Z: OrderWorkbench, CreateOrder; L: lista státusz, kijelölés, tömeges módosítás.
 Stagingen bemutatható eredmény: Admin kézzel rendelést rögzít partnernek, majd listából egyesével és tömegesen feldolgozza.
 
-- [ ] M11.01 V6 rendeléslista kereséssel és cég/dátum/státusz/összeg szűrőkkel, lapozással és megőrzött URL-állapottal.
-- [ ] M11.02 Soronkénti állapotváltás; kijelölés és látható sorok kijelölése; szűrés/keresés váltáskor kijelölés törlése.
-- [ ] M11.03 Tömeges státuszváltás megerősítéssel, rekordjogosultság és állapotátmenet ellenőrzéssel, részleges hibák jelzésével.
-- [ ] M11.04 OrderStatusService, státuszelőzmények, felelős és megjegyzés; kapcsolódó értesítések.
-- [ ] M11.05 Rendelésadatlap rögzített címekkel/árakkal, dokumentumokkal; D09 szerinti egyszerű Törlés gomb megerősítéssel. Javasolt technika: visszaállítható törlés, audit és külön jogosultság, a Törölve státusztól elkülönítve; végleges fizikai törlés nincs jóváhagyva.
-- [ ] M11.06 Új rendelés: aktív partner, kapcsolattartó, mentett/egyedi cím, fizetés, termékkereső, csomagszám, ellenőrzés és rögzítés.
-- [ ] M11.07 Kézzel szerkesztett/importált termék és ugyanazon partner PricingService ára használható; ZIP elkülönült demóárazása helyett közös backend.
-- [ ] M11.08 Adminrendelés is tranzakciós és ismétlésbiztos; admin szereplő audit, a partner saját fiókjában ugyanaz a rendelés látszik.
+- [x] M11.01 V6 rendeléslista kereséssel és cég/dátum/státusz/összeg szűrőkkel, lapozással és megőrzött URL-állapottal.
+- [x] M11.02 Soronkénti állapotváltás; kijelölés és látható sorok kijelölése; szűrés/keresés váltáskor kijelölés törlése.
+- [x] M11.03 Tömeges státuszváltás megerősítéssel, rekordjogosultság és állapotátmenet ellenőrzéssel, részleges hibák jelzésével.
+- [x] M11.04 OrderStatusService, státuszelőzmények, felelős és megjegyzés; kapcsolódó értesítések.
+- [x] M11.05 Rendelésadatlap rögzített címekkel/árakkal, dokumentumokkal; D09 szerinti egyszerű Törlés gomb megerősítéssel. A törlés SoftDeletes + audit, a Törölve státusztól elkülönül; végleges fizikai törlés nincs.
+- [x] M11.06 Új rendelés: aktív partner, kapcsolattartó, mentett/egyedi cím, fizetés, termékkereső, csomagszám, ellenőrzés és rögzítés.
+- [x] M11.07 Kézzel szerkesztett/importált termék és ugyanazon partner PricingService ára használható; ZIP elkülönült demóárazása helyett közös backend.
+- [x] M11.08 Adminrendelés is tranzakciós és ismétlésbiztos; admin szereplő audit, a partner saját fiókjában ugyanaz a rendelés látszik.
 
 Ellenőrzés: Kijelölés reset; tiltott átmenet; több admin ütközése; aktív/inaktív partner; adminrendelés -> partnerfiók egyezés.
 Adat/deploy: Állapotmapping és audit bővítő migráció; történeti rendelések megőrzése.
 
 ### M11 kiadási kapuk
 
-- [ ] M11.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
-- [ ] M11.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
-- [ ] M11.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [x] M11.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [x] M11.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
+- [x] M11.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
 - [ ] M11.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
 - [ ] M11.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
 - [ ] M11.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
@@ -1140,6 +1140,16 @@ Kiadási bejegyzéshez szükséges részletek:
 - M10 elkészült: partnerkérelem és admin jóváhagyás, `pending/approved/rejected/blocked` állapotok, belépési védelem, email-ellenőrzési nézet, fiókösszegző, rendelés-szűrés/PDF, aktuális áras újrarendelés, cím-default, kedvencek, email-váltási újraellenőrzés és tartós értesítési beállítások.
 - Helyi ellenőrzés: teljes PHPUnit 77 teszt / 310 assertion, PHP lint, Blade cache, Vite build és diff-check sikeres. Ismert figyelmeztetés: a meglévő Sass/Bootstrap deprecation warningok M21 technikai adósságai, az M10 működését nem blokkolják.
 - Állapot: M09 és M10 STAGINGEN ELLENŐRZÖTT; következő konkrét fejlesztés: M11.01 admin rendeléskezelés és kézi rendelésfelvitel.
+
+### 2026-10-15: M11 kód kész, staging kiadás előtt
+
+- Elkészült az M11 teljes backend és admin felülete: V6 rendeléslista kereséssel, cégnév-, dátum-, státusz- és nettóösszeg-szűréssel, lapozással és URL-állapottal; soros státuszváltás; látható soros kijelölés; tömeges váltás megerősítéssel, állapotátmenet- és részleges hibakezeléssel.
+- Bevezetésre került az OrderStatusService, az order_status_histories napló, státuszfelelős és belső megjegyzés, audit és státuszértesítési queue job. A rendelésadatlap a mentett cím-/ár-pillanatképet, tételeket, PDF-et és státuszidővonalat mutatja.
+- A törlés D09 szerint külön művelet: SoftDeletes + audit, az aktív listából eltűnik, de a történeti rendelés nem veszik el és az admin „Töröltek is” szűrővel látható.
+- A kézi rendelés aktív partnerhez, mentett vagy egyedi szállítási címhez, fizetéshez és termékkeresőhöz kötött. A ManualOrderService tranzakcióban, ismétlésbiztos kulccsal és a partner aktuális PricingService árával ment; a termék-/ár-/mennyiségi snapshot a partnerfiókban is ugyanazt a rendelést mutatja.
+- Új migráció: 2026_10_15_170000_add_order_management_fields; visszagörgethető, történeti rendelést nem töröl. Nincs új környezeti változó vagy feature flag.
+- Helyi ellenőrzés: M11 célteszt 4 teszt / 23 assertion; teljes PHPUnit 81 teszt / 335 assertion; php artisan view:cache, route:cache, Vite build és git diff --check sikeres. A build meglévő Sass/Bootstrap deprecation figyelmeztetései továbbra M21 technikai adósságok.
+- M11.K1-K3 teljesült, K4-K6 nyitott. Commit és develop push még nem történt; következő konkrét lépés: célzott diff áttekintés, commit, develop push, workflow megvárása, majd staging admin lista/státusz/új rendelés átvétel.
 
 ### Következő munkamenet sablonja
 

@@ -60,9 +60,9 @@
         <td style="width: 50%;">
             <strong>Szállítási cím:</strong><br>
             {{ $order->name ?? '-' }}<br>
-            {{ $order->user_shipping->receiver ?? '-' }}<br>
-            {{ $order->user_shipping->zipcode }} {{ $order->user_shipping->city }} {{ $order->user_shipping->address }}<br>
-            Tel: {{ $order->user_shipping->phone ?? '-' }}
+            {{ $order->shipping_receiver ?: ($order->user_shipping->receiver ?? '-') }}<br>
+            {{ $order->zipcode ?: ($order->user_shipping->zipcode ?? '') }} {{ $order->city ?: ($order->user_shipping->city ?? '') }} {{ $order->address ?: ($order->user_shipping->address ?? '') }}<br>
+            Tel: {{ $order->phone ?: ($order->user_shipping->phone ?? '-') }}
         </td>
     </tr>
 </table>

@@ -17,6 +17,7 @@ class UpdateOrderStatusRequest extends FormRequest
     {
         return [
             'status' => ['required', 'string', Rule::in(Order::allowedStatuses())],
+            'note' => ['nullable', 'string', 'max:2000'],
         ];
     }
 }

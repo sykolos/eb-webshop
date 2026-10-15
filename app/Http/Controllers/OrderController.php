@@ -2,96 +2,126 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Order;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use Barryvdh\DomPDF\Facade\Pdf;
+use App\Http\Requests\StoreAdminOrderRequest;
 use App\Http\Requests\UpdateOrderStatusRequest;
+use App\Models\Order;
+use App\Models\Products;
+use App\Models\User;
 use App\Services\AuditLogger;
+use App\Services\ManualOrderService;
+use App\Services\OrderManagementService;
+use App\Services\OrderNotificationService;
+use App\Services\OrderStatusService;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class OrderController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, OrderManagementService $orders)
     {
-        $query = Order::with(['user.user_invoice', 'items']);
-        // Cégnév szűrés
-        if ($request->filled('company_name')) {
-            $query->whereHas('user.user_invoice', function ($q) use ($request) {
-                $q->where('company_name', 'like', '%' . $request->company_name . '%');
-            });
-        }
+        $paginated = $orders->paginate($request);
 
-        // Dátum szűrés
-        if ($request->filled('from_date')) {
-            $query->whereDate('created_at', '>=', $request->from_date);
-        }
-        if ($request->filled('to_date')) {
-            $query->whereDate('created_at', '<=', $request->to_date);
-        }
-
-        // Státusz szűrés
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        // Összeg szűrés
-        if ($request->filled('min_total')) {
-            $query->where('total', '>=', $request->min_total);
-        }
-        if ($request->filled('max_total')) {
-            $query->where('total', '<=', $request->max_total);
-        }
-
-        $orders = $query->orderBy('created_at', 'desc')->paginate(15)->appends($request->query());
-        
         if ($request->ajax()) {
-            return response()->view('admin.pages.orders.partials.list', compact('orders'));
+            return view('admin.m11.orders.partials.list', ['orders' => $paginated, 'states' => Order::statuses()]);
         }
-        return view('admin.pages.orders.index', compact('orders'));
+
+        return view('admin.m11.orders.index', ['orders' => $paginated, 'states' => Order::statuses()]);
     }
+
+    public function create()
+    {
+        return view('admin.m11.orders.create', [
+            'partners' => User::query()->with(['user_invoice', 'user_shipping'])
+                ->where('is_admin', false)->where('account_status', 'active')->orderBy('name')->get(),
+            'products' => Products::query()->where('is_archived', false)->with('product_unit')->orderBy('title')->get(),
+            'states' => array_diff(Order::statuses(), ['törölve']),
+            'idempotencyKey' => (string) Str::uuid(),
+        ]);
+    }
+
+    public function store(StoreAdminOrderRequest $request, ManualOrderService $manualOrders, OrderNotificationService $notifications)
+    {
+        $order = $manualOrders->create($request->user(), $request->validated());
+        if ($order->wasRecentlyCreated) {
+            $notifications->dispatch($order);
+        }
+
+        return redirect()->route('adminpanel.orders.view', $order->id)
+            ->with('success', $order->wasRecentlyCreated ? 'A kézi rendelés rögzítve.' : 'A kézi rendelés már korábban rögzítve lett.');
+    }
+
     public function storeFilterUrl(Request $request)
     {
-        try {
-            $url = url('/adminpanel/orders') . '?' . http_build_query($request->all());
-        } catch (\Exception $e) {
-            \Log::error('Hiba a route generálásnál a storeFilterUrl-ben: ' . $e->getMessage());
-            return response()->json(['error' => 'URL generation failed'], 500);
-        }
-
-        session(['orders_filter_url' => $url]);
-        \Log::info('Mentett URL: ' . $url);
+        session(['orders_filter_url' => route('adminpanel.orders', $request->query())]);
         return response()->noContent();
     }
 
+    public function view(int $id)
+    {
+        $order = Order::withTrashed()->with([
+            'user', 'user_invoice', 'user_shipping', 'items.product.product_unit',
+            'statusHistories.responsible', 'statusResponsible', 'createdByAdmin',
+        ])->findOrFail($id);
 
-    public function view($id){
-        $order=Order::with('user','items','items.product')->findOrFail($id);
-        return view('admin.pages.orders.view',['order'=>$order,'states'=>$order->statusOptions()]);
+        return view('admin.m11.orders.view', ['order' => $order, 'states' => $order->statusOptions()]);
     }
-    public function updateStatus(UpdateOrderStatusRequest $request, $id, AuditLogger $audit){
-        $validated = $request->validated();
-        $order = Order::findOrFail($id);
 
-        if (!Order::canTransition((string) $order->status, $validated['status'])) {
-            return back()->withErrors([
-                'status' => 'A rendelés státusza ebből az állapotból nem módosítható.',
-            ])->withInput();
+    public function updateStatus(
+        UpdateOrderStatusRequest $request,
+        int $id,
+        OrderStatusService $statuses,
+        OrderNotificationService $notifications,
+    ) {
+        $order = Order::findOrFail($id);
+        $from = $order->status;
+        $updated = $statuses->change($order, $request->validated('status'), $request->user(), $request->validated('note'));
+        if ($from !== $updated->status && ($history = $updated->statusHistories->first())) {
+            $notifications->dispatchStatusChanged($updated, $history);
         }
 
-        $order->update(['status' => $validated['status']]);
-        $audit->record('order.status_updated', $order, [
-            'from' => $order->getOriginal('status'),
-            'to' => $validated['status'],
-        ]);
-        return back()->with('success','Rendelés Frissitve');
+        return back()->with('success', 'A rendelés státusza frissítve.');
     }
-    public function getpdf($id){
-        $order=Order::with('user','items','items.product')->findOrFail($id);
-        
-        $status=['függőben','feldolgozás','kiszállítva','törölve'];
 
-        $pdf =Pdf::loadView('myPDF',['order'=>$order,'states'=>$status,'id'=>$id]);
-        return $pdf->download("document.pdf");
-    
+    public function bulkStatus(Request $request, OrderStatusService $statuses, OrderNotificationService $notifications)
+    {
+        $validated = $request->validate([
+            'order_ids' => ['required', 'array', 'min:1', 'max:100'],
+            'order_ids.*' => ['integer', 'distinct', 'exists:orders,id'],
+            'status' => ['required', 'string', 'in:'.implode(',', Order::allowedStatuses())],
+            'note' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        $orders = Order::whereIn('id', $validated['order_ids'])->get()->keyBy('id');
+        $result = $statuses->bulkChange($orders, $validated['status'], $request->user(), $validated['note'] ?? null);
+        foreach ($result['changed'] as $changed) {
+            if ($history = $changed->statusHistories->first()) {
+                $notifications->dispatchStatusChanged($changed, $history);
+            }
+        }
+
+        $message = count($result['changed']).' rendelés frissítve.';
+        if ($result['errors'] !== []) {
+            return back()->with('warning', $message)->with('bulk_errors', $result['errors']);
+        }
+
+        return back()->with('success', $message);
+    }
+
+    public function destroy(int $id, AuditLogger $audit)
+    {
+        $order = Order::findOrFail($id);
+        $number = $order->displayNumber();
+        $order->delete();
+        $audit->record('order.deleted', $order, ['order_number' => $number]);
+
+        return redirect()->route('adminpanel.orders')->with('success', 'A rendelés elrejtve az aktív listából. Az adatok megmaradtak.');
+    }
+
+    public function getpdf(int $id)
+    {
+        $order = Order::withTrashed()->with('user', 'items', 'items.product', 'user_shipping')->findOrFail($id);
+        $pdf = Pdf::loadView('myPDF', ['order' => $order, 'states' => Order::statuses(), 'id' => $id]);
+        return $pdf->download($order->displayNumber().'.pdf');
     }
 }

@@ -171,9 +171,13 @@ Route::group(['prefix'=>'account','middleware'=>'auth'],function(){
         //order group
         Route::group(['prefix'=>'orders',], function(){
             Route::get('/',[OrderController::class, 'index'])->name('adminpanel.orders');
+            Route::get('/create',[OrderController::class, 'create'])->name('adminpanel.orders.create');
+            Route::post('/create',[OrderController::class, 'store'])->name('adminpanel.orders.store');
             Route::get('/view/{id}',[OrderController::class, 'view'])->name('adminpanel.orders.view');
-            Route::post('/{id}',[OrderController::class, 'updateStatus'])->name('adminpanel.orders.status.update');
+            Route::post('/bulk-status',[OrderController::class, 'bulkStatus'])->name('adminpanel.orders.bulk-status');
             Route::post('/store-filter-url', [OrderController::class, 'storeFilterUrl'])->name('adminpanel.orders.storeFilterUrl');
+            Route::post('/{id}',[OrderController::class, 'updateStatus'])->name('adminpanel.orders.status.update');
+            Route::delete('/{id}',[OrderController::class, 'destroy'])->name('adminpanel.orders.destroy');
             //pdf generálás
             Route::get('/{id}',[OrderController::class,'getpdf'])->name('adminpanel.orders.getpdf');
         });
