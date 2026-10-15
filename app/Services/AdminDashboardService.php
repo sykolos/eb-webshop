@@ -16,9 +16,16 @@ use Illuminate\Support\Facades\DB;
 
 final class AdminDashboardService
 {
+    public static function invalidateSummaryCache(): void
+    {
+        Cache::add('admin-dashboard:version', 1, now()->addDay());
+        Cache::increment('admin-dashboard:version');
+    }
+
     public function summary(Carbon $from, Carbon $to): array
     {
-        $key = 'admin-dashboard:'.sha1($from->toDateString().'|'.$to->toDateString());
+        $version = (int) Cache::get('admin-dashboard:version', 1);
+        $key = 'admin-dashboard:'.$version.':'.sha1($from->toDateString().'|'.$to->toDateString());
         return Cache::remember($key, 60, function () use ($from, $to): array {
             $orders = $this->periodOrders($from, $to);
             $total = (float) $orders->sum(DB::raw('COALESCE(NULLIF(subtotal_net, 0), total)'));

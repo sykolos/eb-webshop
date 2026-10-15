@@ -4,7 +4,9 @@ namespace App\Services;
 
 use App\Models\FilterValue;
 use App\Models\ProductMedia;
+use App\Models\ProductAvailabilityHistory;
 use App\Models\Products;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -15,6 +17,10 @@ use Intervention\Image\Laravel\Facades\Image;
 
 class ProductCatalogService
 {
+    public function __construct(private readonly AuditLogger $audit)
+    {
+    }
+
     public function query(array $filters = []): Builder
     {
         return Products::query()->with(['category', 'product_unit', 'media', 'filterValues.definition'])
@@ -45,13 +51,34 @@ class ProductCatalogService
     public function update(Products $product, array $attributes, ?UploadedFile $image = null): Products
     {
         return DB::transaction(function () use ($product, $attributes, $image): Products {
+            $previousAvailability = $product->availability_status;
             $product->update($this->attributes($attributes, $product));
             if ($image) {
                 $this->storeImage($product, $image);
             }
             $this->syncFilters($product, $attributes['filter_value_ids'] ?? []);
+            $this->recordAvailabilityChange($product, $previousAvailability);
 
-            return $product->refresh()->load(['category', 'product_unit', 'media', 'filterValues']);
+            return $product->refresh()->load(['category', 'product_unit', 'media', 'filterValues', 'availabilityHistories.changedBy']);
+        });
+    }
+
+    public function setAvailabilityStatus(Products $product, string $status, ?User $actor = null, ?string $note = null): Products
+    {
+        if (! in_array($status, Products::availabilityStatuses(), true)) {
+            throw ValidationException::withMessages(['availability_status' => 'Ismeretlen elérhetőségi státusz.']);
+        }
+
+        return DB::transaction(function () use ($product, $status, $actor, $note): Products {
+            $previous = $product->availability_status;
+            if ($previous === $status) {
+                return $product->refresh();
+            }
+
+            $product->update(['availability_status' => $status]);
+            $this->recordAvailabilityChange($product, $previous, $actor?->id ?? auth()->id(), $note);
+
+            return $product->refresh();
         });
     }
 
@@ -148,6 +175,27 @@ class ProductCatalogService
             'is_published' => (bool) ($attributes['is_published'] ?? true),
             'availability_status' => $attributes['availability_status'] ?? 'in_stock',
         ];
+    }
+
+    private function recordAvailabilityChange(Products $product, ?string $previous, ?int $actorId = null, ?string $note = null): void
+    {
+        if ($previous === $product->availability_status) {
+            return;
+        }
+
+            ProductAvailabilityHistory::create([
+            'product_id' => $product->id,
+            'changed_by_user_id' => $actorId ?? auth()->id(),
+            'from_status' => $previous,
+            'to_status' => $product->availability_status,
+            'note' => $note,
+            ]);
+        AdminDashboardService::invalidateSummaryCache();
+        $this->audit->record('product.availability_changed', $product, [
+            'from_status' => $previous,
+            'to_status' => $product->availability_status,
+            'note' => $note,
+        ]);
     }
 
     private function storeImage(Products $product, UploadedFile $file, bool $asMedia = false, ?int $sortOrder = null): ProductMedia

@@ -6,6 +6,7 @@ use App\Models\AdminImport;
 use App\Models\Category;
 use App\Models\Products;
 use App\Models\product_unit;
+use App\Services\ProductCatalogService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -154,7 +155,12 @@ final class AdminProductImportService
                 if ($specifications !== []) $attributes['specifications'] = $specifications;
 
                 if ($product) {
+                    $nextAvailability = $attributes['availability_status'] ?? null;
+                    unset($attributes['availability_status']);
                     $product->update($attributes);
+                    if ($nextAvailability !== null) {
+                        app(ProductCatalogService::class)->setAvailabilityStatus($product, $nextAvailability, $actor, 'Termékimport');
+                    }
                 } else {
                     $attributes['slug'] = $this->uniqueSlug($record['title']);
                     $attributes['is_published'] ??= true;

@@ -55,7 +55,7 @@ class ProductController extends Controller
 
     public function edit(int $id, CategoryTreeService $tree)
     {
-        $product = Products::with(['media', 'filterValues'])->findOrFail($id);
+        $product = Products::with(['media', 'filterValues', 'availabilityHistories.changedBy'])->findOrFail($id);
 
         return view('admin.m06.products.form', [
             'product_units' => product_unit::where('is_active', true)->orderBy('unit')->get(),

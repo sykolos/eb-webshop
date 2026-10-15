@@ -53,6 +53,11 @@ class Products extends Model
         return $this->belongsToMany(FilterValue::class, 'product_filter_value', 'product_id', 'filter_value_id');
     }
 
+    public function availabilityHistories()
+    {
+        return $this->hasMany(ProductAvailabilityHistory::class, 'product_id')->latest('created_at');
+    }
+
     public function scopePublished($query)
     {
         return $query->where('is_published', true)->where('is_archived', false);

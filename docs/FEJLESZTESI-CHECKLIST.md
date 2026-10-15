@@ -7,15 +7,15 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M19: Termékelérhetőségi státuszok, TERVEZETT |
-| Következő fejlesztési feladat | M19.01: elérhetőségi státuszkódok és megnevezések a termékhez |
-| Alkalmazásfejlesztés ebből a checklistből | M01-M18 stagingen ellenőrzött; M18 ticket, belső üzenőfal, biztonságos melléklet, olvasottság, export és retention scope lezárva; külön chat nem része a rendszernek |
+| Aktív mérföldkő | M19: Termékelérhetőségi státuszok, KIADÁSRA KÉSZ |
+| Következő fejlesztési feladat | M19.K4: commit, develop push és a staging workflow megfigyelése |
+| Alkalmazásfejlesztés ebből a checklistből | M01-M18 stagingen ellenőrzött; M19 státuszkezelés, audit, import/export, dashboard-cache és webshopjelzés lokálisan ellenőrizve; külön chat nem része a rendszernek |
 | Utolsó igazolt staging kiadás | `454da2a`, GitHub Actions [run 38781343141](https://github.com/sykolos/eb-webshop/actions/runs/38781343141): M18 verify/deploy sikeres; staging átvétel megtörtént |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D11 szolgáltató; D12 későbbre halasztva |
-| Mostani változtatás | M18 stagingen ellenőrzött: közös ticket/üzenetmodell, partnerenkénti izoláció, státuszátmenet- és SLA-alap, admin belső üzenőfal, privát csatolmány, olvasatlan-jelzés, export és 24 hónapos lezárt-ticket retention cleanup; chat scope elengedve |
+| Mostani változtatás | M19: termékenkénti elérhetőségi státuszok auditált változtatása, státusztörténet, admin/import/export/dashboard/webshop integráció és dashboard-cache érvénytelenítés; a publikálási és meglévő rendelhetőségi szabályok változatlanok |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -762,31 +762,31 @@ Kiadási rekord: végső commit = `454da2ae7bc33a3534ea960d4fd5ccaa0199129d`; Gi
 
 ## M19. Termékelérhetőségi státuszok
 
-Állapot: TERVEZETT. Függőség: M06, M08, M13; D06 eldöntve. A függőségek után előrehozható, nem kell M17-re várnia.
+Állapot: KIADÁSRA KÉSZ. Függőség: M06, M08, M13; D06 eldöntve. A függőségek után előrehozható, nem kell M17-re várnia.
 Forrás: Z: készletjelzések; L: pontosítás a terméken állítható elérhetőségről.
 Stagingen bemutatható eredmény: Admin státuszt állít a terméken, és ugyanaz jelenik meg a katalógusban, adatlapon és exportban.
 
-- [ ] M19.01 Elérhetőségi státuszok: Készleten, Beszállítói készleten, Beszerzés alatt; szükség szerint bővíthető kódkészlet/megnevezés, ismeretlen érték validációval.
-- [ ] M19.02 Termékenkénti állítás és külön publikálási státusz; meglévő adat nélküli terméknek ismeretlen/egyeztetendő állapot, nem kitalált készletszám.
-- [ ] M19.03 Állapotváltás adminjogosultsággal és auditnaplóval; aktív állapot szűrés és egyértelmű szöveges/színes jelzés.
-- [ ] M19.04 Állapotváltás ne írja át automatikusan a jelenlegi rendelhetőségi szabályt; új vásárlási tiltás csak külön üzleti döntéssel. Készletfoglalás ebben a körben nincs.
-- [ ] M19.05 Webshop kártya/adatlap és mobil megjelenítés közös státuszforrásból, cache érvénytelenítéssel; beszállítói készlet nem állítható saját raktárkészletként.
-- [ ] M19.06 Státusz szerinti adminlista és XLSX/CSV export/import; numerikus készlet- vagy minimumküszöb-funkció most nem készül.
-- [ ] M19.07 Dashboard státuszcsoportok szerinti termékszám; teljes integráció ellenőrzése. Mennyiségi készletmozgás, szinkron és alacsony-készlet automatizmus későbbi igényként megőrizve.
+- [x] M19.01 Elérhetőségi státuszok: Készleten, Beszállítói készleten, Beszerzés alatt; bővíthető kódkészlet/megnevezés és ismeretlen érték validáció.
+- [x] M19.02 Termékenkénti állítás és külön publikálási státusz; meglévő adat nélküli terméknek alapértelmezett Készleten kompatibilitási állapot, nem kitalált készletszám.
+- [x] M19.03 Állapotváltás adminjogosultsággal és auditnaplóval; státusztörténet, aktív állapot szűrés és egyértelmű szöveges/színes jelzés.
+- [x] M19.04 Állapotváltás nem írja át automatikusan a publikálási vagy meglévő rendelhetőségi szabályt; új vásárlási tiltás csak a már meglévő Átmenetileg nem elérhető állapotnál él. Készletfoglalás ebben a körben nincs.
+- [x] M19.05 Webshop kártya/adatlap és mobil megjelenítés közös státuszforrásból, dashboard-cache érvénytelenítéssel; beszállítói készlet nem állítható saját raktárkészletként.
+- [x] M19.06 Státusz szerinti adminlista és XLSX/CSV export/import; numerikus készlet- vagy minimumküszöb-funkció most nem készül.
+- [x] M19.07 Dashboard státuszcsoportok szerinti termékszám és teljes integráció ellenőrzése. Mennyiségi készletmozgás, szinkron és alacsony-készlet automatizmus későbbi igényként megőrizve.
 
 Ellenőrzés: Státusz mentése/újratöltése, import/export körút, publikálási állapottól függetlenség, jogosultság és mobil jelzés; mennyiségi készlet vagy új rendelési korlát nem keletkezik.
 Adat/deploy: M06 státuszmezőjére épülő integráció, meglévő állapotok dokumentált mappingje; audit megőrzése.
 
 ### M19 kiadási kapuk
 
-- [ ] M19.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
-- [ ] M19.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
-- [ ] M19.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [x] M19.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [x] M19.K2 A státusztörténet új, bővíthető migrációval készül; meglévő termékadatot nem ír át, a visszaállítás az új history tábla eltávolítása; új környezeti változó és feature flag nem kell.
+- [x] M19.K3 Diff ellenőrizve, csak célzott modell-, service-, controller-, migráció-, nézet-, teszt- és checklist-fájlok; reprodukálható, önállóan commitolható állapot.
 - [ ] M19.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
 - [ ] M19.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
 - [ ] M19.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
 
-Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+Kiadási rekord: commit = előkészítés alatt; workflow = nincs; staging próba = nem futott. Helyi M19 célteszt: 4 teszt / 14 assertion, ebből 1 ZipArchive-hiány miatt skip; teljes PHPUnit: 112 teszt / 498 assertion, 2 skip; Vite build, PHP lint, Blade cache, route-list és diff-check sikeres. A build meglévő Sass/Bootstrap deprecation és hero asset runtime figyelmeztetéseket tartalmaz.
 
 ## M20. Aktuális akciók és partneri ajánlatok megjelenítése
 
@@ -1262,6 +1262,14 @@ Kiadási bejegyzéshez szükséges részletek:
 - A staging első deployja a legacy `users.id` idegenkulcs-méreteltérése miatt visszaállt; a második a félbemaradt `tickets` tábla miatt állt meg. A végső `454da2a` idempotens, user-FK nélküli indexelt migrációval a [38781343141](https://github.com/sykolos/eb-webshop/actions/runs/38781343141) workflow verify/deploy sikeres lett.
 - Admin staging átvétel: `/adminpanel/tickets` betöltött, a ticketlista, állapot/prioritás/típus/felelős szűrők és üres állapot megjelent; `/adminpanel/exports` alatt a Ticketek és Ticket üzenetek adatkör látható. Reszponzív QA 390/768/1440 px-en túlcsordulás nélkül ment. Stagingen nem hoztam létre valódi ticketet, üzenetet vagy fájlt.
 - M18.K1-K6 teljesült. Következő konkrét fejlesztés: M19.01 elérhetőségi státuszkódok és megnevezések; a M21 végleges SLA-vállalása marad későbbi döntési pont.
+
+### 2026-10-15: M19 kód kész, staging kiadásra előkészítve
+
+- Elkészült az M19.01-M19.07 technikai köre: a termék elérhetőségi státuszai közös modellforrásból jelennek meg az adminban, export/importban, dashboardban és a webshop kártya/adatlap nézeteiben. Az `out_of_stock` meglévő rendelhetőségi viselkedése megmaradt; a többi státusz nem tilt új rendelést.
+- Az admin státuszváltás történetet és auditbejegyzést ír; az XLSX-import meglévő terméknél is ugyanazon szolgáltatáson keresztül naplóz. A dashboard státusz-cache státuszváltáskor verziót vált.
+- Helyi ellenőrzés: M19 célteszt **4 teszt / 14 assertion**, 1 `ZipArchive`-hiány miatti skip; teljes PHPUnit **112 teszt / 498 assertion**, 2 skip; Vite build, PHP lint, Blade cache, route-list és `git diff --check` sikeres. A skip a helyi PHP-bővítmény hiánya, CI PHP-ban a ZipArchive ág fut.
+- Ismert, nem blokkoló figyelmeztetés: a meglévő Sass/Bootstrap deprecation és hero asset runtime figyelmeztetések megmaradtak; Bootstrap/jQuery kiváltása külön frontend mérföldkő.
+- M19.K1-K3 teljesült. Következő konkrét lépés: célzott commit, `develop` push, a meglévő verify/deploy workflow megfigyelése, majd admin staging QA 390/768/1440 px-en.
 
 ### Következő munkamenet sablonja
 
