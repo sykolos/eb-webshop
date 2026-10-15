@@ -85,6 +85,14 @@ return [
             'status' => 'available',
         ],
         [
+            'key' => 'offers',
+            'label' => 'Aktuális ajánlatok',
+            'description' => 'Időzített ajánlati tartalom és a hozzá kapcsolt termék- és kategóriakörök.',
+            'source' => 'offers',
+            'scope' => 'Ajánlati törzs, kapcsolati darabszámok és publikációs időszak; árak nélkül.',
+            'status' => 'available',
+        ],
+        [
             'key' => 'carts',
             'label' => 'Kosarak',
             'description' => 'Partnerkosarak állapota, utolsó aktivitása és tételszáma.',

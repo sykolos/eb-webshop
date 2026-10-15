@@ -19,6 +19,7 @@
             <label>Alt szöveg<input name="alt_text" required maxlength="191" value="{{ old('alt_text') }}"></label>
             <label>CTA szöveg<input name="link_label" maxlength="120" value="{{ old('link_label') }}" placeholder="Kategória megnyitása"></label>
             <label>CTA / kategória URL<input name="link_url" maxlength="2048" value="{{ old('link_url') }}" placeholder="/shop?category=..."></label>
+            <label>Kapcsolt ajánlat<select name="offer_id"><option value="">Nincs, kézi link</option>@foreach($offers as $offer)<option value="{{ $offer->id }}" @selected(old('offer_id') == $offer->id)>{{ $offer->title }}</option>@endforeach</select></label>
             <label>Aktív ettől<input type="datetime-local" name="starts_at" value="{{ old('starts_at') }}"></label>
             <label>Aktív eddig<input type="datetime-local" name="ends_at" value="{{ old('ends_at') }}"></label>
             <label>Desktop kép<input type="file" name="desktop" accept="image/jpeg,image/png,image/webp" required></label>

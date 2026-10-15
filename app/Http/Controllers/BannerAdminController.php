@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Banner;
+use App\Models\Offer;
 use App\Services\AuditLogger;
 use App\Services\BannerService;
 use Illuminate\Http\Request;
@@ -16,6 +17,7 @@ class BannerAdminController extends Controller
         return view('admin.m14.banners.index', [
             'banners' => Banner::query()->orderBy('slot')->orderBy('sort_order')->orderByDesc('id')->paginate(15),
             'sizes' => $banners->sizes(),
+            'offers' => Offer::query()->where('is_published', true)->orderBy('sort_order')->orderBy('title')->get(['id', 'title']),
         ]);
     }
 
@@ -65,6 +67,7 @@ class BannerAdminController extends Controller
             'alt_text' => ['required', 'string', 'max:191'],
             'link_url' => ['nullable', 'string', 'max:2048'],
             'link_label' => ['nullable', 'string', 'max:120'],
+            'offer_id' => ['nullable', 'integer', 'exists:offers,id'],
             'sort_order' => ['nullable', 'integer', 'min:0', 'max:100000'],
             'starts_at' => ['nullable', 'date'],
             'ends_at' => ['nullable', 'date', 'after_or_equal:starts_at'],

@@ -36,4 +36,9 @@ class Banner extends Model
             default => null,
         };
     }
+
+    public function offer()
+    {
+        return $this->belongsTo(Offer::class, 'offer_id');
+    }
 }

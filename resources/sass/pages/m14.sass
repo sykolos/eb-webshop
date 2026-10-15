@@ -98,6 +98,52 @@
     color: #65717b
 .v6-document
   min-height: 300px
+
+.m20-offer__media
+  display: block
+  margin: -1px -1px 24px
+  overflow: hidden
+  img
+    display: block
+    width: 100%
+    max-height: 360px
+    object-fit: cover
+
+.m20-offer__products
+  display: grid
+  grid-template-columns: repeat(4, minmax(0, 1fr))
+  gap: 16px
+
+.m20-home-offers
+  margin: 32px auto
+
+.m20-home-offers__list
+  display: grid
+  grid-template-columns: repeat(3, minmax(0, 1fr))
+  gap: 16px
+  a
+    display: grid
+    gap: 6px
+    padding: 18px
+    border: 1px solid #dfe4e8
+    border-radius: 8px
+    color: #202529
+    text-decoration: none
+    &:hover, &:focus-visible
+      border-color: #e60000
+    span
+      color: #65717b
+      font-size: 14px
+
+@media (max-width: 900px)
+  .m20-offer__products
+    grid-template-columns: repeat(2, minmax(0, 1fr))
+  .m20-home-offers__list
+    grid-template-columns: 1fr
+
+@media (max-width: 520px)
+  .m20-offer__products
+    grid-template-columns: 1fr
 .m14-honeypot
   position: absolute !important
   left: -10000px !important

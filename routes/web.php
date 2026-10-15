@@ -32,6 +32,7 @@ use App\Http\Controllers\ProductMediaController;
 use App\Http\Controllers\FilterDefinitionController;
 use App\Http\Controllers\PricingController;
 use App\Http\Controllers\BannerAdminController;
+use App\Http\Controllers\OfferAdminController;
 use App\Http\Controllers\ActivityTrackingController;
 use App\Http\Controllers\EmailAdminController;
 use App\Http\Controllers\EmailPublicController;
@@ -51,6 +52,7 @@ Route::get('aszf/',[PagesController::class,'aszf'])->name('aszf');
 Route::get('gyik/',[PagesController::class,'gyik'])->name('gyik');
 Route::get('elallasi-nyilatkozat/',[PagesController::class,'eny'])->name('elallasi-nyilatkozat');
 Route::get('adatkezelesi-nyilatkozat/',[PagesController::class,'any'])->name('adatkezelesi-nyilatkozat');
+Route::get('info/akciok', [PagesController::class, 'offers'])->name('info.offers');
 Route::get('info/{slug}', function (string $slug) {
     abort_unless(in_array($slug, ['szallitas', 'fizetes', 'katalogus'], true), 404);
     return view('pages.m14.info', ['slug' => $slug]);
@@ -186,6 +188,12 @@ Route::group(['prefix'=>'account','middleware'=>'auth'],function(){
         Route::post('/banners/{banner}/publish', [BannerAdminController::class, 'publish'])->name('adminpanel.banners.publish');
         Route::post('/banners/{banner}/archive', [BannerAdminController::class, 'archive'])->name('adminpanel.banners.archive');
         Route::delete('/banners/{banner}', [BannerAdminController::class, 'destroy'])->name('adminpanel.banners.destroy');
+        Route::get('/offers', [OfferAdminController::class, 'index'])->name('adminpanel.offers');
+        Route::post('/offers', [OfferAdminController::class, 'store'])->name('adminpanel.offers.store');
+        Route::get('/offers/{offer}/edit', [OfferAdminController::class, 'edit'])->name('adminpanel.offers.edit');
+        Route::put('/offers/{offer}', [OfferAdminController::class, 'update'])->name('adminpanel.offers.update');
+        Route::post('/offers/{offer}/publish', [OfferAdminController::class, 'publish'])->name('adminpanel.offers.publish');
+        Route::post('/offers/{offer}/archive', [OfferAdminController::class, 'archive'])->name('adminpanel.offers.archive');
         Route::get('/security/2fa', [AdminTwoFactorController::class, 'setup'])->name('admin.2fa.setup');
         Route::post('/security/2fa/confirm', [AdminTwoFactorController::class, 'confirm'])->name('admin.2fa.confirm');
         Route::post('/security/2fa/disable', [AdminTwoFactorController::class, 'disable'])->name('admin.2fa.disable');

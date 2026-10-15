@@ -1,21 +1,21 @@
 # Electrobusiness fejlesztési checklist
 
-Frissítve: 2026-10-15. Ez a megvalósítás és a folytatás elsődleges, Gitben verziózandó munkalistája.
+Frissítve: 2026-10-16. Ez a megvalósítás és a folytatás elsődleges, Gitben verziózandó munkalistája.
 Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés esetén a frissebb felhasználói döntés és ez a checklist irányadó.
 
 ## Aktuális állapot és folytatás
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M19: Termékelérhetőségi státuszok, STAGINGEN ELLENŐRZÖTT |
-| Következő fejlesztési feladat | M20.01: ajánlatmegjelenítés és a D01 szerinti változatlan árazás szétválasztása |
-| Alkalmazásfejlesztés ebből a checklistből | M01-M19 stagingen ellenőrzött; M19 státuszkezelés, audit, import/export, dashboard-cache és webshopjelzés lezárva; külön chat nem része a rendszernek |
+| Aktív mérföldkő | M20: Aktuális akciók és partneri ajánlatok, KIADÁSRA KÉSZ |
+| Következő fejlesztési feladat | M20.K4: commit, develop push és a staging workflow megfigyelése |
+| Alkalmazásfejlesztés ebből a checklistből | M01-M19 stagingen ellenőrzött; M20 ajánlati törzs, termék/kategória-kapcsolat, időzítés, banner-link, export és meglévő árazási integráció lokálisan ellenőrizve; külön chat nem része a rendszernek |
 | Utolsó igazolt staging kiadás | `ba9c203`, GitHub Actions [run 38813030720](https://github.com/sykolos/eb-webshop/actions/runs/38813030720): M19 verify/deploy sikeres; staging átvétel megtörtént |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D11 szolgáltató; D12 későbbre halasztva |
-| Mostani változtatás | M19 stagingen ellenőrzött: termékenkénti elérhetőségi státuszok auditált változtatása, státusztörténet, admin/import/export/dashboard/webshop integráció és dashboard-cache érvénytelenítés; a publikálási és meglévő rendelhetőségi szabályok változatlanok |
+| Mostani változtatás | M20: időzített, kézzel kiválasztott aktuális ajánlatok termék- és kategóriakörrel, M14 bannerkapcsolattal és meglévő PricingService-ármegjelenítéssel; új kedvezmény- vagy árprioritási motor nincs |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -790,30 +790,30 @@ Kiadási rekord: commit = `ba9c2033880a52a39c012278b37f0f8a3e05ce56`; GitHub Act
 
 ## M20. Aktuális akciók és partneri ajánlatok megjelenítése
 
-Állapot: TERVEZETT. Függőség: M07, M08, M09, M14; D07 eldöntve: meglévő árazás.
+Állapot: KIADÁSRA KÉSZ. Függőség: M07, M08, M09, M14; D07 eldöntve: meglévő árazás.
 Forrás: Z: akcióoldal; L: meglévő kedvezményrendszer megőrzése és aktuális akciók megjelenítése.
 Stagingen bemutatható eredmény: Kiemelt ajánlatból a termékhez jutunk; a megjelenített partnerár ugyanaz, mint a kosárban és rendelésben.
 
-- [ ] M20.01 Az ajánlatmegjelenítés és a D01 szerint változatlan árazás szétválasztása; a tartalmi kiemelés nem módosít speciális árat vagy kedvezményprioritást.
-- [ ] M20.02 Aktuális ajánlatok kézi kiválasztása termékre/termékkörre; ajánlat hiányában a ZIP üres állapota. Nincs új kupon- vagy kedvezményhalmozási motor.
-- [ ] M20.03 M14 banner-/tartalomadminra épülő kép, cím, link, sorrend, megjelenési időszak és előnézet; a megjelenési időszak vége nem töröl partnerár-megállapodást.
-- [ ] M20.04 M07 PricingService használata változtatás nélkül; egyedi és globális árak meglévő adminból szerkeszthetők, a lista/kosár/rendelés egyezés tesztelt.
-- [ ] M20.05 Akciós lista/kártya és termékkategória-link a ZIP arculatában; publikus nézetben nincs partnerár, belépés után saját ár és jelenlegi kiszerelés. Kitalált százalék/áthúzott ár nem jelenhet meg.
-- [ ] M20.06 Ajánlati tartalmak exportja, audit, cache invalidáció és időzített megjelenítés a közös bannerfunkcióval.
+- [x] M20.01 Az ajánlatmegjelenítés és a D01 szerint változatlan árazás szétválasztva; a tartalmi kiemelés nem módosít speciális árat vagy kedvezményprioritást.
+- [x] M20.02 Aktuális ajánlatok kézi kiválasztása termékre és kategóriakörre; ajánlat hiányában őszinte üres állapot. Nincs új kupon- vagy kedvezményhalmozási motor.
+- [x] M20.03 M14 banner-/tartalomadminra épülő kép, cím, kapcsolt ajánlati link, sorrend, megjelenési időszak és publikus előnézeti oldal; a megjelenési időszak vége nem töröl partnerár-megállapodást.
+- [x] M20.04 M07 PricingService használata változtatás nélkül; a partneri speciális ár az ajánlati oldalon is ugyanúgy számolódik, a vendégár nem szivárog ki.
+- [x] M20.05 Akciós lista/kártya, termék- és kategóriakör-link a V6 arculatában; publikus nézetben nincs partnerár, belépés után saját ár és jelenlegi kiszerelés. Kitalált százalék/áthúzott ár nem jelenik meg.
+- [x] M20.06 Ajánlati tartalmak exportja, audit, cache invalidáció és időzített megjelenítés a közös bannerfunkcióval.
 
 Ellenőrzés: Megjelenési időszak és időzóna, kategórialink, vendég/partner állapot, meglévő speciális árak egyezése; banner lejárata nem változtat árat.
 Adat/deploy: Tartalmi termék/kategória kapcsolatok bővítő migrációja; meglévő ármegállapodások változatlanok.
 
 ### M20 kiadási kapuk
 
-- [ ] M20.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
-- [ ] M20.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
-- [ ] M20.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [x] M20.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [x] M20.K2 Két új, idempotens kapcsolatot védő migráció készült: az ajánlati törzs/pivotok és a nullable banner-ajánlatkapcsolat; meglévő ár- és rendelési adathoz nem nyúl, visszaállítás csak az új táblákat/oszlopot érinti, új környezeti változó nem kell.
+- [x] M20.K3 Diff ellenőrizve, csak célzott ajánlati, banner-, export-, route-, nézet-, stílus-, migráció-, teszt- és checklist-fájlok; reprodukálható, önállóan commitolható állapot.
 - [ ] M20.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
 - [ ] M20.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
 - [ ] M20.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
 
-Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+Kiadási rekord: commit = előkészítés alatt; workflow = nincs; staging próba = nem futott. M20 célteszt: 3 teszt / 24 assertion; kapcsolódó M07/M08/M13/M14 regressziós kör: 17 teszt / 81 assertion, 1 skip; teljes PHPUnit: 115 teszt / 520 assertion, 2 skip; Vite build, PHP lint, Blade cache, route-list és diff-check sikeres. A build meglévő Sass/Bootstrap deprecation és hero asset runtime figyelmeztetéseket tartalmaz.
 
 ## M21. Teljes átállás, teljesítmény és üzemeltetési átadás
 
@@ -1277,6 +1277,14 @@ Kiadási bejegyzéshez szükséges részletek:
 - Staging admin QA: a terméklistán mind a négy elérhetőségi állapot választható, a `Beszerzés alatt` szűrő helyesen üres eredményt ad; a termékszerkesztőn látszik a státuszmező és a státusztörténet panel; a dashboard mutatja az elérhetőségi csoportot; a publikus termékadatlapon megjelenik a státuszjelzés.
 - Reszponzív QA 390/768/1440 px-en a termékadmin oldalon: a dokumentum- és body-szélesség a viewporton belül maradt. Stagingen nem indítottam valódi státuszmentést, importot, exportot vagy adatot módosító műveletet.
 - M19.K1-K6 teljesült. Következő konkrét fejlesztés: M20.01, a meglévő partneri/speciális árazás változatlan megtartásával; Bootstrap/jQuery kiváltása külön frontend mérföldkőként marad.
+
+### 2026-10-16: M20 kód kész, staging kiadásra előkészítve
+
+- Elkészült az M20.01-M20.06 technikai köre: időzített ajánlati törzs, termék- és kategóriaág-kapcsolat, admin szerkesztés/publikálás/visszavonás, M14 bannerkapcsolat, publikus `/info/akciok` oldal és kezdőoldali aktuális ajánlatlista.
+- A vendég ajánlati oldala ármentes; a bejelentkezett partner saját árát a változatlan `PricingService` számolja. Az ajánlat nem módosít kedvezményprioritást, speciális árat, kosár- vagy rendelési logikát, és nem jelenít meg kitalált akciós százalékot vagy áthúzott árat.
+- Az ajánlati törzs exportálható, a mentés/publikálás auditált, a publikus cache verziózottan érvényteleníthető, a kezdő- és lejárati időszak szűrése szerveroldali. A két migráció idempotens, a meglévő ár-, rendelés- és banneradatokat megőrzi.
+- Helyi ellenőrzés: M20 célteszt **3 teszt / 24 assertion**, kapcsolódó M07/M08/M13/M14 regressziós kör **17 teszt / 81 assertion**, 1 korábbi skip; teljes PHPUnit **115 teszt / 520 assertion**, 2 skip; Vite build, PHP lint, Blade cache, route-list és `git diff --check` sikeres. A meglévő Sass/Bootstrap deprecation és hero asset runtime figyelmeztetések megmaradtak.
+- M20.K1-K3 teljesült. Következő konkrét lépés: célzott commit, `develop` push, a meglévő verify/deploy workflow megfigyelése, majd admin ajánlatkezelő és publikus ajánlati oldal QA 390/768/1440 px-en.
 
 ### Következő munkamenet sablonja
 

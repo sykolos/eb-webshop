@@ -21,7 +21,7 @@ final class BannerService
 
     public function active(string $slot = 'hero'): ?Banner
     {
-        return Banner::query()->active($slot)->first();
+        return Banner::query()->with('offer')->active($slot)->first();
     }
 
     public function save(array $attributes, array $files, ?Banner $banner = null, bool $publish = false): Banner
@@ -34,6 +34,7 @@ final class BannerService
                 'alt_text' => trim($attributes['alt_text']),
                 'link_url' => filled($attributes['link_url'] ?? null) ? trim($attributes['link_url']) : null,
                 'link_label' => filled($attributes['link_label'] ?? null) ? trim($attributes['link_label']) : null,
+                'offer_id' => $attributes['offer_id'] ?? null,
                 'sort_order' => (int) ($attributes['sort_order'] ?? 0),
                 'starts_at' => $attributes['starts_at'] ?? null,
                 'ends_at' => $attributes['ends_at'] ?? null,

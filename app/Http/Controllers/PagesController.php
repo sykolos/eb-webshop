@@ -18,11 +18,12 @@ use App\Services\PricingService;
 use App\Services\CartService;
 use App\Jobs\SendContactMessage;
 use App\Services\BannerService;
+use App\Services\OfferService;
 
 class PagesController extends Controller
 {
     //home
-    public function home(PricingService $pricing, BannerService $banners)
+    public function home(PricingService $pricing, BannerService $banners, OfferService $offers)
     {
         $highlighted = RecommendedProduct::query()->orderBy('sort_order')->orderBy('id')->with([
             'product' => function ($query) {
@@ -45,12 +46,28 @@ class PagesController extends Controller
         }
 
         $topCategories = $recommend->topCategoriesRaw(); // ezt is hozzuk létre
+        $activeOffers = $offers->active();
         foreach ($latestProducts as $i => $product) {
             if (!$product->id) {
                 dd("HIBA: $i. terméknek nincs ID-je", $product->toArray());
             }
         }
-        return view('pages.home', compact('highlighted', 'latestProducts', 'topCategories', 'banners'));
+        return view('pages.home', compact('highlighted', 'latestProducts', 'topCategories', 'banners', 'activeOffers'));
+    }
+
+    public function offers(OfferService $offers, PricingService $pricing)
+    {
+        $activeOffers = $offers->active();
+        foreach ($activeOffers as $offer) {
+            $products = $offers->productsFor($offer);
+            if (auth()->check()) {
+                $priceMap = $pricing->priceMany($products, auth()->id());
+                $products->each(fn (Products $product) => $product->setAttribute('pricing', $priceMap[(int) $product->id] ?? null));
+            }
+            $offer->setRelation('displayProducts', $products);
+        }
+
+        return view('pages.m20.offers', compact('activeOffers'));
     }
 
 
