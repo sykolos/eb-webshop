@@ -52,6 +52,7 @@ class AccountpageController extends Controller
 
     public function modify()
     {
+        app(AccountService::class)->ensureDefaultAddress(auth()->user());
         $user = auth()->user()->load(['user_invoice', 'user_shipping', 'preference']);
         $preferences = app(AccountService::class)->preferences($user);
         return view('pages.components.account.modify', compact('user', 'preferences'));

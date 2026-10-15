@@ -511,7 +511,7 @@ Adat/deploy: Partnerstátusz/kedvencek/preferenciák migrációja; meglévő akt
 - [ ] M10.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
 - [ ] M10.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
 
-Kiadási rekord: helyi kész állapot; `php -d extension=php_pdo_sqlite.dll vendor/bin/phpunit` = 77 teszt / 310 assertion, PHP lint, Blade cache, Vite build és `git diff --check` sikeres. Új adatbázis: `2026_10_15_160000_create_account_features` (partnerkérelmek, fiókállapot, cím-default, kedvencek, preferenciák); meglévő aktív ügyfelek alapértelmezett állapota `active`. K4-K6 a develop push és staging ellenőrzés után zárható.
+Kiadási rekord: helyi kész állapot; `php -d extension=php_pdo_sqlite.dll vendor/bin/phpunit` = 77 teszt / 310 assertion, PHP lint, Blade cache, Vite build és `git diff --check` sikeres. Új adatbázis: `2026_10_15_160000_create_account_features` és `2026_10_15_160100_backfill_default_shipping_addresses` (partnerkérelmek, fiókállapot, cím-default visszatöltés, kedvencek, preferenciák); meglévő aktív ügyfelek alapértelmezett állapota `active`, meglévő címek közül az első automatikusan alapértelmezett. K4-K6 a javító develop push és staging ellenőrzés után zárható.
 
 ## M11. Admin rendeléskezelés és kézi rendelésfelvitel
 

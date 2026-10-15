@@ -68,6 +68,14 @@ class M10AccountTest extends TestCase
         $owner = User::factory()->create();
         $other = User::factory()->create();
 
+        $legacy = User::factory()->create();
+        User_shipping::create([
+            'user_id' => $legacy->id, 'receiver' => 'Régi cím', 'phone' => '0633333333',
+            'zipcode' => '3333', 'city' => 'Vác', 'address' => 'Régi utca 3.', 'is_default' => false,
+        ]);
+        $this->actingAs($legacy)->get(route('account.modify'))->assertOk();
+        $this->assertDatabaseHas('user_shippings', ['user_id' => $legacy->id, 'is_default' => true]);
+
         $this->actingAs($owner)->post(route('shipping.store'), [
             'receiver' => 'Első', 'phone' => '0611111111', 'zipcode' => '1111',
             'city' => 'Budapest', 'address' => 'Első utca 1.',

@@ -17,6 +17,7 @@ final class AccountService
 
     public function dashboard(User $user): array
     {
+        $this->ensureDefaultAddress($user);
         $user->loadMissing(['user_invoice', 'user_shipping', 'preference']);
 
         return [
@@ -54,6 +55,14 @@ final class AccountService
             $data['is_default'] = !User_shipping::where('user_id', $user->id)->exists();
             return $user->user_shipping()->create($data);
         });
+    }
+
+    public function ensureDefaultAddress(User $user): void
+    {
+        $addresses = $user->user_shipping()->orderBy('id')->get();
+        if ($addresses->isNotEmpty() && !$addresses->contains('is_default', true)) {
+            $addresses->first()->forceFill(['is_default' => true])->save();
+        }
     }
 
     public function deleteAddress(User $user, User_shipping $address): void
