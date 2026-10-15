@@ -266,8 +266,9 @@ body.v6-body a { color: inherit; }
 .v6-empty-state span { color: var(--eb-muted); font-size: 13px; }
 
 .v6-section__header { display: flex; align-items: start; justify-content: space-between; gap: 20px; margin-bottom: 24px; }
+.v6-section__header > div { min-width: 0; }
 .v6-section__header h2, .v6-section__header h3 { margin: 4px 0 0; }
-.v6-section__header p { margin: 7px 0 0; color: var(--eb-muted); }
+.v6-section__header p { margin: 7px 0 0; color: var(--eb-muted); overflow-wrap: anywhere; }
 .v6-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .v6-button--danger { border-color: #b42318; background: #b42318; color: var(--eb-white) !important; }
 .v6-button--danger:hover { background: #8f1d15; }
