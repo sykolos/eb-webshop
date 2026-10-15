@@ -33,6 +33,7 @@ class SuccesOrderAdminMail extends Mailable
         $filename = $this->order->displayNumber() . '.pdf';
 
         return $this->view('emails.SuccesOrderAdmin')
+            ->text('emails.SuccesOrderAdmin-text')
             ->subject('Új rendelés érkezett a webshopból!')
             ->with([
                 'order' => $this->order,

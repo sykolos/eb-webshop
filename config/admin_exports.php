@@ -100,5 +100,21 @@ return [
             'scope' => 'A megőrzési időn belüli események; személyes és partnerár-adatok nélkül.',
             'status' => 'available',
         ],
+        [
+            'key' => 'email_campaigns',
+            'label' => 'Emailkampányok',
+            'description' => 'Kampánytörzs, ütemezés és összesített küldési eredmények.',
+            'source' => 'email_campaigns',
+            'scope' => 'Adminisztrátori kampánynapló, emailtörzs nélkül.',
+            'status' => 'available',
+        ],
+        [
+            'key' => 'email_deliveries',
+            'label' => 'Email kézbesítések',
+            'description' => 'Címzett- és kézbesítési státuszok auditja.',
+            'source' => 'email_deliveries',
+            'scope' => 'Adminisztrátori, privát export; az emailtartalom nem része.',
+            'status' => 'available',
+        ],
     ],
 ];

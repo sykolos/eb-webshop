@@ -29,6 +29,9 @@ class Kernel extends ConsoleKernel
             ->dailyAt('03:20')
             ->withoutOverlapping(10)
             ->when(fn () => ! app()->environment('testing'));
+
+        $schedule->command('email:dispatch-scheduled')->everyMinute()->withoutOverlapping(10)->when(fn () => ! app()->environment('testing'));
+        $schedule->command('email:cleanup')->dailyAt('03:40')->withoutOverlapping(10)->when(fn () => ! app()->environment('testing'));
     }
 
     /**

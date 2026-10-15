@@ -13,6 +13,8 @@ use App\Models\User;
 use App\Models\Banner;
 use App\Models\ActivityEvent;
 use App\Models\Cart;
+use App\Models\EmailCampaign;
+use App\Models\EmailDelivery;
 use App\Models\product_unit;
 use Illuminate\Support\LazyCollection;
 
@@ -33,6 +35,8 @@ final class AdminTransferQueryService
             'banners' => ['id' => 'ID', 'slot' => 'Hely', 'title' => 'Cím', 'alt_text' => 'Alt szöveg', 'link_url' => 'Link', 'sort_order' => 'Sorrend', 'is_published' => 'Publikus', 'starts_at' => 'Kezdet', 'ends_at' => 'Vége'],
             'carts' => ['id' => 'ID', 'partner' => 'Partner', 'email' => 'Email', 'last_activity_at' => 'Utolsó aktivitás', 'item_count' => 'Tételszám', 'state' => 'Állapot', 'current_net' => 'Aktuális nettó'],
             'activity_events' => ['id' => 'ID', 'event_name' => 'Esemény', 'page_path' => 'Útvonal', 'device_type' => 'Eszköz', 'campaign_source' => 'Forrás', 'occurred_at' => 'Időpont', 'payload' => 'Maszkolt adat'],
+            'email_campaigns' => ['id' => 'ID', 'name' => 'Kampány', 'subject' => 'Tárgy', 'type' => 'Típus', 'status' => 'Állapot', 'segment' => 'Szegmens', 'recipient_count' => 'Címzettek', 'sent_count' => 'Elküldve', 'failed_count' => 'Hibás', 'skipped_count' => 'Kihagyva', 'scheduled_at' => 'Ütemezés', 'created_at' => 'Létrehozva'],
+            'email_deliveries' => ['id' => 'ID', 'campaign_id' => 'Kampány ID', 'email' => 'Email', 'type' => 'Típus', 'status' => 'Állapot', 'attempts' => 'Próbálkozás', 'last_error' => 'Hiba', 'sent_at' => 'Elküldve', 'created_at' => 'Létrehozva'],
             default => throw new \InvalidArgumentException('Ismeretlen export adatkör: '.$dataset),
         };
     }
@@ -52,6 +56,8 @@ final class AdminTransferQueryService
             'banners' => $this->banners($filters),
             'carts' => $this->carts($filters),
             'activity_events' => $this->activityEvents($filters),
+            'email_campaigns' => $this->emailCampaigns(),
+            'email_deliveries' => $this->emailDeliveries(),
             default => throw new \InvalidArgumentException('Ismeretlen export adatkör: '.$dataset),
         };
     }
@@ -208,6 +214,24 @@ final class AdminTransferQueryService
         return LazyCollection::make(function (): \Generator {
             foreach (ActivityEvent::query()->orderBy('id')->cursor() as $event) {
                 yield [$event->id, $event->event_name, $event->page_path, $event->device_type, $event->campaign_source, $event->occurred_at?->toDateTimeString(), json_encode($event->payload ?? [], JSON_UNESCAPED_UNICODE)];
+            }
+        });
+    }
+
+    private function emailCampaigns(): LazyCollection
+    {
+        return LazyCollection::make(function (): \Generator {
+            foreach (EmailCampaign::query()->orderBy('id')->cursor() as $campaign) {
+                yield [$campaign->id, $campaign->name, $campaign->subject, $campaign->type, $campaign->status, $campaign->segment, $campaign->recipient_count, $campaign->sent_count, $campaign->failed_count, $campaign->skipped_count, $campaign->scheduled_at?->toDateTimeString(), $campaign->created_at?->toDateTimeString()];
+            }
+        });
+    }
+
+    private function emailDeliveries(): LazyCollection
+    {
+        return LazyCollection::make(function (): \Generator {
+            foreach (EmailDelivery::query()->orderBy('id')->cursor() as $delivery) {
+                yield [$delivery->id, $delivery->campaign_id, $delivery->email, $delivery->type, $delivery->status, $delivery->attempts, $delivery->last_error, $delivery->sent_at?->toDateTimeString(), $delivery->created_at?->toDateTimeString()];
             }
         });
     }

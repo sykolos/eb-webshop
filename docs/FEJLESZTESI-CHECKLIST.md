@@ -7,15 +7,15 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M15: Dashboard, top termékek, kosár- és aktivitásfigyelés, TERVEZETT |
-| Következő fejlesztési feladat | M15.01: nettó rendelési érték, rendelésszám és átlagérték azonos időszakkal |
-| Alkalmazásfejlesztés ebből a checklistből | M01-M14 stagingen ellenőrzött; M14 banneradmin, publikus tartalmi oldalak, kapcsolatűrlap és banner-PPT lezárva |
-| Utolsó igazolt staging kiadás | `a4e1364`, GitHub Actions run 38743946029: M14 verify/deploy sikeres; reszponzív staging átvétel megtörtént |
+| Aktív mérföldkő | M16: Emailközpont és hírlevél, STAGINGRE KÉSZ |
+| Következő fejlesztési feladat | M16 staging kiadás, admin Emailközpont reszponzív átvétele és staging sink-ellenőrzés |
+| Alkalmazásfejlesztés ebből a checklistből | M01-M15 stagingen ellenőrzött; M16 emailközpont, kampány queue, leiratkozás és export elkészült |
+| Utolsó igazolt staging kiadás | `67c4da0`, GitHub Actions run 38746941405: M15 verify/deploy sikeres; M16 helyi kiadásra kész |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D11 szolgáltató; D12-D13 későbbre halasztva |
-| Mostani változtatás | M14 hero/úszó banner admin és publikálás, M14 tartalmi oldalak, kapcsolat queue, banner-meta export és renderelt bannerkészítési PPT; a meglévő M07 ár-, M09 kosár-, M11 rendelés- és M12 partnerlogika változatlan |
+| Mostani változtatás | M16 szolgáltatófüggetlen emailkampány, staging-safe queue, leiratkozás/kizárólista, tranzakciós plain-text levelek, admin Emailközpont és email export; a meglévő ár-, kosár-, rendelés- és partnerlogika változatlan |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -164,7 +164,7 @@ A vásárlás backendben rögzített üzleti esemény és a külső viselkedési
 | M13 | Excel-import és minden üzleti táblázat exportja | STAGINGEN ELLENŐRZÖTT |
 | M14 | Hero, úszó banner, tartalmi oldalak és PPT | STAGINGEN ELLENŐRZÖTT |
 | M15 | Dashboard, top termékek, kosár- és aktivitásfigyelés | STAGINGEN ELLENŐRZÖTT |
-| M16 | Emailközpont és hírlevél | TERVEZETT |
+| M16 | Emailközpont és hírlevél | STAGINGRE KÉSZ |
 | M17 | Kosárelhagyás és időzített automatizmusok | TERVEZETT |
 | M18 | Ticket, belső üzenőfal és chat | TERVEZETT |
 | M19 | Termékelérhetőségi státuszok | TERVEZETT |
@@ -677,27 +677,27 @@ Kiadási rekord: commit = `67c4da0`; workflow = [38746941405](https://github.com
 
 ## M16. Emailközpont és hírlevél
 
-Állapot: TERVEZETT. Függőség: M04, M10, M12, M13; D12 címzett/szolgáltató.
+Állapot: STAGINGRE KÉSZ. Függőség: M04, M10, M12, M13; D12 külső szolgáltató/domainhitelesítés továbbra külön döntés.
 Forrás: Z: emailminta, értesítési preferenciák; L: email admin, hírlevél, rendszeres hírlevél.
 Stagingen bemutatható eredmény: Admin tesztkampányt szerkeszt, előnéz, időzít, és tesztcímzetteken követi a kézbesítést.
 
-- [ ] M16.01 Email menüpont jogosultsággal: sablon, egyedi küldés, címzettlista/szegmens, előnézet és tesztküldés.
-- [ ] M16.02 V6 visszaigazoló email valódi levelezőkliens-kompatibilis HTML és szöveges változata; partner- és adminlevelek.
-- [ ] M16.03 Tranzakciós és marketing email szétválasztása; preferenciák, leiratkozás, kizárólista és címzettjogosultság.
-- [ ] M16.04 Hírlevél kampány szerkesztés, ütemezés, időzóna, megszakítás és kiküldés előtti címzettszám-ellenőrzés.
-- [ ] M16.05 Szolgáltatói limitek, domainhitelesítés, visszapattanás és panasz feldolgozása; státuszok pontos jelentése.
-- [ ] M16.06 Queue, küldési limit, retry/backoff és duplikációvédelem; admin tömeges küldés nem blokkol webkérést.
-- [ ] M16.07 Küldési napló és kampánytáblák exportja hozzáféréssel; privát emailtartalom és címzettadatok megőrzése.
-- [ ] M16.08 Stagingen minden küldés tesztkörnyezetbe terelve; valódi marketingindítás külön kiadási művelet.
+- [x] M16.01 Email menüpont jogosultsággal: kampánysablon, címzettlista/szegmens, sandboxolt előnézet és tesztküldés.
+- [x] M16.02 V6 visszaigazoló email valódi levelezőkliens-kompatibilis HTML és szöveges változata; partner- és adminlevelek.
+- [x] M16.03 Tranzakciós és marketing email szétválasztása; meglévő preferenciák, leiratkozás, kizárólista és címzettjogosultság.
+- [x] M16.04 Hírlevél kampány szerkesztés, ütemezés, időzóna, megszakítás és kiküldés előtti friss címzettszám-ellenőrzés.
+- [x] M16.05 Provider-semleges limit- és státuszmodell, retry/failed napló és provider_message_id előkészítve; domainhitelesítés, bounce/complaint webhook a D12 szolgáltató-döntéséig halasztott.
+- [x] M16.06 Queue, küldési limit, retry/backoff és idempotens delivery kulcs; admin tömeges küldés nem blokkol webkérést.
+- [x] M16.07 Küldési napló és kampánytáblák admin-only XLSX/CSV exportja; a kampánytörzs és címzettadat megőrzése, levéltörzs exportból kizárva.
+- [x] M16.08 A meglévő staging mail-sink szabály megtartva; tényleges marketingindítás külön kiadási művelet és D12 jóváhagyás.
 
 Ellenőrzés: Tesztküldés, időzítés, leiratkozás, kizárt címzett, szolgáltatóhiba és ismételt job; email kliens előnézet.
 Adat/deploy: Kampány/címzett/küldési napló migráció; régi felhasználókat nem szabad automatikusan feliratkozónak tekinteni.
 
 ### M16 kiadási kapuk
 
-- [ ] M16.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
-- [ ] M16.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
-- [ ] M16.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [x] M16.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [x] M16.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; régi felhasználók nem lettek automatikusan feliratkoztatva.
+- [x] M16.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
 - [ ] M16.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
 - [ ] M16.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
 - [ ] M16.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
@@ -1223,6 +1223,16 @@ Kiadási bejegyzéshez szükséges részletek:
 - Kiadás: M14 kód `717e917`, workflow [38743282148](https://github.com/sykolos/eb-webshop/actions/runs/38743282148) verify/deploy sikeres. Staging átvétel közben 768 px-es V6 fejléc-overflow derült ki, ezt `a4e1364` javította; a [38743946029](https://github.com/sykolos/eb-webshop/actions/runs/38743946029) workflow verify/deploy része szintén sikeres.
 - Staging átvétel: `/adminpanel/banners`, `/info/katalogus`, `/contact` és hiányzó útvonalon a 404 nézet betöltött. A 390x844, 768x1024 és 1440x900 méretek dokumentumszélességen belül maradtak; az adminban a három eszközfeltöltő, külön piszkozat/publikálás és az üres bannerlista látható. Valódi bannerfeltöltést, kapcsolatüzenet-küldést és destructive admin műveletet stagingen nem indítottam.
 - M14.K1-K6 teljesült. Ismert tartalmi korlát: a jóváhagyott katalógus PDF és a végleges jogi szövegek üzleti átadást igényelnek; addig a katalógus üres állapota és a jogi oldalak verziózott jóváhagyási jelzése marad. Következő konkrét feladat: M15.01 nettó dashboard mutatók.
+
+### 2026-10-15: M16 kód kész, staging kiadás előtt
+
+- Elkészült az M16.01-M16.08 kódja: admin-only Emailközpont, marketing kampánysablon, sandboxolt HTML előnézet, hírlevél/marketing szegmensek, friss címzettszám-ellenőrzés, ütemezés és megszakítás.
+- A levélküldés szolgáltatófüggetlen Laravel Mail + queue folyamat: egyedi delivery rekord, retry/backoff, limitált dispatch, idempotencia, jogosultság- és preferencia-újraellenőrzés, leiratkozási aláírt link és kizárólista.
+- A tranzakciós rendelési levelek plain-text alternatívát kaptak. Az emailkampányok/kézbesítések admin-only exportálhatóak; a levéltörzs nem kerül exportba. A régi felhasználók `newsletter_subscribed=false` alapértéke változatlan.
+- Új migráció: `2026_10_15_210000_create_email_campaign_tables`; visszagörgethető, legacy user-kulcsokra nem kényszerít idegenkulcsot. Új környezeti változó nem kötelező; a meglévő `STAGING_MAIL_TO` sink és D14 deployfolyamat változatlan.
+- Külső szolgáltató, domainhitelesítés, bounce/complaint webhook és provider-fiók D12 szerint nincs kitalálva vagy aktiválva; a lokális státuszok pontosan queue/sending/sent/failed/skipped állapotot jelentenek.
+- Ellenőrzés: M16 célteszt **4 teszt / 17 assertion**, teljes PHPUnit **98 teszt / 439 assertion**, Vite build, Composer validate, PHP lint, Blade/route/config cache és `git diff --check` sikeres. A meglévő Sass/Bootstrap deprecation és hero asset runtime figyelmeztetések megmaradtak.
+- M16.K1-K3 teljesült. Következő konkrét lépés: egy funkciós commit, `develop` push, meglévő workflow megvárása, majd staging `/adminpanel/emails` átvétel 390/768/1440 px-en és küldés nélkül végzett sink/preview ellenőrzés.
 
 ### Következő munkamenet sablonja
 

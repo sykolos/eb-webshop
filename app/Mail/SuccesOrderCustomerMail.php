@@ -34,6 +34,7 @@ class SuccesOrderCustomerMail extends Mailable
         $filename = $this->order->displayNumber() . '.pdf';
 
         return $this->view('emails.SuccesOrderCustomer')
+            ->text('emails.SuccesOrderCustomer-text')
             ->subject('Sikeres Rendelés')
             ->with([
                 'order' => $this->order,

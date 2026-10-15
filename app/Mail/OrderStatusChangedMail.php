@@ -19,6 +19,7 @@ class OrderStatusChangedMail extends Mailable
     public function build()
     {
         return $this->view('emails.order-status-changed')
+            ->text('emails.order-status-changed-text')
             ->subject('Rendelés állapota frissítve: '.$this->order->displayNumber());
     }
 }

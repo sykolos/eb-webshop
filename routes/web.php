@@ -33,6 +33,8 @@ use App\Http\Controllers\FilterDefinitionController;
 use App\Http\Controllers\PricingController;
 use App\Http\Controllers\BannerAdminController;
 use App\Http\Controllers\ActivityTrackingController;
+use App\Http\Controllers\EmailAdminController;
+use App\Http\Controllers\EmailPublicController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 
@@ -40,6 +42,7 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 Route::get('/success',[PagesController::class,'success'])->name('success');
 Route::get('/',[PagesController::class,'home'])->name('home');
 Route::post('/tracking/events', [ActivityTrackingController::class, 'store'])->middleware('throttle:tracking')->name('tracking.events');
+Route::get('/email/unsubscribe/{delivery}', [EmailPublicController::class, 'unsubscribe'])->middleware('signed')->name('email.unsubscribe');
 Route::get('impresszum/',[PagesController::class,'impresszum'])->name('impresszum');
 Route::get('aszf/',[PagesController::class,'aszf'])->name('aszf');
 Route::get('gyik/',[PagesController::class,'gyik'])->name('gyik');
@@ -143,6 +146,11 @@ Route::group(['prefix'=>'account','middleware'=>'auth'],function(){
         Route::get('/',[AdminController::class, 'dashboard'])->name('adminpanel');
         Route::get('/carts', [\App\Http\Controllers\AdminActivityController::class, 'carts'])->name('adminpanel.carts');
         Route::get('/activity', [\App\Http\Controllers\AdminActivityController::class, 'activity'])->name('adminpanel.activity');
+        Route::get('/emails', [EmailAdminController::class, 'index'])->name('adminpanel.emails');
+        Route::post('/emails/campaigns', [EmailAdminController::class, 'campaign'])->name('adminpanel.emails.campaigns.store');
+        Route::post('/emails/test', [EmailAdminController::class, 'test'])->name('adminpanel.emails.test');
+        Route::post('/emails/campaigns/{campaign}/send', [EmailAdminController::class, 'send'])->name('adminpanel.emails.campaigns.send');
+        Route::post('/emails/campaigns/{campaign}/cancel', [EmailAdminController::class, 'cancel'])->name('adminpanel.emails.campaigns.cancel');
         Route::get('/design-system', [DesignSystemController::class, 'index'])->name('adminpanel.design-system');
         Route::get('/design-system/shop', [DesignSystemController::class, 'shop'])->name('adminpanel.design-system.shop');
         Route::get('/design-system/account', [DesignSystemController::class, 'account'])->name('adminpanel.design-system.account');
