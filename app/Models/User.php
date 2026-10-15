@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Products;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -21,6 +22,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
+        'account_status',
     ];
 
     /**
@@ -48,6 +50,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'two_factor_confirmed_at' => 'datetime',
         'last_login_at' => 'datetime',
         'is_admin' => 'boolean',
+        'account_status' => 'string',
     ];
 
     public function technicalRole(): string
@@ -88,6 +91,22 @@ class User extends Authenticatable implements MustVerifyEmail
     public function cart()
     {
         return $this->hasOne(Cart::class);
+    }
+
+    public function favoriteProducts()
+    {
+        return $this->belongsToMany(Products::class, 'user_favorites', 'user_id', 'product_id')
+            ->withTimestamps();
+    }
+
+    public function preference()
+    {
+        return $this->hasOne(UserPreference::class);
+    }
+
+    public function registrationRequests()
+    {
+        return $this->hasMany(PartnerRegistrationRequest::class);
     }
 
     

@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User_shipping;
+use App\Services\AccountService;
 use Illuminate\Http\Request;
 
 class ShippingAddressController extends Controller
@@ -11,7 +12,7 @@ class ShippingAddressController extends Controller
         return view('pages.components.account.shipping.create');
     }
 
-    public function store(Request $request)
+    public function store(Request $request, AccountService $accounts)
     {
         $validated = $request->validate([
             'receiver' => 'required|string|max:100',
@@ -22,7 +23,7 @@ class ShippingAddressController extends Controller
             'comment' => 'nullable|string|max:255',
         ]);
 
-        $request->user()->user_shipping()->create($validated);
+        $accounts->createAddress($request->user(), $validated);
         return redirect()->route('account.modify')->with('success', 'Új szállítási cím hozzáadva.');
     }
 
@@ -50,10 +51,9 @@ class ShippingAddressController extends Controller
         return redirect()->route('account.modify')->with('success', 'Szállítási cím frissítve.');
     }
 
-    public function destroy(User_shipping $address)
+    public function destroy(Request $request, User_shipping $address, AccountService $accounts)
     {
-        $this->authorizeAccess($address);
-        $address->delete();
+        $accounts->deleteAddress($request->user(), $address);
 
         return redirect()->route('account.modify')->with('success', 'Szállítási cím törölve.');
     }

@@ -149,7 +149,7 @@
                                 <label for="shipping-select" class="form-label">Válassz szállítási címet</label>
                                 <select id="shipping-select" class="form-select">
                                     @foreach(auth()->user()->user_shipping ?? [] as $shipping)
-                                        <option value="shipping-{{ $shipping->id }}" @if ($loop->first) selected @endif>
+                                        <option value="shipping-{{ $shipping->id }}" @if ($shipping->is_default || (!$shipping->is_default && $loop->first)) selected @endif>
                                             {{ $shipping->zipcode }}, {{ $shipping->city }} {{ $shipping->address }}
                                         </option>
                                     @endforeach
@@ -157,14 +157,18 @@
                             </div>
 
                             @foreach(auth()->user()->user_shipping ?? [] as $shipping)
-                                <div class="shipping-card card p-3 mb-3 border" id="shipping-{{ $shipping->id }}" style="{{ $loop->first ? '' : 'display:none;' }}">
+                                <div class="shipping-card card p-3 mb-3 border" id="shipping-{{ $shipping->id }}" style="{{ $shipping->is_default || (!$shipping->is_default && $loop->first) ? '' : 'display:none;' }}">
                                     <p><strong>Átvevő:</strong> {{ $shipping->receiver }}</p>
                                     <p><strong>Telefon:</strong> {{ $shipping->phone }}</p>
                                     <p><strong>Cím:</strong> {{ $shipping->zipcode }} {{ $shipping->city }}, {{ $shipping->address }}</p>
                                     <p><strong>Megjegyzés:</strong> {{ $shipping->comment }}</p>
 
+                                    @if($shipping->is_default)<span class="badge text-bg-success mb-2">Alapértelmezett</span>@endif
                                     <div class="d-flex gap-2 mt-2">
                                         <a href="{{ route('shipping.edit', ['address' => $shipping->id, 'selected' => $shipping->id]) }}" class="btn btn-sm btn-outline-primary">Szerkesztés</a>
+                                        @unless($shipping->is_default)
+                                            <form action="{{ route('shipping.default', $shipping) }}" method="post">@csrf<button type="submit" class="btn btn-sm btn-outline-secondary">Legyen alapértelmezett</button></form>
+                                        @endunless
                                         {{-- <form id="delete-form-{{ $shipping->id }}" action="{{ route('shipping.destroy', $shipping) }}" method="POST" style="display: none;">
                                             @csrf
                                             @method('DELETE')
@@ -175,6 +179,13 @@
                             @endforeach
 
                             <a href="{{ route('shipping.create') }}" class="btn btn-success mt-3">+ Új cím hozzáadása</a>
+                        </div>
+
+                        <div class="border-top pt-3 mb-4">
+                            <h5 class="fw-bold mb-3">Értesítési beállítások:</h5>
+                            <div class="form-check"><input class="form-check-input" type="checkbox" name="order_updates" value="1" id="order_updates" @checked($preferences->order_updates)><label class="form-check-label" for="order_updates">Rendelési állapotokról kérek értesítést</label></div>
+                            <div class="form-check"><input class="form-check-input" type="checkbox" name="newsletter_subscribed" value="1" id="newsletter_subscribed" @checked($preferences->newsletter_subscribed)><label class="form-check-label" for="newsletter_subscribed">Feliratkozom a hírlevélre</label></div>
+                            <div class="form-check"><input class="form-check-input" type="checkbox" name="marketing_notifications" value="1" id="marketing_notifications" @checked($preferences->marketing_notifications)><label class="form-check-label" for="marketing_notifications">Marketingértesítéseket kérek</label></div>
                         </div>
 
                         <div class="form-group pt-4">

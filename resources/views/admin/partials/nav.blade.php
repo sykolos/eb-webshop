@@ -13,7 +13,9 @@
         <li> <a href="{{route('adminpanel.orders')}}">Rendelések</a>
         </li>
         <li> <a href="{{route('adminpanel.users')}}">Felhasználók</a>
-        </li>        
+        </li>
+        <li> <a href="{{ route('adminpanel.partner-requests') }}">Partnerkérelmek</a>
+        </li>
         <li> <a href="{{route('adminpanel.units')}}">Mennyiségi egységek</a>
         </li>               
         <li><a href="{{ route('adminpanel.special_prices') }}">Külön árak</a>

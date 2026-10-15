@@ -1,0 +1,7 @@
+@extends('pages.account')
+@section('title','Kedvencek')
+@section('content')
+<div class="accounts-page bg-light py-4"><div class="container-fluid"><div class="row"><div class="col-lg-3 col-md-4 col-sm-12">@include('pages.components.account.header')</div><div class="col-lg-9 col-md-8 col-sm-12"><section class="bg-white rounded shadow-sm p-4"><h1 class="section-header">Kedvencek</h1>@if(session('success'))<div class="alert alert-success" role="status">{{ session('success') }}</div>@endif<div class="row g-3">
+@forelse($products as $product)<div class="col-md-6 col-xl-4"><article class="border rounded p-3 h-100"><h2 class="h6">{{ $product->title }}</h2><p class="small text-muted mb-3">{{ $product->serial_number }}</p><div class="d-flex gap-2 flex-wrap"><a href="{{ $product->slug ? route('product.slug', $product->slug) : route('product', $product->id) }}" class="btn btn-sm btn-outline-dark">Megnyitás</a>@if($product->availability_status !== 'out_of_stock')<form action="{{ route('addtocart', [$product->id, $product->product_unit?->quantity ?? 1, $product->product_unit?->measure ?? 'db']) }}" method="post">@csrf<button class="btn btn-sm btn-primary">Kosárba</button></form>@else<span class="small text-muted">Jelenleg nem rendelhető</span>@endif<form action="{{ route('account.favorite.store', $product->id) }}" method="post">@csrf<button class="btn btn-sm btn-outline-danger">Eltávolítás</button></form></div></article></div>@empty<p class="text-muted">Még nincs mentett terméked.</p>@endforelse
+</div></section></div></div></div></div>
+@endsection

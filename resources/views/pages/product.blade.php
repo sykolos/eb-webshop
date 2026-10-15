@@ -87,6 +87,12 @@
                                     <i class="bi bi-cart-plus" aria-hidden="true"></i> Kosárba
                                 </button>
                             </form>
+                            <form action="{{ route('account.favorite.store', $product->id) }}" method="post" class="mt-2">
+                                @csrf
+                                <button type="submit" class="btn btn-outline-secondary btn-sm">
+                                    <i class="bi bi-heart" aria-hidden="true"></i> Kedvencekhez adás / eltávolítás
+                                </button>
+                            </form>
                         </div>
                     @else
                         <div class="partner-gate p-4">

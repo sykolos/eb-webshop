@@ -9,10 +9,12 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use App\Support\PasswordRules;
 use App\Http\Requests\LoginRequest;
 use App\Services\AuditLogger;
 use App\Services\CartService;
+use App\Models\PartnerRegistrationRequest;
 
 class AuthController extends Controller
 {
@@ -30,39 +32,55 @@ class AuthController extends Controller
     
     //register user
     public function postregister(Request $request){
-       // dd($request->all());
-        //validation
-        $request->validate([
-            'name'=>'required|min:3|max:225',            
-            'email'=>'required|email|max:225|unique:users',            
+        $data = $request->validate([
+            'name' => ['required', 'string', 'min:3', 'max:225'],
+            'email' => ['required', 'email', 'max:225', 'unique:users,email'],
+            'company_name' => ['required', 'string', 'max:191'],
+            'vatnumber' => ['nullable', 'string', 'max:50'],
+            'phone' => ['nullable', 'string', 'max:30'],
+            'message' => ['nullable', 'string', 'max:1000'],
             'password' => PasswordRules::required(),
         ]);
-        //registration
-        $user = User::create([
-            'name'=>$request->name,
-            'email'=>$request->email,
-            'password'=>Hash::make($request->password),
-        ]);
 
-        
+        DB::transaction(function () use ($data) {
+            $user = User::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => Hash::make($data['password']),
+                'role' => 'partner',
+                'account_status' => 'pending',
+            ]);
 
-        $id=$user->id;
-        
-        $user_i=User_invoce::create([
-            'user_id'=>$id,
-        ]);
-        $user_s=User_shipping::create([
-            'user_id'=>$id,
-        ]);
+            User_invoce::create([
+                'user_id' => $user->id,
+                'company_name' => $data['company_name'],
+                'address' => '',
+                'vatnumber' => $data['vatnumber'] ?? null,
+            ]);
 
-        // event(new Registered($user));
-        $user->sendEmailVerificationNotification();
-        //login
-        Auth::login($user);
-        app(CartService::class)->migrateSession($user, (array) $request->session()->get('cart', []));
-        $request->session()->forget('cart');
+            if (!empty($data['phone'])) {
+                User_shipping::create([
+                    'user_id' => $user->id,
+                    'address' => '',
+                    'phone' => $data['phone'],
+                    'receiver' => $data['name'],
+                    'is_default' => true,
+                ]);
+            }
 
-        return back()->with('success','Sikeres bejelentkezés');
+            PartnerRegistrationRequest::create([
+                'user_id' => $user->id,
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'company_name' => $data['company_name'],
+                'vatnumber' => $data['vatnumber'] ?? null,
+                'phone' => $data['phone'] ?? null,
+                'message' => $data['message'] ?? null,
+                'status' => 'pending',
+            ]);
+        });
+
+        return redirect()->route('login')->with('status', 'A partnerkérelmed beérkezett. Jóváhagyás után emailben vagy a megadott adatokkal tudsz belépni.');
     }
     //logout
     public function postlogout(Request $request, AuditLogger $audit){
@@ -89,6 +107,17 @@ class AuthController extends Controller
             $request->session()->regenerate();
 
             $user = $request->user();
+            if (($user->account_status ?: 'active') !== 'active') {
+                Auth::logout();
+                return back()->withInput($request->only('email', 'remember'))->withErrors([
+                    'email' => match ($user->account_status) {
+                        'pending' => 'A partnerkérelmed még jóváhagyásra vár.',
+                        'rejected' => 'A partnerkérelmet elutasítottuk. Vedd fel velünk a kapcsolatot.',
+                        'blocked' => 'A fiók jelenleg tiltva van.',
+                        default => 'A fiók jelenleg nem aktív.',
+                    },
+                ]);
+            }
             app(CartService::class)->migrateSession($user, (array) $request->session()->get('cart', []));
             $request->session()->forget('cart');
             $user->forceFill(['last_login_at' => now()])->save();

@@ -26,6 +26,7 @@ use App\Http\Controllers\ProductRecommend;
 use App\Http\Controllers\AdminTwoFactorController;
 use App\Http\Controllers\PrivateFileController;
 use App\Http\Controllers\DesignSystemController;
+use App\Http\Controllers\PartnerRegistrationRequestController;
 use App\Http\Controllers\ProductMediaController;
 use App\Http\Controllers\FilterDefinitionController;
 use App\Http\Controllers\PricingController;
@@ -84,8 +85,8 @@ Route::get('/product/{id}/similar', [ProductRecommend::class, 'similarProducts']
 
 //users
 Route::get('login/',[AuthController::class,'showlogin'])->name('login')->middleware('guest');
-Route::get('register/',[AuthController::class,'showregister'])->name('register')->middleware(['admin', 'throttle:registration']);
-Route::post('register',[AuthController::class,'postregister'])->name('register.submit')->middleware(['admin', 'throttle:registration']);
+Route::get('register/',[AuthController::class,'showregister'])->name('register')->middleware(['guest', 'throttle:registration']);
+Route::post('register',[AuthController::class,'postregister'])->name('register.submit')->middleware(['guest', 'throttle:registration']);
 Route::post('/login',[AuthController::class,'postlogin'])->name('login.submit')->middleware(['guest', 'throttle:login']);
 Route::post('logout/',[AuthController::class,'postlogout'])->name('logout')->middleware('auth');
 
@@ -103,7 +104,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::group(['prefix'=>'account','middleware'=>'auth'],function(){
-    Route::get('/',[PagesController::class,'account'])->name('account');
+    Route::get('/',[AccountpageController::class,'dashboard'])->name('account');
     Route::get('/orders',[AccountpageController::class,'orders'])->name('account.orders');
     Route::get('/userinfo',[AccountpageController::class,'userinfo'])->name('account.userinfo');
     Route::get('/details/{id}',[AccountpageController::class,'details'])->name('account.details');
@@ -111,6 +112,10 @@ Route::group(['prefix'=>'account','middleware'=>'auth'],function(){
     Route::put('/edit',[AccountpageController::class,'edit'])->name('account.edit');
     //pdf generálás
     Route::get('/getpdf/{id}',[AccountpageController::class,'getpdf'])->name('account.getpdf');
+    Route::post('/orders/{order}/reorder',[AccountpageController::class,'reorder'])->name('account.orders.reorder');
+    Route::get('/favorites',[AccountpageController::class,'favorites'])->name('account.favorites');
+    Route::post('/favorites/{productId}',[AccountpageController::class,'addFavorite'])->whereNumber('productId')->name('account.favorite.store');
+    Route::post('/shipping/{address}/default',[AccountpageController::class,'setDefaultShipping'])->name('shipping.default');
 
     // 💡 Szállítási címek kezelése (csak új/létrehoz/szerkeszt/töröl)
     Route::get('/shipping/create', [ShippingAddressController::class, 'create'])->name('shipping.create');
@@ -130,6 +135,8 @@ Route::group(['prefix'=>'account','middleware'=>'auth'],function(){
         Route::get('/security/2fa', [AdminTwoFactorController::class, 'setup'])->name('admin.2fa.setup');
         Route::post('/security/2fa/confirm', [AdminTwoFactorController::class, 'confirm'])->name('admin.2fa.confirm');
         Route::post('/security/2fa/disable', [AdminTwoFactorController::class, 'disable'])->name('admin.2fa.disable');
+        Route::get('/partner-requests', [PartnerRegistrationRequestController::class, 'index'])->name('adminpanel.partner-requests');
+        Route::post('/partner-requests/{registrationRequest}', [PartnerRegistrationRequestController::class, 'update'])->name('adminpanel.partner-requests.update');
         
         //products group
         Route::group(['prefix'=>'products',], function(){
@@ -213,7 +220,7 @@ Route::group(['prefix'=>'account','middleware'=>'auth'],function(){
 
 //email verification
 Route::get('/email/verify', function () {
-    return view('auth.verify-email');
+    return view('auth.verify');
     })->middleware('auth')->name('verification.notice');
     
     Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {

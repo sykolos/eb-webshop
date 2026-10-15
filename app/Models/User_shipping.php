@@ -18,7 +18,10 @@ class User_shipping extends Model
         'phone',
         'receiver',
         'comment',
+        'is_default',
     ];
+
+    protected $casts = ['is_default' => 'boolean'];
     
     public function user(){
         return $this->belongsTo(User::class, 'user_id');

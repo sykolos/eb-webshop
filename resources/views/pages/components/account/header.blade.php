@@ -30,6 +30,7 @@
     {{-- Gombok --}}
     <div class="d-grid gap-2 w-100">
         <a class="btn btn-primary btn-lg px-4 bg-gradient" href="{{ route('account.orders') }}">Rendelések</a>
+        <a class="btn btn-primary btn-lg px-4 bg-gradient" href="{{ route('account.favorites') }}">Kedvencek</a>
         <a class="btn btn-primary btn-lg px-4 bg-gradient" href="{{ route('account.userinfo') }}">Fh. Adatok</a>
     </div>
 </section>

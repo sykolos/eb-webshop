@@ -83,8 +83,22 @@
                         </div>
                     </div>
                     </div>
-                    <div class="text-center mt-4"> 
+                    <div class="text-center mt-4">
                         <a class="btn btn-primary btn-lg px-4 me-sm-3 bg-gradient" href="{{ route('account.modify') }}">Adatok szerkesztése</a>
+                    </div>
+
+                    <div class="row g-3 mt-4">
+                        <div class="col-lg-7">
+                            <div class="border rounded p-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2"><h3 class="h5 mb-0">Legutóbbi rendelések</h3><a href="{{ route('account.orders') }}">Összes rendelés</a></div>
+                                @forelse($recentOrders as $order)
+                                    <div class="d-flex justify-content-between border-top py-2"><span>{{ $order->displayNumber() }}</span><span>{{ $order->status }}</span></div>
+                                @empty<p class="text-muted mb-0">Még nincs rendelés.</p>@endforelse
+                            </div>
+                        </div>
+                        <div class="col-lg-5">
+                            <div class="border rounded p-3"><div class="d-flex justify-content-between align-items-center mb-2"><h3 class="h5 mb-0">Kedvencek</h3><a href="{{ route('account.favorites') }}">Megnyitás</a></div><p class="mb-0">Mentett termékek: <strong>{{ $favoriteProducts->count() }}</strong></p></div>
+                        </div>
                     </div>
                 </div> {{-- fehér doboz vége --}}
             </div>

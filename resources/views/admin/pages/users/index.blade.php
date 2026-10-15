@@ -4,7 +4,7 @@
 <h1 class="page-title">Felhasználók</h1>
 <div class="container">
     <div class="text-end mb-3">
-        <a href="{{route('register')}}" class="btn btn-primary">Létrehozás</a>    
+        <a href="{{ route('adminpanel.partner-requests') }}" class="btn btn-primary">Partnerkérelmek</a>
     </div>
     {{-- Szűrő card --}}
     <div class="card mb-3">

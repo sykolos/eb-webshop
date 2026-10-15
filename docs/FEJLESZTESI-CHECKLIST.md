@@ -7,15 +7,15 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M09: Adatbázisos kosár és teljes rendelési folyamat, KIADÁSRA KÉSZ; CI/develop/staging kapuk folyamatban |
-| Következő fejlesztési feladat | M09.K1 CI-ellenőrzés, majd egyetlen develop push és staging UI-ellenőrzés |
-| Alkalmazásfejlesztés ebből a checklistből | M01-M08 stagingen ellenőrzött; M09 implementáció elkészült, kiadási kapui folyamatban |
-| Utolsó igazolt staging kiadás | f9f3a39, GitHub Actions #117: verify/deploy, fiókmenü, autocomplete és M08 UI átvétel sikeres |
+| Aktív mérföldkő | M10: Belépés, regisztrációkérés és partnerfiók, KIADÁSRA KÉSZ; develop/staging kapuk folyamatban |
+| Következő fejlesztési feladat | M10.K4 egyetlen develop push, workflow megvárása, majd admin/partner staging UI-ellenőrzés |
+| Alkalmazásfejlesztés ebből a checklistből | M01-M09 stagingen ellenőrzött; M10 implementáció elkészült, K1-K3 teljesült |
+| Utolsó igazolt staging kiadás | 5ce003f, GitHub Actions #120: M09 verify/deploy sikeres; kosár, checkout és árazatlan szállítási opció ellenőrzött |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D09 törlés technikai javaslata, D11 szolgáltató; D12-D13 későbbre halasztva |
-| Mostani változtatás | M09 adatbázisos, partnerhez kötött kosár, session-átvitel, szerveroldali újraárazás, rendelési pillanatképek, idempotens checkout, háttérértesítés, ármentes közvetlen szállítási PDF és nem blokkoló kosár-visszajelzés; az M07 meglévő árlogikája változatlan |
+| Mostani változtatás | M10 partnerkérelem és jóváhagyási állapotok, aktív/pending/tiltott belépés, fiókösszegző, rendelés-szűrés és újrarendelés, cím-alapértelmezés, adatbázisos kedvencek, email-újraellenőrzés és tartós értesítési beállítások; az M09 kosár- és az M07 árlogikája változatlan |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -157,8 +157,8 @@ A vásárlás backendben rögzített üzleti esemény és a külső viselkedési
 | M06 | Terméktörzs, kategóriafa és webshopos szűrők adminja | STAGINGEN ELLENŐRZÖTT |
 | M07 | Egységes árképzés és admin ármátrix | STAGINGEN ELLENŐRZÖTT |
 | M08 | Webshop, katalógus és keresés a v6 kinézetével | STAGINGEN ELLENŐRZÖTT |
-| M09 | Adatbázisos kosár és teljes rendelési folyamat | KIADÁSRA KÉSZ |
-| M10 | Belépés, regisztrációkérés és partnerfiók | TERVEZETT |
+| M09 | Adatbázisos kosár és teljes rendelési folyamat | STAGINGEN ELLENŐRZÖTT |
+| M10 | Belépés, regisztrációkérés és partnerfiók | KIADÁSRA KÉSZ |
 | M11 | Admin rendeléskezelés és kézi rendelésfelvitel | TERVEZETT |
 | M12 | Admin partnerek és felhasználók teljes kezelése | TERVEZETT |
 | M13 | Excel-import és minden üzleti táblázat exportja | TERVEZETT |
@@ -475,43 +475,43 @@ Adat/deploy: DB kosár és order snapshot bővítő migráció; session átvitel
 
 ### M09 kiadási kapuk
 
-- [ ] M09.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [x] M09.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
 - [x] M09.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
-- [ ] M09.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
-- [ ] M09.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
-- [ ] M09.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
-- [ ] M09.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+- [x] M09.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [x] M09.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [x] M09.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
+- [x] M09.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
 
-Kiadási rekord: implementáció elkészült; helyi PHP lint, Blade cache, Vite build és diff-check sikeres; PHPUnit helyben nem indítható PDO SQLite driver hiányában. Commit, CI/workflow és staging próba a következő kiadási kapu.
+Kiadási rekord: commit = `5ce003f`; workflow = [GitHub Actions #120](https://github.com/sykolos/eb-webshop/actions/runs/38667147729), verify/deploy sikeres; helyi PHPUnit 73 teszt / 287 assertion, PHP lint, Blade cache, Vite build és diff-check sikeres. Stagingen partneri termék hozzáadás, fejlécszámláló, mennyiségmódosítás, server oldali nettó/áfa/bruttó újraszámítás, checkout és árazatlan szállítási opció betöltése ellenőrzött. A tesztkosárban 2 csomag szándékosan megmaradt a felhasználói kérés szerint; rendelés leadése nem történt.
 
 ## M10. Belépés, regisztrációkérés és partnerfiók
 
-Állapot: TERVEZETT. Függőség: M04, M05, M09; D03.
+Állapot: KIADÁSRA KÉSZ. Függőség: M04, M05, M09; D03.
 Forrás: Z: customer-experience; L: fiók újragondolás, regisztráció kérés.
 Stagingen bemutatható eredmény: Partnerkérelemtől a saját rendelésekig, címekig és kedvencekig végigjárható fiók.
 
-- [ ] M10.01 V6 belépő és jelszó-helyreállító felület, email ellenőrzés, hibás/lejárt token és sikerállapot; demóbelépés nélkül.
-- [ ] M10.02 Regisztráció kérés gomb és céges kérelem; függő/jóváhagyott/elutasított/tiltott állapot és valódi visszajelzés.
-- [ ] M10.03 Fiókáttekintő és mobil navigáció, rendeléstörténet szűréssel és saját rendelésrészlet/PDF.
-- [ ] M10.04 Újrarendelés a pillanatnyilag rendelhető termékekkel és aktuális árakkal; megszűnt termék jelzése.
-- [ ] M10.05 Szállítási cím létrehozás/szerkesztés/törlés/alapértelmezés; tulajdon és egyetlen alapértelmezett cím.
-- [ ] M10.06 Kedvencek adatbázisban, gyors kosárba helyezés és megszűnt termék kezelése.
-- [ ] M10.07 Céges és kapcsolattartói adatok szerkesztése a szabályok szerint; emailváltás újraellenőrzése; jelszó módosítása.
-- [ ] M10.08 Értesítési és hírlevél-beállítások tartós tárolása, a marketingküldés M16-ban kapcsolódik.
+- [x] M10.01 V6 belépő és jelszó-helyreállító felület, email ellenőrzés, hibás/lejárt token és sikerállapot; demóbelépés nélkül.
+- [x] M10.02 Regisztráció kérés gomb és céges kérelem; függő/jóváhagyott/elutasított/tiltott állapot és valódi visszajelzés.
+- [x] M10.03 Fiókáttekintő és mobil navigáció, rendeléstörténet szűréssel és saját rendelésrészlet/PDF.
+- [x] M10.04 Újrarendelés a pillanatnyilag rendelhető termékekkel és aktuális árakkal; megszűnt termék jelzése.
+- [x] M10.05 Szállítási cím létrehozás/szerkesztés/törlés/alapértelmezés; tulajdon és egyetlen alapértelmezett cím.
+- [x] M10.06 Kedvencek adatbázisban, gyors kosárba helyezés és megszűnt termék kezelése.
+- [x] M10.07 Céges és kapcsolattartói adatok szerkesztése a szabályok szerint; emailváltás újraellenőrzése; jelszó módosítása.
+- [x] M10.08 Értesítési és hírlevél-beállítások tartós tárolása, a marketingküldés M16-ban kapcsolódik.
 
 Ellenőrzés: Más fiók adatainak tiltása; függő partner jogai; cím CRUD; újrarendelés árváltozással; kedvencek új belépés után.
 Adat/deploy: Partnerstátusz/kedvencek/preferenciák migrációja; meglévő aktív ügyfelek ne veszítsék el hozzáférésüket.
 
 ### M10 kiadási kapuk
 
-- [ ] M10.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
-- [ ] M10.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
-- [ ] M10.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [x] M10.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [x] M10.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
+- [x] M10.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
 - [ ] M10.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
 - [ ] M10.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
 - [ ] M10.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
 
-Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+Kiadási rekord: helyi kész állapot; `php -d extension=php_pdo_sqlite.dll vendor/bin/phpunit` = 77 teszt / 310 assertion, PHP lint, Blade cache, Vite build és `git diff --check` sikeres. Új adatbázis: `2026_10_15_160000_create_account_features` (partnerkérelmek, fiókállapot, cím-default, kedvencek, preferenciák); meglévő aktív ügyfelek alapértelmezett állapota `active`. K4-K6 a develop push és staging ellenőrzés után zárható.
 
 ## M11. Admin rendeléskezelés és kézi rendelésfelvitel
 
@@ -1133,6 +1133,13 @@ Kiadási bejegyzéshez szükséges részletek:
 - Helyben ellenőrizve: Vite build, PHP lint és diff-check. A PHPUnit újrafuttatása PDO SQLite driver hiányában nem indult el; a #117 CI verify sikeres. A két új migráció visszagörgethető; nincs új környezeti változó vagy feature flag.
 - Develop/staging: `f9f3a39`, [#117](https://github.com/sykolos/eb-webshop/actions/runs/38651616855) verify/deploy sikeres. Élő staging átvétel: menü, autocomplete, vendég/partner árjogosultság, főoldali hero, admin kiemelt sorrend és 390/768/1440 px nézetek rendben.
 - Állapot: M08 STAGINGEN ELLENŐRZÖTT. Következő konkrét fejlesztés: M09.01 `CartService` és `carts/cart_items` adatmodell; meglévő ár-, mennyiség- és partnerjogosultsági szabályok megőrzésével.
+
+### 2026-10-15: M09 lezárva, M10 kiadásra kész
+
+- M09 staging kiadás: `5ce003f`, [#120](https://github.com/sykolos/eb-webshop/actions/runs/38667147729) verify/deploy sikeres. A stagingen az adatbázisos kosár, hozzáadás, mennyiségfrissítés, server oldali újraárazás, checkout és árazatlan szállítási opció betöltése ellenőrzött; a tesztkosár 2 csomaggal megmaradt, rendelés nem készült.
+- M10 elkészült: partnerkérelem és admin jóváhagyás, `pending/approved/rejected/blocked` állapotok, belépési védelem, email-ellenőrzési nézet, fiókösszegző, rendelés-szűrés/PDF, aktuális áras újrarendelés, cím-default, kedvencek, email-váltási újraellenőrzés és tartós értesítési beállítások.
+- Helyi ellenőrzés: teljes PHPUnit 77 teszt / 310 assertion, PHP lint, Blade cache, Vite build és diff-check sikeres. Ismert figyelmeztetés: a meglévő Sass/Bootstrap deprecation warningok M21 technikai adósságai, az M10 működését nem blokkolják.
+- Állapot: M09 STAGINGEN ELLENŐRZÖTT; M10 KIADÁSRA KÉSZ. Következő: M10 commit/develop push, workflow, majd admin és partner staging ellenőrzés desktop/tablet/mobil nézetben.
 
 ### Következő munkamenet sablonja
 

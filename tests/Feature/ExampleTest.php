@@ -140,12 +140,10 @@ class ExampleTest extends TestCase
     public function test_registration_rejects_passwords_below_the_common_minimum(): void
     {
         $this->withoutVite();
-        $admin = User::factory()->create(['is_admin' => true]);
-
-        $this->actingAs($admin)
-            ->post('/register', [
+        $this->post('/register', [
                 'name' => 'Rövid jelszó',
                 'email' => 'short-password-'.Str::uuid().'@example.test',
+                'company_name' => 'Teszt Kft.',
                 'password' => 'short',
                 'password_confirmation' => 'short',
             ])
