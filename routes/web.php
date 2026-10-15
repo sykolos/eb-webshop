@@ -187,6 +187,9 @@ Route::group(['prefix'=>'account','middleware'=>'auth'],function(){
             Route::get('/',[AdminController::class, 'users'])->name('adminpanel.users');
             Route::post('/',[AdminController::class, 'user_store'])->name('adminpanel.users.user_store');
             Route::get('/{id}',[AdminController::class, 'user_view'])->name('adminpanel.users.user_view');
+            Route::put('/{id}',[AdminController::class, 'user_update'])->name('adminpanel.users.user_update');
+            Route::post('/{id}/restore',[AdminController::class, 'user_restore'])->name('adminpanel.users.user_restore');
+            Route::post('/{id}/password-reset',[AdminController::class, 'user_password_reset'])->name('adminpanel.users.user_password_reset');
             Route::delete('/{id}',[AdminController::class, 'user_destroy'])->name('adminpanel.users.user_destroy');
         });
 

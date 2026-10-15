@@ -261,6 +261,7 @@ body.v6-body a { color: inherit; }
 .v6-preview-strip a { color: var(--eb-red); font-size: 13px; font-weight: 600; text-decoration: none; }
 
 .v6-toast { padding: 12px 14px; border: 1px solid #bfe5d2; border-radius: var(--eb-radius); background: #effaf4; color: var(--eb-success); font-size: 13px; }
+.v6-toast--warning { border-color: #f0d39a; background: #fff8e8; color: #8a5a00; }
 .v6-empty-state { padding: 40px 20px; border: 1px dashed var(--eb-line); border-radius: var(--eb-radius); background: var(--eb-white); text-align: center; }
 .v6-empty-state strong { display: block; margin-bottom: 6px; }
 .v6-empty-state span { color: var(--eb-muted); font-size: 13px; }

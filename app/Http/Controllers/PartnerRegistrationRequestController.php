@@ -16,7 +16,7 @@ class PartnerRegistrationRequestController extends Controller
             ->paginate(20)
             ->withQueryString();
 
-        return view('admin.pages.partner-requests.index', compact('requests'));
+        return view('admin.m12.partner-requests.index', compact('requests'));
     }
 
     public function update(Request $request, PartnerRegistrationRequest $registrationRequest, AuditLogger $audit)

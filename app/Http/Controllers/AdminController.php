@@ -10,6 +10,9 @@ use Illuminate\Http\Request;
 use App\Models\RecommendedProduct;
 use App\Services\AuditLogger;
 use App\Services\UnitCatalogService;
+use App\Services\UserManagementService;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Password;
 
 
 class AdminController extends Controller
@@ -22,35 +25,92 @@ class AdminController extends Controller
         $orders_2=Order::where('status','=','törölve');                
         return view('admin.pages.dashboard',['products'=>$products,'orders_0'=>$orders_0,'orders_1'=>$orders_1,'orders_2'=>$orders_2]);
     }
-    public function users(Request $request){
-        $query = User::query();
+    public function users(Request $request, UserManagementService $users){
+        $filters = $request->validate([
+            'search' => ['nullable', 'string', 'max:191'],
+            'status' => ['nullable', 'in:active,pending,rejected,blocked,archived'],
+            'role' => ['nullable', 'in:partner,administrator'],
+            'created_from' => ['nullable', 'date'],
+            'created_to' => ['nullable', 'date'],
+            'login_from' => ['nullable', 'date'],
+            'login_to' => ['nullable', 'date'],
+            'order_from' => ['nullable', 'date'],
+            'order_to' => ['nullable', 'date'],
+            'inactive_days' => ['nullable', 'integer', 'min:1', 'max:3650'],
+            'without_orders' => ['nullable', 'boolean'],
+            'include_archived' => ['nullable', 'boolean'],
+        ]);
 
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%");
-            });
-        }
-
-        $users = $query->orderBy('created_at', 'desc')->paginate(15)->onEachSide(0);
-
+        $usersList = $users->list($filters);
         if ($request->ajax()) {
-            return view('admin.pages.users.partials.list', compact('users'))->render();
+            return view('admin.m12.users.partials.list', ['users' => $usersList])->render();
         }
 
-        return view('admin.pages.users.index', compact('users'));
+        return view('admin.m12.users.index', ['users' => $usersList]);
     }
     public function user_store(){
         //létrehozni
     }
-    public function user_view($id)    {
-        $user=User::findOrFail($id);
-        return view('admin.pages.users.view',['user'=>$user]);
+    public function user_view(int $id, UserManagementService $users)    {
+        return view('admin.m12.users.view', ['user' => $users->find($id)]);
     }
-    public function user_destroy($id)    {
-        User::findOrFail($id)->delete();
-        return back()->with('success','Sikeresen törölve');
+
+    public function user_update(Request $request, int $id, UserManagementService $users)
+    {
+        $user = $users->find($id);
+        $data = $request->validate([
+            'name' => ['required', 'string', 'min:3', 'max:225'],
+            'email' => ['required', 'email', 'max:225', Rule::unique('users', 'email')->ignore($user->id)],
+            'role' => ['required', 'in:partner,administrator'],
+            'account_status' => ['required', 'in:active,pending,rejected,blocked'],
+            'admin_note' => ['nullable', 'string', 'max:5000'],
+            'invoice' => ['required', 'array'],
+            'invoice.company_name' => ['required', 'string', 'max:191'],
+            'invoice.address' => ['nullable', 'string', 'max:191'],
+            'invoice.city' => ['nullable', 'string', 'max:191'],
+            'invoice.state' => ['nullable', 'string', 'max:191'],
+            'invoice.zipcode' => ['nullable', 'string', 'max:30'],
+            'invoice.country' => ['nullable', 'string', 'max:191'],
+            'invoice.vatnumber' => ['nullable', 'string', 'max:50'],
+            'invoice.registrynumber' => ['nullable', 'string', 'max:100'],
+            'shipping' => ['nullable', 'array'],
+            'shipping.*.address' => ['required', 'string', 'max:191'],
+            'shipping.*.city' => ['nullable', 'string', 'max:191'],
+            'shipping.*.zipcode' => ['nullable', 'string', 'max:30'],
+            'shipping.*.phone' => ['nullable', 'string', 'max:50'],
+            'shipping.*.receiver' => ['nullable', 'string', 'max:191'],
+            'shipping.*.comment' => ['nullable', 'string', 'max:500'],
+            'shipping.*.is_default' => ['nullable', 'boolean'],
+            'new_shipping' => ['nullable', 'array'],
+            'new_shipping.address' => ['nullable', 'string', 'max:191'],
+            'new_shipping.city' => ['nullable', 'string', 'max:191'],
+            'new_shipping.zipcode' => ['nullable', 'string', 'max:30'],
+            'new_shipping.phone' => ['nullable', 'string', 'max:50'],
+            'new_shipping.receiver' => ['nullable', 'string', 'max:191'],
+            'new_shipping.comment' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        $users->update($user, $data, $request->user());
+        return redirect()->route('adminpanel.users.user_view', $id)->with('success', 'A partner adatai frissítve.');
+    }
+
+    public function user_destroy(int $id, UserManagementService $users, Request $request)
+    {
+        $users->archive($users->find($id), $request->user());
+        return redirect()->route('adminpanel.users')->with('success', 'A felhasználó archiválva, a történeti adatai megmaradtak.');
+    }
+
+    public function user_restore(int $id, UserManagementService $users, Request $request)
+    {
+        $users->restore($users->find($id), $request->user());
+        return back()->with('success', 'A felhasználó visszaállítva.');
+    }
+
+    public function user_password_reset(int $id, UserManagementService $users, Request $request)
+    {
+        $status = $users->sendPasswordReset($users->find($id), $request->user());
+        return back()->with($status === Password::RESET_LINK_SENT ? 'success' : 'warning',
+            $status === Password::RESET_LINK_SENT ? 'A jelszó-visszaállító link elküldve.' : 'A visszaállító link nem küldhető el: '.$status);
     }
     public function units(){
         $units = product_unit::withCount('products')->orderBy('unit')->get();

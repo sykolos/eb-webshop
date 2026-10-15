@@ -8,10 +8,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Products;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -23,6 +24,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'account_status',
+        'admin_note',
     ];
 
     /**
@@ -76,6 +78,11 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function orders(){
         return $this->hasMany(Order::class);
+    }
+
+    public function lastOrder()
+    {
+        return $this->hasOne(Order::class)->latestOfMany();
     }
     public function user_invoice(){
         return $this->hasOne(User_invoce::class,'user_id','id');
