@@ -149,7 +149,6 @@ class CheckoutService
 
             $lines[] = [
                 'product_id' => $product->id,
-                'color_id' => 0,
                 'quantity' => $packCount * $quote['pack_quantity'],
                 'unit_price' => $quote['unit_net'],
                 'product_title' => $product->title,
