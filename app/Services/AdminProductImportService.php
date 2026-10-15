@@ -203,7 +203,7 @@ final class AdminProductImportService
             for ($row = 1; $row <= $sheet->getHighestRow(); $row++) {
                 $cells = [];
                 for ($column = 1; $column <= Coordinate::columnIndexFromString($sheet->getHighestColumn()); $column++) {
-                    $cell = $sheet->getCellByColumnAndRow($column, $row);
+                    $cell = $sheet->getCell(Coordinate::stringFromColumnIndex($column).$row);
                     $cells[] = $cell->getDataType() === 'f' ? ['formula' => true] : (string) ($cell->getValue() ?? '');
                 }
                 $rows[] = $cells;
