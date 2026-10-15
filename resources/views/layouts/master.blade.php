@@ -3,19 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>@yield('title')</title>
-    <meta name=”description” content=”Villanyszerelési eszközök kis és nagykereskedelme.” />
+    <meta name="description" content="Villanyszerelési eszközök kis és nagykereskedelme." />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <link rel="icon" type="image/x-icon" href="{{asset('img/logo.png')}}">
     <link rel="apple-touch-icon" href="{{asset('img/logo.png')}}">
     <link rel="shortcut icon" href="{{asset('img/logo.png')}}">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    @vite('resources/js/app.js')
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    @vite('resources/js/app.js')
 
 
 </head>
@@ -24,13 +20,12 @@
 <body>
     @include('layouts.partials.nav')
     
-    <main class="page bg-light">        
+    <main class="page bg-light">
         @yield('content')
     </main>
-    @include('components.chatbot')
     @include('layouts.partials.footer')
-    </body>
     @stack('scripts')
-@include('components.consent')
-<button class="eb-consent-settings" type="button" data-consent-settings>Cookie beállítások</button>
+    @include('components.consent')
+    <button class="eb-consent-settings" type="button" data-consent-settings>Cookie beállítások</button>
+</body>
 </html>

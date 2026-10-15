@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
-
 :root {
     --eb-red: #e60000;
     --eb-red-dark: #b80000;
@@ -28,7 +26,7 @@ body.v6-body {
     margin: 0;
     background: var(--eb-bg);
     color: var(--eb-ink);
-    font-family: 'Poppins', Arial, sans-serif;
+    font-family: Arial, sans-serif;
     font-size: 15px;
     line-height: 1.55;
 }

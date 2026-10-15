@@ -37,15 +37,18 @@
   font-size: 1.75rem
   background-color: $primary-color !important
 
-.swiper
+.legacy-scroller
   width: 100%
+  overflow-x: auto
+  scrollbar-width: thin
   padding: 1rem 0
 
-  .swiper-wrapper
+  .legacy-scroller__track
     display: flex
     align-items: stretch
+    gap: 1rem
 
-  .swiper-slide
+  .legacy-scroller__item
     display: flex
     justify-content: center
     align-items: stretch
@@ -53,30 +56,13 @@
     width: auto
     flex: 0 0 auto
     max-width: 100%
-    padding: 0 0.5rem
+    width: 23%
 
     @media (max-width: 768px)
-      width: 50%
+      width: 31%
 
     @media (max-width: 576px)
-      width: 100%
-
-.highlighted-swiper,
-.top-categories-swiper,
-.latest-products-swiper
-  .swiper-slide
-    padding: 0 0.5rem
-
-.swiper-button-prev,
-.swiper-button-next
-  color: #333
-  background: rgba(255, 255, 255, 0.7)
-  padding: 0.75rem
-  border-radius: 50%
-  top: 40%
-
-  @media (max-width: 576px)
-    display: none
+      width: 78%
 
 .section-header
   font-size: 1.75rem

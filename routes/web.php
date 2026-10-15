@@ -46,6 +46,8 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 Route::get('/success',[PagesController::class,'success'])->name('success');
 Route::get('/',[PagesController::class,'home'])->name('home');
 Route::post('/tracking/events', [ActivityTrackingController::class, 'store'])->middleware('throttle:tracking')->name('tracking.events');
+Route::get('/health/live', [\App\Http\Controllers\SystemHealthController::class, 'live'])->name('health.live');
+Route::get('/health/ready', [\App\Http\Controllers\SystemHealthController::class, 'ready'])->name('health.ready');
 Route::get('/email/unsubscribe/{delivery}', [EmailPublicController::class, 'unsubscribe'])->middleware('signed')->name('email.unsubscribe');
 Route::get('impresszum/',[PagesController::class,'impresszum'])->name('impresszum');
 Route::get('aszf/',[PagesController::class,'aszf'])->name('aszf');

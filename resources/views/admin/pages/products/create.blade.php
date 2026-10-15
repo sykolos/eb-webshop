@@ -48,7 +48,7 @@ $sortedUnits = collect($product_units)->sortBy('unit');
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="category_id">Kategória</label>
-                                    <select name="category_id" id="category_id" class="form-select select2-search @error('category_id') is-invalid @enderror">
+                                    <select name="category_id" id="category_id" class="form-select @error('category_id') is-invalid @enderror">
                                     <option value="">--- Select category ---</option>
                                     @foreach ($sortedCategories as $category)
                                         <option value="{{$category->id}}" {{old('category_id')==$category->id ? 'selected' : ''}}> {{$category->name}} </option>
@@ -77,7 +77,7 @@ $sortedUnits = collect($product_units)->sortBy('unit');
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="colors">Mennyiségi egység</label>
-                                    <select name="unit_id" id="unit_id" class="form-select select2-search @error('unit_id') is-invalid @enderror" >
+                                    <select name="unit_id" id="unit_id" class="form-select @error('unit_id') is-invalid @enderror" >
                                         @foreach($sortedUnits as $unit)
                                         <option value="{{$unit->id}}" {{old('unit_id')==$unit->id ? 'selected' : ''}}>{{$unit->unit}}({{$unit->quantity}}{{$unit->measure}})</option>
                                         @endforeach
@@ -129,20 +129,4 @@ $sortedUnits = collect($product_units)->sortBy('unit');
     </div>
 </div>
 
-<script>
-$(document).ready(function() {
-    if (typeof $.fn.select2 === 'function') {
-        // Initialize Select2 for category and unit selects
-        $('#category_id, #unit_id').select2({
-            allowClear: true,
-            theme: 'bootstrap-5',
-            language: 'hu',
-            width: '100%',
-            placeholder: 'Keresés...'
-        });
-    } else {
-        console.warn('Select2 not loaded; skipping select2 initialization.');
-    }
-});
-</script>
 @endsection

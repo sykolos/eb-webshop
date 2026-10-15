@@ -36,64 +36,66 @@
 
 </section>
 <script>
-function loadQuickProducts() {
-    $('#quick-spinner').removeClass('d-none');
-    const search = $('#quick-search').val();
-    const category = $('#quick-category').val();
+const quickSearch = document.getElementById('quick-search');
+const quickCategory = document.getElementById('quick-category');
+const quickProducts = document.getElementById('quick-products-wrapper');
+const quickSpinner = document.getElementById('quick-spinner');
+const quickInfo = document.getElementById('quick-info');
+const quickStatus = document.getElementById('quick-cart-status');
+const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
 
-    $.get("{{ route('shop.quick.products') }}", { search, category }, function(data) {
-        $('#quick-products-wrapper').html(data.html);
-        $('#quick-spinner').addClass('d-none');
-        $('#quick-info').html(data.info); 
-    });
-}
+const loadQuickProducts = async (url = "{{ route('shop.quick.products') }}") => {
+    quickSpinner?.classList.remove('d-none');
+    const endpoint = new URL(url, window.location.origin);
+    if (endpoint.pathname.endsWith('/quick/products')) {
+        endpoint.searchParams.set('search', quickSearch?.value || '');
+        endpoint.searchParams.set('category', quickCategory?.value || '');
+    }
+    try {
+        const response = await fetch(endpoint, {headers: {Accept: 'application/json'}});
+        const data = await response.json();
+        if (quickProducts) quickProducts.innerHTML = data.html || '';
+        if (quickInfo) quickInfo.textContent = data.info || '';
+    } finally {
+        quickSpinner?.classList.add('d-none');
+    }
+};
 
-$('#quick-search, #quick-category').on('input change', function () {
-    clearTimeout(window.quickTimeout);
-    window.quickTimeout = setTimeout(loadQuickProducts, 400);
+let quickTimeout;
+[quickSearch, quickCategory].forEach((field) => field?.addEventListener('input', () => {
+    clearTimeout(quickTimeout);
+    quickTimeout = setTimeout(() => loadQuickProducts(), 400);
+}));
+
+quickProducts?.addEventListener('click', async (event) => {
+    const pageLink = event.target.closest('.pagination a');
+    const button = event.target.closest('.add-to-cart');
+    if (pageLink) {
+        event.preventDefault();
+        await loadQuickProducts(pageLink.href);
+        return;
+    }
+    if (!button) return;
+    event.preventDefault();
+    const card = button.closest('.card');
+    const originalText = button.innerHTML;
+    button.disabled = true;
+    button.textContent = 'Mentés...';
+    try {
+        const response = await fetch(button.dataset.url, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8', 'X-CSRF-TOKEN': csrf, Accept: 'application/json'},
+            body: new URLSearchParams({_token: csrf || '', quantity: card?.querySelector('.quick-quantity')?.value || '1'}),
+        });
+        if (!response.ok) throw new Error();
+        if (quickStatus) quickStatus.textContent = 'A termék a kosárba került.';
+        window.updateCartCount?.();
+    } catch {
+        if (quickStatus) quickStatus.textContent = 'Hiba történt a kosárba helyezés során.';
+    } finally {
+        setTimeout(() => { button.disabled = false; button.innerHTML = originalText; }, 1500);
+    }
 });
-$(document).on('click', '#quick-products-wrapper .pagination a', function (e) {
-    e.preventDefault();
-    const url = $(this).attr('href');
-    $('#quick-loading').removeClass('d-none');
-    $.get(url, function (data) {
-        $('#quick-products-wrapper').html(data.html);
-        $('#quick-info').html(data.info);
-        $('#quick-loading').addClass('d-none');
-    });
-});
 
-$(document).on('click', '.add-to-cart', function () {
-    const $button = $(this);
-    const card = $button.closest('.card');
-    const url = $button.data('url');
-    const quantity = card.find('.quick-quantity').val() || 1;
-
-    const originalText = $button.html();
-    $button.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1" role="status"></span>');
-
-    $.post(url, {
-        _token: '{{ csrf_token() }}',
-        quantity: quantity
-    }).done(function () {
-        $('#quick-cart-status').text('A termék a kosárba került.');
-
-        // Kosár mennyiség frissítése
-        if (typeof updateCartCount === 'function') {
-            updateCartCount();
-        }
-
-        // Gomb visszaállítása
-        setTimeout(() => {
-            $button.prop('disabled', false).html(originalText);
-        }, 1500);
-    }).fail(function () {
-        $button.prop('disabled', false).html(originalText);
-        alert('Hiba történt a kosárba helyezés során.');
-    });
-});
-
-$(document).ready(function () {
-    loadQuickProducts();
-});
+loadQuickProducts().catch(() => { if (quickInfo) quickInfo.textContent = 'A terméklista nem tölthető be.'; });
 </script>

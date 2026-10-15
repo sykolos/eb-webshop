@@ -1,32 +1,3 @@
-// 1. jQuery – csak ha szükséges a kosár preview-hoz
-import $ from 'jquery';
-window.$ = $;
-window.jQuery = $;
-
-$.ajaxSetup({
-    headers: {
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-    }
-});
-
-// 2. Axios beállítás
-import axios from 'axios';
-window.axios = axios;
-
-axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-
-let token = document.head.querySelector('meta[name="csrf-token"]');
-if (token) {
-    axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
-} else {
-    console.error('CSRF token not found');
-}
-
-// globális libek
-import _ from 'lodash';
-window._ = _;
-
-// Saját JS
 import './cart-preview';
 import './cart';
 import './tracking';
@@ -40,6 +11,36 @@ function closePopup() {
         overlay.style.display = 'none';
     }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const menuToggle = document.querySelector('[data-menu-toggle]');
+    const menu = document.getElementById('navbarSupportedContent');
+    const userToggle = document.querySelector('[data-user-toggle]');
+    const userMenu = document.getElementById('userMenu');
+
+    if (menuToggle && menu) {
+        menuToggle.addEventListener('click', () => {
+            const expanded = menuToggle.getAttribute('aria-expanded') === 'true';
+            menuToggle.setAttribute('aria-expanded', String(!expanded));
+            menu.classList.toggle('is-open', !expanded);
+        });
+    }
+
+    if (userToggle && userMenu) {
+        userToggle.addEventListener('click', () => {
+            const expanded = userToggle.getAttribute('aria-expanded') === 'true';
+            userToggle.setAttribute('aria-expanded', String(!expanded));
+            userMenu.hidden = expanded;
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!userToggle.closest('.dropdown')?.contains(event.target)) {
+                userToggle.setAttribute('aria-expanded', 'false');
+                userMenu.hidden = true;
+            }
+        });
+    }
+});
 
 document.addEventListener('DOMContentLoaded', () => {
     const overlay = document.getElementById('popupOverlay');

@@ -1,12 +1,12 @@
-<nav class="navbar navbar-light sticky-top navbar-expand-lg bg-opacity-75 fixed-top lead text-uppercase">
+<nav class="navbar navbar-light sticky-top navbar-expand-lg bg-opacity-75 fixed-top lead text-uppercase" data-site-nav>
     <div class="container-fluid px-3">
         <a class="navbar-brand" href="{{ route('home') }}">
             <img class="logo img-fluid" src="{{ asset('img/logo.svg') }}" alt="ElectroBusiness">
         </a>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Menü megnyitása">
-            <span class="navbar-toggler-icon"></span>
+        <button class="navbar-toggler" type="button" data-menu-toggle aria-controls="navbarSupportedContent"
+            aria-expanded="false" aria-label="Menü megnyitása">
+            <span aria-hidden="true">Menü</span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -31,7 +31,7 @@
                         data-autocomplete-url="{{ route('search.autocomplete') }}"
                         aria-controls="global-search-suggestions" aria-expanded="false">
                     <button type="submit" aria-label="Keresés" title="Keresés">
-                        <i class="bi bi-search" aria-hidden="true"></i>
+                        Keresés
                     </button>
                 </div>
                 <div id="global-search-suggestions" class="search-suggestions" role="listbox"></div>
@@ -60,11 +60,11 @@
                         <div id="cart-preview" class="dropdown-menu p-2" style="display: none;"></div>
                     </li>
                     <li class="nav-item dropdown" style="z-index: 1040;">
-                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                            data-bs-toggle="dropdown" aria-expanded="false" aria-label="Felhasználói menü">
-                            <i class="bi bi-person-fill" aria-hidden="true"></i>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <button class="nav-link dropdown-toggle" type="button" id="userDropdown" data-user-toggle
+                            aria-expanded="false" aria-controls="userMenu" aria-label="Felhasználói menü">
+                            Fiók
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" id="userMenu" aria-labelledby="userDropdown" hidden>
                             <li><a class="dropdown-item" href="{{ route('account') }}">Fiók</a></li>
                             @if(auth()->user()->is_admin)
                                 <li><hr class="dropdown-divider"></li>

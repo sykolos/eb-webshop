@@ -8,6 +8,21 @@
 		height: 46px
 .navbar-expand-lg .collapse, .navbar-collapse
 	justify-content: right
+	display: none
+
+.navbar-collapse.is-open
+	display: flex
+
+.navbar-toggler
+	display: inline-flex
+	align-items: center
+	border: 1px solid rgba(17, 24, 32, .25)
+	background: #fff
+	padding: .45rem .7rem
+	cursor: pointer
+
+.dropdown-menu[hidden]
+	display: none !important
 
 .navbar ul li a 
 	color: var(--bs-heading-color) !important
@@ -165,3 +180,14 @@ footer hr
 		box-shadow: none
 		text-align: center
 		font-size: 1rem
+
+@media (min-width: 769px)
+	.navbar-toggler
+		display: none
+
+	.navbar-collapse
+		display: flex
+
+	.navbar-collapse .navbar-nav
+		display: flex
+		align-items: center

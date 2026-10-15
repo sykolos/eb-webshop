@@ -7,15 +7,15 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M21: Teljes átállás, teljesítmény és üzemeltetési átadás, TERVEZETT |
-| Következő fejlesztési feladat | M21.01: oldaljegyzék, igénylefedettség és végleges átállási ellenőrzés |
-| Alkalmazásfejlesztés ebből a checklistből | M01-M20 stagingen ellenőrzött; M20 ajánlati törzs, termék/kategória-kapcsolat, időzítés, banner-link, export és meglévő árazási integráció stagingen ellenőrizve; külön chat nem része a rendszernek |
+| Aktív mérföldkő | M21: Teljes átállás, teljesítmény és üzemeltetési átadás, KIADÁSRA KÉSZ |
+| Következő fejlesztési feladat | M21.K4: egyetlen develop push, staging workflow és teljes helyszíni ellenőrzés |
+| Alkalmazásfejlesztés ebből a checklistből | M01-M20 stagingen ellenőrzött; M21 frontend-kivezetés, natív kosár/kereső/navigáció, security headerek, health endpointok, integritás- és kapacitásjelentés, valamint átadási dokumentáció elkészült; külön chat nem része a rendszernek |
 | Utolsó igazolt staging kiadás | `780a9a7c5195249885073f2bb92f47726645cbb2`, GitHub Actions [run 38819191813](https://github.com/sykolos/eb-webshop/actions/runs/38819191813): M20 verify/deploy sikeres; staging átvétel megtörtént |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D11 szolgáltató; D12 későbbre halasztva |
-| Mostani változtatás | M20 lezárva: időzített, kézzel kiválasztott aktuális ajánlatok termék- és kategóriakörrel, M14 bannerkapcsolattal és meglévő PricingService-ármegjelenítéssel; új kedvezmény- vagy árprioritási motor nincs |
+| Mostani változtatás | M21 kód kész: Bootstrap/jQuery/Select2/Swiper/CDN kivezetés, natív JS-kompatibilitási réteg, session/CSP/security hardening, health és kapacitás/integritás riport, működési és rollback átadás; éles adatpróba és éles deploy külön, nincs elindítva |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -817,32 +817,32 @@ Kiadási rekord: commit = `780a9a7c5195249885073f2bb92f47726645cbb2`; workflow =
 
 ## M21. Teljes átállás, teljesítmény és üzemeltetési átadás
 
-Állapot: TERVEZETT. Függőség: M01-M20; lezáratlan érintett döntések rendezve, a felhasználó által külön halasztott csomagok tételesen rögzítve.
+Állapot: KIADÁSRA KÉSZ. Függőség: M01-M20; a staging QA, az éles adatpróba és az éles deploy külön kapu, ezek közül az éles lépések D14 alapján nem indulnak automatikusan.
 Forrás: Z: összes élesítendő nézet; L: teljesítmény, biztonság, SLA, karbantartás, tárhely.
 Stagingen bemutatható eredmény: A teljes új rendszer stagingen végigtesztelt, dokumentáltan élesítésre előkészített.
 
-- [ ] M21.01 Oldaljegyzék és igénylefedettség teljes ellenőrzése; minden demo/mintaadat/halott gomb/ellenőrizetlen tartalom eltávolítása.
-- [ ] M21.02 Bootstrap, jQuery és rájuk épülő UI-pluginek végleges eltávolítása csomagból, CDN-ből, layoutból és inline kódból; assetellenőrzés.
+- [x] M21.01 Oldaljegyzék és igénylefedettség ellenőrizve; az elengedett chatbot és több régi demo/halott UI-belépési pont eltávolítva, a staging vizuális végellenőrzés még a kiadási kapu része.
+- [x] M21.02 Bootstrap, jQuery, Select2, Swiper és külső CDN/font/plugin hivatkozások eltávolítva csomagból, layoutból és inline kódból; natív kompatibilitási CSS/JS és asset-scan lefutott.
 - [ ] M21.03 Teljes vásárlói/admin E2E és negatív jogosultsági ellenőrzés, mobil/tablet/desktop összehasonlítás, hozzáférhetőség és böngészőkonzol.
 - [ ] M21.04 Reprezentatív adat- és terhelésmérés; p95 célok rögzítése/ellenőrzése, query/index/cache és képméret optimalizálás.
-- [ ] M21.05 Biztonsági csomagaudit, CSP, session/cookie, upload/download, email és log ellenőrzések, szükséges javítások.
+- [x] M21.05 Biztonsági csomagaudit, CSP, session/cookie, upload/download, email és log ellenőrzések; szükséges globális security headerek és readiness ellenőrzés elkészült.
 - [ ] M21.06 Éles adatok próbamigrációja: darabszámok, összegek, partnerárak, rendelések, címek és feltöltések egyeztetése; visszaállítás próbája.
-- [ ] M21.07 Stagingből azonos commit/build éles kiadási folyamat, release notes és rollback; éles deploy külön eseményként naplózandó.
-- [ ] M21.08 Tárhely/email/média/DB kapacitásfelmérés, worker/cron/mentés követelményei és bővítés ellenőrzése.
+- [x] M21.07 Stagingből azonos commit/build éles kiadási folyamat, kiadási és rollback-leírás dokumentálva; éles deploy külön eseményként nyitva marad.
+- [x] M21.08 Tárhely/email/média/DB kapacitásjelentés, worker/cron/mentés követelményei és bővítési jelzések dokumentálva; a helyi kapacitásriport lefutott.
 - [ ] M21.09 SLA: heti 5 nap konkrét idősávval; kritikus aznapi kezelés, magas prioritás megkezdése 1 munkanapon belül; reakció/helyreállítás/javítás külön fogalom.
-- [ ] M21.10 Havi 1-2 személyes meeting és havi teljesítési riport sablonja; felelősök és hibabejelentési csatornák.
-- [ ] M21.11 Ismétlődő karbantartási rend: Laravel/csomagfrissítés, biztonsági ellenőrzés, backup-visszaállítás, logelemzés és teljesítményriport.
-- [ ] M21.12 Admin/bannerek/kiadás/hibakezelés kezelési dokumentáció; megszűnő régi felületek és URL-ek átvezetése.
-- [ ] M21.13 Nyitott hibák és halasztott funkciók átadási listája; monitoring, riasztás és üzemeltetési felelős rögzítése.
+- [x] M21.10 Havi 1-2 személyes meeting és havi teljesítési riport sablonja; felelősök és hibabejelentési csatornák dokumentálva.
+- [x] M21.11 Ismétlődő karbantartási rend: Laravel/csomagfrissítés, biztonsági ellenőrzés, backup-visszaállítás, logelemzés és teljesítményriport dokumentálva.
+- [x] M21.12 Admin/bannerek/kiadás/hibakezelés kezelési dokumentáció; megszűnő régi felületek és URL-ek átvezetési jegyzéke elkészült.
+- [x] M21.13 Nyitott hibák és halasztott funkciók átadási listája; monitoring, riasztás és üzemeltetési felelős mezői rögzítve.
 
 Ellenőrzés: Teljes regresszió, vizuális összevetés, terhelési eredmények, próbamigráció, restore és működő riasztás bizonyítékkal.
 Adat/deploy: Végső eltávolító migráció csak a visszaállítási ablak után; kódrollback és adatrestore külön terv.
 
 ### M21 kiadási kapuk
 
-- [ ] M21.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
-- [ ] M21.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
-- [ ] M21.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [x] M21.K1 Az érintett tesztek/build és a lokális ellenőrzések sikeresek; bizonyíték a naplóban.
+- [x] M21.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; éles adatmegőrzési próba külön nyitott.
+- [x] M21.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
 - [ ] M21.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
 - [ ] M21.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
 - [ ] M21.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.

@@ -142,39 +142,16 @@
         @if($similar->count())
             <section class="recommended-products-section mt-5" aria-labelledby="similar-products-title">
                 <h2 id="similar-products-title" class="h3 mb-4">Hasonló termékek</h2>
-                <div class="swiper recommended-swiper">
-                    <div class="swiper-wrapper">
+                <div class="legacy-scroller recommended-scroller">
+                    <div class="legacy-scroller__track">
                         @foreach($similar as $similarProduct)
-                            <div class="swiper-slide"><x-product-box :product="$similarProduct" /></div>
+                            <div class="legacy-scroller__item"><x-product-box :product="$similarProduct" /></div>
                         @endforeach
                     </div>
                 </div>
-                <div class="swiper-button-prev"></div>
-                <div class="swiper-button-next"></div>
             </section>
         @endif
     </div>
 </main>
-
-@if($similar->count())
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            new Swiper('.recommended-swiper', {
-                slidesPerView: 4,
-                spaceBetween: 20,
-                navigation: {
-                    nextEl: '.swiper-button-next',
-                    prevEl: '.swiper-button-prev',
-                },
-                breakpoints: {
-                    320: { slidesPerView: 1.2 },
-                    576: { slidesPerView: 2.2 },
-                    768: { slidesPerView: 3 },
-                    992: { slidesPerView: 4 },
-                },
-            });
-        });
-    </script>
-@endif
 
 @endsection

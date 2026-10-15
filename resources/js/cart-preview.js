@@ -1,91 +1,82 @@
-import $ from 'jquery';
-
-let previewTimer = null;
 const cartRoot = document.getElementById('cart-icon-container');
-const cartRoutes = {
-	count: cartRoot?.dataset.countUrl || '/cart/count',
-	preview: cartRoot?.dataset.previewUrl || '/cart/preview',
-	update: cartRoot?.dataset.updateUrl || '/cart/update',
-	remove: cartRoot?.dataset.removeUrl || '/cart/remove',
-};
+const preview = document.getElementById('cart-preview');
+const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
 
-// Mobilon nem aktiváljuk a hoveres előnézetet
-const isDesktop = window.innerWidth > 768;
+if (cartRoot && preview && csrf) {
+    let hideTimer;
+    const routes = {
+        count: cartRoot.dataset.countUrl || '/cart/count',
+        preview: cartRoot.dataset.previewUrl || '/cart/preview',
+        update: cartRoot.dataset.updateUrl || '/cart/update',
+        remove: cartRoot.dataset.removeUrl || '/cart/remove',
+    };
 
-if (isDesktop) {
-	// Kosár előnézet betöltése hoverre
-	$('#cart-icon-container').on('mouseenter', function () {
-		clearTimeout(previewTimer);
+    const request = async (url, options = {}) => {
+        const response = await fetch(url, {
+            credentials: 'same-origin',
+            ...options,
+            headers: {
+                Accept: 'application/json, text/html',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': csrf,
+                ...(options.headers || {}),
+            },
+        });
+        if (!response.ok) throw new Error('A kosár frissítése nem sikerült.');
+        return response;
+    };
 
-		$('#cart-preview')
-			.html('<div class="text-center py-3"><div class="spinner-border" role="status"><span class="visually-hidden">Betöltés...</span></div></div>')
-			.stop()
-			.fadeIn(150);
+    const loading = () => {
+        preview.innerHTML = '<div class="cart-preview-loading" role="status">Betöltés...</div>';
+        preview.style.display = 'block';
+    };
 
-		$.get(cartRoutes.preview, function (data) {
-			$('#cart-preview').html(data);
-		});
-	});
+    const reload = async () => {
+        const response = await request(routes.preview);
+        preview.innerHTML = await response.text();
+    };
 
-	$('#cart-icon-container').on('mouseleave', function () {
-		previewTimer = setTimeout(function () {
-			$('#cart-preview').stop().fadeOut(150);
-		}, 300);
-	});
+    const updateCount = async () => {
+        const response = await request(routes.count);
+        const data = await response.json();
+        document.querySelectorAll('.cart-badge, #cart-count').forEach((badge) => { badge.textContent = String(data.count); });
+    };
 
-	$('#cart-preview').on('mouseenter', function () {
-		clearTimeout(previewTimer);
-	}).on('mouseleave', function () {
-		previewTimer = setTimeout(function () {
-			$('#cart-preview').stop().fadeOut(150);
-		}, 300);
-	});
-}
+    const scheduleHide = () => {
+        window.clearTimeout(hideTimer);
+        hideTimer = window.setTimeout(() => { preview.style.display = 'none'; }, 300);
+    };
 
-//  Mennyiség módosítás
-$(document).on('click', '.btn-increase, .btn-decrease', function () {
-	const key = $(this).data('key');
-	const change = $(this).hasClass('btn-increase') ? 1 : -1;
-	const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    if (window.innerWidth > 768) {
+        cartRoot.addEventListener('mouseenter', async () => {
+            window.clearTimeout(hideTimer);
+            loading();
+            try { await reload(); } catch { preview.textContent = 'A kosár előnézete jelenleg nem érhető el.'; }
+        });
+        cartRoot.addEventListener('mouseleave', scheduleHide);
+        preview.addEventListener('mouseenter', () => window.clearTimeout(hideTimer));
+        preview.addEventListener('mouseleave', scheduleHide);
+    }
 
-	//  Spinner jelenjen meg azonnal
-	$('#cart-preview').html('<div class="text-center py-3"><div class="spinner-border" role="status"></div></div>');
+    document.addEventListener('click', async (event) => {
+        const button = event.target.closest('.btn-increase, .btn-decrease, .btn-remove');
+        if (!button || (!cartRoot.contains(button) && !preview.contains(button))) return;
+        event.preventDefault();
+        loading();
+        const remove = button.classList.contains('btn-remove');
+        const body = new URLSearchParams({key: button.dataset.key || ''});
+        if (!remove) body.set('change', button.classList.contains('btn-increase') ? '1' : '-1');
+        try {
+            await request(remove ? routes.remove : routes.update, {
+                method: remove ? 'DELETE' : 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
+                body,
+            });
+            await Promise.all([reload(), updateCount()]);
+        } catch (error) {
+            preview.textContent = error.message;
+        }
+    });
 
-	$.post(cartRoutes.update, { key, change, _token: token }, function () {
-		reloadCartPreview();
-		updateCartCount();
-	});
-});
-
-//  Termék törlés
-$(document).on('click', '.btn-remove', function () {
-	const key = $(this).data('key');
-	const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-	//  Spinner jelenjen meg azonnal
-	$('#cart-preview').html('<div class="text-center py-3"><div class="spinner-border" role="status"></div></div>');
-
-	$.ajax({
-		url: cartRoutes.remove,
-		type: 'DELETE',
-		data: { key, _token: token },
-		success: function () {
-			reloadCartPreview();
-			updateCartCount();
-		}
-	});
-});
-
-// Kosár újratöltés
-function reloadCartPreview() {
-	$.get(cartRoutes.preview, function (data) {
-		$('#cart-preview').html(data);
-	});
-}
-
-// Kosár badge frissítés
-window.updateCartCount = function updateCartCount() {
-	$.get(cartRoutes.count, function (data) {
-		$('.cart-badge').text(data.count);
-	});
+    window.updateCartCount = updateCount;
 }

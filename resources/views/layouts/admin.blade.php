@@ -8,40 +8,7 @@
     <title>@yield('title')</title>
     <meta name= “robots” content=noindex, nofollow”>
     {{-- <link rel="stylesheet" href="{{asset('css/admin.css')}}"> --}}
-    <!-- jQuery must load before Vite bundle -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <!-- Select2 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
-    <!-- Select2 JS must load before Vite bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     @vite(['resources/js/admin.js'])
-    <style>
-        /* Select2 Mobile Friendly Styling */
-        .select2-container--bootstrap-5 .select2-selection--single {
-            height: auto;
-            padding: 0.375rem 0.75rem;
-        }
-        
-        .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
-            padding: 0;
-        }
-        
-        .select2-container--bootstrap-5.select2-container--open .select2-dropdown {
-            z-index: 1060 !important;
-        }
-
-        /* Responsive dropdown width on mobile */
-        @media (max-width: 576px) {
-            .select2-container {
-                width: 100% !important;
-            }
-            
-            .select2-dropdown {
-                width: 100% !important;
-            }
-        }
-    </style>
 </head>
 <body>
     <div class="admin-wrapper">
@@ -71,48 +38,5 @@
         </main>
     </div>
     <div class="sidebar-overlay d-lg-none" id="sidebarOverlay"></div>
-    <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const toggleBtn = document.getElementById("toggle-sidebar");
-        const sidebar = document.getElementById("adminSidebar");
-        const overlay = document.getElementById("sidebarOverlay");
-
-        const openSidebar = () => {
-            sidebar.classList.add("open");
-            overlay.classList.add("active");
-        };
-
-        const closeSidebar = () => {
-            sidebar.classList.remove("open");
-            overlay.classList.remove("active");
-        };
-
-        if (toggleBtn && sidebar && overlay) {
-            // Hamburger gombra kattintás
-            toggleBtn.addEventListener("click", () => {
-                if (sidebar.classList.contains("open")) {
-                    closeSidebar();
-                } else {
-                    openSidebar();
-                }
-            });
-
-            // Overlay kattintásra zárás
-            overlay.addEventListener("click", () => {
-                closeSidebar();
-            });
-
-            // Mobilon linkre kattintásra zárás
-            document.querySelectorAll('#adminSidebar a').forEach(link => {
-                link.addEventListener('click', () => {
-                    if (window.innerWidth <= 992) {
-                        closeSidebar();
-                    }
-                });
-            });
-        }
-    });
-</script>
-
 </body>
 </html>

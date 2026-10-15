@@ -1,0 +1,197 @@
+// Small compatibility layer for legacy Blade templates while they are being
+// replaced by the V6 layouts. It intentionally contains no framework code.
+*, *::before, *::after
+  box-sizing: border-box
+
+html
+  font-size: 16px
+
+body
+  margin: 0
+
+a
+  color: inherit
+
+img
+  max-width: 100%
+
+.container, .container-fluid
+  width: 100%
+  margin-inline: auto
+  padding-inline: 1rem
+
+.container
+  max-width: 1240px
+
+.row
+  display: flex
+  flex-wrap: wrap
+  margin-inline: -0.75rem
+
+[class^='col-'], [class*=' col-']
+  width: 100%
+  padding-inline: 0.75rem
+
+.col-12
+  flex: 0 0 100%
+  max-width: 100%
+
+.d-none
+  display: none !important
+
+.d-flex
+  display: flex !important
+
+.d-grid
+  display: grid !important
+
+.flex-wrap
+  flex-wrap: wrap !important
+
+.justify-content-between
+  justify-content: space-between !important
+
+.justify-content-center
+  justify-content: center !important
+
+.align-items-center
+  align-items: center !important
+
+.text-center
+  text-align: center !important
+
+.text-muted
+  color: #65717b !important
+
+.text-white
+  color: #fff !important
+
+.bg-light
+  background: #f6f7f8 !important
+
+.bg-white
+  background: #fff !important
+
+.border
+  border: 1px solid #dfe4e8 !important
+
+.rounded, .rounded-3
+  border-radius: 8px !important
+
+.shadow, .shadow-sm
+  box-shadow: 0 8px 24px rgba(20, 24, 29, .08) !important
+
+.w-100
+  width: 100% !important
+
+.form-control, .form-select, input, select, textarea
+  width: 100%
+  min-height: 42px
+  padding: .6rem .75rem
+  border: 1px solid #cfd7dc
+  border-radius: 6px
+  background: #fff
+  color: #14181d
+  font: inherit
+
+button, .btn
+  font: inherit
+
+.btn
+  display: inline-flex
+  align-items: center
+  justify-content: center
+  gap: .45rem
+  min-height: 40px
+  padding: .55rem 1rem
+  border: 1px solid transparent
+  border-radius: 6px
+  cursor: pointer
+  text-decoration: none
+
+.btn-primary
+  background: #e60000
+  color: #fff
+
+.btn-dark
+  background: #202529
+  color: #fff
+
+.btn-outline-primary, .btn-outline-secondary, .btn-outline-dark, .btn-outline-danger
+  background: #fff
+  color: #202529
+  border-color: #cfd7dc
+
+.btn-outline-danger
+  color: #b42318
+  border-color: #e2a4a4
+
+.alert
+  margin: 1rem 0
+  padding: .85rem 1rem
+  border: 1px solid #dfe4e8
+  border-radius: 6px
+
+.table-responsive
+  overflow-x: auto
+
+.table
+  width: 100%
+  border-collapse: collapse
+
+.table th, .table td
+  padding: .7rem
+  border-bottom: 1px solid #dfe4e8
+  text-align: left
+
+.badge
+  display: inline-flex
+  padding: .2rem .45rem
+  border-radius: 999px
+  font-size: .8rem
+
+.position-relative
+  position: relative !important
+
+.position-fixed
+  position: fixed !important
+
+.top-0
+  top: 0 !important
+
+.bottom-0
+  bottom: 0 !important
+
+.end-0
+  right: 0 !important
+
+@media (min-width: 576px)
+  .col-sm-6
+    flex: 0 0 50%
+    max-width: 50%
+
+@media (min-width: 768px)
+  .col-md-6
+    flex: 0 0 50%
+    max-width: 50%
+
+@media (min-width: 992px)
+  .col-lg-3
+    flex: 0 0 25%
+    max-width: 25%
+
+  .col-lg-5
+    flex: 0 0 41.666667%
+    max-width: 41.666667%
+
+  .col-lg-6
+    flex: 0 0 50%
+    max-width: 50%
+
+  .col-lg-7
+    flex: 0 0 58.333333%
+    max-width: 58.333333%
+
+@media (min-width: 1200px)
+  .container
+    max-width: 1240px

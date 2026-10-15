@@ -26,7 +26,7 @@
                                     <td>
                                         <form action="{{route('adminpanel.orders.status.update', $order->id)}}" method="POST" class="d-flex flex-column flex-md-row gap-2">
                                         @csrf
-                                        <select name="status" id="orderStatusSelect" class="form-select select2-search">
+                                        <select name="status" id="orderStatusSelect" class="form-select">
                                             @foreach ($states as $status)
                                                 <option value="{{$status}}" @if($order->status==$status) selected @endif>{{$status}}</option>
                                             @endforeach
@@ -96,20 +96,4 @@
     </div>
 </div>
 
-<script>
-$(document).ready(function() {
-    if (typeof $.fn.select2 === 'function') {
-        // Initialize Select2 for status select
-        $('#orderStatusSelect').select2({
-            allowClear: true,
-            theme: 'bootstrap-5',
-            language: 'hu',
-            width: '100%',
-            placeholder: 'Válassz státuszt...'
-        });
-    } else {
-        console.warn('Select2 not loaded; skipping select2 initialization on order view.');
-    }
-});
-</script>
 @endsection

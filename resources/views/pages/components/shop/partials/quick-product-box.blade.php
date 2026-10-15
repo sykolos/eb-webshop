@@ -95,26 +95,18 @@
 
 @auth
 <script>
-$(document).ready(function () {
-    $('.quick-quantity').each(function () {
-        const $input = $(this);
-        const container = $input.closest('.card');
-        const priceText = container.find('.bg-light').text().replace(/[^0-9]/g, '');
-        const price = parseFloat(priceText) || 0;
-        const multiplier = {{ $product->product_unit->quantity ?? 1 }};
-        const output = container.find('.calculated-price');
-
-        const updatePrice = () => {
-            const qty = parseInt($input.val()) || 0;
-            const total = qty * multiplier * price;
-            output.text(total.toLocaleString() + ' Ft');
-        };
-
-        updatePrice();
-        $input.on('input', updatePrice);
-    });
-
-    
+document.querySelectorAll('.quick-quantity').forEach((input) => {
+    const container = input.closest('.card');
+    const priceText = container?.querySelector('.bg-light')?.textContent || '';
+    const price = Number(priceText.replace(/[^0-9]/g, '')) || 0;
+    const multiplier = {{ $product->product_unit->quantity ?? 1 }};
+    const output = container?.querySelector('.calculated-price');
+    const updatePrice = () => {
+        const quantity = Number.parseInt(input.value, 10) || 0;
+        if (output) output.textContent = `${(quantity * multiplier * price).toLocaleString('hu-HU')} Ft`;
+    };
+    updatePrice();
+    input.addEventListener('input', updatePrice);
 });
 </script>
 @endauth

@@ -1,157 +1,21 @@
 @extends('layouts.admin')
-@section('title','Termékek')
+@section('title', 'Termékek')
 @section('content')
-<?php
-// Sort categories alphabetically
-$sortedCategories = collect($categories)->sortBy('name');
-?>
-<h1 class="page-title">Termékek</h1>
-
-<div class="container">
-    <div class="text-end mb-3">
-        <a href="{{ route('adminpanel.products.create') }}" class="btn btn-primary">Create Product</a>
-    </div>
-
-    {{-- Szűrő card --}}
-    <div class="card mb-3">
-        <div class="card-header bg-dark text-white">
-            <h5>Szűrés</h5>
+@php($sortedCategories = collect($categories)->sortBy('name'))
+<main class="container">
+    <div class="d-flex justify-content-between align-items-center"><h1>Termékek</h1><a href="{{ route('adminpanel.products.create') }}" class="btn btn-primary">Új termék</a></div>
+    <form id="product-filter-form" class="card" method="get" action="{{ route('adminpanel.products') }}">
+        <div class="card-body row">
+            <div class="col-md-3"><label for="product-search">Keresés</label><input id="product-search" type="search" name="search" class="form-control" value="{{ request('search') }}"></div>
+            <div class="col-md-3"><label for="product-category">Kategória</label><select id="product-category" name="category_id" class="form-select"><option value="">Összes</option>@foreach($sortedCategories as $category)<option value="{{ $category->id }}" @selected((string) request('category_id') === (string) $category->id)>{{ $category->name }}</option>@endforeach</select></div>
+            <div class="col-md-2"><label for="from-date">Dátumtól</label><input id="from-date" type="date" name="from_date" class="form-control" value="{{ request('from_date') }}"></div>
+            <div class="col-md-2"><label for="to-date">Dátumig</label><input id="to-date" type="date" name="to_date" class="form-control" value="{{ request('to_date') }}"></div>
+            <div class="col-md-2"><button class="btn btn-primary" type="submit">Szűrés</button></div>
         </div>
-        
-        <div class="card-body">
-            <form id="product-filter-form">
-                <div class="row g-2 align-items-end">
-                    <div class="col-md-3">
-                        <input type="text" name="search" class="form-control" placeholder="Keresés név alapján">
-                    </div>
-                    
-                    <div class="col-md-2">
-                        <select name="category_id" class="form-select select2-search">
-                            <option value="">-- Kategória --</option>
-                            @foreach ($sortedCategories as $category)
-                                <option value="{{ $category->id }}">{{ $category->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <input type="date" name="from_date" class="form-control">
-                    </div>
-                    <div class="col-md-2">
-                        <input type="date" name="to_date" class="form-control">
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    {{-- Spinner --}}
-    <div class="text-center my-3" id="spinner" style="display: none;">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Töltés...</span>
-        </div>
-    </div>
-
-    {{-- Terméklista AJAX-szal frissül --}}
-    <div id="products-list">
-        @include('admin.pages.products.partials.list', ['products' => $products, 'units' => $units])
-    </div>
-</div>
+    </form>
+    <div id="products-list">@include('admin.pages.products.partials.list', ['products' => $products, 'units' => $units])</div>
+</main>
 <script>
-$(document).ready(function () {
-    const form = $('#product-filter-form');
-    const spinner = $('#spinner');
-    const listContainer = $('#products-list');
-
-    // Initialize Select2 for category filter
-    if (typeof $.fn.select2 === 'function') {
-        form.find('select[name="category_id"]').select2({
-            allowClear: true,
-            theme: 'bootstrap-5',
-            language: 'hu',
-            width: '100%',
-            placeholder: 'Keresés...'
-        });
-    } else {
-        console.warn('Select2 not loaded; skipping select2 initialization on products index.');
-    }
-
-    // Load state from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('search')) {
-        form.find('input[name="search"]').val(urlParams.get('search'));
-    }
-    if (urlParams.has('category_id')) {
-        form.find('select[name="category_id"]').val(urlParams.get('category_id')).trigger('change');
-    }
-    if (urlParams.has('from_date')) {
-        form.find('input[name="from_date"]').val(urlParams.get('from_date'));
-    }
-    if (urlParams.has('to_date')) {
-        form.find('input[name="to_date"]').val(urlParams.get('to_date'));
-    }
-
-    function updateUrl() {
-        const formData = form.serialize();
-        const url = new URL(window.location);
-        url.search = formData;
-        window.history.replaceState({}, '', url);
-    }
-
-    function loadProducts(page = 1) {
-        let data = form.serialize();
-        if (page > 1) {
-            data += '&page=' + page;
-        }
-
-        updateUrl();
-
-        $.ajax({
-            url: '{{ route('adminpanel.products') }}',
-            type: 'GET',
-            data: data,
-            success: function (data) {
-                listContainer.html(data);
-                
-                // Reattach pagination handlers
-                $(document).on('click', '#products-list .pagination a', function (e) {
-                    e.preventDefault();
-                    const pageUrl = new URL($(this).attr('href'));
-                    const page = pageUrl.searchParams.get('page') || 1;
-                    loadProducts(page);
-                });
-            },
-            error: function () {
-                alert('Hiba történt a szűrés során.');
-            }
-        });
-    }
-
-    form.on('submit', function (e) {
-        e.preventDefault();
-        loadProducts(1);
-    });
-
-    // Debounce for search input
-    let searchTimeout;
-    form.find('input[name="search"]').on('input', function() {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            loadProducts(1);
-        }, 500);
-    });
-
-    // Immediate update for select filters
-    form.find('select[name="category_id"], input[name="from_date"], input[name="to_date"]').on('change', function() {
-        loadProducts(1);
-    });
-
-    $(document).on('click', '#products-list .pagination a', function (e) {
-        e.preventDefault();
-        const pageUrl = new URL($(this).attr('href'));
-        const page = pageUrl.searchParams.get('page') || 1;
-        loadProducts(page);
-    });
-});
+document.querySelector('#product-filter-form')?.addEventListener('submit', (event) => { event.currentTarget.querySelector('button').disabled = true; });
 </script>
 @endsection
-
