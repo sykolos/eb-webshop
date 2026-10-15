@@ -32,12 +32,14 @@ use App\Http\Controllers\ProductMediaController;
 use App\Http\Controllers\FilterDefinitionController;
 use App\Http\Controllers\PricingController;
 use App\Http\Controllers\BannerAdminController;
+use App\Http\Controllers\ActivityTrackingController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 
 
 Route::get('/success',[PagesController::class,'success'])->name('success');
 Route::get('/',[PagesController::class,'home'])->name('home');
+Route::post('/tracking/events', [ActivityTrackingController::class, 'store'])->middleware('throttle:tracking')->name('tracking.events');
 Route::get('impresszum/',[PagesController::class,'impresszum'])->name('impresszum');
 Route::get('aszf/',[PagesController::class,'aszf'])->name('aszf');
 Route::get('gyik/',[PagesController::class,'gyik'])->name('gyik');
@@ -139,6 +141,8 @@ Route::group(['prefix'=>'account','middleware'=>'auth'],function(){
     //adminpanel group
     Route::group(['prefix' =>'adminpanel','middleware'=>'admin'],function(){
         Route::get('/',[AdminController::class, 'dashboard'])->name('adminpanel');
+        Route::get('/carts', [\App\Http\Controllers\AdminActivityController::class, 'carts'])->name('adminpanel.carts');
+        Route::get('/activity', [\App\Http\Controllers\AdminActivityController::class, 'activity'])->name('adminpanel.activity');
         Route::get('/design-system', [DesignSystemController::class, 'index'])->name('adminpanel.design-system');
         Route::get('/design-system/shop', [DesignSystemController::class, 'shop'])->name('adminpanel.design-system.shop');
         Route::get('/design-system/account', [DesignSystemController::class, 'account'])->name('adminpanel.design-system.account');

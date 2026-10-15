@@ -18,6 +18,8 @@
                 <a href="{{ route('adminpanel.categories') }}">Kategóriák</a>
                 <a href="{{ route('adminpanel.units') }}">Mennyiségi egységek</a>
                 <a href="{{ route('adminpanel.orders') }}">Rendelések</a>
+                <a href="{{ route('adminpanel.carts') }}">Kosárfigyelés</a>
+                <a href="{{ route('adminpanel.activity') }}">Aktivitás</a>
                 <a href="{{ route('adminpanel.users') }}">Felhasználók</a>
                 <a href="{{ route('adminpanel.special_prices') }}">Külön árak</a>
                 <a href="{{ route('adminpanel.exports') }}">Exportok</a>

@@ -13,5 +13,7 @@
     @include('components.v6.header')
     <main id="main-content">@yield('content')</main>
     @include('components.v6.footer')
+    @include('components.consent')
+    <button class="eb-consent-settings" type="button" data-consent-settings>Cookie beállítások</button>
 </body>
 </html>

@@ -14,17 +14,26 @@ use App\Services\UnitCatalogService;
 use App\Services\UserManagementService;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Password;
+use App\Services\AdminDashboardService;
+use Illuminate\Support\Carbon;
 
 
 class AdminController extends Controller
 {
     //dashboard
-    public function dashboard(){
-        $products=Products::all();
-        $orders_0=Order::where('status','like','kiszállítva')->orWhere('status','like','függőben');
-        $orders_1=Order::where('status','=','kiszállítva');        
-        $orders_2=Order::where('status','=','törölve');                
-        return view('admin.pages.dashboard',['products'=>$products,'orders_0'=>$orders_0,'orders_1'=>$orders_1,'orders_2'=>$orders_2]);
+    public function dashboard(Request $request, AdminDashboardService $dashboard){
+        $to = $request->date('to')?->endOfDay() ?: now()->endOfDay();
+        $from = $request->date('from')?->startOfDay() ?: $to->copy()->subDays(29)->startOfDay();
+        if ($from->gt($to)) {
+            [$from, $to] = [$to->copy()->startOfDay(), $from->copy()->endOfDay()];
+        }
+        $summary = $dashboard->summary($from, $to);
+        return view('admin.m15.dashboard', [
+            'from' => $from, 'to' => $to, 'summary' => $summary,
+            'topProducts' => $dashboard->topProducts($from, $to),
+            'featuredProducts' => $dashboard->featuredProducts(),
+            'availability' => collect($summary['availability'])->sortKeys(),
+        ]);
     }
 
     public function exportCatalog(AdminExportCatalogService $catalog)

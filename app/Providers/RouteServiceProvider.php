@@ -88,6 +88,10 @@ class RouteServiceProvider extends ServiceProvider
         RateLimiter::for('contact', function (Request $request) {
             return Limit::perMinute(3)->by($this->identityKey($request));
         });
+
+        RateLimiter::for('tracking', function (Request $request) {
+            return Limit::perMinute(60)->by($request->ip());
+        });
     }
 
     private function identityKey(Request $request): string

@@ -10,10 +10,11 @@ class Cart extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'last_activity_at', 'session_migration_hash'];
+    protected $fillable = ['user_id', 'last_activity_at', 'session_migration_hash', 'converted_at'];
 
     protected $casts = [
         'last_activity_at' => 'datetime',
+        'converted_at' => 'datetime',
     ];
 
     public function items()

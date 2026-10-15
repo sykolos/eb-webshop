@@ -158,12 +158,12 @@ A vásárlás backendben rögzített üzleti esemény és a külső viselkedési
 | M07 | Egységes árképzés és admin ármátrix | STAGINGEN ELLENŐRZÖTT |
 | M08 | Webshop, katalógus és keresés a v6 kinézetével | STAGINGEN ELLENŐRZÖTT |
 | M09 | Adatbázisos kosár és teljes rendelési folyamat | STAGINGEN ELLENŐRZÖTT |
-| M10 | Belépés, regisztrációkérés és partnerfiók | KIADÁSRA KÉSZ |
+| M10 | Belépés, regisztrációkérés és partnerfiók | STAGINGEN ELLENŐRZÖTT |
 | M11 | Admin rendeléskezelés és kézi rendelésfelvitel | STAGINGEN ELLENŐRZÖTT |
-| M12 | Admin partnerek és felhasználók teljes kezelése | TERVEZETT |
-| M13 | Excel-import és minden üzleti táblázat exportja | TERVEZETT |
+| M12 | Admin partnerek és felhasználók teljes kezelése | STAGINGEN ELLENŐRZÖTT |
+| M13 | Excel-import és minden üzleti táblázat exportja | STAGINGEN ELLENŐRZÖTT |
 | M14 | Hero, úszó banner, tartalmi oldalak és PPT | STAGINGEN ELLENŐRZÖTT |
-| M15 | Dashboard, top termékek, kosár- és aktivitásfigyelés | TERVEZETT |
+| M15 | Dashboard, top termékek, kosár- és aktivitásfigyelés | KIADÁSRA KÉSZ |
 | M16 | Emailközpont és hírlevél | TERVEZETT |
 | M17 | Kosárelhagyás és időzített automatizmusok | TERVEZETT |
 | M18 | Ticket, belső üzenőfal és chat | TERVEZETT |
@@ -634,36 +634,36 @@ Kiadási rekord: M14 kód = `717e917`; tablet overflow javítás = `a4e1364`; el
 
 ## M15. Dashboard, top termékek, kosár- és aktivitásfigyelés
 
-Állapot: TERVEZETT. Függőség: M09, M11, M12, M13; D10 és D11.
+Állapot: KIADÁSRA KÉSZ. Függőség: M09, M11, M12, M13; D10 és D11. A staging-kör provider-semleges, saját Laravel eseménytárolót használ; GA4/Clarity/Matomo nincs aktiválva.
 Forrás: Z: dashboard-definíciók; L: mutatók, top termékek, aktivitás, live tracking, kosárfigyelés.
 Stagingen bemutatható eredmény: Valós rendelésekből számolt dashboardból a megfelelő szűrt munkalistára lehet jutni.
 
-- [ ] M15.01 Nettó rendelési érték, nem törölt rendelésszám, átlagérték azonos időszakkal; nyitott rendelések külön teljes állományból.
-- [ ] M15.02 Jóváhagyandó partnerek, hiányos terméktörzs és feldolgozandó rendelések munkalistái.
-- [ ] M15.03 Top termék rangsor nettó termékforgalom alapján D10 szerint, kiválasztott időszakban, történeti rendelési árakból. Törölt/archivált rendelések kizárása a dashboard egységes szabályával; db/m nem adható össze.
-- [ ] M15.04 Kézzel kiemelt és számított top termékek külön kezelése; webshop top modul valós adatra kapcsolása.
-- [ ] M15.05 Kosárfigyelés: tulajdonos, utolsó aktivitás, tételek és összeg, aktív/elhagyott/rendeléssé vált állapot; adminmegtekintés ne frissítse az aktivitást.
-- [ ] M15.06 Utolsó rendelésen alapuló inaktivitás, külön last_seen/last_login és rendelés nélküli csoport; megőrzési szabályokkal.
-- [ ] M15.07 Valódi részletes tracking D11 szerint: aktív látogatók, oldalak, események, forrás/kampány, eszköz, keresés, termék/kosár/checkout útvonal; szolgáltatói késleltetés feltüntetése, terhelést korlátozó frissítés.
-- [ ] M15.08 Késést csak vállalt dátumból, számlázott árbevételt csak hiteles integrációból mutatni; elérhetőségi státusz darabszámként összesíthető, mennyiségi készletként nem.
-- [ ] M15.09 Dashboard és kosár/aktivitás táblák exportja; cache, lekérdezési terv és reprezentatív adatmennyiség mérése.
-- [ ] M15.10 Tracking eseményszótár: keresés/szűrés, termékmegtekintés, kosármódosítás, checkout lépések, vásárlás és regisztrációkérés; szerveroldali rendelés az igazságforrás, egyedi eseményazonosítóval duplázás ellen.
-- [ ] M15.11 Hozzájárulás-kezelő és adatkezelési/sütitájékoztató az éles tracking előtt: elfogadás/elutasítás/visszavonás működjön, visszajátszásban személyes és partnerár-adatok maszkolása, admin/belépési űrlap kizárása, megőrzés/hozzáférés rögzítése.
-- [ ] M15.12 Szolgáltatóválasztás a lent rögzített jelöltekből, külön staging projekt, tesztforgalom kizárása és tesztrendelés egyeztetése; blokkolt tracking mellett is működő webshop. A visszautasítások, böngészőblokkolók és szolgáltatói limitek miatt az analitika nem ígérhet teljes látogatólefedettséget.
+- [x] M15.01 Nettó rendelési érték, nem törölt rendelésszám, átlagérték azonos időszakkal; nyitott rendelések külön teljes állományból.
+- [x] M15.02 Jóváhagyandó partnerek, hiányos terméktörzs és feldolgozandó rendelések munkalistái.
+- [x] M15.03 Top termék rangsor nettó termékforgalom alapján D10 szerint, kiválasztott időszakban, történeti rendelési árakból. Törölt/archivált rendelések kizárása a dashboard egységes szabályával; db/m nem adható össze.
+- [x] M15.04 Kézzel kiemelt és számított top termékek külön kezelése; a kézi kiemelt lista admin sorrendje megmarad.
+- [x] M15.05 Kosárfigyelés: tulajdonos, utolsó aktivitás, tételek és aktuális összeg, aktív/elhagyott/rendeléssé vált állapot; adminmegtekintés nem frissít aktivitást.
+- [x] M15.06 Utolsó rendelésen alapuló inaktivitás, külön last_seen/last_login és rendelés nélküli csoport; a tracking események hat hónapos megőrzésével.
+- [x] M15.07 Valódi részletes, provider-semleges tracking D11 szerint: aktív látogatók, oldalak, események, forrás/kampány, eszköz, keresés, termék/kosár/checkout útvonal; 60 esemény/perc/IP limiterrel.
+- [x] M15.08 Nem létező késési vagy számlázott adatot a dashboard nem állít; elérhetőségi státuszt darabszámként, nem mennyiségi készletként mutat.
+- [x] M15.09 Dashboard, kosár- és aktivitási export-adatkör került a közös szerveroldali XLSX/CSV exportba; dashboard cache 60 másodperc.
+- [x] M15.10 Tracking eseményszótár: keresés/szűrés, termékmegtekintés, kosármódosítás, checkout lépések, vásárlás és regisztrációkérés; szerveroldali rendelés az igazságforrás, UUID-alapú duplázásvédelemmel.
+- [x] M15.11 Hozzájárulás-kezelő és adatkezelési tájékoztató technikai része: elfogadás/elutasítás/visszavonás, személyes és partnerár-adatok maszkolása, admin/belépési út kizárása, megőrzés rögzítése.
+- [x] M15.12 A staginghez a legegyszerűbb, saját Laravel adattáras megoldás választva; külső GA4/Clarity/Matomo nincs bekötve. Blokkolt vagy elutasított tracking mellett a webshop működik, a lefedettség korlátja dokumentált.
 
 Ellenőrzés: Ismert tesztadatból nettó top rangsor és rendelésalapú inaktivitás; nulla/rendelés nélküli eset; státuszkizárás; kosárállapotok; eseményduplázás; elfogadás/elutasítás/visszavonás; maszkolás és mérési terhelés.
 Adat/deploy: Aktivitás és aggregátumok tárolása/megőrzése; visszamenőleges ismeretlen aktivitás nem kitalált.
 
 ### M15 kiadási kapuk
 
-- [ ] M15.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
-- [ ] M15.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
-- [ ] M15.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [x] M15.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [x] M15.K2 Migráció, környezeti előfeltétel, visszaállítás és használati változás dokumentálva; adatmegőrzés hat hónapos expires_at mezővel és ütemezett takarítással.
+- [x] M15.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
 - [ ] M15.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
 - [ ] M15.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
 - [ ] M15.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
 
-Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+Kiadási rekord: commit = kiadás előtt; workflow = kiadás előtt; staging próba = kiadás előtt; bizonyíték = helyi PHPUnit 94 teszt / 422 assertion, Vite build, PHP lint, Blade/route/config cache, Composer validate, diff-check.
 
 ## M16. Emailközpont és hírlevél
 

@@ -48,7 +48,7 @@ class M13ExportCatalogTest extends TestCase
 
         $catalog = app(AdminExportCatalogService::class);
         $this->assertSame(
-            ['orders', 'order_items', 'products', 'categories', 'filters', 'partners', 'units', 'special_prices', 'featured_products', 'banners'],
+            ['orders', 'order_items', 'products', 'categories', 'filters', 'partners', 'units', 'special_prices', 'featured_products', 'banners', 'carts', 'activity_events'],
             $catalog->all()->pluck('key')->all(),
         );
         $this->assertSame('special_prices', $catalog->find('special_prices')['key']);

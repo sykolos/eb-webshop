@@ -11,6 +11,8 @@ use App\Models\RecommendedProduct;
 use App\Models\Special_prices;
 use App\Models\User;
 use App\Models\Banner;
+use App\Models\ActivityEvent;
+use App\Models\Cart;
 use App\Models\product_unit;
 use Illuminate\Support\LazyCollection;
 
@@ -24,11 +26,13 @@ final class AdminTransferQueryService
             'products' => ['serial_number' => 'Cikkszám', 'title' => 'Terméknév', 'category' => 'Kategória', 'price' => 'Nettó egységár', 'unit' => 'Egység', 'manufacturer' => 'Gyártó', 'availability_status' => 'Elérhetőség', 'is_published' => 'Publikus', 'is_archived' => 'Archivált'],
             'categories' => ['id' => 'ID', 'path' => 'Kategóriaútvonal', 'name' => 'Név', 'parent_id' => 'Szülő ID', 'is_active' => 'Aktív', 'sort_order' => 'Sorrend'],
             'filters' => ['definition' => 'Szűrő', 'type' => 'Típus', 'value' => 'Érték', 'is_active' => 'Aktív', 'categories' => 'Kategóriák'],
-            'partners' => ['id' => 'ID', 'name' => 'Név', 'company' => 'Cég', 'email' => 'Email', 'role' => 'Szerepkör', 'account_status' => 'Fiókállapot', 'created_at' => 'Létrehozva', 'last_login_at' => 'Utolsó belépés'],
+            'partners' => ['id' => 'ID', 'name' => 'Név', 'company' => 'Cég', 'email' => 'Email', 'role' => 'Szerepkör', 'account_status' => 'Fiókállapot', 'created_at' => 'Létrehozva', 'last_login_at' => 'Utolsó belépés', 'last_seen_at' => 'Utolsó látogatás'],
             'units' => ['id' => 'ID', 'unit' => 'Egység', 'quantity' => 'Szorzó', 'measure' => 'Mérték', 'is_active' => 'Aktív'],
             'special_prices' => ['id' => 'ID', 'partner' => 'Partner', 'sku' => 'Cikkszám', 'product' => 'Termék', 'price' => 'Speciális ár', 'created_at' => 'Létrehozva'],
             'featured_products' => ['sort_order' => 'Sorrend', 'sku' => 'Cikkszám', 'product' => 'Termék'],
             'banners' => ['id' => 'ID', 'slot' => 'Hely', 'title' => 'Cím', 'alt_text' => 'Alt szöveg', 'link_url' => 'Link', 'sort_order' => 'Sorrend', 'is_published' => 'Publikus', 'starts_at' => 'Kezdet', 'ends_at' => 'Vége'],
+            'carts' => ['id' => 'ID', 'partner' => 'Partner', 'email' => 'Email', 'last_activity_at' => 'Utolsó aktivitás', 'item_count' => 'Tételszám', 'state' => 'Állapot', 'current_net' => 'Aktuális nettó'],
+            'activity_events' => ['id' => 'ID', 'event_name' => 'Esemény', 'page_path' => 'Útvonal', 'device_type' => 'Eszköz', 'campaign_source' => 'Forrás', 'occurred_at' => 'Időpont', 'payload' => 'Maszkolt adat'],
             default => throw new \InvalidArgumentException('Ismeretlen export adatkör: '.$dataset),
         };
     }
@@ -46,6 +50,8 @@ final class AdminTransferQueryService
             'special_prices' => $this->specialPrices($filters),
             'featured_products' => $this->featuredProducts($filters),
             'banners' => $this->banners($filters),
+            'carts' => $this->carts($filters),
+            'activity_events' => $this->activityEvents($filters),
             default => throw new \InvalidArgumentException('Ismeretlen export adatkör: '.$dataset),
         };
     }
@@ -138,7 +144,7 @@ final class AdminTransferQueryService
 
         return LazyCollection::make(function () use ($query): \Generator {
             foreach ($query->orderBy('id')->cursor() as $user) {
-                yield [$user->id, $user->name, $user->user_invoice?->company_name, $user->email, $user->role ?: ($user->is_admin ? 'administrator' : 'partner'), $user->account_status, $user->created_at?->toDateTimeString(), $user->last_login_at?->toDateTimeString()];
+                yield [$user->id, $user->name, $user->user_invoice?->company_name, $user->email, $user->role ?: ($user->is_admin ? 'administrator' : 'partner'), $user->account_status, $user->created_at?->toDateTimeString(), $user->last_login_at?->toDateTimeString(), $user->last_seen_at?->toDateTimeString()];
             }
         });
     }
@@ -175,6 +181,33 @@ final class AdminTransferQueryService
         return LazyCollection::make(function (): \Generator {
             foreach (Banner::query()->orderBy('slot')->orderBy('sort_order')->orderBy('id')->cursor() as $banner) {
                 yield [$banner->id, $banner->slot, $banner->title, $banner->alt_text, $banner->link_url, $banner->sort_order, $banner->is_published ? 'Igen' : 'Nem', $banner->starts_at?->toDateTimeString(), $banner->ends_at?->toDateTimeString()];
+            }
+        });
+    }
+
+    private function carts(array $filters): LazyCollection
+    {
+        return LazyCollection::make(function (): \Generator {
+            $pricing = app(PricingService::class);
+            foreach (Cart::query()->with('user')->whereHas('items')->orderBy('id')->cursor() as $cart) {
+                $total = 0;
+                $items = $cart->items()->with('product.product_unit')->get();
+                foreach ($items as $item) {
+                    if ($item->product) {
+                        $total += (float) $pricing->quote($item->product, (int) $item->quantity, $cart->user_id)['line_net'];
+                    }
+                }
+                $state = $cart->converted_at ? 'Rendeléssé vált' : ($cart->last_activity_at?->gte(now()->subDays(7)) ? 'Aktív' : 'Elhagyott');
+                yield [$cart->id, $cart->user?->name, $cart->user?->email, $cart->last_activity_at?->toDateTimeString(), $items->count(), $state, $total];
+            }
+        });
+    }
+
+    private function activityEvents(array $filters): LazyCollection
+    {
+        return LazyCollection::make(function (): \Generator {
+            foreach (ActivityEvent::query()->orderBy('id')->cursor() as $event) {
+                yield [$event->id, $event->event_name, $event->page_path, $event->device_type, $event->campaign_source, $event->occurred_at?->toDateTimeString(), json_encode($event->payload ?? [], JSON_UNESCAPED_UNICODE)];
             }
         });
     }

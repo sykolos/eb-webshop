@@ -24,6 +24,11 @@ class Kernel extends ConsoleKernel
             ->hourly()
             ->withoutOverlapping(10)
             ->when(fn () => ! app()->environment('testing'));
+
+        $schedule->command('activity:purge')
+            ->dailyAt('03:20')
+            ->withoutOverlapping(10)
+            ->when(fn () => ! app()->environment('testing'));
     }
 
     /**

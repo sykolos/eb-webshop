@@ -84,5 +84,21 @@ return [
             'scope' => 'A banneradmin teljes listája, képfájlok nélkül, exportálható metaadatokkal.',
             'status' => 'available',
         ],
+        [
+            'key' => 'carts',
+            'label' => 'Kosarak',
+            'description' => 'Partnerkosarak állapota, utolsó aktivitása és tételszáma.',
+            'source' => 'carts',
+            'scope' => 'A nem üres, adminisztrátori kosárfigyelő lista aktuális állapota.',
+            'status' => 'available',
+        ],
+        [
+            'key' => 'activity_events',
+            'label' => 'Aktivitási események',
+            'description' => 'Hozzájárulás után rögzített, maszkolt első fél események.',
+            'source' => 'activity_events',
+            'scope' => 'A megőrzési időn belüli események; személyes és partnerár-adatok nélkül.',
+            'status' => 'available',
+        ],
     ],
 ];

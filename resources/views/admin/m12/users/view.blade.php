@@ -7,7 +7,7 @@
 @section('content')
 <div class="v6-section">
     <div class="v6-section__header">
-        <div><span class="v6-eyebrow">M12 adatlap</span><h2>{{ $user->name }}</h2><p>{{ $user->email }} · utolsó belépés: {{ optional($user->last_login_at)->format('Y. m. d. H:i') ?: 'ismeretlen' }} · utolsó rendelés: {{ optional($user->orders->first()?->created_at)->format('Y. m. d. H:i') ?: 'nincs' }}</p></div>
+        <div><span class="v6-eyebrow">M12 adatlap</span><h2>{{ $user->name }}</h2><p>{{ $user->email }} · utolsó belépés: {{ optional($user->last_login_at)->format('Y. m. d. H:i') ?: 'ismeretlen' }} · utolsó látogatás: {{ optional($user->last_seen_at)->format('Y. m. d. H:i') ?: 'ismeretlen' }} · utolsó rendelés: {{ optional($user->orders->first()?->created_at)->format('Y. m. d. H:i') ?: 'nincs' }}</p></div>
         <a class="v6-button v6-button--outline" href="{{ session('users_filter_url', route('adminpanel.users')) }}">Vissza a listához</a>
     </div>
     @if(session('success'))<div class="v6-toast" role="status">{{ session('success') }}</div>@endif

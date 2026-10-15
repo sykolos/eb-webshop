@@ -130,6 +130,11 @@ final class CartService
         $cart->forceFill(['last_activity_at' => now()])->save();
     }
 
+    public function markConverted(User $user): void
+    {
+        $this->forUser($user)->forceFill(['converted_at' => now()])->save();
+    }
+
     public function count(User $user): int
     {
         return (int) $this->forUser($user)->items()->sum('quantity');

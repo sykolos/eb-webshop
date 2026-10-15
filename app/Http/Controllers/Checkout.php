@@ -24,6 +24,7 @@ class Checkout extends Controller
 
         if ($isNewOrder) {
             $carts->clear($request->user());
+            $carts->markConverted($request->user());
         }
         session()->forget(['cart', 'checkout_token']);
 

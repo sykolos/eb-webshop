@@ -29,6 +29,7 @@ window._ = _;
 // Saját JS
 import './cart-preview';
 import './cart';
+import './tracking';
 
 // Stílusok
 import '../sass/app.scss';
