@@ -140,9 +140,11 @@ final class AutomationRuleService
             return false;
         }
 
-        return $event !== 'order_status_changed'
-            ? (bool) $user->preference?->marketing_notifications
-            : (bool) ($user->preference?->order_updates ?? true);
+        return match ($event) {
+            'order_status_changed', 'ticket_update' => (bool) ($user->preference?->order_updates ?? true),
+            'partner_approved' => true,
+            default => (bool) $user->preference?->marketing_notifications,
+        };
     }
 
     private function hasReachedLimit(AutomationRule $rule, ?int $userId, Carbon $now): bool

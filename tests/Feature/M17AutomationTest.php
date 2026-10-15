@@ -83,7 +83,7 @@ class M17AutomationTest extends TestCase
     {
         Queue::fake();
         $user = User::factory()->create(['account_status' => 'active']);
-        UserPreference::create(['user_id' => $user->id, 'marketing_notifications' => true, 'newsletter_subscribed' => false, 'order_updates' => false]);
+        UserPreference::create(['user_id' => $user->id, 'marketing_notifications' => false, 'newsletter_subscribed' => false, 'order_updates' => false]);
         $rule = AutomationRule::where('key', 'partner_approved')->firstOrFail();
         $rule->update(['enabled' => true]);
         $service = app(AutomationRuleService::class);
