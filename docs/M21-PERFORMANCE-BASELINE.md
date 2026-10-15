@@ -25,3 +25,17 @@ Invoke-WebRequest https://ebtest.dekor26.hu/health/live
 A release előtti baseline a kiadási checklistben szerepel. Tuning csak query,
 index, cache vagy képméret bizonyítékkal kerülhet be; partnerár és rendelési
 összeg változása teljes regressziót igényel.
+
+## 2026-10-16 staging mérés
+
+20 egymást követő `Invoke-WebRequest` mintából, cache-melegítés mellett:
+
+| Útvonal | p50 | p95 | maximum |
+| --- | ---: | ---: | ---: |
+| `/` | 347 ms | 394 ms | 464 ms |
+| `/shop` | 191 ms | 227 ms | 228 ms |
+| `/health/live` | 171 ms | 212 ms | 215 ms |
+
+A publikus célok teljesültek. Az admin lista p95-e külön, hitelesített
+terhelésmérést igényel; a jelenlegi staging QA során a dashboard, banner,
+export és árazás oldalak betöltése és reszponzív viselkedése lett ellenőrizve.

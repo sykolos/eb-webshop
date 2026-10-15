@@ -30,6 +30,11 @@ elfogadási bizonyítékot. A publikus ármentes katalógus és a partneri
 árképzés külön ellenőrzendő; a partneri/special-price logika nem kerülhet
 megosztott cache-be vagy vendég HTML-be.
 
+A ZIP referencia `/orderpage` útvonala Laravelben `/shop` néven létezik; a
+`/quick-order` régi belépési pont a webshopra vezet. Belső linkek a névvel
+rendelkező Laravel route-okat használják, ezért a referenciaútvonal hiánya nem
+jelent működő belső hivatkozást.
+
 ## Frontend átállás
 
 Az M21.02 után a frontend runtime natív DOM/fetch és Alpine.js alapú. A

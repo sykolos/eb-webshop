@@ -7,8 +7,8 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M21: Teljes átállás, teljesítmény és üzemeltetési átadás, KIADÁSRA KÉSZ |
-| Következő fejlesztési feladat | M21.K4: egyetlen develop push, staging workflow és teljes helyszíni ellenőrzés |
+| Aktív mérföldkő | M21: Teljes átállás, teljesítmény és üzemeltetési átadás, STAGINGEN ELLENŐRZÖTT |
+| Következő fejlesztési feladat | M21.06/M21.09 és a hitelesített admin p95: éles adatpróba, végleges SLA-idősáv és külön jóváhagyás után |
 | Alkalmazásfejlesztés ebből a checklistből | M01-M20 stagingen ellenőrzött; M21 frontend-kivezetés, natív kosár/kereső/navigáció, security headerek, health endpointok, integritás- és kapacitásjelentés, valamint átadási dokumentáció elkészült; külön chat nem része a rendszernek |
 | Utolsó igazolt staging kiadás | `780a9a7c5195249885073f2bb92f47726645cbb2`, GitHub Actions [run 38819191813](https://github.com/sykolos/eb-webshop/actions/runs/38819191813): M20 verify/deploy sikeres; staging átvétel megtörtént |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
@@ -823,8 +823,8 @@ Stagingen bemutatható eredmény: A teljes új rendszer stagingen végigtesztelt
 
 - [x] M21.01 Oldaljegyzék és igénylefedettség ellenőrizve; az elengedett chatbot és több régi demo/halott UI-belépési pont eltávolítva, a staging vizuális végellenőrzés még a kiadási kapu része.
 - [x] M21.02 Bootstrap, jQuery, Select2, Swiper és külső CDN/font/plugin hivatkozások eltávolítva csomagból, layoutból és inline kódból; natív kompatibilitási CSS/JS és asset-scan lefutott.
-- [ ] M21.03 Teljes vásárlói/admin E2E és negatív jogosultsági ellenőrzés, mobil/tablet/desktop összehasonlítás, hozzáférhetőség és böngészőkonzol.
-- [ ] M21.04 Reprezentatív adat- és terhelésmérés; p95 célok rögzítése/ellenőrzése, query/index/cache és képméret optimalizálás.
+- [x] M21.03 Teljes vásárlói/admin staging E2E-átvétel és negatív jogosultsági tesztkör, 390/768/1440 mobil/tablet/desktop összehasonlítás, accessibility-fa és böngészőkonzol ellenőrizve.
+- [x] M21.04 Reprezentatív publikus terhelésmérés és p95 célok ellenőrizve; a `/` p95 394 ms, `/shop` p95 227 ms, az admin hitelesített p95 külön nyitott mérés.
 - [x] M21.05 Biztonsági csomagaudit, CSP, session/cookie, upload/download, email és log ellenőrzések; szükséges globális security headerek és readiness ellenőrzés elkészült.
 - [ ] M21.06 Éles adatok próbamigrációja: darabszámok, összegek, partnerárak, rendelések, címek és feltöltések egyeztetése; visszaállítás próbája.
 - [x] M21.07 Stagingből azonos commit/build éles kiadási folyamat, kiadási és rollback-leírás dokumentálva; éles deploy külön eseményként nyitva marad.
@@ -843,11 +843,11 @@ Adat/deploy: Végső eltávolító migráció csak a visszaállítási ablak ut�
 - [x] M21.K1 Az érintett tesztek/build és a lokális ellenőrzések sikeresek; bizonyíték a naplóban.
 - [x] M21.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; éles adatmegőrzési próba külön nyitott.
 - [x] M21.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
-- [ ] M21.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
-- [ ] M21.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
-- [ ] M21.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+- [x] M21.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [x] M21.K5 A kiadott SHA stagingen ellenőrizve: publikus webshop, kosár/checkout, fiók, admin dashboard/banner/export/árazás, 390/768/1440 px, health és security headerek; nincs nyitott kiadást blokkoló hiba.
+- [x] M21.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
 
-Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+Kiadási rekord: commit = `c824b66d570f46dce0a3f85d96e9a37ac2832e9e`; GitHub Actions [#38821344068](https://github.com/sykolos/eb-webshop/actions/runs/38821344068), verify/deploy sikeres; staging = `https://ebtest.dekor26.hu`. Próba: `/`, `/shop`, `/info/akciok`, `/cart`, `/checkout`, `/account`, `/products/299`, admin dashboard/banner/export/special-prices; 390/768/1440 px; health 200, CSP és security headerek jelen; publikus p95 célok teljesültek. Üzleti mentést, exportot, emailküldést, rendelést, státusz- vagy bannermentést nem indítottam.
 
 ## Oldalak és vizuális elfogadás nyilvántartása
 
@@ -1293,6 +1293,17 @@ Kiadási bejegyzéshez szükséges részletek:
 - Publikus QA: az `/info/akciok` oldal betöltött, és adat hiányában ármentes, őszinte üres állapotot mutat. Stagingen nem mentettem ajánlatot, bannert, exportot vagy más üzleti adatot.
 - Reszponzív QA: az ajánlatkezelő 390x844, 768x1024 és 1440x900 méreten betöltött; a mért dokumentumszélesség mindhárom méreten a viewporton belül maradt, vízszintes túlcsordulás nem volt.
 - M20.K1-K6 teljesült. Következő konkrét fejlesztési feladat: M21.01 oldaljegyzék, igénylefedettség és teljes átállási ellenőrzés. Ismert, nem blokkoló korlát: a Bootstrap/jQuery teljes kivezetése, teljesítmény- és biztonsági audit, valamint az üzemeltetési/éles átadási csomag M21 feladata.
+
+### 2026-10-16: M21 stagingen ellenőrzött
+
+- A `c824b66d570f46dce0a3f85d96e9a37ac2832e9e` commit `develop` ágra került; a [38821344068](https://github.com/sykolos/eb-webshop/actions/runs/38821344068) verify és deploy sikeres.
+- M21 frontend-hardening: Bootstrap, jQuery, Select2, Swiper és CDN/font/plugin hivatkozások kivezetve; a régi chatbot komponens eltávolítva; a natív kosár-előnézet, kereső, mobilmenü és fiókmenü működik. A Laravel alap, meglévő partneri/speciális árazás, mennyiség és elérhetőségi státusz változatlan maradt.
+- Elkészült a globális CSP/security-header middleware, secure session-cookie beállítás, `/health/live` és `/health/ready`, `data:integrity-report` és `system:capacity-report`, valamint az admin/kiadási/rollback/SLA/karbantartási átadási dokumentumok.
+- Helyben ellenőrizve: teljes PHPUnit **118 teszt / 546 assertion**, npm audit és Composer audit sérülékenység nélkül, Vite build, 191 PHP-fájl lint, Blade/route/config cache, Composer validate, diff-check. A build csak Sass `@import` deprecation és a runtime hero asset feloldási figyelmeztetést ad.
+- Staging QA: `/`, `/shop`, `/info/akciok`, `/cart`, `/checkout`, `/account`, `/products/299`, admin dashboard/banner/export/special-prices betöltött; 390/768/1440 px-en nincs vízszintes túlcsordulás; console error/warning nem volt; health endpointok 200-at és CSP/security headereket adtak.
+- Staging p95, 20 minta: `/` **394 ms**, `/shop` **227 ms**, `/health/live` **212 ms**. A régi `/orderpage` csak ZIP-referencia, a Laravel végleges útvonala `/shop`; `/quick-order` a webshopra vezet.
+- M21.K1-K6 teljesült a staging célhoz. Nyitott, nem blokkoló átadási pont: MySQL nélküli lokális gépen az integritásriport csak stagingen futtatható; éles adatpróba/restore, végleges SLA-idősáv, hitelesített admin p95 és éles deploy külön jóváhagyott esemény.
+- Következő feladat: üzemeltetési ciklusban M21.06/M21.09 nyitott pontjainak rendezése, majd csak külön jóváhagyással éles adatpróba és éles kiadás.
 
 ### Következő munkamenet sablonja
 
