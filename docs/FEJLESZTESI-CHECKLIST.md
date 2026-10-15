@@ -163,7 +163,7 @@ A vásárlás backendben rögzített üzleti esemény és a külső viselkedési
 | M12 | Admin partnerek és felhasználók teljes kezelése | STAGINGEN ELLENŐRZÖTT |
 | M13 | Excel-import és minden üzleti táblázat exportja | STAGINGEN ELLENŐRZÖTT |
 | M14 | Hero, úszó banner, tartalmi oldalak és PPT | STAGINGEN ELLENŐRZÖTT |
-| M15 | Dashboard, top termékek, kosár- és aktivitásfigyelés | KIADÁSRA KÉSZ |
+| M15 | Dashboard, top termékek, kosár- és aktivitásfigyelés | STAGINGEN ELLENŐRZÖTT |
 | M16 | Emailközpont és hírlevél | TERVEZETT |
 | M17 | Kosárelhagyás és időzített automatizmusok | TERVEZETT |
 | M18 | Ticket, belső üzenőfal és chat | TERVEZETT |
@@ -659,11 +659,21 @@ Adat/deploy: Aktivitás és aggregátumok tárolása/megőrzése; visszamenőleg
 - [x] M15.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
 - [x] M15.K2 Migráció, környezeti előfeltétel, visszaállítás és használati változás dokumentálva; adatmegőrzés hat hónapos expires_at mezővel és ütemezett takarítással.
 - [x] M15.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
-- [ ] M15.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
-- [ ] M15.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
-- [ ] M15.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+- [x] M15.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [x] M15.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
+- [x] M15.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
 
-Kiadási rekord: commit = kiadás előtt; workflow = kiadás előtt; staging próba = kiadás előtt; bizonyíték = helyi PHPUnit 94 teszt / 422 assertion, Vite build, PHP lint, Blade/route/config cache, Composer validate, diff-check.
+Kiadási rekord: commit = `67c4da0`; workflow = [38746941405](https://github.com/sykolos/eb-webshop/actions/runs/38746941405) verify/deploy sikeres; staging próba = `/adminpanel`, `/adminpanel/carts`, `/adminpanel/activity`, `/adatkezelesi-nyilatkozat` és publikus consent-flow, 390/768/1440 px, vízszintes túlcsordulás nélkül; bizonyíték = helyi PHPUnit 94 teszt / 422 assertion, Vite build, PHP lint, Blade/route/config cache, Composer validate, diff-check, stagingen egy consentelt `page_view` esemény.
+
+### 2026-10-15: M15 stagingen ellenőrzött
+
+- Elkészült a dashboard valódi, nem törölt rendelési adatokból számolt nettó összeggel, rendelésszámmal, átlagértékkel, teljes állományú nyitott rendelésekkel, partner- és terméktörzs-munkalistákkal, top termék rangsorral és külön kézi kiemelt listával. A top rangsor történeti `items.line_net`/`unit_price` adatokból dolgozik, a jelenlegi partneri árlogikát nem számolja újra.
+- Elkészült a partnerkosár-figyelés aktív/elhagyott/rendeléssé vált állapottal, tulajdonossal, utolsó aktivitással és aktuális nettó összeggel. A sikeres checkout a kosarat rendeléshez kapcsolja, az adminnézet olvasási művelete nem frissíti az aktivitást.
+- Elkészült az első fél aktivitási eseménytároló hozzájárulással, UUID-duplázásvédelemmel, érzékeny mezőmaszkolással, 60 esemény/perc/IP limiterrel és hat hónapos automatikus megőrzéssel. A webshop blokkolt vagy visszautasított mérés mellett is működik; külső GA4/Clarity/Matomo nincs aktiválva.
+- Az admin dashboard, kosárfigyelés és aktivitásnézet stagingen betöltött 390x844, 768x1024 és 1440x900 méreten, túlcsordulás nélkül. Consent elfogadás után `page_view` esemény láthatóvá vált, majd a hozzájárulás visszavonása is működött. Valódi rendelés, kosármódosítás és destruktív művelet nem történt.
+- Helyi ellenőrzés: M15 célteszt **6 teszt / 43 assertion**, teljes PHPUnit **94 teszt / 422 assertion**, Vite build, PHP lint, Blade/route/config cache, Composer validate és `git diff --check` sikeres. A Vite meglévő Sass/Bootstrap deprecation figyelmeztetései továbbra is M21 technikai adósságok.
+- Kiadás: `67c4da0`, GitHub Actions [38746941405](https://github.com/sykolos/eb-webshop/actions/runs/38746941405) verify/deploy sikeres. A checklist ezen záró adminisztratív frissítése helyi commitban marad, külön dokumentációs deploy nem indul.
+- Állapot: M15 STAGINGEN ELLENŐRZÖTT. Következő konkrét fejlesztés: M16.01 emailközpont és hírlevél szolgáltatói döntés nélkül, a D12 szerint előkészítve.
 
 ## M16. Emailközpont és hírlevél
 
