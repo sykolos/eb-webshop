@@ -83,7 +83,9 @@ class CheckoutService
                     $order->items()->create($line);
                 }
 
-                return $order->fresh();
+                // Preserve wasRecentlyCreated so the controller can clear the
+                // cart and dispatch notifications only for a new order.
+                return $order->load('items');
             });
         } catch (QueryException $exception) {
             // The unique checkout token makes parallel submissions idempotent.
