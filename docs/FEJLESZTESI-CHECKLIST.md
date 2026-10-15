@@ -9,8 +9,8 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 | --- | --- |
 | Aktív mérföldkő | M13: Excel-import és minden üzleti táblázat exportja, FOLYAMATBAN |
 | Következő fejlesztési feladat | M13.02: teljes szűrt eredményhalmazra épülő exportút előkészítése |
-| Alkalmazásfejlesztés ebből a checklistből | M01-M12 stagingen ellenőrzött; M13.01 elkészült, M13.K1-K3 teljesült |
-| Utolsó igazolt staging kiadás | `ea7a9cc`, GitHub Actions run 38726573353: verify/deploy sikeres; M12 admin lista, kérelmek, adatlap és reszponzív ellenőrzés megtörtént |
+| Alkalmazásfejlesztés ebből a checklistből | M01-M12 stagingen ellenőrzött; M13.01 stagingen ellenőrzött, M13.K1-K3 teljesült |
+| Utolsó igazolt staging kiadás | `e257ec0`, GitHub Actions run 38727685489: verify/deploy sikeres; M13.01 exportkatalógus és reszponzív ellenőrzés megtörtént |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
@@ -600,7 +600,7 @@ Adat/deploy: Import job/hiba/export táblák; alkalmazás előtt előnézet; meg
 - [ ] M13.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
 - [ ] M13.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
 
-Kiadási rekord: M13.01 release-jelölt commit = a következő develop integrációban; workflow = nincs; staging próba = nem futott; bizonyíték = alábbi napló.
+Kiadási rekord: M13.01 commit = `e257ec0`; workflow = [38727685489](https://github.com/sykolos/eb-webshop/actions/runs/38727685489) (`verify: success`, `deploy: success`); staging próba = `/adminpanel/exports`, 9 adatkör, 390x844/768x1024/1440x900; M13.K4-K6 a teljes M13 mérföldkő további export/import pontjai miatt nyitva.
 
 ## M14. Hero, úszó banner, tartalmi oldalak és PPT
 
@@ -1186,6 +1186,13 @@ Kiadási bejegyzéshez szükséges részletek:
 - Új admin-only `/adminpanel/exports` nézet készült a közös V6 navigációban. Az oldal csak a forrásokat és export-hatóköröket mutatja; fájlletöltést még nem indít, így M13.02-M13.11 hatóköre változatlanul nyitott.
 - Ellenőrzés: M13 célteszt 2 teszt / 16 assertion; teljes PHPUnit **86 teszt / 367 assertion**; Blade cache, route cache, PHP lint és `git diff --check` sikeres. A Vite build D:-s ideiglenes útvonallal sikeres, a meglévő Sass/Bootstrap deprecation figyelmeztetések és a hero asset runtime figyelmeztetése megmaradt.
 - M13.K1-K3 teljesült. Következő konkrét feladat: a release-jelölt commit `develop` integrációja, workflow/deploy, majd az exportkatalógus staging átvétele.
+
+### 2026-10-15: M13.01 stagingen ellenőrzött részkiadás
+
+- Az `e257ec0` commit sikeresen kikerült a `develop` ágra; a [38727685489](https://github.com/sykolos/eb-webshop/actions/runs/38727685489) workflow `verify: success` és `deploy: success` eredménnyel zárult.
+- Admin staging átvétel: `/adminpanel/exports` betöltött, a közös navigációban az Exportok menüpont látható, mind a kilenc nyilvántartott adatkör és a forrása megjelent. A nézet szándékosan nem indít még fájlletöltést.
+- Reszponzív ellenőrzés: 390x844, 768x1024 és 1440x900; a dokumentum szélessége minden méreten a viewporton belül maradt, 9 táblázatsor töltődött be.
+- M13.01 stagingen ellenőrzött. M13.K4-K6 a teljes M13 mérföldkő végéig nyitva marad; következő konkrét feladat: M13.02 teljes szűrt eredményhalmazra épülő exportút.
 
 ### Következő munkamenet sablonja
 
