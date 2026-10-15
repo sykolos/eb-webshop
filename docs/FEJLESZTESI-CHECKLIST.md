@@ -7,14 +7,14 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M11: Admin rendeléskezelés és kézi rendelésfelvitel, KIADÁSRA KÉSZ |
-| Következő fejlesztési feladat | M11 K4: commit, develop push, staging workflow és admin átvétel |
-| Alkalmazásfejlesztés ebből a checklistből | M01-M10 stagingen ellenőrzött; M11 K1-K3 teljesült, K4-K6 nyitott |
-| Utolsó igazolt staging kiadás | 30304d9, GitHub Actions run 38699613557: M10 verify/deploy sikeres; partnerfiók, admin partnerkérelmek és cím-default ellenőrzött |
+| Aktív mérföldkő | M11: Admin rendeléskezelés és kézi rendelésfelvitel, STAGINGEN ELLENŐRZÖTT |
+| Következő fejlesztési feladat | M12.01: admin partnerlista és teljes partneradatlap |
+| Alkalmazásfejlesztés ebből a checklistből | M01-M11 stagingen ellenőrzött; M11 K1-K6 teljesült |
+| Utolsó igazolt staging kiadás | 822094a, GitHub Actions run 38717403164: verify/deploy sikeres; admin rendeléslista, kézi rendelésfelvitel, rendelésadatlap és reszponzív ellenőrzés rendben |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
-| Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D09 törlés technikai javaslata, D11 szolgáltató; D12-D13 későbbre halasztva |
+| Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D11 szolgáltató; D12-D13 későbbre halasztva |
 | Mostani változtatás | M11 V6 admin rendeléslista és URL-szűrés, soros/tömeges státuszkezelés, státuszelőzmény/audit/értesítés, visszaállítható törlés és közös PricingService-t használó idempotens kézi rendelésrögzítés; az M09 kosár- és az M07 árlogikája változatlan |
 
 ### Kezelési szabályok a következő munkamenetekhez
@@ -159,7 +159,7 @@ A vásárlás backendben rögzített üzleti esemény és a külső viselkedési
 | M08 | Webshop, katalógus és keresés a v6 kinézetével | STAGINGEN ELLENŐRZÖTT |
 | M09 | Adatbázisos kosár és teljes rendelési folyamat | STAGINGEN ELLENŐRZÖTT |
 | M10 | Belépés, regisztrációkérés és partnerfiók | KIADÁSRA KÉSZ |
-| M11 | Admin rendeléskezelés és kézi rendelésfelvitel | KIADÁSRA KÉSZ |
+| M11 | Admin rendeléskezelés és kézi rendelésfelvitel | STAGINGEN ELLENŐRZÖTT |
 | M12 | Admin partnerek és felhasználók teljes kezelése | TERVEZETT |
 | M13 | Excel-import és minden üzleti táblázat exportja | TERVEZETT |
 | M14 | Hero, úszó banner, tartalmi oldalak és PPT | TERVEZETT |
@@ -536,11 +536,11 @@ Adat/deploy: Állapotmapping és audit bővítő migráció; történeti rendel�
 - [x] M11.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
 - [x] M11.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
 - [x] M11.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
-- [ ] M11.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
-- [ ] M11.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
-- [ ] M11.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+- [x] M11.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [x] M11.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
+- [x] M11.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
 
-Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+Kiadási rekord: commit = `822094a`; workflow = [38717403164](https://github.com/sykolos/eb-webshop/actions/runs/38717403164), sikeres verify/deploy; staging próba = lista, kézi rendelésfelvitel, adatlap és 390/768/1440 px ellenőrzés; bizonyíték = fenti napló.
 
 ## M12. Admin partnerek és felhasználók teljes kezelése
 
@@ -1150,6 +1150,15 @@ Kiadási bejegyzéshez szükséges részletek:
 - Új migráció: 2026_10_15_170000_add_order_management_fields; visszagörgethető, történeti rendelést nem töröl. Nincs új környezeti változó vagy feature flag.
 - Helyi ellenőrzés: M11 célteszt 4 teszt / 23 assertion; teljes PHPUnit 81 teszt / 335 assertion; php artisan view:cache, route:cache, Vite build és git diff --check sikeres. A build meglévő Sass/Bootstrap deprecation figyelmeztetései továbbra M21 technikai adósságok.
 - M11.K1-K3 teljesült, K4-K6 nyitott. Commit és develop push még nem történt; következő konkrét lépés: célzott diff áttekintés, commit, develop push, workflow megvárása, majd staging admin lista/státusz/új rendelés átvétel.
+
+### 2026-10-15: M11 stagingen ellenőrzött
+
+- A kiadott végső kód a `822094a`, a develop push és a meglévő verify/deploy workflow sikeres: [GitHub Actions run 38717403164](https://github.com/sykolos/eb-webshop/actions/runs/38717403164).
+- A staging admin rendeléslistája, a kézi rendelésfelvitel nézete és a történeti rendelésadatlap betöltött. A legacy rendelés bruttó végösszege már nem `0 Ft`, hanem a meglévő nettó adatból helyesen visszaszámolt `23 686 Ft`.
+- A listában a keresés/szűrés és a rendelésműveletek korábbi átvétele megmaradt; a kézi rendelés oldalon az aktív partner, címválasztás és termékkereső látható. A staging próba során új rendelés nem került mentésre és rendelés nem került törlésre.
+- Reszponzív ellenőrzés az adatlap végső kiadásán: 390x844, 768x1024 és 1440x900 méreten betöltés rendben, vízszintes túlcsordulás nélkül. A hosszú partner email tablet-tördelése célzott CSS-javítást kapott.
+- Helyben a Vite build és `git diff --check` sikeres. A teljes PHPUnit újrafuttatása ezen a gépen a hiányzó `pdo_sqlite` driver miatt nem indítható; a korábbi M11 baseline 4 célteszt / 23 assertion és teljes PHPUnit 81 teszt / 335 assertion volt, a staging CI verify sikeres.
+- M11.K1-K6 teljesült. Következő konkrét fejlesztési feladat: M12.01 partnerlista és teljes partneradatlap; a D04 végleges munkakörlista továbbra is nyitott döntés.
 
 ### Következő munkamenet sablonja
 
