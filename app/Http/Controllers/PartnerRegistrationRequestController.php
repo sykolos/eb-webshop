@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\PartnerRegistrationRequest;
 use App\Services\AuditLogger;
+use App\Services\AutomationRuleService;
 use Illuminate\Http\Request;
 
 class PartnerRegistrationRequestController extends Controller
@@ -19,7 +20,7 @@ class PartnerRegistrationRequestController extends Controller
         return view('admin.m12.partner-requests.index', compact('requests'));
     }
 
-    public function update(Request $request, PartnerRegistrationRequest $registrationRequest, AuditLogger $audit)
+    public function update(Request $request, PartnerRegistrationRequest $registrationRequest, AuditLogger $audit, AutomationRuleService $automations)
     {
         $data = $request->validate([
             'status' => ['required', 'in:pending,approved,rejected,blocked'],
@@ -42,6 +43,9 @@ class PartnerRegistrationRequestController extends Controller
                     default => 'pending',
                 },
             ])->save();
+            if ($data['status'] === 'approved') {
+                $automations->dispatchEvent('partner_approved', $registrationRequest->user, ['registration_request_id' => $registrationRequest->id]);
+            }
         }
 
         $audit->record('partner_registration.updated', $registrationRequest, [

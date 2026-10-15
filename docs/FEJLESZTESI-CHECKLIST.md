@@ -7,15 +7,15 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M17: Kosárelhagyás és időzített automatizmusok, TERVEZETT |
-| Következő fejlesztési feladat | M17.01: kosárelhagyási küszöb, címzettkör, küldési ablak és maximum emlékeztető meghatározása |
-| Alkalmazásfejlesztés ebből a checklistből | M01-M16 stagingen ellenőrzött; M16 emailközpont, kampány queue, leiratkozás és export lezárva |
+| Aktív mérföldkő | M17: Kosárelhagyás és időzített automatizmusok, KIADÁSRA KÉSZ |
+| Következő fejlesztési feladat | M17.K4: egy funkciós commit, `develop` push, workflow és staging átvétel |
+| Alkalmazásfejlesztés ebből a checklistből | M01-M16 stagingen ellenőrzött; M17 kosárelhagyási és eseményautomatizmus kódja, admin kezelése és exportja elkészült |
 | Utolsó igazolt staging kiadás | `c93c74f`, GitHub Actions run 38749992983: M16 verify/deploy sikeres; staging átvétel megtörtént |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D11 szolgáltató; D12-D13 későbbre halasztva |
-| Mostani változtatás | M16 szolgáltatófüggetlen emailkampány, staging-safe queue, leiratkozás/kizárólista, tranzakciós plain-text levelek, admin Emailközpont és email export; a meglévő ár-, kosár-, rendelés- és partnerlogika változatlan |
+| Mostani változtatás | M17 kikapcsolt alapértelmezett automatizmus-szabályok, kosárelhagyási queue, idempotens futási napló, partner/rendelés eseményhorgok, admin szabálykezelés és export; a meglévő ár-, kosár-, rendelés- és partnerlogika változatlan |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -165,7 +165,7 @@ A vásárlás backendben rögzített üzleti esemény és a külső viselkedési
 | M14 | Hero, úszó banner, tartalmi oldalak és PPT | STAGINGEN ELLENŐRZÖTT |
 | M15 | Dashboard, top termékek, kosár- és aktivitásfigyelés | STAGINGEN ELLENŐRZÖTT |
 | M16 | Emailközpont és hírlevél | STAGINGEN ELLENŐRZÖTT |
-| M17 | Kosárelhagyás és időzített automatizmusok | TERVEZETT |
+| M17 | Kosárelhagyás és időzített automatizmusok | KIADÁSRA KÉSZ |
 | M18 | Ticket, belső üzenőfal és chat | TERVEZETT |
 | M19 | Termékelérhetőségi státuszok | TERVEZETT |
 | M20 | Aktuális akciók és partneri ajánlatok megjelenítése | TERVEZETT |
@@ -706,30 +706,30 @@ Kiadási rekord: commit = `c93c74f`; workflow = [GitHub Actions run 38749992983]
 
 ## M17. Kosárelhagyás és időzített automatizmusok
 
-Állapot: TERVEZETT. Függőség: M09, M15, M16; D12.
+Állapot: KIADÁSRA KÉSZ. Függőség: M09, M15, M16; D12.
 Forrás: L: emlékeztető email, automatikus és időzített értesítések.
 Stagingen bemutatható eredmény: Egy tesztkosár szabály szerint emlékeztetőt kap, vásárlás után pedig már nem.
 
-- [ ] M17.01 Elhagyott kosár küszöb, címzettkör, küldési ablak/időzóna és maximum emlékeztető meghatározása.
-- [ ] M17.02 Kosáraktivitásból időzített feladat; végrehajtáskor jogosultság/kosárállapot újbóli ellenőrzése.
-- [ ] M17.03 Új vásárlás, üres kosár, leiratkozás, tiltás vagy új aktivitás esetén emlékeztető megszüntetése/újraütemezése.
-- [ ] M17.04 Eseményértesítések: partnerjóváhagyás, rendelésállapot és ticket. Elérhetőségi státuszváltozás M19 után külön bekapcsolható; mennyiségi alacsony-készlet értesítés a későbbi készletbővítéshez tartozik.
-- [ ] M17.05 Admin automatizmusszabály, bekapcsolás/szünet, következő futás, futási napló és export.
-- [ ] M17.06 Scheduler és job idempotencia, küldési korlát, hibariasztás és ismételt futás kizárása.
+- [x] M17.01 Elhagyott kosár küszöb, címzettkör, küldési ablak/időzóna és maximum emlékeztető meghatározása.
+- [x] M17.02 Kosáraktivitásból időzített feladat; végrehajtáskor jogosultság/kosárállapot újbóli újraellenőrzése.
+- [x] M17.03 Új vásárlás, üres kosár, leiratkozás, tiltás vagy új aktivitás esetén emlékeztető megszüntetése/újraütemezése.
+- [x] M17.04 Eseményértesítések: partnerjóváhagyás és rendelésállapot; a ticket szabály és eseményhorog előkészítve, tényleges ticket domain az M18-ban. Elérhetőségi státuszváltozás M19 után külön kapcsolható; mennyiségi alacsony-készlet értesítés a későbbi készletbővítéshez tartozik.
+- [x] M17.05 Admin automatizmusszabály, bekapcsolás/szünet, következő futás, futási napló és export.
+- [x] M17.06 Scheduler és job idempotencia, küldési korlát, hibariasztási állapot és ismételt futás kizárása.
 
 Ellenőrzés: Idővezérelt tesztek valódi várakozás nélkül; vásárlás/küldés versenyhelyzet; duplikált futás; tiltott címzett.
 Adat/deploy: Szabályok/futások/küldési kulcsok bővítő migrációi; kezdetben kikapcsolt automatizmusok.
 
 ### M17 kiadási kapuk
 
-- [ ] M17.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
-- [ ] M17.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
-- [ ] M17.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [x] M17.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [x] M17.K2 Migráció, környezeti előfeltétel, kikapcsolt alapértelmezés, visszaállítás és használati változás dokumentálva; meglévő kosár-, ár- és emailadat megőrzése ellenőrizve.
+- [x] M17.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
 - [ ] M17.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
 - [ ] M17.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
 - [ ] M17.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
 
-Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+Kiadási rekord: commit = kiadás előtt; workflow = kiadás előtt; staging próba = kiadás előtt; bizonyíték = helyi M17 célteszt 5 teszt / 23 assertion, teljes PHPUnit 103 teszt / 462 assertion, Vite build, Composer validate, cache/lint/diff-check sikeres.
 
 ## M18. Ticket, belső üzenőfal és chat
 

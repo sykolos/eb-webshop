@@ -35,6 +35,7 @@ use App\Http\Controllers\BannerAdminController;
 use App\Http\Controllers\ActivityTrackingController;
 use App\Http\Controllers\EmailAdminController;
 use App\Http\Controllers\EmailPublicController;
+use App\Http\Controllers\AutomationAdminController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 
@@ -147,6 +148,9 @@ Route::group(['prefix'=>'account','middleware'=>'auth'],function(){
         Route::get('/carts', [\App\Http\Controllers\AdminActivityController::class, 'carts'])->name('adminpanel.carts');
         Route::get('/activity', [\App\Http\Controllers\AdminActivityController::class, 'activity'])->name('adminpanel.activity');
         Route::get('/emails', [EmailAdminController::class, 'index'])->name('adminpanel.emails');
+        Route::get('/automations', [AutomationAdminController::class, 'index'])->name('adminpanel.automations');
+        Route::post('/automations/{rule}', [AutomationAdminController::class, 'update'])->name('adminpanel.automations.update');
+        Route::post('/automations/{rule}/run', [AutomationAdminController::class, 'run'])->name('adminpanel.automations.run');
         Route::post('/emails/campaigns', [EmailAdminController::class, 'campaign'])->name('adminpanel.emails.campaigns.store');
         Route::post('/emails/test', [EmailAdminController::class, 'test'])->name('adminpanel.emails.test');
         Route::post('/emails/campaigns/{campaign}/send', [EmailAdminController::class, 'send'])->name('adminpanel.emails.campaigns.send');

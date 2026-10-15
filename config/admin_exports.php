@@ -116,5 +116,21 @@ return [
             'scope' => 'Adminisztrátori, privát export; az emailtartalom nem része.',
             'status' => 'available',
         ],
+        [
+            'key' => 'automation_rules',
+            'label' => 'Automatizmus szabályok',
+            'description' => 'Időzítési, címzett- és bekapcsolási szabályok.',
+            'source' => 'automation_rules',
+            'scope' => 'Adminisztrátori szabálytörzs, levéltartalom nélkül.',
+            'status' => 'available',
+        ],
+        [
+            'key' => 'automation_runs',
+            'label' => 'Automatizmus futások',
+            'description' => 'Automatikus értesítések idempotens futási és hibastátuszai.',
+            'source' => 'automation_runs',
+            'scope' => 'Adminisztrátori futási napló, levéltartalom nélkül.',
+            'status' => 'available',
+        ],
     ],
 ];

@@ -15,6 +15,8 @@ use App\Models\ActivityEvent;
 use App\Models\Cart;
 use App\Models\EmailCampaign;
 use App\Models\EmailDelivery;
+use App\Models\AutomationRule;
+use App\Models\AutomationRun;
 use App\Models\product_unit;
 use Illuminate\Support\LazyCollection;
 
@@ -37,6 +39,8 @@ final class AdminTransferQueryService
             'activity_events' => ['id' => 'ID', 'event_name' => 'Esemény', 'page_path' => 'Útvonal', 'device_type' => 'Eszköz', 'campaign_source' => 'Forrás', 'occurred_at' => 'Időpont', 'payload' => 'Maszkolt adat'],
             'email_campaigns' => ['id' => 'ID', 'name' => 'Kampány', 'subject' => 'Tárgy', 'type' => 'Típus', 'status' => 'Állapot', 'segment' => 'Szegmens', 'recipient_count' => 'Címzettek', 'sent_count' => 'Elküldve', 'failed_count' => 'Hibás', 'skipped_count' => 'Kihagyva', 'scheduled_at' => 'Ütemezés', 'created_at' => 'Létrehozva'],
             'email_deliveries' => ['id' => 'ID', 'campaign_id' => 'Kampány ID', 'email' => 'Email', 'type' => 'Típus', 'status' => 'Állapot', 'attempts' => 'Próbálkozás', 'last_error' => 'Hiba', 'sent_at' => 'Elküldve', 'created_at' => 'Létrehozva'],
+            'automation_rules' => ['id' => 'ID', 'key' => 'Kulcs', 'name' => 'Név', 'event' => 'Esemény', 'enabled' => 'Aktív', 'delay_minutes' => 'Késleltetés perc', 'timezone' => 'Időzóna', 'max_per_user' => 'Maximum/felhasználó', 'cooldown_minutes' => 'Cooldown perc', 'next_run_at' => 'Következő futás'],
+            'automation_runs' => ['id' => 'ID', 'rule' => 'Szabály', 'event' => 'Esemény', 'email' => 'Email', 'status' => 'Állapot', 'attempts' => 'Próbálkozás', 'scheduled_for' => 'Ütemezve', 'executed_at' => 'Végrehajtva', 'last_error' => 'Hiba', 'created_at' => 'Létrehozva'],
             default => throw new \InvalidArgumentException('Ismeretlen export adatkör: '.$dataset),
         };
     }
@@ -58,6 +62,8 @@ final class AdminTransferQueryService
             'activity_events' => $this->activityEvents($filters),
             'email_campaigns' => $this->emailCampaigns(),
             'email_deliveries' => $this->emailDeliveries(),
+            'automation_rules' => $this->automationRules(),
+            'automation_runs' => $this->automationRuns(),
             default => throw new \InvalidArgumentException('Ismeretlen export adatkör: '.$dataset),
         };
     }
@@ -232,6 +238,24 @@ final class AdminTransferQueryService
         return LazyCollection::make(function (): \Generator {
             foreach (EmailDelivery::query()->orderBy('id')->cursor() as $delivery) {
                 yield [$delivery->id, $delivery->campaign_id, $delivery->email, $delivery->type, $delivery->status, $delivery->attempts, $delivery->last_error, $delivery->sent_at?->toDateTimeString(), $delivery->created_at?->toDateTimeString()];
+            }
+        });
+    }
+
+    private function automationRules(): LazyCollection
+    {
+        return LazyCollection::make(function (): \Generator {
+            foreach (AutomationRule::query()->orderBy('id')->cursor() as $rule) {
+                yield [$rule->id, $rule->key, $rule->name, $rule->event, $rule->enabled ? 'Igen' : 'Nem', $rule->delay_minutes, $rule->timezone, $rule->max_per_user, $rule->cooldown_minutes, $rule->next_run_at?->toDateTimeString()];
+            }
+        });
+    }
+
+    private function automationRuns(): LazyCollection
+    {
+        return LazyCollection::make(function (): \Generator {
+            foreach (AutomationRun::query()->with(['rule', 'user'])->orderBy('id')->cursor() as $run) {
+                yield [$run->id, $run->rule?->key, $run->event, $run->user?->email, $run->status, $run->attempts, $run->scheduled_for?->toDateTimeString(), $run->executed_at?->toDateTimeString(), $run->last_error, $run->created_at?->toDateTimeString()];
             }
         });
     }
