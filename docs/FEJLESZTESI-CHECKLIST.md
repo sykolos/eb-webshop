@@ -10,7 +10,7 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 | Aktív mérföldkő | M18: Ticket, belső üzenőfal és chat, TERVEZETT |
 | Következő fejlesztési feladat | M18.01: supportlista és ticket-adatlap mezői, kapcsolódó rendelés és szűrés |
 | Alkalmazásfejlesztés ebből a checklistből | M01-M17 stagingen ellenőrzött; M17 kosárelhagyás, eseményautomatizmus, admin szabálykezelés és futási export lezárva |
-| Utolsó igazolt staging kiadás | `9614e5e`, GitHub Actions run 38774621418: M17 verify/deploy sikeres; staging átvétel megtörtént |
+| Utolsó igazolt staging kiadás | `eac8964`, GitHub Actions run 38775259789: M17 verify/deploy sikeres; staging átvétel megtörtént |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
@@ -729,7 +729,7 @@ Adat/deploy: Szabályok/futások/küldési kulcsok bővítő migrációi; kezdet
 - [x] M17.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
 - [x] M17.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
 
-Kiadási rekord: commit = `9614e5e`; workflow = [GitHub Actions run 38774621418](https://github.com/sykolos/eb-webshop/actions/runs/38774621418), verify/deploy sikeres; staging próba = `/adminpanel/automations` admin belépéssel, 4 kikapcsolt szabály, üres futási napló, 390/768/1440 px; `/adminpanel/exports` alatt az `automation_rules` és `automation_runs` adatkör látható. Küldést, szabálybekapcsolást és kézi futtatást nem indítottam. Ismert korlát: D12 provider/domainhitelesítés nyitott; a ticket eseményhurok az M18 ticket domainjéig előkészített és kikapcsolt.
+Kiadási rekord: commit = `eac8964`; workflow = [GitHub Actions run 38775259789](https://github.com/sykolos/eb-webshop/actions/runs/38775259789), verify/deploy sikeres; staging próba = `/adminpanel/automations` admin belépéssel, 4 kikapcsolt szabály, üres futási napló, 390/768/1440 px; `/adminpanel/exports` alatt az `automation_rules` és `automation_runs` adatkör látható. Küldést, szabálybekapcsolást és kézi futtatást nem indítottam. Ismert korlát: D12 provider/domainhitelesítés nyitott; a ticket eseményhurok az M18 ticket domainjéig előkészített és kikapcsolt.
 
 ## M18. Ticket, belső üzenőfal és chat
 
@@ -1249,7 +1249,7 @@ Kiadási bejegyzéshez szükséges részletek:
 - Elkészült az admin Automatizmusok oldal szabálykapcsolóval, következő futással, futási naplóval és kézi kosár-dispatch gombbal, valamint az automatizmus-szabályok és futások admin-only exportja. Az alapértelmezett szabályok kikapcsolva maradtak.
 - Új migráció: `2026_10_15_220000_create_automation_tables`; visszagörgethető, a `automation_runs` idempotency kulcsa egyedi, a meglévő kosár-, rendelés-, ár- és emailadatokhoz nem nyúl. Új kötelező környezeti változó nincs; a meglévő scheduler, queue és staging mail-sink folyamat maradt.
 - Ellenőrzés: M17 célteszt **5 teszt / 23 assertion**, teljes PHPUnit **103 teszt / 462 assertion**, Vite build, Composer validate, Blade/route/config cache, PHP lint és `git diff --check` sikeres. A korábbi Sass/Bootstrap deprecation és hero asset runtime figyelmeztetések megmaradtak.
-- Kiadás: `9614e5e` commit, [38774621418](https://github.com/sykolos/eb-webshop/actions/runs/38774621418) verify/deploy sikeres. Stagingen az Automatizmusok oldal adminnal 390/768/1440 px-en betöltött, túlcsordulás nélkül; a négy szabály szünetelt, a futási napló üres, az exportkatalógusban mindkét új adatkör megjelent. Működési emailt és szabálybekapcsolást nem indítottam.
+- Kiadás: `eac8964` commit, [38775259789](https://github.com/sykolos/eb-webshop/actions/runs/38775259789) verify/deploy sikeres. A korrekció a partnerjóváhagyási értesítést rendszerüzenetként kezeli, ezért nem kötődik a marketingfeliratkozáshoz; a rendelésállapot a `order_updates`, a kosárelhagyás a `marketing_notifications` preferenciát követi. Stagingen az Automatizmusok oldal adminnal 390/768/1440 px-en betöltött, túlcsordulás nélkül; a négy szabály szünetelt, a futási napló üres, az exportkatalógusban mindkét új adatkör megjelent. Működési emailt és szabálybekapcsolást nem indítottam.
 - M17.K1-K6 teljesült. Következő konkrét feladat: M18.01 supportlista és ticket-adatlap mezői, kapcsolódó rendelés és szűrés. D12 provider-döntés és M18 ticket domain továbbra is nyitott.
 
 ### Következő munkamenet sablonja
