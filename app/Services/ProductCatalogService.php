@@ -25,7 +25,7 @@ class ProductCatalogService
             })
             ->when($filters['category_id'] ?? null, fn (Builder $query, $id) => $query->whereIn('category_id', $this->categoryIds((int) $id)))
             ->when(isset($filters['availability_status']) && $filters['availability_status'] !== '', fn (Builder $query) => $query->where('availability_status', $filters['availability_status']))
-            ->when(isset($filters['published']) && $filters['published'] !== '', fn (Builder $query) => $query->where('is_published', (bool) $filters['published']))
+            ->when(isset($filters['published']) && $filters['published'] !== '', fn (Builder $query) => $query->where('is_published', filter_var($filters['published'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? (bool) $filters['published']))
             ->when(!($filters['include_archived'] ?? false), fn (Builder $query) => $query->where('is_archived', false));
     }
 

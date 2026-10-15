@@ -19,6 +19,11 @@ class Kernel extends ConsoleKernel
             ->everyFiveMinutes()
             ->withoutOverlapping(10)
             ->when(fn () => ! app()->environment('testing'));
+
+        $schedule->command('admin:exports-cleanup')
+            ->hourly()
+            ->withoutOverlapping(10)
+            ->when(fn () => ! app()->environment('testing'));
     }
 
     /**
