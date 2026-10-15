@@ -7,10 +7,10 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M14: Hero, úszó banner, tartalmi oldalak és PPT, KIADÁSRA KÉSZ |
-| Következő fejlesztési feladat | M14 staging kiadás, majd M15.01: nettó rendelési érték, rendelésszám és átlagérték azonos időszakkal |
+| Aktív mérföldkő | M15: Dashboard, top termékek, kosár- és aktivitásfigyelés, TERVEZETT |
+| Következő fejlesztési feladat | M15.01: nettó rendelési érték, rendelésszám és átlagérték azonos időszakkal |
 | Alkalmazásfejlesztés ebből a checklistből | M01-M14 stagingen ellenőrzött; M14 banneradmin, publikus tartalmi oldalak, kapcsolatűrlap és banner-PPT lezárva |
-| Utolsó igazolt staging kiadás | `1623206`, GitHub Actions run 38738575391: M13 verify/deploy sikeres; M14 kiadásra kész |
+| Utolsó igazolt staging kiadás | `a4e1364`, GitHub Actions run 38743946029: M14 verify/deploy sikeres; reszponzív staging átvétel megtörtént |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
@@ -162,7 +162,7 @@ A vásárlás backendben rögzített üzleti esemény és a külső viselkedési
 | M11 | Admin rendeléskezelés és kézi rendelésfelvitel | STAGINGEN ELLENŐRZÖTT |
 | M12 | Admin partnerek és felhasználók teljes kezelése | TERVEZETT |
 | M13 | Excel-import és minden üzleti táblázat exportja | TERVEZETT |
-| M14 | Hero, úszó banner, tartalmi oldalak és PPT | KIADÁSRA KÉSZ |
+| M14 | Hero, úszó banner, tartalmi oldalak és PPT | STAGINGEN ELLENŐRZÖTT |
 | M15 | Dashboard, top termékek, kosár- és aktivitásfigyelés | TERVEZETT |
 | M16 | Emailközpont és hírlevél | TERVEZETT |
 | M17 | Kosárelhagyás és időzített automatizmusok | TERVEZETT |
@@ -604,7 +604,7 @@ Kiadási rekord: M13.01 commit = `e257ec0`; workflow = [38727685489](https://git
 
 ## M14. Hero, úszó banner, tartalmi oldalak és PPT
 
-Állapot: KIADÁSRA KÉSZ. Függőség: M04, M05, M08, M13; D08 tartalom/banner.
+Állapot: STAGINGEN ELLENŐRZÖTT. Függőség: M04, M05, M08, M13; D08 tartalom/banner.
 Forrás: Z: hero, információs oldalak, emailminta; L: banner feltöltés három eszközre, PPT, úszó menü.
 Stagingen bemutatható eredmény: Adminból időzíthető banner jelenik meg a webshopban, a három képkivágás ellenőrizhető.
 
@@ -626,11 +626,11 @@ Adat/deploy: Banner és média metaadatok; korábbi képek megőrzése; szövege
 - [x] M14.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
 - [x] M14.K2 A banner-migráció, meglévő adatok megőrzése, publikus médiaútvonal, rollback és a jogi tartalom jóváhagyásra váró jelzése dokumentálva.
 - [x] M14.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
-- [ ] M14.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
-- [ ] M14.K5 A kiadott SHA stagingen ellenőrizve; admin bannerlista és publikus tartalmi oldalak 390x844/768x1024/1440x900 méreten túlcsordulás nélkül betöltöttek.
-- [ ] M14.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat M15.01, ismert tartalmi korlát rögzítve.
+- [x] M14.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [x] M14.K5 A kiadott SHA stagingen ellenőrizve; admin bannerlista és publikus tartalmi oldalak 390x844/768x1024/1440x900 méreten túlcsordulás nélkül betöltöttek.
+- [x] M14.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat M15.01, ismert tartalmi korlát rögzítve.
 
-Kiadási rekord: a legfrissebb commit, workflow és staging próba a mérföldkő lezáró naplóbejegyzésében szerepel.
+Kiadási rekord: M14 kód = `717e917`; tablet overflow javítás = `a4e1364`; első workflow = [38743282148](https://github.com/sykolos/eb-webshop/actions/runs/38743282148), verify/deploy sikeres; javító workflow = [38743946029](https://github.com/sykolos/eb-webshop/actions/runs/38743946029), verify/deploy sikeres. A staging admin `/adminpanel/banners`, `/info/katalogus`, `/contact` és 404 útvonalai 390x844/768x1024/1440x900 méreten ellenőrizve; a katalógus jelenleg őszinte üres állapotot mutat, mert nincs jóváhagyott PDF a repóban.
 
 ## M15. Dashboard, top termékek, kosár- és aktivitásfigyelés
 
@@ -1203,6 +1203,16 @@ Kiadási bejegyzéshez szükséges részletek:
 - Kiadás: végleges deployolt SHA `162320699d0ec97d0e4f9fbf131d45a085cd6510`; GitHub Actions [38738575391](https://github.com/sykolos/eb-webshop/actions/runs/38738575391) verify és deploy sikeres. Az első deploy-kísérlet a staging legacy `users.id` méreteltérése miatt megállt; a migráció ezt idegenkulcs-kényszer nélküli, indexelt nullable owner mezővel kezeli.
 - Staging átvétel adminnal: `/adminpanel/exports`; a 9 adatkör, exportindító, import-előnézet és import-sablon vezérlői látszanak. A 390x844, 768x1024 és 1440x900 ellenőrzéseken nem volt vízszintes overflow; a két táblában összesen 10 sor jelent meg. Valódi exportot/importot nem indítottam stagingen.
 - M13.K1-K6 teljesült. Következő konkrét feladat: M14.01 hero/úszóképek adminja.
+
+### 2026-10-15: M14 teljes mérföldkő stagingen ellenőrzött
+
+- Elkészült az M14.01-M14.09 technikai köre: a `banners` migráció és `BannerService` három fix eszközváltozatot készít, az adminból külön menthető és publikálható a hero/úszó banner, időzítés és visszavonás kezelhető, a banner-metaadat bekerült az M13 exportkatalógusba.
+- A publikus főoldal kezeli a reszponzív hero képet és az úszó bannert. A V6 kapcsolati, szállítás/fizetés, GYIK, katalógus, impresszum, ÁSZF, adatkezelés, elállás és 404 nézetek működnek. A kapcsolatűrlap validál, rate limitet használ és commit utáni `SendContactMessage` queue-jobot indít.
+- A `docs/M14-banner-keszitesi-utmutato.pptx` 7 diás, renderelt és strukturálisan validált útmutató; a három kimeneti méret, szövegzóna, jó/rossz példa, feltöltési folyamat és ellenőrzőlista szerepel benne.
+- Helyi ellenőrzés: M14 célteszt **4 teszt / 28 assertion**, teljes PHPUnit **92 teszt / 406 assertion**, Vite build, Composer validate, Blade/route/config cache, PHP lint és `git diff --check` sikeres. A Vite buildben a korábbi Sass/Bootstrap deprecation és hero asset runtime figyelmeztetés megmaradt.
+- Kiadás: M14 kód `717e917`, workflow [38743282148](https://github.com/sykolos/eb-webshop/actions/runs/38743282148) verify/deploy sikeres. Staging átvétel közben 768 px-es V6 fejléc-overflow derült ki, ezt `a4e1364` javította; a [38743946029](https://github.com/sykolos/eb-webshop/actions/runs/38743946029) workflow verify/deploy része szintén sikeres.
+- Staging átvétel: `/adminpanel/banners`, `/info/katalogus`, `/contact` és hiányzó útvonalon a 404 nézet betöltött. A 390x844, 768x1024 és 1440x900 méretek dokumentumszélességen belül maradtak; az adminban a három eszközfeltöltő, külön piszkozat/publikálás és az üres bannerlista látható. Valódi bannerfeltöltést, kapcsolatüzenet-küldést és destructive admin műveletet stagingen nem indítottam.
+- M14.K1-K6 teljesült. Ismert tartalmi korlát: a jóváhagyott katalógus PDF és a végleges jogi szövegek üzleti átadást igényelnek; addig a katalógus üres állapota és a jogi oldalak verziózott jóváhagyási jelzése marad. Következő konkrét feladat: M15.01 nettó dashboard mutatók.
 
 ### Következő munkamenet sablonja
 
