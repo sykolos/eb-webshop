@@ -7,15 +7,15 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M17: Kosárelhagyás és időzített automatizmusok, KIADÁSRA KÉSZ |
-| Következő fejlesztési feladat | M17.K4: egy funkciós commit, `develop` push, workflow és staging átvétel |
-| Alkalmazásfejlesztés ebből a checklistből | M01-M16 stagingen ellenőrzött; M17 kosárelhagyási és eseményautomatizmus kódja, admin kezelése és exportja elkészült |
-| Utolsó igazolt staging kiadás | `c93c74f`, GitHub Actions run 38749992983: M16 verify/deploy sikeres; staging átvétel megtörtént |
+| Aktív mérföldkő | M18: Ticket, belső üzenőfal és chat, TERVEZETT |
+| Következő fejlesztési feladat | M18.01: supportlista és ticket-adatlap mezői, kapcsolódó rendelés és szűrés |
+| Alkalmazásfejlesztés ebből a checklistből | M01-M17 stagingen ellenőrzött; M17 kosárelhagyás, eseményautomatizmus, admin szabálykezelés és futási export lezárva |
+| Utolsó igazolt staging kiadás | `9614e5e`, GitHub Actions run 38774621418: M17 verify/deploy sikeres; staging átvétel megtörtént |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D11 szolgáltató; D12-D13 későbbre halasztva |
-| Mostani változtatás | M17 kikapcsolt alapértelmezett automatizmus-szabályok, kosárelhagyási queue, idempotens futási napló, partner/rendelés eseményhorgok, admin szabálykezelés és export; a meglévő ár-, kosár-, rendelés- és partnerlogika változatlan |
+| Mostani változtatás | M17 stagingen ellenőrzött: kikapcsolt alapértelmezett automatizmus-szabályok, kosárelhagyási queue, idempotens futási napló, partner/rendelés eseményhorgok, admin szabálykezelés és export; a meglévő ár-, kosár-, rendelés- és partnerlogika változatlan |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -165,7 +165,7 @@ A vásárlás backendben rögzített üzleti esemény és a külső viselkedési
 | M14 | Hero, úszó banner, tartalmi oldalak és PPT | STAGINGEN ELLENŐRZÖTT |
 | M15 | Dashboard, top termékek, kosár- és aktivitásfigyelés | STAGINGEN ELLENŐRZÖTT |
 | M16 | Emailközpont és hírlevél | STAGINGEN ELLENŐRZÖTT |
-| M17 | Kosárelhagyás és időzített automatizmusok | KIADÁSRA KÉSZ |
+| M17 | Kosárelhagyás és időzített automatizmusok | STAGINGEN ELLENŐRZÖTT |
 | M18 | Ticket, belső üzenőfal és chat | TERVEZETT |
 | M19 | Termékelérhetőségi státuszok | TERVEZETT |
 | M20 | Aktuális akciók és partneri ajánlatok megjelenítése | TERVEZETT |
@@ -725,11 +725,11 @@ Adat/deploy: Szabályok/futások/küldési kulcsok bővítő migrációi; kezdet
 - [x] M17.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
 - [x] M17.K2 Migráció, környezeti előfeltétel, kikapcsolt alapértelmezés, visszaállítás és használati változás dokumentálva; meglévő kosár-, ár- és emailadat megőrzése ellenőrizve.
 - [x] M17.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
-- [ ] M17.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
-- [ ] M17.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
-- [ ] M17.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+- [x] M17.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [x] M17.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
+- [x] M17.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
 
-Kiadási rekord: commit = kiadás előtt; workflow = kiadás előtt; staging próba = kiadás előtt; bizonyíték = helyi M17 célteszt 5 teszt / 23 assertion, teljes PHPUnit 103 teszt / 462 assertion, Vite build, Composer validate, cache/lint/diff-check sikeres.
+Kiadási rekord: commit = `9614e5e`; workflow = [GitHub Actions run 38774621418](https://github.com/sykolos/eb-webshop/actions/runs/38774621418), verify/deploy sikeres; staging próba = `/adminpanel/automations` admin belépéssel, 4 kikapcsolt szabály, üres futási napló, 390/768/1440 px; `/adminpanel/exports` alatt az `automation_rules` és `automation_runs` adatkör látható. Küldést, szabálybekapcsolást és kézi futtatást nem indítottam. Ismert korlát: D12 provider/domainhitelesítés nyitott; a ticket eseményhurok az M18 ticket domainjéig előkészített és kikapcsolt.
 
 ## M18. Ticket, belső üzenőfal és chat
 
@@ -1241,6 +1241,16 @@ Kiadási bejegyzéshez szükséges részletek:
 - A HTML előnézet stagingen ténylegesen megnyitható. Reszponzív ellenőrzés 390x844, 768x1024 és 1440x900 méreten történt, a dokumentum szélessége minden méreten a viewporton belül maradt.
 - Kampány mentést, tesztküldést, tömeges küldést és leiratkozást stagingen nem indítottam, mert ezek külső levél/üzleti állapotváltozást okozhatnak; a sink-védelem a kódban és a céltesztekben ellenőrzött. A külső provider és domainhitelesítés D12 alapján nyitott.
 - M16.K1-K6 teljesült. Következő konkrét feladat: M17.01 kosárelhagyási szabályok és küldési korlátok meghatározása.
+
+### 2026-10-15: M17 stagingen ellenőrzött
+
+- Elkészült az M17.01-M17.06 technikai köre: kikapcsolt alapértelmezett automatizmus-szabályok, 24 órás alap kosárelhagyási küszöb, címzett- és preferenciaellenőrzés, küldési ablak/időzóna, maximum és cooldown mezők, idempotens futási kulcs és queue-job.
+- A kosár-emlékeztető küldés előtt újraellenőrzi az aktivitás időpontját, a kosár tételét és konverzióját, a fiókállapotot, email-verifikációt, marketingpreferenciát és kizárólistát. Partnerjóváhagyás és rendelésállapot eseményhorgok elkészültek; a ticket szabály csak M18-ig előkészített és kikapcsolt.
+- Elkészült az admin Automatizmusok oldal szabálykapcsolóval, következő futással, futási naplóval és kézi kosár-dispatch gombbal, valamint az automatizmus-szabályok és futások admin-only exportja. Az alapértelmezett szabályok kikapcsolva maradtak.
+- Új migráció: `2026_10_15_220000_create_automation_tables`; visszagörgethető, a `automation_runs` idempotency kulcsa egyedi, a meglévő kosár-, rendelés-, ár- és emailadatokhoz nem nyúl. Új kötelező környezeti változó nincs; a meglévő scheduler, queue és staging mail-sink folyamat maradt.
+- Ellenőrzés: M17 célteszt **5 teszt / 23 assertion**, teljes PHPUnit **103 teszt / 462 assertion**, Vite build, Composer validate, Blade/route/config cache, PHP lint és `git diff --check` sikeres. A korábbi Sass/Bootstrap deprecation és hero asset runtime figyelmeztetések megmaradtak.
+- Kiadás: `9614e5e` commit, [38774621418](https://github.com/sykolos/eb-webshop/actions/runs/38774621418) verify/deploy sikeres. Stagingen az Automatizmusok oldal adminnal 390/768/1440 px-en betöltött, túlcsordulás nélkül; a négy szabály szünetelt, a futási napló üres, az exportkatalógusban mindkét új adatkör megjelent. Működési emailt és szabálybekapcsolást nem indítottam.
+- M17.K1-K6 teljesült. Következő konkrét feladat: M18.01 supportlista és ticket-adatlap mezői, kapcsolódó rendelés és szűrés. D12 provider-döntés és M18 ticket domain továbbra is nyitott.
 
 ### Következő munkamenet sablonja
 
