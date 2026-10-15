@@ -8,15 +8,17 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            if (!Schema::hasColumn('users', 'admin_note')) {
+        if (!Schema::hasColumn('users', 'admin_note')) {
+            Schema::table('users', function (Blueprint $table): void {
                 $table->text('admin_note')->nullable();
-            }
+            });
+        }
 
-            if (!Schema::hasColumn('users', 'deleted_at')) {
-                $table->softDeletes();
-            }
-        });
+        if (!Schema::hasColumn('users', 'deleted_at')) {
+            Schema::table('users', function (Blueprint $table): void {
+                $table->timestamp('deleted_at')->nullable()->index();
+            });
+        }
     }
 
     public function down(): void
