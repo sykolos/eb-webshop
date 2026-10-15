@@ -7,10 +7,10 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M12: Admin partnerek és felhasználók teljes kezelése, STAGING KIADÁS FOLYAMATBAN |
-| Következő fejlesztési feladat | M12 `develop` újradeploy a felszabadított staging tárhellyel; utána admin lista/adatlap átvétel |
-| Alkalmazásfejlesztés ebből a checklistből | M01-M11 stagingen ellenőrzött; M12.01-M12.07 kód elkészült, M12 K1-K3 teljesült |
-| Utolsó igazolt staging kiadás | 822094a, GitHub Actions run 38717403164: M11 verify/deploy sikeres; az M12 deploy a távoli tárhelykvóta miatt rollbackolt |
+| Aktív mérföldkő | M13: Excel-import és minden üzleti táblázat exportja, M13.01 következik |
+| Következő fejlesztési feladat | M13.01: közös export-szerződés és szűrt XLSX/CSV export előkészítése |
+| Alkalmazásfejlesztés ebből a checklistből | M01-M12 stagingen ellenőrzött; M12.01-M12.07 és M12.K1-K6 teljesült |
+| Utolsó igazolt staging kiadás | `ea7a9cc`, GitHub Actions run 38726573353: verify/deploy sikeres; M12 admin lista, kérelmek, adatlap és reszponzív ellenőrzés megtörtént |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
@@ -544,7 +544,7 @@ Kiadási rekord: commit = `822094a`; workflow = [38717403164](https://github.com
 
 ## M12. Admin partnerek és felhasználók teljes kezelése
 
-Állapot: KÓD KÉSZ / STAGING BLOKKOLVA. Függőség: M04, M10, M11.
+Állapot: STAGINGEN ELLENŐRZÖTT. Függőség: M04, M10, M11.
 Forrás: Z: Partners és részletes adatlap; L: összes adat, inaktív/sima felhasználó szűrés.
 Stagingen bemutatható eredmény: Admin kérelmet jóváhagy, üzleti adatokat módosít, és a felhasználókat több szempont szerint szűri.
 
@@ -564,11 +564,11 @@ Adat/deploy: Régi felhasználó/cég/cím mezők mappingje, státuszok és akti
 - [x] M12.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
 - [x] M12.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
 - [x] M12.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
-- [ ] M12.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
-- [ ] M12.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
-- [ ] M12.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+- [x] M12.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [x] M12.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
+- [x] M12.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
 
-Kiadási rekord: kód commitok = `7d0da75`, `039aa00`, `9d63951`; verify sikeres = [38721498975](https://github.com/sykolos/eb-webshop/actions/runs/38721498975), [38721808476](https://github.com/sykolos/eb-webshop/actions/runs/38721808476); staging deploy sikertelen = a távoli kibontás `Disk quota exceeded` hibával rollbackolt; staging próba = az M12 még nem érhető el.
+Kiadási rekord: kód commitok = `7d0da75`, `039aa00`, `9d63951`; retry/release commit = `ea7a9cc`; sikeres workflow = [38726573353](https://github.com/sykolos/eb-webshop/actions/runs/38726573353) (`verify: success`, `deploy: success`). Staging próba: `/adminpanel/users`, `/adminpanel/partner-requests`, `/adminpanel/users/310`; 390x844, 768x1024 és 1440x900 méreten a partneradatlap betöltött, a dokumentum szélessége nem haladta meg a viewportot. A korábbi `Disk quota exceeded` rollbackek: [38721498975](https://github.com/sykolos/eb-webshop/actions/runs/38721498975), [38721808476](https://github.com/sykolos/eb-webshop/actions/runs/38721808476) történeti hibaként megmaradnak.
 
 ## M13. Excel-import és minden üzleti táblázat exportja
 
@@ -1172,6 +1172,13 @@ Kiadási bejegyzéshez szükséges részletek:
 ### 2026-10-15: M12 staging retry indítva
 
 - A staging tárhely felszabadítása után az M12 kiadási folyamatot újraindítom a meglévő `develop` -> GitHub Actions -> staging úton. M12.K4-K6 csak sikeres workflow és helyszíni admin/reszponzív ellenőrzés után zárható.
+
+### 2026-10-15: M12 stagingen ellenőrzött
+
+- Az `ea7a9cc` develop kiadás GitHub Actions [38726573353](https://github.com/sykolos/eb-webshop/actions/runs/38726573353) futásban sikeres verify/deploy eredménnyel került stagingre; a tárhelykvóta hiba nem ismétlődött.
+- Bejelentkezett adminnal olvasási ellenőrzés történt: a `/adminpanel/users` partnerlista 224 találattal és a kombinálható szűrőkkel, a `/adminpanel/partner-requests` jóváhagyási nézet, valamint a `/adminpanel/users/310` teljes partneradatlap betöltött. Látható a számlázás, szállítási címek, admin műveletek, kapcsolódó rendelések és külön ár hivatkozás.
+- Reszponzív ellenőrzés a partneradatlapon: 390x844, 768x1024 és 1440x900; mindhárom méreten a dokumentum szélessége a viewporton belül maradt. Módosítás, archiválás, jelszó-reset és rendelésmentés nem történt.
+- A korábban futtatott helyi ellenőrzések változatlanul érvényesek: M12 célteszt 3 teszt / 16 assertion, teljes PHPUnit 84 teszt / 351 assertion, Blade/route cache, PHP lint, Vite build és `git diff --check` sikeres. Következő konkrét feladat: M13.01 közös táblázat-export és XLSX/CSV exportfolyamat.
 
 ### Következő munkamenet sablonja
 
