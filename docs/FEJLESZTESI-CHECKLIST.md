@@ -7,15 +7,15 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M19: Termékelérhetőségi státuszok, KIADÁSRA KÉSZ |
-| Következő fejlesztési feladat | M19.K4: commit, develop push és a staging workflow megfigyelése |
-| Alkalmazásfejlesztés ebből a checklistből | M01-M18 stagingen ellenőrzött; M19 státuszkezelés, audit, import/export, dashboard-cache és webshopjelzés lokálisan ellenőrizve; külön chat nem része a rendszernek |
-| Utolsó igazolt staging kiadás | `454da2a`, GitHub Actions [run 38781343141](https://github.com/sykolos/eb-webshop/actions/runs/38781343141): M18 verify/deploy sikeres; staging átvétel megtörtént |
+| Aktív mérföldkő | M19: Termékelérhetőségi státuszok, STAGINGEN ELLENŐRZÖTT |
+| Következő fejlesztési feladat | M20.01: ajánlatmegjelenítés és a D01 szerinti változatlan árazás szétválasztása |
+| Alkalmazásfejlesztés ebből a checklistből | M01-M19 stagingen ellenőrzött; M19 státuszkezelés, audit, import/export, dashboard-cache és webshopjelzés lezárva; külön chat nem része a rendszernek |
+| Utolsó igazolt staging kiadás | `ba9c203`, GitHub Actions [run 38813030720](https://github.com/sykolos/eb-webshop/actions/runs/38813030720): M19 verify/deploy sikeres; staging átvétel megtörtént |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D11 szolgáltató; D12 későbbre halasztva |
-| Mostani változtatás | M19: termékenkénti elérhetőségi státuszok auditált változtatása, státusztörténet, admin/import/export/dashboard/webshop integráció és dashboard-cache érvénytelenítés; a publikálási és meglévő rendelhetőségi szabályok változatlanok |
+| Mostani változtatás | M19 stagingen ellenőrzött: termékenkénti elérhetőségi státuszok auditált változtatása, státusztörténet, admin/import/export/dashboard/webshop integráció és dashboard-cache érvénytelenítés; a publikálási és meglévő rendelhetőségi szabályok változatlanok |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -762,7 +762,7 @@ Kiadási rekord: végső commit = `454da2ae7bc33a3534ea960d4fd5ccaa0199129d`; Gi
 
 ## M19. Termékelérhetőségi státuszok
 
-Állapot: KIADÁSRA KÉSZ. Függőség: M06, M08, M13; D06 eldöntve. A függőségek után előrehozható, nem kell M17-re várnia.
+Állapot: STAGINGEN ELLENŐRZÖTT. Függőség: M06, M08, M13; D06 eldöntve. A függőségek után előrehozható, nem kell M17-re várnia.
 Forrás: Z: készletjelzések; L: pontosítás a terméken állítható elérhetőségről.
 Stagingen bemutatható eredmény: Admin státuszt állít a terméken, és ugyanaz jelenik meg a katalógusban, adatlapon és exportban.
 
@@ -782,11 +782,11 @@ Adat/deploy: M06 státuszmezőjére épülő integráció, meglévő állapotok 
 - [x] M19.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
 - [x] M19.K2 A státusztörténet új, bővíthető migrációval készül; meglévő termékadatot nem ír át, a visszaállítás az új history tábla eltávolítása; új környezeti változó és feature flag nem kell.
 - [x] M19.K3 Diff ellenőrizve, csak célzott modell-, service-, controller-, migráció-, nézet-, teszt- és checklist-fájlok; reprodukálható, önállóan commitolható állapot.
-- [ ] M19.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
-- [ ] M19.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
-- [ ] M19.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+- [x] M19.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
+- [x] M19.K5 A `ba9c203` kiadott SHA stagingen ellenőrizve: admin terméklista, státuszszűrő, státusztörténet, dashboard, publikus termékadatlap; 390/768/1440 px-en nincs vízszintes túlcsordulás, kiadást blokkoló hiba nincs.
+- [x] M19.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, a következő feladat M20.01, az ismert frontend deprecation figyelmeztetések megadva.
 
-Kiadási rekord: commit = előkészítés alatt; workflow = nincs; staging próba = nem futott. Helyi M19 célteszt: 4 teszt / 14 assertion, ebből 1 ZipArchive-hiány miatt skip; teljes PHPUnit: 112 teszt / 498 assertion, 2 skip; Vite build, PHP lint, Blade cache, route-list és diff-check sikeres. A build meglévő Sass/Bootstrap deprecation és hero asset runtime figyelmeztetéseket tartalmaz.
+Kiadási rekord: commit = `ba9c2033880a52a39c012278b37f0f8a3e05ce56`; GitHub Actions [#145 / 38813030720](https://github.com/sykolos/eb-webshop/actions/runs/38813030720), verify/deploy sikeres; staging próba = `/adminpanel/products`, `?availability_status=procurement`, `/adminpanel/products/299`, `/adminpanel`, `/products/299`, 390/768/1440 px; valódi státuszváltást és importot stagingen nem indítottam.
 
 ## M20. Aktuális akciók és partneri ajánlatok megjelenítése
 
@@ -1270,6 +1270,13 @@ Kiadási bejegyzéshez szükséges részletek:
 - Helyi ellenőrzés: M19 célteszt **4 teszt / 14 assertion**, 1 `ZipArchive`-hiány miatti skip; teljes PHPUnit **112 teszt / 498 assertion**, 2 skip; Vite build, PHP lint, Blade cache, route-list és `git diff --check` sikeres. A skip a helyi PHP-bővítmény hiánya, CI PHP-ban a ZipArchive ág fut.
 - Ismert, nem blokkoló figyelmeztetés: a meglévő Sass/Bootstrap deprecation és hero asset runtime figyelmeztetések megmaradtak; Bootstrap/jQuery kiváltása külön frontend mérföldkő.
 - M19.K1-K3 teljesült. Következő konkrét lépés: célzott commit, `develop` push, a meglévő verify/deploy workflow megfigyelése, majd admin staging QA 390/768/1440 px-en.
+
+### 2026-10-15: M19 stagingen ellenőrzött
+
+- A `ba9c203` commit a `develop` ágra került, a [38813030720](https://github.com/sykolos/eb-webshop/actions/runs/38813030720) verify/deploy sikeres lett.
+- Staging admin QA: a terméklistán mind a négy elérhetőségi állapot választható, a `Beszerzés alatt` szűrő helyesen üres eredményt ad; a termékszerkesztőn látszik a státuszmező és a státusztörténet panel; a dashboard mutatja az elérhetőségi csoportot; a publikus termékadatlapon megjelenik a státuszjelzés.
+- Reszponzív QA 390/768/1440 px-en a termékadmin oldalon: a dokumentum- és body-szélesség a viewporton belül maradt. Stagingen nem indítottam valódi státuszmentést, importot, exportot vagy adatot módosító műveletet.
+- M19.K1-K6 teljesült. Következő konkrét fejlesztés: M20.01, a meglévő partneri/speciális árazás változatlan megtartásával; Bootstrap/jQuery kiváltása külön frontend mérföldkőként marad.
 
 ### Következő munkamenet sablonja
 
