@@ -1,0 +1,116 @@
+.m14-hero
+  position: relative
+  min-height: 420px
+  overflow: hidden
+  background: #202529
+  .m14-hero__overlay
+    position: absolute
+    inset: 0
+    display: flex
+    align-items: center
+    background: linear-gradient(90deg, rgba(20,24,29,.82), rgba(20,24,29,.12))
+    color: #fff
+    .m14-eyebrow
+      color: #ff7777
+      font-size: 12px
+      font-weight: 700
+      letter-spacing: .08em
+      text-transform: uppercase
+    h1
+      max-width: 650px
+      margin: 10px 0 22px
+      font-size: clamp(2rem, 5vw, 4rem)
+      line-height: 1.08
+  picture, img
+    display: block
+    width: 100%
+    height: 100%
+  img
+    position: absolute
+    inset: 0
+    object-fit: cover
+  .m14-button
+    display: inline-flex
+    min-height: 44px
+    align-items: center
+    padding: 10px 16px
+    border-radius: 4px
+    background: #e60000
+    color: #fff
+    font-weight: 700
+    text-decoration: none
+
+.m14-hero__overlay > div
+  width: min(100% - 32px, 1240px)
+  margin: 0 auto
+
+.m14-floating-banner
+  position: fixed
+  z-index: 20
+  right: 20px
+  bottom: 20px
+  width: min(220px, calc(100vw - 40px))
+  border: 3px solid #fff
+  border-radius: 8px
+  background: #202529
+  box-shadow: 0 12px 28px rgba(20,24,29,.24)
+  overflow: hidden
+  a
+    display: block
+    color: #fff
+    text-decoration: none
+  img
+    display: block
+    width: 100%
+    aspect-ratio: 4 / 5
+    object-fit: cover
+  strong
+    display: block
+    padding: 9px 10px
+    font-size: 13px
+
+.v6-m14-page
+  padding: 48px 0 72px
+.v6-m14-contact-grid, .v6-m14-info-grid
+  display: grid
+  grid-template-columns: repeat(2, minmax(0, 1fr))
+  gap: 20px
+.v6-panel--dark
+  background: #202529
+  color: #fff
+  p
+    color: #d5dadd
+  a
+    color: #fff
+.v6-faq
+  display: grid
+  gap: 10px
+  details
+    padding: 18px 20px
+    border: 1px solid #dfe4e8
+    border-radius: 8px
+    background: #fff
+  summary
+    cursor: pointer
+    font-weight: 700
+  p
+    margin: 14px 0 0
+    color: #65717b
+.v6-document
+  min-height: 300px
+.m14-honeypot
+  position: absolute !important
+  left: -10000px !important
+  width: 1px !important
+  height: 1px !important
+  opacity: 0 !important
+
+@media (max-width: 760px)
+  .m14-hero
+    min-height: 500px
+  .m14-floating-banner
+    right: 12px
+    bottom: 12px
+    width: 150px
+  .v6-m14-contact-grid, .v6-m14-info-grid
+    grid-template-columns: 1fr

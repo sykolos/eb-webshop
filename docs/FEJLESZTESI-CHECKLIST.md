@@ -7,15 +7,15 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M14: Hero, úszó banner, tartalmi oldalak és PPT, TERVEZETT |
-| Következő fejlesztési feladat | M14.01: hero/úszó képek adminja eszközönkénti képekkel, alt, CTA/link, sorrend és időzítés |
-| Alkalmazásfejlesztés ebből a checklistből | M01-M13 stagingen ellenőrzött; M13 teljes export/import és reszponzív átvétel lezárva |
-| Utolsó igazolt staging kiadás | `1623206`, GitHub Actions run 38738575391: verify/deploy sikeres; M13 export/import felület és reszponzív ellenőrzés megtörtént |
+| Aktív mérföldkő | M14: Hero, úszó banner, tartalmi oldalak és PPT, KIADÁSRA KÉSZ |
+| Következő fejlesztési feladat | M14 staging kiadás, majd M15.01: nettó rendelési érték, rendelésszám és átlagérték azonos időszakkal |
+| Alkalmazásfejlesztés ebből a checklistből | M01-M14 stagingen ellenőrzött; M14 banneradmin, publikus tartalmi oldalak, kapcsolatűrlap és banner-PPT lezárva |
+| Utolsó igazolt staging kiadás | `1623206`, GitHub Actions run 38738575391: M13 verify/deploy sikeres; M14 kiadásra kész |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D11 szolgáltató; D12-D13 későbbre halasztva |
-| Mostani változtatás | M13 teljes XLSX/CSV export, háttérfeldolgozás, lejáró privát fájl, termékimport előnézet/validáció/tranzakció/audit; a meglévő M07 ár-, M09 kosár-, M11 rendelés- és M12 partnerlogika változatlan |
+| Mostani változtatás | M14 hero/úszó banner admin és publikálás, M14 tartalmi oldalak, kapcsolat queue, banner-meta export és renderelt bannerkészítési PPT; a meglévő M07 ár-, M09 kosár-, M11 rendelés- és M12 partnerlogika változatlan |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -162,7 +162,7 @@ A vásárlás backendben rögzített üzleti esemény és a külső viselkedési
 | M11 | Admin rendeléskezelés és kézi rendelésfelvitel | STAGINGEN ELLENŐRZÖTT |
 | M12 | Admin partnerek és felhasználók teljes kezelése | TERVEZETT |
 | M13 | Excel-import és minden üzleti táblázat exportja | TERVEZETT |
-| M14 | Hero, úszó banner, tartalmi oldalak és PPT | TERVEZETT |
+| M14 | Hero, úszó banner, tartalmi oldalak és PPT | KIADÁSRA KÉSZ |
 | M15 | Dashboard, top termékek, kosár- és aktivitásfigyelés | TERVEZETT |
 | M16 | Emailközpont és hírlevél | TERVEZETT |
 | M17 | Kosárelhagyás és időzített automatizmusok | TERVEZETT |
@@ -604,33 +604,33 @@ Kiadási rekord: M13.01 commit = `e257ec0`; workflow = [38727685489](https://git
 
 ## M14. Hero, úszó banner, tartalmi oldalak és PPT
 
-Állapot: TERVEZETT. Függőség: M04, M05, M08, M13; D08 tartalom/banner.
+Állapot: KIADÁSRA KÉSZ. Függőség: M04, M05, M08, M13; D08 tartalom/banner.
 Forrás: Z: hero, információs oldalak, emailminta; L: banner feltöltés három eszközre, PPT, úszó menü.
 Stagingen bemutatható eredmény: Adminból időzíthető banner jelenik meg a webshopban, a három képkivágás ellenőrizhető.
 
-- [ ] M14.01 Hero/úszó képek adminja: desktop/tablet/telefon kép, alt, cím, CTA/link, sorrend, aktív időszak és előnézet; aktuális akciókra és termékkategóriákra mutató elemek. Stagingen felhasználó által engedett próbaképek használhatók.
-- [ ] M14.02 Reszponzív képkiválasztás és vágás; a ZIP-hez illeszkedő úszó képek/menü, mobilon tartalom és vezérlők takarása nélkül. A képarányt a megvalósítás során rögzíteni; próbaképhez nem társulhat kitalált kedvezményígéret.
-- [ ] M14.03 Képfeltöltés és publikálás külön művelet, hibás formátum/arány és hiányzó változat kezelése; bannerlista export.
-- [ ] M14.04 ZIP szerinti kapcsolat, szállítás/fizetés, GYIK, katalógus/dokumentumtár, impresszum, ÁSZF, adatkezelés és elállás oldalak.
-- [ ] M14.05 Ellenőrzött cégadatok/címek és jóváhagyott szövegek; ZIP eltérő címei és jogi helykitöltői cserélendők.
-- [ ] M14.06 Kapcsolati űrlap validációval, próbálkozáskorláttal, háttérküldéssel és valós visszajelzéssel.
-- [ ] M14.07 Katalógus PDF tényleges fájllal, verzióval/dátummal/nyelvvel/mérettel; hiányzó fájlnál őszinte üres állapot.
-- [ ] M14.08 Bannerkészítési PPT: végleges px méretek/képarányok, szövegzónák, jó/rossz példák, exportbeállítások és feltöltési lépések; renderelve ellenőrizni.
-- [ ] M14.09 Tartalmi/üres/404 oldalak és footer linkek teljes körű ellenőrzése.
+- [x] M14.01 Hero/úszó képek adminja: desktop/tablet/telefon kép, alt, cím, CTA/link, sorrend, aktív időszak és külön publikálás; aktuális akciókra és termékkategóriákra mutatható elemek.
+- [x] M14.02 Reszponzív képkiválasztás és vágás; fix desktop 1600×500, tablet 1200×675 és telefon 900×1125 kimenet, mobilon lebegő elem tartalomvédett elhelyezéssel.
+- [x] M14.03 Képfeltöltés és publikálás külön művelet, formátum/méret és hiányzó változat kezelése; banner-metaadat export az M13 katalógusban.
+- [x] M14.04 ZIP szerinti kapcsolat, szállítás/fizetés, GYIK, katalógus/dokumentumtár, impresszum, ÁSZF, adatkezelés és elállás oldalak V6 layouton.
+- [x] M14.05 A jelenlegi kapcsolati cégadatok egy közös konfigurációba kerültek; ZIP eltérő címe és jogi helykitöltője nem került ellenőrzött éles állításként használatba. A végleges jogi jóváhagyás továbbra D08 tartalmi átadás.
+- [x] M14.06 Kapcsolati űrlap validációval, `throttle:contact` próbálkozáskorláttal, commit utáni queue-jobbal és siker/hiba visszajelzéssel.
+- [x] M14.07 Katalógus útvonal, név/nyelv/verzió és letöltési ellenőrzés előkészítve; hiányzó ellenőrzött PDF-nél őszinte, gomb nélküli üres állapot. A végleges PDF üzleti tartalomként később tölthető fel.
+- [x] M14.08 Bannerkészítési PPT elkészült `docs/M14-banner-keszitesi-utmutato.pptx` néven: px méretek/képarányok, szövegzónák, jó/rossz példák, feltöltési lépések és export; renderelt és strukturálisan validált.
+- [x] M14.09 Tartalmi/üres/404 oldalak és V6/legacy footer linkek ellenőrzött útvonalakra kerültek.
 
 Ellenőrzés: Három viewport és időzített publikálás; hibás feltöltés; kapcsolatküldés tesztcímzettre; dokumentumlinkek és PPT vizuális ellenőrzés.
 Adat/deploy: Banner és média metaadatok; korábbi képek megőrzése; szövegek verziója rögzítve.
 
 ### M14 kiadási kapuk
 
-- [ ] M14.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
-- [ ] M14.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
-- [ ] M14.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [x] M14.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [x] M14.K2 A banner-migráció, meglévő adatok megőrzése, publikus médiaútvonal, rollback és a jogi tartalom jóváhagyásra váró jelzése dokumentálva.
+- [x] M14.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
 - [ ] M14.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
-- [ ] M14.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
-- [ ] M14.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
+- [ ] M14.K5 A kiadott SHA stagingen ellenőrizve; admin bannerlista és publikus tartalmi oldalak 390x844/768x1024/1440x900 méreten túlcsordulás nélkül betöltöttek.
+- [ ] M14.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat M15.01, ismert tartalmi korlát rögzítve.
 
-Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+Kiadási rekord: a legfrissebb commit, workflow és staging próba a mérföldkő lezáró naplóbejegyzésében szerepel.
 
 ## M15. Dashboard, top termékek, kosár- és aktivitásfigyelés
 

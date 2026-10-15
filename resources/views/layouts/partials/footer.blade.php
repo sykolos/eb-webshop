@@ -46,6 +46,8 @@
               <p>
                 <a href="{{route('gyik')}}" class="text-white">Gyakran Ismételt Kérdések</a>
               </p>
+              <p><a href="{{ route('info', ['slug' => 'szallitas']) }}" class="text-white">Szállítás és fizetés</a></p>
+              <p><a href="{{ route('info', ['slug' => 'katalogus']) }}" class="text-white">Katalógus</a></p>
               <p>
                 <a href="{{route('elallasi-nyilatkozat')}}" class="text-white">Elállási nyilatkozat</a>
               </p>
@@ -58,10 +60,9 @@
               <hr
                   class="mb-4 mt-0 d-inline-block mx-auto"
                   />
-              <p><i class="fas fa-home mr-3"></i> 2600 Vác Naszály út 18.</p>
-              <p><i class="fas fa-envelope mr-3"></i><a href="mailto:info@electrobusiness.hu" class="text-white text-decoration-none">info@electrobusiness.hu</a></p>
-              <p><i class="fas fa-phone mr-3"></i><a href="tel:+36202923769" class="text-white text-decoration-none">+36 20 292 3769</a></p>
-              <p><i class="fas fa-phone mr-3"></i><a href="tel:+36303508644" class="text-white text-decoration-none">+36 30 350 8644</a></p>
+              <p><i class="fas fa-home mr-3"></i> {{ config('site.company.address') }}</p>
+              <p><i class="fas fa-envelope mr-3"></i><a href="mailto:{{ config('site.company.email') }}" class="text-white text-decoration-none">{{ config('site.company.email') }}</a></p>
+              @foreach(config('site.company.phones') as $phone)<p><i class="fas fa-phone mr-3"></i><a href="tel:{{ preg_replace('/[^0-9+]/', '', $phone) }}" class="text-white text-decoration-none">{{ $phone }}</a></p>@endforeach
             </div>
           </div>
         </div>

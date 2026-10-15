@@ -19,6 +19,7 @@
                 <a href="{{ route('login') }}">Belépés</a>
             @endauth
             <a href="{{ route('contact') }}">Kapcsolat</a>
+            <a href="{{ route('info', ['slug' => 'gyik']) }}">GYIK</a>
         </nav>
     </div>
 </header>

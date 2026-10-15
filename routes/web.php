@@ -31,6 +31,7 @@ use App\Http\Controllers\PartnerRegistrationRequestController;
 use App\Http\Controllers\ProductMediaController;
 use App\Http\Controllers\FilterDefinitionController;
 use App\Http\Controllers\PricingController;
+use App\Http\Controllers\BannerAdminController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 
@@ -42,6 +43,15 @@ Route::get('aszf/',[PagesController::class,'aszf'])->name('aszf');
 Route::get('gyik/',[PagesController::class,'gyik'])->name('gyik');
 Route::get('elallasi-nyilatkozat/',[PagesController::class,'eny'])->name('elallasi-nyilatkozat');
 Route::get('adatkezelesi-nyilatkozat/',[PagesController::class,'any'])->name('adatkezelesi-nyilatkozat');
+Route::get('info/{slug}', function (string $slug) {
+    abort_unless(in_array($slug, ['szallitas', 'fizetes', 'katalogus'], true), 404);
+    return view('pages.m14.info', ['slug' => $slug]);
+})->name('info');
+Route::get('info/katalogus/download', function () {
+    $path = public_path(config('site.catalog.path'));
+    abort_unless(is_file($path), 404);
+    return response()->download($path, config('site.catalog.name'), ['Content-Type' => 'application/pdf']);
+})->name('info.catalog.download');
 Route::get('contact/',[PagesController::class,'contact'])->name('contact');
 Route::get('cart/',[PagesController::class,'cart'])->name('cart')->middleware('auth');
 Route::get('checkout/',[PagesController::class,'checkout'])->name('checkout')->middleware('auth');
@@ -142,6 +152,11 @@ Route::group(['prefix'=>'account','middleware'=>'auth'],function(){
         Route::post('/exports/import/{import}/apply', [AdminExportController::class, 'importApply'])->name('adminpanel.exports.import.apply');
         Route::get('/exports/import/{import}/errors', [AdminExportController::class, 'importErrors'])->name('adminpanel.exports.import.errors');
         Route::get('/exports/{export}/download', [AdminExportController::class, 'download'])->name('adminpanel.exports.download');
+        Route::get('/banners', [BannerAdminController::class, 'index'])->name('adminpanel.banners');
+        Route::post('/banners', [BannerAdminController::class, 'store'])->name('adminpanel.banners.store');
+        Route::post('/banners/{banner}/publish', [BannerAdminController::class, 'publish'])->name('adminpanel.banners.publish');
+        Route::post('/banners/{banner}/archive', [BannerAdminController::class, 'archive'])->name('adminpanel.banners.archive');
+        Route::delete('/banners/{banner}', [BannerAdminController::class, 'destroy'])->name('adminpanel.banners.destroy');
         Route::get('/security/2fa', [AdminTwoFactorController::class, 'setup'])->name('admin.2fa.setup');
         Route::post('/security/2fa/confirm', [AdminTwoFactorController::class, 'confirm'])->name('admin.2fa.confirm');
         Route::post('/security/2fa/disable', [AdminTwoFactorController::class, 'disable'])->name('admin.2fa.disable');

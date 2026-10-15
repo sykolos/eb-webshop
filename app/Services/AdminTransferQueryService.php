@@ -10,6 +10,7 @@ use App\Models\Products;
 use App\Models\RecommendedProduct;
 use App\Models\Special_prices;
 use App\Models\User;
+use App\Models\Banner;
 use App\Models\product_unit;
 use Illuminate\Support\LazyCollection;
 
@@ -27,6 +28,7 @@ final class AdminTransferQueryService
             'units' => ['id' => 'ID', 'unit' => 'Egység', 'quantity' => 'Szorzó', 'measure' => 'Mérték', 'is_active' => 'Aktív'],
             'special_prices' => ['id' => 'ID', 'partner' => 'Partner', 'sku' => 'Cikkszám', 'product' => 'Termék', 'price' => 'Speciális ár', 'created_at' => 'Létrehozva'],
             'featured_products' => ['sort_order' => 'Sorrend', 'sku' => 'Cikkszám', 'product' => 'Termék'],
+            'banners' => ['id' => 'ID', 'slot' => 'Hely', 'title' => 'Cím', 'alt_text' => 'Alt szöveg', 'link_url' => 'Link', 'sort_order' => 'Sorrend', 'is_published' => 'Publikus', 'starts_at' => 'Kezdet', 'ends_at' => 'Vége'],
             default => throw new \InvalidArgumentException('Ismeretlen export adatkör: '.$dataset),
         };
     }
@@ -43,6 +45,7 @@ final class AdminTransferQueryService
             'units' => $this->units($filters),
             'special_prices' => $this->specialPrices($filters),
             'featured_products' => $this->featuredProducts($filters),
+            'banners' => $this->banners($filters),
             default => throw new \InvalidArgumentException('Ismeretlen export adatkör: '.$dataset),
         };
     }
@@ -163,6 +166,15 @@ final class AdminTransferQueryService
         return LazyCollection::make(function (): \Generator {
             foreach (RecommendedProduct::with('product')->orderBy('sort_order')->orderBy('id')->cursor() as $featured) {
                 yield [$featured->sort_order, $featured->product?->serial_number, $featured->product?->title];
+            }
+        });
+    }
+
+    private function banners(array $filters): LazyCollection
+    {
+        return LazyCollection::make(function (): \Generator {
+            foreach (Banner::query()->orderBy('slot')->orderBy('sort_order')->orderBy('id')->cursor() as $banner) {
+                yield [$banner->id, $banner->slot, $banner->title, $banner->alt_text, $banner->link_url, $banner->sort_order, $banner->is_published ? 'Igen' : 'Nem', $banner->starts_at?->toDateTimeString(), $banner->ends_at?->toDateTimeString()];
             }
         });
     }

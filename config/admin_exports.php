@@ -76,5 +76,13 @@ return [
             'scope' => 'A jelenlegi kiemelt terméklista teljes sorrendje.',
             'status' => 'available',
         ],
+        [
+            'key' => 'banners',
+            'label' => 'Hero és bannerek',
+            'description' => 'Bannerhely, eszközváltozatok, időzítés és publikálási állapot.',
+            'source' => 'banners',
+            'scope' => 'A banneradmin teljes listája, képfájlok nélkül, exportálható metaadatokkal.',
+            'status' => 'available',
+        ],
     ],
 ];

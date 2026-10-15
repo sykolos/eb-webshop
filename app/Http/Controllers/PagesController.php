@@ -11,18 +11,18 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Models\RecommendedProduct;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\ContactFormMail;
 use App\Http\Controllers\ProductRecommend;
 use App\Services\CategoryTreeService;
 use App\Services\FilterCatalogService;
 use App\Services\PricingService;
 use App\Services\CartService;
+use App\Jobs\SendContactMessage;
+use App\Services\BannerService;
 
 class PagesController extends Controller
 {
     //home
-    public function home(PricingService $pricing)
+    public function home(PricingService $pricing, BannerService $banners)
     {
         $highlighted = RecommendedProduct::query()->orderBy('sort_order')->orderBy('id')->with([
             'product' => function ($query) {
@@ -50,7 +50,7 @@ class PagesController extends Controller
                 dd("HIBA: $i. terméknek nincs ID-je", $product->toArray());
             }
         }
-        return view('pages.home', compact('highlighted', 'latestProducts', 'topCategories'));
+        return view('pages.home', compact('highlighted', 'latestProducts', 'topCategories', 'banners'));
     }
 
 
@@ -93,7 +93,7 @@ class PagesController extends Controller
     }
 
     public function contact(){
-        return view('pages.contact');
+        return view('pages.m14.contact');
     }
     public function sendContact(Request $request)
     {
@@ -101,11 +101,12 @@ class PagesController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email',
             'phone' => 'nullable|string|max:50',
-            'message' => 'required|string',
+            'message' => 'required|string|max:5000',
+            'subject' => 'nullable|string|max:191',
+            'website' => 'nullable|string|max:0',
         ]);
 
-        Mail::to('info@electrobusiness.hu')
-            ->send(new ContactFormMail($data));
+        SendContactMessage::dispatch($data)->afterCommit();
 
         return back()->with('success', 'Üzenetedet sikeresen elküldtük!');
     }
@@ -116,19 +117,19 @@ class PagesController extends Controller
             return view('pages.components.account.userinfo');        
     }
     public function impresszum(){
-        return view('pages.impresszum');
+        return view('pages.m14.info', ['slug' => 'impresszum']);
     }
     public function aszf(){
-        return view('pages.aszf');
+        return view('pages.m14.info', ['slug' => 'aszf']);
     }
     public function gyik(){
-        return view('pages.gyik');
+        return view('pages.m14.info', ['slug' => 'gyik']);
     }
     public function any(){
-        return view('pages.any');
+        return view('pages.m14.info', ['slug' => 'adatkezeles']);
     }
     public function eny(){
-        return view('pages.eny');
+        return view('pages.m14.info', ['slug' => 'elallas']);
     }
     public function checkout(CartService $carts){
         $id=auth()->user()->id;

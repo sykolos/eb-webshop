@@ -1,15 +1,7 @@
-@extends('layouts.master')
-@section('title','Az oldal nem található!')
+@extends('layouts.v6.shop')
+@section('title','Az oldal nem található')
 @section('content')
-
-<div class="row justify-content-center align-items-center page-header-title">
-    <div class="col-md-6 text-center mb-5">
-        <h2 class="heading-section section-header ">Az oldal nem található </h2>
-    </div>
-</div>
-<section class="page-success">
-    <div class="container">
-        <h1>:(</h1>
-    </div>
+<section class="v6-container v6-container--narrow v6-m14-page">
+    <div class="v6-empty-state"><span class="v6-eyebrow">404</span><strong>Ez az oldal nem található.</strong><span>A hivatkozás lejárhatott vagy megváltozott. Innen folytathatod a böngészést.</span><a class="v6-button v6-button--primary" href="{{ route('home') }}">Vissza a főoldalra</a></div>
 </section>
 @endsection

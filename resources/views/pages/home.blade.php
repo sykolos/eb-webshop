@@ -2,6 +2,8 @@
 @section('title','Főoldal')
 @section('content')
 <main class="homepage flex-shrink-0">
+    @include('pages.components.home.banner', ['banners' => $banners])
+    @include('pages.components.home.floating-banner', ['banners' => $banners])
     <!-- Header-->
     @include('pages.components.home.header')
     {{-- Swiper section --}}
