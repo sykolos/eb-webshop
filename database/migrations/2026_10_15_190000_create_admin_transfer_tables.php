@@ -11,7 +11,9 @@ return new class extends Migration
         if (! Schema::hasTable('admin_exports')) {
             Schema::create('admin_exports', function (Blueprint $table): void {
                 $table->id();
-                $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+                // The legacy users table has deployment-specific integer sizing.
+                // Keep the audit owner nullable without imposing a new FK on it.
+                $table->unsignedBigInteger('user_id')->nullable()->index();
                 $table->string('dataset', 60);
                 $table->string('format', 10);
                 $table->string('download_token', 80)->unique();
@@ -31,7 +33,7 @@ return new class extends Migration
         if (! Schema::hasTable('admin_imports')) {
             Schema::create('admin_imports', function (Blueprint $table): void {
                 $table->id();
-                $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+                $table->unsignedBigInteger('user_id')->nullable()->index();
                 $table->string('dataset', 60)->default('products');
                 $table->string('original_name');
                 $table->string('checksum', 64)->index();
