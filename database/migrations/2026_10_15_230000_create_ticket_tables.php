@@ -8,7 +8,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('tickets', function (Blueprint $table): void {
+        if (! Schema::hasTable('tickets')) {
+            Schema::create('tickets', function (Blueprint $table): void {
             $table->id();
             $table->string('ticket_number')->unique();
             // The deployed legacy users table can use a different integer width.
@@ -28,18 +29,22 @@ return new class extends Migration
             $table->timestamp('resolved_at')->nullable();
             $table->timestamp('closed_at')->nullable();
             $table->timestamps();
-        });
+            });
+        }
 
-        Schema::create('ticket_messages', function (Blueprint $table): void {
+        if (! Schema::hasTable('ticket_messages')) {
+            Schema::create('ticket_messages', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('ticket_id')->constrained()->cascadeOnDelete();
             $table->unsignedBigInteger('author_user_id')->nullable()->index();
             $table->text('body');
             $table->boolean('is_internal')->default(false)->index();
             $table->timestamp('created_at')->useCurrent()->index();
-        });
+            });
+        }
 
-        Schema::create('ticket_attachments', function (Blueprint $table): void {
+        if (! Schema::hasTable('ticket_attachments')) {
+            Schema::create('ticket_attachments', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('ticket_message_id')->constrained()->cascadeOnDelete();
             $table->unsignedBigInteger('uploaded_by_user_id')->nullable()->index();
@@ -50,9 +55,11 @@ return new class extends Migration
             $table->unsignedBigInteger('size_bytes');
             $table->string('sha256', 64)->nullable();
             $table->timestamps();
-        });
+            });
+        }
 
-        Schema::create('ticket_status_histories', function (Blueprint $table): void {
+        if (! Schema::hasTable('ticket_status_histories')) {
+            Schema::create('ticket_status_histories', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('ticket_id')->constrained()->cascadeOnDelete();
             $table->unsignedBigInteger('changed_by_user_id')->nullable()->index();
@@ -60,16 +67,19 @@ return new class extends Migration
             $table->string('to_status', 30);
             $table->string('note')->nullable();
             $table->timestamp('created_at')->useCurrent()->index();
-        });
+            });
+        }
 
-        Schema::create('ticket_reads', function (Blueprint $table): void {
+        if (! Schema::hasTable('ticket_reads')) {
+            Schema::create('ticket_reads', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('ticket_id')->constrained()->cascadeOnDelete();
             $table->unsignedBigInteger('user_id')->index();
             $table->timestamp('last_read_at');
             $table->timestamps();
             $table->unique(['ticket_id', 'user_id']);
-        });
+            });
+        }
     }
 
     public function down(): void
