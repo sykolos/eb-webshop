@@ -20,6 +20,7 @@
                 <a href="{{ route('adminpanel.orders') }}">Rendelések</a>
                 <a href="{{ route('adminpanel.users') }}">Felhasználók</a>
                 <a href="{{ route('adminpanel.special_prices') }}">Külön árak</a>
+                <a href="{{ route('adminpanel.exports') }}">Exportok</a>
                 <a href="{{ route('adminpanel.design-system') }}" aria-current="page">V6 komponensek</a>
             </nav>
             <div class="v6-admin-sidebar__bottom">

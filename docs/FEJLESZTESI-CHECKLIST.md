@@ -7,9 +7,9 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M13: Excel-import és minden üzleti táblázat exportja, M13.01 következik |
-| Következő fejlesztési feladat | M13.01: közös export-szerződés és szűrt XLSX/CSV export előkészítése |
-| Alkalmazásfejlesztés ebből a checklistből | M01-M12 stagingen ellenőrzött; M12.01-M12.07 és M12.K1-K6 teljesült |
+| Aktív mérföldkő | M13: Excel-import és minden üzleti táblázat exportja, FOLYAMATBAN |
+| Következő fejlesztési feladat | M13.02: teljes szűrt eredményhalmazra épülő exportút előkészítése |
+| Alkalmazásfejlesztés ebből a checklistből | M01-M12 stagingen ellenőrzött; M13.01 elkészült, M13.K1-K3 teljesült |
 | Utolsó igazolt staging kiadás | `ea7a9cc`, GitHub Actions run 38726573353: verify/deploy sikeres; M12 admin lista, kérelmek, adatlap és reszponzív ellenőrzés megtörtént |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
@@ -572,11 +572,11 @@ Kiadási rekord: kód commitok = `7d0da75`, `039aa00`, `9d63951`; retry/release 
 
 ## M13. Excel-import és minden üzleti táblázat exportja
 
-Állapot: TERVEZETT. Függőség: M06, M07, M11, M12.
+Állapot: FOLYAMATBAN. Függőség: M06, M07, M11, M12.
 Forrás: Z: admin-transfer, import-validation; L: Excel export minden táblázathoz.
 Stagingen bemutatható eredmény: Sablonból ellenőrzött import készül, majd a teljes szűrt terméklista visszaimportálható XLSX-ként exportálható.
 
-- [ ] M13.01 Exportálható táblák nyilvántartása: rendelések, rendeléssorok, termékek, kategóriák, szűrők, partnerek, egységek, árak, kiemeltek; későbbi modulok saját exporttal záródnak.
+- [x] M13.01 Exportálható táblák nyilvántartása: rendelések, rendeléssorok, termékek, kategóriák, szűrők, partnerek, egységek, árak, kiemeltek; későbbi modulok saját exporttal záródnak.
 - [ ] M13.02 Export a teljes szűrt eredményhalmazból, nem csak aktuális oldalból/kijelölésből; műveletoszlopok nélkül, mentett szerveradatokból.
 - [ ] M13.03 Valódi XLSX és ZIP szerinti opcionális pontosvesszős UTF-8 BOM CSV; oszlopjogosultság és képletinjektálás elleni védelem.
 - [ ] M13.04 Nagy export háttérfeladat, állapot, privát lejáró letöltés, jogosultság újraellenőrzése, fájltakarítás.
@@ -593,14 +593,14 @@ Adat/deploy: Import job/hiba/export táblák; alkalmazás előtt előnézet; meg
 
 ### M13 kiadási kapuk
 
-- [ ] M13.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
-- [ ] M13.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
-- [ ] M13.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
+- [x] M13.K1 Az érintett tesztek/build és a fenti ellenőrzések sikeresek; bizonyíték a naplóban.
+- [x] M13.K2 Migráció, környezeti előfeltétel, feature flag, visszaállítás és használati változás dokumentálva; adat megőrzése ellenőrizve.
+- [x] M13.K3 Diff ellenőrizve, csak célzott fájlok; reprodukálható, önállóan commitolható állapot.
 - [ ] M13.K4 Commit és develop integráció/push megtörtént; staging workflow sikeres; tényleges SHA és futásazonosító rögzítve.
 - [ ] M13.K5 A kiadott SHA stagingen ellenőrizve a fenti folyamattal; UI esetén mobil/tablet/desktop is; nincs nyitott kiadást blokkoló hiba.
 - [ ] M13.K6 Kiadási/folytatási napló frissítve: állapot STAGINGEN ELLENŐRZÖTT, következő feladat és ismert korlát megadva.
 
-Kiadási rekord: commit = nincs; workflow = nincs; staging próba = nem futott; bizonyíték = nincs.
+Kiadási rekord: M13.01 release-jelölt commit = a következő develop integrációban; workflow = nincs; staging próba = nem futott; bizonyíték = alábbi napló.
 
 ## M14. Hero, úszó banner, tartalmi oldalak és PPT
 
@@ -1179,6 +1179,13 @@ Kiadási bejegyzéshez szükséges részletek:
 - Bejelentkezett adminnal olvasási ellenőrzés történt: a `/adminpanel/users` partnerlista 224 találattal és a kombinálható szűrőkkel, a `/adminpanel/partner-requests` jóváhagyási nézet, valamint a `/adminpanel/users/310` teljes partneradatlap betöltött. Látható a számlázás, szállítási címek, admin műveletek, kapcsolódó rendelések és külön ár hivatkozás.
 - Reszponzív ellenőrzés a partneradatlapon: 390x844, 768x1024 és 1440x900; mindhárom méreten a dokumentum szélessége a viewporton belül maradt. Módosítás, archiválás, jelszó-reset és rendelésmentés nem történt.
 - A korábban futtatott helyi ellenőrzések változatlanul érvényesek: M12 célteszt 3 teszt / 16 assertion, teljes PHPUnit 84 teszt / 351 assertion, Blade/route cache, PHP lint, Vite build és `git diff --check` sikeres. Következő konkrét feladat: M13.01 közös táblázat-export és XLSX/CSV exportfolyamat.
+
+### 2026-10-15: M13.01 exportkatalógus kód kész
+
+- Elkészült az `AdminExportCatalogService` és a verziózott `config/admin_exports.php` nyilvántartás. A kilenc M13.01 adatkör: rendelések, rendeléssorok, termékek, kategóriák, szűrők, partnerek, mennyiségi egységek, külön árak és kiemelt termékek.
+- Új admin-only `/adminpanel/exports` nézet készült a közös V6 navigációban. Az oldal csak a forrásokat és export-hatóköröket mutatja; fájlletöltést még nem indít, így M13.02-M13.11 hatóköre változatlanul nyitott.
+- Ellenőrzés: M13 célteszt 2 teszt / 16 assertion; teljes PHPUnit **86 teszt / 367 assertion**; Blade cache, route cache, PHP lint és `git diff --check` sikeres. A Vite build D:-s ideiglenes útvonallal sikeres, a meglévő Sass/Bootstrap deprecation figyelmeztetések és a hero asset runtime figyelmeztetése megmaradt.
+- M13.K1-K3 teljesült. Következő konkrét feladat: a release-jelölt commit `develop` integrációja, workflow/deploy, majd az exportkatalógus staging átvétele.
 
 ### Következő munkamenet sablonja
 

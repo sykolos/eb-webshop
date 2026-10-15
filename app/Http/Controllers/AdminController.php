@@ -9,6 +9,7 @@ use App\Models\product_unit;
 use Illuminate\Http\Request;
 use App\Models\RecommendedProduct;
 use App\Services\AuditLogger;
+use App\Services\AdminExportCatalogService;
 use App\Services\UnitCatalogService;
 use App\Services\UserManagementService;
 use Illuminate\Validation\Rule;
@@ -25,6 +26,12 @@ class AdminController extends Controller
         $orders_2=Order::where('status','=','törölve');                
         return view('admin.pages.dashboard',['products'=>$products,'orders_0'=>$orders_0,'orders_1'=>$orders_1,'orders_2'=>$orders_2]);
     }
+
+    public function exportCatalog(AdminExportCatalogService $catalog)
+    {
+        return view('admin.m13.exports.index', ['datasets' => $catalog->all()]);
+    }
+
     public function users(Request $request, UserManagementService $users){
         $filters = $request->validate([
             'search' => ['nullable', 'string', 'max:191'],

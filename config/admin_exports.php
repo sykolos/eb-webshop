@@ -1,0 +1,80 @@
+<?php
+
+return [
+    'version' => 1,
+
+    'datasets' => [
+        [
+            'key' => 'orders',
+            'label' => 'Rendelések',
+            'description' => 'Rendelésfejlécek partner-, státusz- és összegadatokkal.',
+            'source' => 'orders',
+            'scope' => 'A későbbi export az admin rendeléslista szűrt eredményhalmazát használja.',
+            'status' => 'planned',
+        ],
+        [
+            'key' => 'order_items',
+            'label' => 'Rendeléssorok',
+            'description' => 'Rendelt termékek, mennyiségek, egységek és rendeléskapcsolatok.',
+            'source' => 'order_items',
+            'scope' => 'A rendelés-exporttal együtt vagy külön szűrt adathalmazként lesz elérhető.',
+            'status' => 'planned',
+        ],
+        [
+            'key' => 'products',
+            'label' => 'Termékek',
+            'description' => 'Cikkszám, megnevezés, kategória, egység, ár- és elérhetőségi mezők.',
+            'source' => 'products',
+            'scope' => 'A terméklista minden szűrt oldalán túli teljes eredményhalmaz.',
+            'status' => 'planned',
+        ],
+        [
+            'key' => 'categories',
+            'label' => 'Kategóriák',
+            'description' => 'Kategóriafa- és szülőkapcsolatok tetszőleges mélységben.',
+            'source' => 'categories',
+            'scope' => 'A kategóriaadminisztráció aktuális, teljes fája.',
+            'status' => 'planned',
+        ],
+        [
+            'key' => 'filters',
+            'label' => 'Szűrők',
+            'description' => 'Szűrődefiníciók és a hozzájuk tartozó értékek.',
+            'source' => 'filter_definitions',
+            'scope' => 'A termékszűréshez mentett definíciók és értékek.',
+            'status' => 'planned',
+        ],
+        [
+            'key' => 'partners',
+            'label' => 'Partnerek',
+            'description' => 'Partnerfiókok és üzleti törzsadatok adminisztrátori exportja.',
+            'source' => 'users',
+            'scope' => 'A partnerlista szűrt, teljes eredményhalmaza; érzékeny adminadat.',
+            'status' => 'planned',
+        ],
+        [
+            'key' => 'units',
+            'label' => 'Mennyiségi egységek',
+            'description' => 'Egységek, szorzók, mértékek és aktív állapot.',
+            'source' => 'product_units',
+            'scope' => 'A mennyiségi egységek teljes adminlistája.',
+            'status' => 'planned',
+        ],
+        [
+            'key' => 'special_prices',
+            'label' => 'Külön árak',
+            'description' => 'Partner-, termék- és termékkörszintű speciális árkapcsolatok.',
+            'source' => 'special_prices',
+            'scope' => 'A meglévő árazási szabályok változatlanul maradnak; az export külön jogosultságú.',
+            'status' => 'planned',
+        ],
+        [
+            'key' => 'featured_products',
+            'label' => 'Kiemeltek',
+            'description' => 'Kiemelt termékek és adminisztrátori sorrendjük.',
+            'source' => 'recommended_products',
+            'scope' => 'A jelenlegi kiemelt terméklista teljes sorrendje.',
+            'status' => 'planned',
+        ],
+    ],
+];
