@@ -29,7 +29,8 @@ class PagesController extends Controller
             'product' => function ($query) {
                 $query->published()->select('id', 'title', 'serial_number', 'price', 'unit_id', 'image', 'slug', 'availability_status');
             },
-            'product.product_unit:id,id,measure'
+            'product.product_unit:id,id,measure',
+            'product.media'
         ])->get();
 
         $recommend = new ProductRecommend();
@@ -169,7 +170,7 @@ class PagesController extends Controller
     
     public function orderpage(Request $request, CategoryTreeService $tree, FilterCatalogService $filters, PricingService $pricing)
     {
-        $query = Products::published()->with('category', 'product_unit');
+        $query = Products::published()->with('category', 'product_unit', 'media');
         $activeCategory = $this->resolveShopCategory($request->get('category'));
 
         // KIEMELT TERMÉKEK
@@ -331,7 +332,7 @@ class PagesController extends Controller
     }
     public function quickProductsAjax(Request $request, CategoryTreeService $tree, PricingService $pricing)
     {
-        $query = Products::published()->with('product_unit');
+        $query = Products::published()->with('product_unit', 'media');
 
         // Kiemelt termékek
         if ($request->get('category') === 'highlighted') {

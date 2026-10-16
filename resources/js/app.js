@@ -4,6 +4,7 @@ import './tracking';
 
 // Stílusok
 import '../sass/app.scss';
+import '../css/legacy-fixes.css';
 
 function closePopup() {
     const overlay = document.getElementById('popupOverlay');

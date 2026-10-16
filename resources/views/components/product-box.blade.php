@@ -7,9 +7,20 @@
 	<div class="image bg-light">
 		@php
             $imagePath = $product->image;
+            $imageUrl = ($imagePath && Storage::disk('public')->exists($imagePath))
+                ? Storage::disk('public')->url($imagePath)
+                : null;
+            if (!$imageUrl && $product->relationLoaded('media')) {
+                $media = $product->media->first(function ($item) {
+                    return $item->kind === 'image'
+                        && $item->is_public
+                        && Storage::disk('public')->exists($item->path);
+                });
+                $imageUrl = $media ? Storage::disk('public')->url($media->path) : null;
+            }
         @endphp
 		<img class="img-fluid w-100"
-			src="{{ ($imagePath && Storage::disk('public')->exists($imagePath)) ? Storage::url($imagePath) : asset('img/landscape-placeholder.svg') }}"
+			src="{{ $imageUrl ?: asset('img/landscape-placeholder.svg') }}"
 			alt="{{ $product->title }}"
 			width="100" height="100"
 			loading="lazy">

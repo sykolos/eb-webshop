@@ -4,11 +4,18 @@
         <div class="col-12 col-md d-flex align-items-start gap-3 quick-main">
             @php
                 $imagePath = $product->image;
+                $imageUrl = ($imagePath && Storage::disk('public')->exists($imagePath))
+                    ? Storage::disk('public')->url($imagePath)
+                    : null;
+                if (!$imageUrl && $product->relationLoaded('media')) {
+                    $media = $product->media->first(fn ($item) => $item->kind === 'image' && $item->is_public && Storage::disk('public')->exists($item->path));
+                    $imageUrl = $media ? Storage::disk('public')->url($media->path) : null;
+                }
             @endphp
 
             {{-- Kép – csak md fölött --}}
             <div class="d-none d-sm-block flex-shrink-0" style="width: 64px;">
-                <img src="{{ Storage::exists($imagePath) ? Storage::url($imagePath) : asset('img/landscape-placeholder.svg') }}"
+                <img src="{{ $imageUrl ?: asset('img/landscape-placeholder.svg') }}"
                      class="img-fluid rounded border"
                      alt="{{ $product->title }}"
                      loading="lazy">
