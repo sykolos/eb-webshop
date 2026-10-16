@@ -10,12 +10,12 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 | Aktív mérföldkő | M21: Teljes átállás, teljesítmény és üzemeltetési átadás, STAGINGEN ELLENŐRZÖTT |
 | Következő fejlesztési feladat | M21.06/M21.09 és a hitelesített admin p95: éles adatpróba, végleges SLA-idősáv és külön jóváhagyás után |
 | Alkalmazásfejlesztés ebből a checklistből | M01-M20 stagingen ellenőrzött; M21 frontend-kivezetés, natív kosár/kereső/navigáció, security headerek, health endpointok, integritás- és kapacitásjelentés, valamint átadási dokumentáció elkészült; külön chat nem része a rendszernek |
-| Utolsó igazolt staging kiadás | `780a9a7c5195249885073f2bb92f47726645cbb2`, GitHub Actions [run 38819191813](https://github.com/sykolos/eb-webshop/actions/runs/38819191813): M20 verify/deploy sikeres; staging átvétel megtörtént |
+| Utolsó igazolt staging kiadás | `1eb52ddca5752e66ab41f70f10cdd0ee4a6b5202`, GitHub Actions [run 38872072642](https://github.com/sykolos/eb-webshop/actions/runs/38872072642): M21 vizuális korrekciós verify/deploy sikeres; friss bundle és staging átvétel megtörtént |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D11 szolgáltató; D12 későbbre halasztva |
-| Mostani változtatás | M21 kód kész: Bootstrap/jQuery/Select2/Swiper/CDN kivezetés, natív JS-kompatibilitási réteg, session/CSP/security hardening, health és kapacitás/integritás riport, működési és rollback átadás; éles adatpróba és éles deploy külön, nincs elindítva |
+| Mostani változtatás | M21 kód kész: Bootstrap/jQuery/Select2/Swiper/CDN kivezetés, natív JS-kompatibilitási réteg, session/CSP/security hardening, health és kapacitás/integritás riport, működési és rollback átadás; a staging átvétel után a webshop navigációja, rácsos termékkártyái, média-fallbackje és mobilmenüje külön vizuális korrekciót kapott; éles adatpróba és éles deploy külön, nincs elindítva |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -1304,6 +1304,16 @@ Kiadási bejegyzéshez szükséges részletek:
 - Staging p95, 20 minta: `/` **394 ms**, `/shop` **227 ms**, `/health/live` **212 ms**. A régi `/orderpage` csak ZIP-referencia, a Laravel végleges útvonala `/shop`; `/quick-order` a webshopra vezet.
 - M21.K1-K6 teljesült a staging célhoz. Nyitott, nem blokkoló átadási pont: MySQL nélküli lokális gépen az integritásriport csak stagingen futtatható; éles adatpróba/restore, végleges SLA-idősáv, hitelesített admin p95 és éles deploy külön jóváhagyott esemény.
 - Következő feladat: üzemeltetési ciklusban M21.06/M21.09 nyitott pontjainak rendezése, majd csak külön jóváhagyással éles adatpróba és éles kiadás.
+
+### 2026-10-16: M21 staging vizuális korrekció ellenőrizve
+
+- A staging átvételen feltárt tényleges UI-hibákat javítottam: a desktop navigáció a hibás Sass media-query kimenet miatt rejtve maradt, a webshop rácsa és a régi termékkártya-stílus nem követte a v6 referenciát, a `bg-dark` kompatibilitási szabály hiánya pedig kontrasztproblémát okozott.
+- Elkészült a framework-független `legacy-fixes.css`: látható desktop navigáció, működő mobilmenü, reszponzív 3/2 oszlopos katalógusrács, új fehér termékkártya kép-/ár-/státusz-hierarchiával és sötét, olvasható kiemelt szekciók.
+- A termékkártyák és gyorsnézetek a betöltött publikus médiát használják, hiányzó fájlnál közös placeholderrel esnek vissza. A főoldali és webshop lekérdezések médiakapcsolattal töltődnek.
+- Helyben ellenőrizve: teljes PHPUnit **118 teszt / 546 assertion**, Vite build, PHP lint, Blade/route cache és `git diff --check` sikeres. A korábbi Sass deprecation figyelmeztetések megmaradtak; új böngészőhiba nem jelent meg.
+- Kiadás: `1eb52ddca5752e66ab41f70f10cdd0ee4a6b5202`, GitHub Actions [run 38872072642](https://github.com/sykolos/eb-webshop/actions/runs/38872072642) verify/deploy sikeres. A friss asset bundle stagingen betöltődött.
+- Staging QA: desktop 1440 px-en a teljes navigáció és a háromoszlopos webshoprács látszik; mobil 390 px-en a menü gomb és lenyíló navigáció működik, a katalógus két oszlopra törik; a böngésző konzolában nem volt error/warning. Üzleti adatot nem módosítottam.
+- M21.K1-K6 továbbra is teljesült; a vizuális hibajavítás lezárva. Következő konkrét feladat: M21.06/M21.09 üzemeltetési pontok, majd külön jóváhagyással éles adatpróba és éles kiadás.
 
 ### Következő munkamenet sablonja
 
