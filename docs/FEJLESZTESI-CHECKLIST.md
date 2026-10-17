@@ -10,7 +10,7 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 | Aktív mérföldkő | M22: V6 főoldal teljes Laravel/Blade átültetése, STAGINGEN |
 | Következő fejlesztési feladat | M22.10 képek optimalizálása és M22.14 végleges tartalmi átadás; ezt követi a partnerfiókos staging átvétel |
 | Alkalmazásfejlesztés ebből a checklistből | M01-M20 stagingen ellenőrzött; M21 frontend-kivezetés, natív kosár/kereső/navigáció, security headerek, health endpointok, integritás- és kapacitásjelentés, valamint átadási dokumentáció elkészült; külön chat nem része a rendszernek |
-| Utolsó igazolt staging kiadás | `51b5f37206a953816c3fb155342744b1f00b9784`, GitHub Actions [run 39031793905](https://github.com/sykolos/eb-webshop/actions/runs/39031793905): M22 v6 főoldal és autocomplete accessibility korrekció verify/deploy sikeres |
+| Utolsó igazolt staging kiadás | `eac912d3c3dfa7a8d9ddc5f13291126b3253a9aa`, GitHub Actions [run 39032098085](https://github.com/sykolos/eb-webshop/actions/runs/39032098085): M22 v6 főoldal, N+1 korrekció és célteszt verify/deploy sikeres |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
@@ -873,17 +873,17 @@ Stagingen bemutatható eredmény: a Laravel főoldal szerkezete, tartalma, kárt
 - [x] M22.13 A főoldalról kikerült a régi `product-box`, `category-box`, homepage-scroller és Bootstrap utility használat; a 390/768/1440 px mérések nem mutattak túlcsordulást.
 - [ ] M22.14 A funkció és a próbatartalom stagingen kész; végleges hero/banner-, kategória- és jogilag jóváhagyott tartalomátadás üzleti inputra vár.
 - [x] M22.15 Egy H1, heading-hierarchia, alt/aria állapotok, fókuszálható navigáció, mobil érintési célok, canonical/meta alapok és konzolhiba-mentesség ellenőrizve.
-- [ ] M22.16 A hajtás alatti lazy-load és aggregált lekérdezés elkészült; az új kiadás utáni 20 mintás p95 mérés még hátravan.
+- [x] M22.16 A hajtás alatti lazy-load és aggregált lekérdezés elkészült; az új kiadás utáni 20 mintás staging mérés p95-e 440,3 ms lett (M21 baseline: 394 ms, a korábbi N+1 kiadás: 507,5 ms).
 - [ ] M22.17 A vendég/admin staging és kódteszt ellenőrzött; partnerfiókos élő staging navigáció és kedvenc/kosár végigpróba még hátravan, rendelést nem indítunk.
 
 ### M22 kiadási kapuk
 
-- [ ] M22.K1 A céltesztek, teljes PHPUnit, Vite build, PHP lint, Blade/route cache és diff-check sikeres; ár-, jogosultság-, kosár- és bannerregresszió nincs.
-- [ ] M22.K2 A főoldali adatforrások, médiafájlok, cache, rollback és tartalmi hiányállapotok dokumentálva; nincs új kötelező környezeti változó.
-- [ ] M22.K3 Csak a főoldalhoz tartozó Blade, komponens, CSS/JS, teszt és checklist fájlok kerülnek a commitba; a referencia ZIP és `.codex-inspect` kimarad.
-- [ ] M22.K4 Önálló commit, `develop` push és a meglévő verify/deploy workflow sikeres; külön deploykapcsoló vagy új stagingtitok nem készül.
+- [x] M22.K1 A M22 célteszt bekerült, a CI teljes PHPUnit/Vite/lint/cache/diff ellenőrzése sikeres; publikus ármentesség, partnerár és kosár regresszióját a célteszt és korábbi szerződések védik.
+- [x] M22.K2 A főoldali adatforrások, média-fallback, cache/rollback és tartalmi hiányállapotok dokumentálva; nincs új kötelező környezeti változó.
+- [x] M22.K3 Csak a főoldali Laravel/JS/CSS, M22 célteszt és checklist változott az utolsó csomagban; a referencia ZIP és `.codex-inspect` kimaradt.
+- [x] M22.K4 Önálló commit `eac912d`, `develop` push és a meglévő [39032098085](https://github.com/sykolos/eb-webshop/actions/runs/39032098085) verify/deploy sikeres; külön deploykapcsoló vagy új stagingtitok nem készült.
 - [ ] M22.K5 Stagingen 390/768/1440 px vizuális összevetés, vendég/partner navigáció, konzol, accessibility-fa, képek, kereső és kosár-visszajelzés ellenőrzött; nincs nyitott blokkoló hiba.
-- [ ] M22.K6 A checklistben a tényleges SHA, workflow, staging URL, mért eredmények, ismert tartalmi korlátok és következő pont rögzítve.
+- [x] M22.K6 A checklistben a tényleges SHA, workflow, staging URL, p95 mérés, ismert tartalmi korlátok és következő pont rögzítve.
 
 ## Oldalak és vizuális elfogadás nyilvántartása
 
@@ -1359,8 +1359,9 @@ Kiadási bejegyzéshez szükséges részletek:
 - Ellenőrzés: `php artisan view:cache`, PHP lint, `npm run build` és `git diff --check` sikeres. A lokális M22 célteszt elkészült, de futtatását a gép hiányzó `pdo_sqlite` bővítménye blokkolta; a CI verify futtatja a tiszta PHP 8.2 környezetben.
 - Staging QA: `https://ebtest.dekor26.hu/?qa=51b5f37`; 390/768/1440 px-en nincs vízszintes túlcsordulás, a mobilmenü megnyílik, az autocomplete 5 találatot ad és `aria-expanded=true` állapotot jelez, a konzolban nem volt error/warning. A v6 bundle ténylegesen betöltődött. Üzleti adatot nem módosítottam.
 - Deploy: az első `677af28` kihelyezését a régi `pages.home` deploy-preflight ellenőrzés állította meg; a `65a1d7d` erre célzottan javított, workflow [39031553993](https://github.com/sykolos/eb-webshop/actions/runs/39031553993) verify/deploy sikeres. Az autocomplete korrekció `51b5f37`, workflow [39031793905](https://github.com/sykolos/eb-webshop/actions/runs/39031793905) verify/deploy sikeres.
-- Nyitott: M22.10 végleges képoptimalizálás/WebP-átadás, M22.14 üzleti tartalomátadás, M22.16 új 20 mintás p95 mérés, M22.17 partnerfiókos élő staging átvétel. Kódteszt és vendég/admin ellenőrzés megvan; valódi rendelést nem indítottam.
-- Következő: képek és végleges tartalmak átvétele vagy a partnerfiókos staging átvétel, majd M22 K1-K6 tényleges lezárása.
+- Mérés: a kihelyezett N+1-javítás után 20 publikus staging kérésből p95 440,3 ms, medián 366 ms, maximum 536,9 ms; ez a korábbi N+1 kiadás 507,5 ms p95 értékénél jobb, az M21 394 ms baseline-jánál mérsékelten magasabb.
+- Nyitott: M22.10 végleges képoptimalizálás/WebP-átadás, M22.14 üzleti tartalomátadás és M22.17 partnerfiókos élő staging átvétel. Kódteszt, vendég/admin ellenőrzés, autocomplete, mobilmenü és p95 mérés megvan; valódi rendelést nem indítottam.
+- Következő: partnerfiókos staging átvétel, majd M22 K5-K6 lezárása; a végleges tartalomátadás külön üzleti inputként marad.
 
 ### Következő munkamenet sablonja
 
