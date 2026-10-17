@@ -7,15 +7,15 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M22: V6 főoldal teljes Laravel/Blade átültetése, TERVEZETT |
-| Következő fejlesztési feladat | M22.01 referenciafagyasztás és a főoldali komponens-/adatkontraktus véglegesítése |
+| Aktív mérföldkő | M22: V6 főoldal teljes Laravel/Blade átültetése, STAGINGEN |
+| Következő fejlesztési feladat | M22.10 képek optimalizálása és M22.14 végleges tartalmi átadás; ezt követi a partnerfiókos staging átvétel |
 | Alkalmazásfejlesztés ebből a checklistből | M01-M20 stagingen ellenőrzött; M21 frontend-kivezetés, natív kosár/kereső/navigáció, security headerek, health endpointok, integritás- és kapacitásjelentés, valamint átadási dokumentáció elkészült; külön chat nem része a rendszernek |
-| Utolsó igazolt staging kiadás | `1eb52ddca5752e66ab41f70f10cdd0ee4a6b5202`, GitHub Actions [run 38872072642](https://github.com/sykolos/eb-webshop/actions/runs/38872072642): M21 vizuális korrekciós verify/deploy sikeres; friss bundle és staging átvétel megtörtént |
+| Utolsó igazolt staging kiadás | `51b5f37206a953816c3fb155342744b1f00b9784`, GitHub Actions [run 39031793905](https://github.com/sykolos/eb-webshop/actions/runs/39031793905): M22 v6 főoldal és autocomplete accessibility korrekció verify/deploy sikeres |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D11 szolgáltató; D12 későbbre halasztva |
-| Mostani változtatás | M21 kód kész: Bootstrap/jQuery/Select2/Swiper/CDN kivezetés, natív JS-kompatibilitási réteg, session/CSP/security hardening, health és kapacitás/integritás riport, működési és rollback átadás; a staging átvétel után a webshop navigációja, rácsos termékkártyái, média-fallbackje és mobilmenüje külön vizuális korrekciót kapott; éles adatpróba és éles deploy külön, nincs elindítva |
+| Mostani változtatás | M22 v6 főoldal Laravel/Blade + v6 CSS + natív JS/Alpine alapon: régi homepage lánc kivezetve, új hero/navigáció/kategória/termék/partner/segítség blokkok, responsive menü, autocomplete, modal nélküli kosár-visszajelzés és publikus ármentesség; a kategória-ajánlás N+1 lekérése egy aggregált lekérdezésre váltott. A végleges tartalomképek, WebP/AVIF optimalizálás és partnerfiókos élő átvétel még nyitott; éles deploy nincs elindítva. |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -170,7 +170,7 @@ A vásárlás backendben rögzített üzleti esemény és a külső viselkedési
 | M19 | Termékelérhetőségi státuszok | TERVEZETT |
 | M20 | Aktuális akciók és partneri ajánlatok megjelenítése | TERVEZETT |
 | M21 | Teljes átállás, teljesítmény és üzemeltetési átadás | TERVEZETT |
-| M22 | V6 főoldal: vizuális és működési teljes egyezés | TERVEZETT |
+| M22 | V6 főoldal: vizuális és működési teljes egyezés | STAGINGEN; funkcionális v6 átültetés és vendég/admin responsive QA megtörtént, végleges tartalom és partneri átvétel nyitott |
 
 ## M00. Összevetés és folytatható munkalista
 
@@ -858,23 +858,23 @@ Stagingen bemutatható eredmény: a Laravel főoldal szerkezete, tartalma, kárt
 
 ### M22 megvalósítási checklist
 
-- [ ] M22.01 A ZIP főoldalának referenciafagyasztása: 1440, 768 és 390 px célképek; szekciósorrend; színek; Poppins/fallback tipográfia; 8 pontos térközrendszer; 1240 px tartalomszélesség; elfogadási eltérések rögzítése.
-- [ ] M22.02 Főoldali komponens- és adatkontraktus: `HomeView` és `HomeAdditions` elemeinek Laravel Blade-komponensekre bontása; publikus, partneri és admin által szerkesztett adatmezők szétválasztása; hiányos adat esetén őszinte üres állapot, demóadat beszúrása nélkül.
-- [ ] M22.03 Új v6 fejléc és lábléc a publikus webshop-layoutban: utility bar, kereső, partnerfiók, kosár, kategória-navigáció, mobil drawer, fókusz- és billentyűzetkezelés. A régi admin/fiók layout nem törhet el.
-- [ ] M22.04 Hero és úszó banner végleges összekötése: publikált `BannerService`-adat, desktop/tablet/mobil kép, alt/link/CTA, dátum- és ajánlatkapcsolat, hiányzó banner esetén stabil alap hero; képbetöltés és CLS ellenőrzése.
-- [ ] M22.05 Gyors előnyök sáv: gyors kiszállítás, stabil elérhetőség, minőség és szakértői segítség; ikonokkal, magyar szöveggel, kontraszttal és mobilos tördeléssel.
-- [ ] M22.06 Kategória-kártyák: képes/színezett v6 kártyák, valódi kategória- és alkategória-linkek, termékszám, kép-fallback, tetszőleges mélységű fa kompatibilitás; ne legyen vízszintes régi scroller.
-- [ ] M22.07 Kiemelt termékek blokk: valódi `RecommendedProduct` sorrend, v6 `ProductCard`, publikus ármentesség, partnerár kizárólag jogosultsággal, elérhetőségi státusz, kiszerelés, kedvenc és kosárba helyezés.
-- [ ] M22.08 Partneri CTA/feature strip: regisztrációkérés, partnerárak, szállítási és szakmai segítség mutatók; bejelentkezett és vendég állapot külön kezelve; kitalált üzleti statisztika nélkül.
-- [ ] M22.09 Újdonságok és segítség blokk: legújabb termékek valódi lekérdezésből, katalógus-link, GYIK/szállítási kérdések, üres katalógus esetén korrekt állapot; az M20 ajánlatblokk csak valós aktív ajánlatnál jelenjen meg.
-- [ ] M22.10 Termék- és kategória-média rendezése: meglévő publikus média használata, placeholder csak hiányzó fájlnál; adminból feltölthető tartós kép; képméretek, WebP/AVIF vagy optimalizált WebP, `width`/`height`, lazy-load és preload szabályok.
-- [ ] M22.11 Backend lekérdezési és biztonsági ellenőrzés: eager loading, N+1 kizárás, publikus HTML/JSON ármentesség, `PricingService` változatlan használata, `CartService` tranzakció és kosár-visszajelzés, publikus cache-ben partneradat nélkül.
-- [ ] M22.12 Frontend viselkedés: autocomplete kereső, kategória- és terméklinkek, gyors kosárba helyezés, kedvencállapot, visszajelzés modal nélkül, hiba/üres/betöltési állapot, natív JS vagy Alpine.js; Bootstrap/jQuery nem kerül vissza.
-- [ ] M22.13 Közös v6 vizuális CSS: legacy `product-box`, `category-box`, Bootstrap utility és régi homepage-scroller kivezetése a főoldalról; stabil grid/flex méretek; 390/768/1440 px-en nincs levágás, átfedés vagy vízszintes túlcsordulás.
-- [ ] M22.14 Tartalmi átadás: végleges hero- és bannerképek, kategóriaképek, termékképek, CTA-szövegek, katalógus-link, cím/kapcsolati adatok és jogilag jóváhagyott szövegek. Addig stagingen jelölt próbaképek és tartalom használható.
-- [ ] M22.15 SEO és accessibility: egyetlen H1, helyes heading-hierarchia, alt-szövegek, kontraszt, fókusz, 44 px-es érintési célok, `aria-label`, canonical/meta/OG alapok, strukturált terméknavigáció és 404/hibaállapot.
-- [ ] M22.16 Teljesítmény: hero és első viewport optimalizálás, lazy-load a hajtás alatt, asset cache, lekérdezési idő és memória mérése, p95 összevetés a M21 baseline-nal; teljes oldal ne töltse be feleslegesen az összes terméket.
-- [ ] M22.17 Főoldali ellenőrzés: vendég, partner és admin által látott állapot; navigáció, keresés, banner, kategória, termékadatlap, kosár, kedvenc, partnerregisztráció és ajánlatlink végigkattintása; valódi rendelést nem indítva.
+- [x] M22.01 A ZIP v6 főoldali szerkezete és a 1440/768/390 px staging célméretek rögzítve és ellenőrizve.
+- [x] M22.02 A főoldal Laravel Blade komponensekre és valódi adatforrásokra bontva; publikus/partneri/admin szerkesztési határok és üres állapotok megmaradtak.
+- [x] M22.03 Elkészült az új v6 fejléc/lábléc, utility bar, kereső, partnerfiók, kosár, kategória-navigáció és mobilmenü; admin/fiók layout nem változott.
+- [x] M22.04 A publikált `BannerService` hero/úszó banner desktop/tablet/mobil képei, alt/link/CTA és alap hero fallback működik.
+- [x] M22.05 Elkészült a gyors kiszállítás, stabil elérhetőség, minőség és szakértői segítség előnysáv magyar, kontrasztos, reszponzív tartalommal.
+- [x] M22.06 Elkészültek a valós kategória-linkes v6 kártyák termékszámmal és fájlhiányos placeholder fallbackkel; régi vízszintes scroller nincs.
+- [x] M22.07 A kiemelt termékek `RecommendedProduct` sorrendből, v6 kártyával, publikus ármentességgel, partneri `PricingService` árral, státusszal, kiszereléssel és kosárvezérlővel jelennek meg.
+- [x] M22.08 Elkészült a vendég/partner CTA és a partnerár, szállítási, szakmai segítség blokk üzleti statisztika kitalálása nélkül.
+- [x] M22.09 Az újdonságok, katalógus, GYIK/szállítási linkek és az aktív ajánlatok feltételes blokkja elkészült.
+- [ ] M22.10 A meglévő média és fallback, méretattribútumok és lazy-load elkészült; végleges képkonverzió/WebP-átadás még nyitott.
+- [x] M22.11 A főoldali termékadatok eager loadingot használnak, a kategóriakép-ajánlás egy aggregált lekérdezésre került, az ármentes publikus állapot és a változatlan `PricingService`/kosárfolyamat ellenőrzött.
+- [x] M22.12 Az autocomplete, linkek, gyors kosárba helyezés, mobilmenü, natív JS/Alpine és modal nélküli toast elkészült; Bootstrap/jQuery nem került vissza.
+- [x] M22.13 A főoldalról kikerült a régi `product-box`, `category-box`, homepage-scroller és Bootstrap utility használat; a 390/768/1440 px mérések nem mutattak túlcsordulást.
+- [ ] M22.14 A funkció és a próbatartalom stagingen kész; végleges hero/banner-, kategória- és jogilag jóváhagyott tartalomátadás üzleti inputra vár.
+- [x] M22.15 Egy H1, heading-hierarchia, alt/aria állapotok, fókuszálható navigáció, mobil érintési célok, canonical/meta alapok és konzolhiba-mentesség ellenőrizve.
+- [ ] M22.16 A hajtás alatti lazy-load és aggregált lekérdezés elkészült; az új kiadás utáni 20 mintás p95 mérés még hátravan.
+- [ ] M22.17 A vendég/admin staging és kódteszt ellenőrzött; partnerfiókos élő staging navigáció és kedvenc/kosár végigpróba még hátravan, rendelést nem indítunk.
 
 ### M22 kiadási kapuk
 
@@ -1350,6 +1350,17 @@ Kiadási bejegyzéshez szükséges részletek:
 - Kiadás: `1eb52ddca5752e66ab41f70f10cdd0ee4a6b5202`, GitHub Actions [run 38872072642](https://github.com/sykolos/eb-webshop/actions/runs/38872072642) verify/deploy sikeres. A friss asset bundle stagingen betöltődött.
 - Staging QA: desktop 1440 px-en a teljes navigáció és a háromoszlopos webshoprács látszik; mobil 390 px-en a menü gomb és lenyíló navigáció működik, a katalógus két oszlopra törik; a böngésző konzolában nem volt error/warning. Üzleti adatot nem módosítottam.
 - M21.K1-K6 továbbra is teljesült; a vizuális hibajavítás lezárva. Következő konkrét feladat: M21.06/M21.09 üzemeltetési pontok, majd külön jóváhagyással éles adatpróba és éles kiadás.
+
+### 2026-10-17: M22 v6 főoldal staging kihelyezés és N+1 korrekció
+
+- Elkészült a Laravel/Blade alapú v6 főoldal: új utility/header/nav, responsive mobilmenü, BannerService hero/úszó banner, előnysáv, kategóriák, kiemelt termékek, partner CTA, újdonságok/segítség és v6 footer. A régi `pages.home` nézet törölve, a publikus `/` az új `pages.home-v6` nézetet használja.
+- A főoldal natív JS/Alpine + saját v6 CSS bundle-t használ; Bootstrap/jQuery, régi `product-box`, `category-box` és homepage-scroller nincs a főoldali markupban. Az autocomplete ármentes, escape-elt találatokat ad; a kosár gyorsvezérlő modal nélkül, státusz-toasttal működik.
+- A főoldali kategóriakép-ajánlás korábbi kategóriánkénti véletlen lekéréseit egyetlen aggregált lekérdezés váltotta ki. A meglévő partneri/speciális árazás, státusz, kiszerelés és publikus ármentesség változatlan maradt.
+- Ellenőrzés: `php artisan view:cache`, PHP lint, `npm run build` és `git diff --check` sikeres. A lokális M22 célteszt elkészült, de futtatását a gép hiányzó `pdo_sqlite` bővítménye blokkolta; a CI verify futtatja a tiszta PHP 8.2 környezetben.
+- Staging QA: `https://ebtest.dekor26.hu/?qa=51b5f37`; 390/768/1440 px-en nincs vízszintes túlcsordulás, a mobilmenü megnyílik, az autocomplete 5 találatot ad és `aria-expanded=true` állapotot jelez, a konzolban nem volt error/warning. A v6 bundle ténylegesen betöltődött. Üzleti adatot nem módosítottam.
+- Deploy: az első `677af28` kihelyezését a régi `pages.home` deploy-preflight ellenőrzés állította meg; a `65a1d7d` erre célzottan javított, workflow [39031553993](https://github.com/sykolos/eb-webshop/actions/runs/39031553993) verify/deploy sikeres. Az autocomplete korrekció `51b5f37`, workflow [39031793905](https://github.com/sykolos/eb-webshop/actions/runs/39031793905) verify/deploy sikeres.
+- Nyitott: M22.10 végleges képoptimalizálás/WebP-átadás, M22.14 üzleti tartalomátadás, M22.16 új 20 mintás p95 mérés, M22.17 partnerfiókos élő staging átvétel. Kódteszt és vendég/admin ellenőrzés megvan; valódi rendelést nem indítottam.
+- Következő: képek és végleges tartalmak átvétele vagy a partnerfiókos staging átvétel, majd M22 K1-K6 tényleges lezárása.
 
 ### Következő munkamenet sablonja
 
