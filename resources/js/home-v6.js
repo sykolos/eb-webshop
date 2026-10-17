@@ -13,6 +13,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.querySelector('[data-home-search-input]');
     const suggestions = document.querySelector('#home-v6-search-suggestions');
     const cartToast = document.querySelector('[data-home-cart-toast]');
+    const setSuggestionsVisible = (visible) => {
+        suggestions?.classList.toggle('is-visible', visible);
+        searchInput?.setAttribute('aria-expanded', String(visible));
+    };
 
     menuButton?.addEventListener('click', () => {
         const open = nav?.classList.toggle('is-open') ?? false;
@@ -26,14 +30,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const query = searchInput.value.trim();
         if (query.length < 2) {
             suggestions?.replaceChildren();
-            suggestions?.classList.remove('is-visible');
+            setSuggestionsVisible(false);
             return;
         }
         debounce = window.setTimeout(async () => {
             const url = new URL(searchInput.dataset.autocompleteUrl, window.location.origin);
             url.searchParams.set('q', query);
             const response = await fetch(url, { headers: { Accept: 'application/json' } });
-            if (!response.ok || !suggestions) return;
+            if (!response.ok || !suggestions) {
+                setSuggestionsVisible(false);
+                return;
+            }
             const data = await response.json();
             suggestions.replaceChildren();
             active = -1;
@@ -44,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 link.innerHTML = `<strong>${escapeHtml(result.title)}</strong>${result.serial_number ? `<small>Cikkszám: ${escapeHtml(result.serial_number)}</small>` : ''}`;
                 suggestions.append(link);
             });
-            suggestions.classList.toggle('is-visible', suggestions.children.length > 0);
+            setSuggestionsVisible(suggestions.children.length > 0);
         }, 220);
     });
 
@@ -63,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.addEventListener('click', (event) => {
-        if (!event.target.closest('.home-v6-search')) suggestions?.classList.remove('is-visible');
+        if (!event.target.closest('.home-v6-search')) setSuggestionsVisible(false);
     });
 
     document.querySelectorAll('[data-home-cart-form]').forEach((form) => {
