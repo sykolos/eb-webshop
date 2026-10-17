@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
-use App\Models\Item;
 use App\Models\Products;
 use App\Models\RecommendedProduct;
 use App\Models\User;
@@ -20,7 +19,6 @@ class M22HomepageTest extends TestCase
         $this->withoutVite();
         [$category, $product] = $this->homepageProduct();
         RecommendedProduct::create(['product_id' => $product->id, 'sort_order' => 1]);
-        Item::create(['product_id' => $product->id, 'color_id' => 1, 'quantity' => 3]);
 
         $this->get(route('home'))
             ->assertOk()
