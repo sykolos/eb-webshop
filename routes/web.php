@@ -26,6 +26,7 @@ use App\Http\Controllers\ShippingAddressController;
 use App\Http\Controllers\ProductRecommend;
 use App\Http\Controllers\AdminTwoFactorController;
 use App\Http\Controllers\PrivateFileController;
+use App\Http\Controllers\PublicMediaController;
 use App\Http\Controllers\DesignSystemController;
 use App\Http\Controllers\PartnerRegistrationRequestController;
 use App\Http\Controllers\ProductMediaController;
@@ -45,6 +46,9 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 Route::get('/success',[PagesController::class,'success'])->name('success');
 Route::get('/',[PagesController::class,'home'])->name('home');
+Route::get('/storage/{path}', [PublicMediaController::class, 'show'])
+    ->where('path', '.*')
+    ->name('public.storage');
 Route::post('/tracking/events', [ActivityTrackingController::class, 'store'])->middleware('throttle:tracking')->name('tracking.events');
 Route::get('/health/live', [\App\Http\Controllers\SystemHealthController::class, 'live'])->name('health.live');
 Route::get('/health/ready', [\App\Http\Controllers\SystemHealthController::class, 'ready'])->name('health.ready');
