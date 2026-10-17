@@ -59,7 +59,7 @@ foreach (['home', 'contact', 'login'] as $name) {
     $check($app['router']->getRoutes()->getByName($name) !== null, "Required route missing: $name");
 }
 
-foreach (['pages.home', 'pages.contact', 'pages.login'] as $view) {
+foreach (['pages.home-v6', 'pages.contact', 'pages.login'] as $view) {
     $check($app['view']->exists($view), "Required view missing: $view");
 }
 
