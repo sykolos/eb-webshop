@@ -14,7 +14,7 @@ class DeploymentPackageTest extends TestCase
     {
         $this->bash = PHP_OS_FAMILY === 'Windows' ? 'C:/Program Files/Git/bin/bash.exe' : 'bash';
         $this->directory = dirname(__DIR__, 2).'/storage/framework/testing/eb-package-test-'.bin2hex(random_bytes(8));
-        foreach (['app', 'bootstrap/cache', 'config', 'database', 'lang', 'resources', 'routes', 'scripts/deploy', 'vendor', 'public/build', 'public/storage', 'public/.well-known', '.codex-inspect', 'docs'] as $path) {
+        foreach (['app', 'bootstrap/cache', 'config', 'database', 'lang', 'resources', 'routes', 'scripts/deploy', 'vendor', 'storage/app/public/products', 'public/build', 'public/storage', 'public/.well-known', '.codex-inspect', 'docs'] as $path) {
             mkdir($this->directory.'/'.$path, 0777, true);
         }
         copy(dirname(__DIR__, 2).'/scripts/deploy/package.sh', $this->directory.'/scripts/deploy/package.sh');
@@ -22,6 +22,7 @@ class DeploymentPackageTest extends TestCase
             file_put_contents($this->directory.'/'.$file, 'fixture');
         }
         file_put_contents($this->directory.'/REVISION', str_repeat('a', 40));
+        file_put_contents($this->directory.'/storage/app/public/products/product.webp', 'product-image');
     }
 
     protected function tearDown(): void
@@ -42,6 +43,7 @@ class DeploymentPackageTest extends TestCase
         foreach (['app/example.php', 'vendor/autoload.php', 'REVISION'] as $expected) {
             $this->assertStringContainsString($expected, $app);
         }
+        $this->assertStringContainsString('storage/app/public/products/product.webp', $app);
         foreach (['.env', '.zip', '.codex-inspect', 'docs/', 'bootstrap/cache/config.php'] as $excluded) {
             $this->assertStringNotContainsString($excluded, $app);
         }
