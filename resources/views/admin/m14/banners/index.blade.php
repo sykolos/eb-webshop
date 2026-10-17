@@ -37,7 +37,7 @@
         <div class="v6-table-wrap"><table class="v6-table"><thead><tr><th>Előnézet</th><th>Hely és tartalom</th><th>Időszak</th><th>Állapot</th><th>Műveletek</th></tr></thead><tbody>
         @forelse($banners as $banner)
             <tr>
-                <td>@if($banner->mobile_path)<img class="v6-media-thumb" src="{{ asset('storage/'.$banner->mobile_path) }}" alt="">@endif</td>
+                <td>@if($banner->mobile_path)<img class="v6-media-thumb" src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($banner->mobile_path) }}" alt="">@endif</td>
                 <td><strong>{{ $banner->title ?: 'Névtelen banner' }}</strong><small>{{ strtoupper($banner->slot) }} · {{ $banner->alt_text }}</small></td>
                 <td><small>{{ $banner->starts_at?->format('Y-m-d H:i') ?: 'Azonnal' }} – {{ $banner->ends_at?->format('Y-m-d H:i') ?: 'Visszavonásig' }}</small></td>
                 <td><span class="v6-status {{ $banner->is_published ? 'v6-status--success' : 'v6-status--neutral' }}">{{ $banner->is_published ? 'Publikus' : 'Piszkozat' }}</span></td>

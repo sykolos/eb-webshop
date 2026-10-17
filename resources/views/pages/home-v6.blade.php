@@ -9,9 +9,9 @@
 <section class="home-v6-hero">
     @if($hero)
         <picture class="home-v6-hero__image">
-            <source media="(max-width: 520px)" srcset="{{ asset('storage/'.$hero->mobile_path) }}">
-            <source media="(max-width: 1024px)" srcset="{{ asset('storage/'.$hero->tablet_path) }}">
-            <img src="{{ asset('storage/'.$hero->desktop_path) }}" alt="{{ $hero->alt_text }}" width="1600" height="500">
+            <source media="(max-width: 520px)" srcset="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($hero->mobile_path) }}">
+            <source media="(max-width: 1024px)" srcset="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($hero->tablet_path) }}">
+            <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($hero->desktop_path) }}" alt="{{ $hero->alt_text }}" width="1600" height="500">
         </picture>
     @else
         <img class="home-v6-hero__image" src="{{ asset('img/electrobusiness-hero.png') }}" alt="Villamossági termékek szakembereknek" width="1672" height="941">
@@ -39,7 +39,7 @@
 @if($floating)
     <aside class="home-v6-floating-banner" aria-label="{{ $floating->alt_text }}">
         <a href="{{ $floating->link_url ?: ($floating->offer ? route('info.offers').'#ajanlat-'.$floating->offer->slug : route('orderpage')) }}">
-            <picture><source media="(max-width: 520px)" srcset="{{ asset('storage/'.$floating->mobile_path) }}"><img src="{{ asset('storage/'.$floating->desktop_path) }}" alt="{{ $floating->alt_text }}" width="900" height="1125"></picture>
+            <picture><source media="(max-width: 520px)" srcset="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($floating->mobile_path) }}"><img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($floating->desktop_path) }}" alt="{{ $floating->alt_text }}" width="900" height="1125"></picture>
             @if($floating->title)<strong>{{ $floating->title }}</strong>@endif
         </a>
     </aside>

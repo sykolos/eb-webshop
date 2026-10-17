@@ -2,7 +2,7 @@
 <article class="v6-product-card">
     <div class="v6-product-card__media">
         @if($productImage)
-            <img src="{{ asset('storage/' . ltrim($productImage, '/')) }}" alt="{{ data_get($product, 'title', 'Termék') }}">
+            <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url(ltrim($productImage, '/')) }}" alt="{{ data_get($product, 'title', 'Termék') }}">
         @else
             <span class="v6-product-card__placeholder">Termékkép előnézet</span>
         @endif

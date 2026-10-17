@@ -10,9 +10,9 @@
             @if($banner && $banner->desktop_path)
                 <a class="m20-offer__media" href="#ajanlat-{{ $offer->slug }}">
                     <picture>
-                        @if($banner->mobile_path)<source media="(max-width: 520px)" srcset="{{ asset('storage/'.$banner->mobile_path) }}">@endif
-                        @if($banner->tablet_path)<source media="(max-width: 1024px)" srcset="{{ asset('storage/'.$banner->tablet_path) }}">@endif
-                        <img src="{{ asset('storage/'.$banner->desktop_path) }}" alt="{{ $banner->alt_text }}">
+                        @if($banner->mobile_path)<source media="(max-width: 520px)" srcset="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($banner->mobile_path) }}">@endif
+                        @if($banner->tablet_path)<source media="(max-width: 1024px)" srcset="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($banner->tablet_path) }}">@endif
+                        <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($banner->desktop_path) }}" alt="{{ $banner->alt_text }}">
                     </picture>
                 </a>
             @endif

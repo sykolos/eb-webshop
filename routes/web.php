@@ -46,9 +46,9 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 Route::get('/success',[PagesController::class,'success'])->name('success');
 Route::get('/',[PagesController::class,'home'])->name('home');
-Route::get('/storage/{path}', [PublicMediaController::class, 'show'])
+Route::get('/media/{path}', [PublicMediaController::class, 'show'])
     ->where('path', '.*')
-    ->name('public.storage');
+    ->name('public.media');
 Route::post('/tracking/events', [ActivityTrackingController::class, 'store'])->middleware('throttle:tracking')->name('tracking.events');
 Route::get('/health/live', [\App\Http\Controllers\SystemHealthController::class, 'live'])->name('health.live');
 Route::get('/health/ready', [\App\Http\Controllers\SystemHealthController::class, 'ready'])->name('health.ready');

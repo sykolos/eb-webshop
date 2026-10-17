@@ -15,7 +15,7 @@ class PublicMediaTest extends TestCase
         Storage::fake('public');
         Storage::disk('public')->put('products/test-media.txt', 'public media');
 
-        $this->get('/storage/products/test-media.txt')
+        $this->get('/media/products/test-media.txt')
             ->assertOk()
             ->assertHeader('Cache-Control', 'max-age=86400, public')
             ->assertStreamedContent('public media');
@@ -23,6 +23,6 @@ class PublicMediaTest extends TestCase
 
     public function test_public_storage_does_not_allow_path_traversal(): void
     {
-        $this->get('/storage/../private/secret.txt')->assertNotFound();
+        $this->get('/media/../private/secret.txt')->assertNotFound();
     }
 }

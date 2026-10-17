@@ -42,7 +42,7 @@
                                 @if ($product)
                                     <a href="{{ route('product', $product->id) }}" class="cart-item-title d-flex align-items-center gap-2">
                                         @if ($product->image)
-                                            <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->title }}" style="width:60px; height:auto">
+                                            <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($product->image) }}" alt="{{ $product->title }}" style="width:60px; height:auto">
                                         @endif
                                         <p class="m-0">{{ $product->title }}</p>
                                     </a>
