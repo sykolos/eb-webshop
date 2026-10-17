@@ -7,8 +7,8 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M21: Teljes átállás, teljesítmény és üzemeltetési átadás, STAGINGEN ELLENŐRZÖTT |
-| Következő fejlesztési feladat | M21.06/M21.09 és a hitelesített admin p95: éles adatpróba, végleges SLA-idősáv és külön jóváhagyás után |
+| Aktív mérföldkő | M22: V6 főoldal teljes Laravel/Blade átültetése, TERVEZETT |
+| Következő fejlesztési feladat | M22.01 referenciafagyasztás és a főoldali komponens-/adatkontraktus véglegesítése |
 | Alkalmazásfejlesztés ebből a checklistből | M01-M20 stagingen ellenőrzött; M21 frontend-kivezetés, natív kosár/kereső/navigáció, security headerek, health endpointok, integritás- és kapacitásjelentés, valamint átadási dokumentáció elkészült; külön chat nem része a rendszernek |
 | Utolsó igazolt staging kiadás | `1eb52ddca5752e66ab41f70f10cdd0ee4a6b5202`, GitHub Actions [run 38872072642](https://github.com/sykolos/eb-webshop/actions/runs/38872072642): M21 vizuális korrekciós verify/deploy sikeres; friss bundle és staging átvétel megtörtént |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
@@ -170,6 +170,7 @@ A vásárlás backendben rögzített üzleti esemény és a külső viselkedési
 | M19 | Termékelérhetőségi státuszok | TERVEZETT |
 | M20 | Aktuális akciók és partneri ajánlatok megjelenítése | TERVEZETT |
 | M21 | Teljes átállás, teljesítmény és üzemeltetési átadás | TERVEZETT |
+| M22 | V6 főoldal: vizuális és működési teljes egyezés | TERVEZETT |
 
 ## M00. Összevetés és folytatható munkalista
 
@@ -849,11 +850,46 @@ Adat/deploy: Végső eltávolító migráció csak a visszaállítási ablak ut�
 
 Kiadási rekord: commit = `c824b66d570f46dce0a3f85d96e9a37ac2832e9e`; GitHub Actions [#38821344068](https://github.com/sykolos/eb-webshop/actions/runs/38821344068), verify/deploy sikeres; staging = `https://ebtest.dekor26.hu`. Próba: `/`, `/shop`, `/info/akciok`, `/cart`, `/checkout`, `/account`, `/products/299`, admin dashboard/banner/export/special-prices; 390/768/1440 px; health 200, CSP és security headerek jelen; publikus p95 célok teljesültek. Üzleti mentést, exportot, emailküldést, rendelést, státusz- vagy bannermentést nem indítottam.
 
+## M22. V6 főoldal: vizuális és működési teljes egyezés
+
+Állapot: TERVEZETT. Függőség: M05, M08, M09, M10, M14, M19, M20 és M21 frontend-alapjai; az M21 éles adatpróba továbbra is külön üzemeltetési kapu.
+Forrás: Z: `shop-experience.tsx` `HomeView` és `HomeAdditions`; L: új design, mobiloptimalizálás, úszó banner, kategóriák, top termékek és kosár-visszajelzés; K: jelenlegi Laravel/Blade, `PricingService`, `CartService`, `BannerService`, `OfferService`.
+Stagingen bemutatható eredmény: a Laravel főoldal szerkezete, tartalma, kártyái, navigációja és interakciói a v6 terv szerint működnek valódi adatforrásokkal, a partnerár és kosár üzleti szabályainak változtatása nélkül.
+
+### M22 megvalósítási checklist
+
+- [ ] M22.01 A ZIP főoldalának referenciafagyasztása: 1440, 768 és 390 px célképek; szekciósorrend; színek; Poppins/fallback tipográfia; 8 pontos térközrendszer; 1240 px tartalomszélesség; elfogadási eltérések rögzítése.
+- [ ] M22.02 Főoldali komponens- és adatkontraktus: `HomeView` és `HomeAdditions` elemeinek Laravel Blade-komponensekre bontása; publikus, partneri és admin által szerkesztett adatmezők szétválasztása; hiányos adat esetén őszinte üres állapot, demóadat beszúrása nélkül.
+- [ ] M22.03 Új v6 fejléc és lábléc a publikus webshop-layoutban: utility bar, kereső, partnerfiók, kosár, kategória-navigáció, mobil drawer, fókusz- és billentyűzetkezelés. A régi admin/fiók layout nem törhet el.
+- [ ] M22.04 Hero és úszó banner végleges összekötése: publikált `BannerService`-adat, desktop/tablet/mobil kép, alt/link/CTA, dátum- és ajánlatkapcsolat, hiányzó banner esetén stabil alap hero; képbetöltés és CLS ellenőrzése.
+- [ ] M22.05 Gyors előnyök sáv: gyors kiszállítás, stabil elérhetőség, minőség és szakértői segítség; ikonokkal, magyar szöveggel, kontraszttal és mobilos tördeléssel.
+- [ ] M22.06 Kategória-kártyák: képes/színezett v6 kártyák, valódi kategória- és alkategória-linkek, termékszám, kép-fallback, tetszőleges mélységű fa kompatibilitás; ne legyen vízszintes régi scroller.
+- [ ] M22.07 Kiemelt termékek blokk: valódi `RecommendedProduct` sorrend, v6 `ProductCard`, publikus ármentesség, partnerár kizárólag jogosultsággal, elérhetőségi státusz, kiszerelés, kedvenc és kosárba helyezés.
+- [ ] M22.08 Partneri CTA/feature strip: regisztrációkérés, partnerárak, szállítási és szakmai segítség mutatók; bejelentkezett és vendég állapot külön kezelve; kitalált üzleti statisztika nélkül.
+- [ ] M22.09 Újdonságok és segítség blokk: legújabb termékek valódi lekérdezésből, katalógus-link, GYIK/szállítási kérdések, üres katalógus esetén korrekt állapot; az M20 ajánlatblokk csak valós aktív ajánlatnál jelenjen meg.
+- [ ] M22.10 Termék- és kategória-média rendezése: meglévő publikus média használata, placeholder csak hiányzó fájlnál; adminból feltölthető tartós kép; képméretek, WebP/AVIF vagy optimalizált WebP, `width`/`height`, lazy-load és preload szabályok.
+- [ ] M22.11 Backend lekérdezési és biztonsági ellenőrzés: eager loading, N+1 kizárás, publikus HTML/JSON ármentesség, `PricingService` változatlan használata, `CartService` tranzakció és kosár-visszajelzés, publikus cache-ben partneradat nélkül.
+- [ ] M22.12 Frontend viselkedés: autocomplete kereső, kategória- és terméklinkek, gyors kosárba helyezés, kedvencállapot, visszajelzés modal nélkül, hiba/üres/betöltési állapot, natív JS vagy Alpine.js; Bootstrap/jQuery nem kerül vissza.
+- [ ] M22.13 Közös v6 vizuális CSS: legacy `product-box`, `category-box`, Bootstrap utility és régi homepage-scroller kivezetése a főoldalról; stabil grid/flex méretek; 390/768/1440 px-en nincs levágás, átfedés vagy vízszintes túlcsordulás.
+- [ ] M22.14 Tartalmi átadás: végleges hero- és bannerképek, kategóriaképek, termékképek, CTA-szövegek, katalógus-link, cím/kapcsolati adatok és jogilag jóváhagyott szövegek. Addig stagingen jelölt próbaképek és tartalom használható.
+- [ ] M22.15 SEO és accessibility: egyetlen H1, helyes heading-hierarchia, alt-szövegek, kontraszt, fókusz, 44 px-es érintési célok, `aria-label`, canonical/meta/OG alapok, strukturált terméknavigáció és 404/hibaállapot.
+- [ ] M22.16 Teljesítmény: hero és első viewport optimalizálás, lazy-load a hajtás alatt, asset cache, lekérdezési idő és memória mérése, p95 összevetés a M21 baseline-nal; teljes oldal ne töltse be feleslegesen az összes terméket.
+- [ ] M22.17 Főoldali ellenőrzés: vendég, partner és admin által látott állapot; navigáció, keresés, banner, kategória, termékadatlap, kosár, kedvenc, partnerregisztráció és ajánlatlink végigkattintása; valódi rendelést nem indítva.
+
+### M22 kiadási kapuk
+
+- [ ] M22.K1 A céltesztek, teljes PHPUnit, Vite build, PHP lint, Blade/route cache és diff-check sikeres; ár-, jogosultság-, kosár- és bannerregresszió nincs.
+- [ ] M22.K2 A főoldali adatforrások, médiafájlok, cache, rollback és tartalmi hiányállapotok dokumentálva; nincs új kötelező környezeti változó.
+- [ ] M22.K3 Csak a főoldalhoz tartozó Blade, komponens, CSS/JS, teszt és checklist fájlok kerülnek a commitba; a referencia ZIP és `.codex-inspect` kimarad.
+- [ ] M22.K4 Önálló commit, `develop` push és a meglévő verify/deploy workflow sikeres; külön deploykapcsoló vagy új stagingtitok nem készül.
+- [ ] M22.K5 Stagingen 390/768/1440 px vizuális összevetés, vendég/partner navigáció, konzol, accessibility-fa, képek, kereső és kosár-visszajelzés ellenőrzött; nincs nyitott blokkoló hiba.
+- [ ] M22.K6 A checklistben a tényleges SHA, workflow, staging URL, mért eredmények, ismert tartalmi korlátok és következő pont rögzítve.
+
 ## Oldalak és vizuális elfogadás nyilvántartása
 
 A route-ok a ZIP-ből származó referenciaútvonalak, nem kötelező Laravel URL-ek. Minden csoport mellé a megvalósításkor rögzítendő a végleges route, referencia/Laravel képpár és ellenőrzés dátuma. A csoport csak az összes felsorolt nézet ellenőrzése után pipálható.
 
-- [ ] V01 Főoldal `/`, fejléc/footer, hero, kategóriák és terméksávok; M08/M14.
+- [ ] V01 Főoldal `/`, fejléc/footer, hero, előnysáv, kategóriák, kiemelt/új termékek, partner CTA és segítségblokk; M08/M14/M22.
 - [ ] V02 `/termekek`: keresés/szűrés/rács/lista; `/termekek/[slug]`: adatlap és dokumentum; M08.
 - [ ] V03 `/gyorsrendeles`, `/kosar` üres/feltöltött, `/penztar` és ellenőrzés, `/siker`; M08/M09.
 - [ ] V04 `/belepes`, `/regisztracio`, `/jelszo`, visszajelzések és jóváhagyásra váró állapot; M10.
