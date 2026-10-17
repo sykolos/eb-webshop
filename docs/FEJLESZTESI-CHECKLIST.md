@@ -1,6 +1,6 @@
 # Electrobusiness fejlesztési checklist
 
-Frissítve: 2026-10-16. Ez a megvalósítás és a folytatás elsődleges, Gitben verziózandó munkalistája.
+Frissítve: 2026-10-17. Ez a megvalósítás és a folytatás elsődleges, Gitben verziózandó munkalistája.
 Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés esetén a frissebb felhasználói döntés és ez a checklist irányadó.
 
 ## Aktuális állapot és folytatás
@@ -8,14 +8,14 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 | Mező | Aktuális érték |
 | --- | --- |
 | Aktív mérföldkő | M22: V6 főoldal teljes Laravel/Blade átültetése, STAGINGEN |
-| Következő fejlesztési feladat | M22.10 képek optimalizálása és M22.14 végleges tartalmi átadás; ezt követi a partnerfiókos staging átvétel |
+| Következő fejlesztési feladat | M22.14 végleges üzleti tartalomátadás; ezt követi a partnerfiókos staging átvétel és a M22 záró QA |
 | Alkalmazásfejlesztés ebből a checklistből | M01-M20 stagingen ellenőrzött; M21 frontend-kivezetés, natív kosár/kereső/navigáció, security headerek, health endpointok, integritás- és kapacitásjelentés, valamint átadási dokumentáció elkészült; külön chat nem része a rendszernek |
-| Utolsó igazolt staging kiadás | `eac912d3c3dfa7a8d9ddc5f13291126b3253a9aa`, GitHub Actions [run 39032098085](https://github.com/sykolos/eb-webshop/actions/runs/39032098085): M22 v6 főoldal, N+1 korrekció és célteszt verify/deploy sikeres |
+| Utolsó igazolt staging kiadás | `a094171049bca622e80a967fe0a1179dbcf30c79`, GitHub Actions [run 39033613954](https://github.com/sykolos/eb-webshop/actions/runs/39033613954): publikus média `/media` útvonalra állítása, céltesztek és verify/deploy sikeres |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D11 szolgáltató; D12 későbbre halasztva |
-| Mostani változtatás | M22 v6 főoldal Laravel/Blade + v6 CSS + natív JS/Alpine alapon: régi homepage lánc kivezetve, új hero/navigáció/kategória/termék/partner/segítség blokkok, responsive menü, autocomplete, modal nélküli kosár-visszajelzés és publikus ármentesség; a kategória-ajánlás N+1 lekérése egy aggregált lekérdezésre váltott. A végleges tartalomképek, WebP/AVIF optimalizálás és partnerfiókos élő átvétel még nyitott; éles deploy nincs elindítva. |
+| Mostani változtatás | M22 v6 főoldal Laravel/Blade + v6 CSS + natív JS/Alpine alapon; a publikus storage média a hibás Apache symlink helyett Laravel `/media/{path}` útvonalon, a public disk URL-je és az érintett nézetek átvezetve. Stagingen a termékképek 200 `image/webp` válasszal betöltődnek, 8 média URL és 0 placeholder látszik; a végleges hero/banner üzleti tartalom és a partneri záró átvétel még nyitott. |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -852,7 +852,7 @@ Kiadási rekord: commit = `c824b66d570f46dce0a3f85d96e9a37ac2832e9e`; GitHub Act
 
 ## M22. V6 főoldal: vizuális és működési teljes egyezés
 
-Állapot: TERVEZETT. Függőség: M05, M08, M09, M10, M14, M19, M20 és M21 frontend-alapjai; az M21 éles adatpróba továbbra is külön üzemeltetési kapu.
+Állapot: STAGINGEN. Függőség: M05, M08, M09, M10, M14, M19, M20 és M21 frontend-alapjai; az M21 éles adatpróba továbbra is külön üzemeltetési kapu.
 Forrás: Z: `shop-experience.tsx` `HomeView` és `HomeAdditions`; L: új design, mobiloptimalizálás, úszó banner, kategóriák, top termékek és kosár-visszajelzés; K: jelenlegi Laravel/Blade, `PricingService`, `CartService`, `BannerService`, `OfferService`.
 Stagingen bemutatható eredmény: a Laravel főoldal szerkezete, tartalma, kártyái, navigációja és interakciói a v6 terv szerint működnek valódi adatforrásokkal, a partnerár és kosár üzleti szabályainak változtatása nélkül.
 
@@ -867,7 +867,7 @@ Stagingen bemutatható eredmény: a Laravel főoldal szerkezete, tartalma, kárt
 - [x] M22.07 A kiemelt termékek `RecommendedProduct` sorrendből, v6 kártyával, publikus ármentességgel, partneri `PricingService` árral, státusszal, kiszereléssel és kosárvezérlővel jelennek meg.
 - [x] M22.08 Elkészült a vendég/partner CTA és a partnerár, szállítási, szakmai segítség blokk üzleti statisztika kitalálása nélkül.
 - [x] M22.09 Az újdonságok, katalógus, GYIK/szállítási linkek és az aktív ajánlatok feltételes blokkja elkészült.
-- [ ] M22.10 A meglévő média és fallback, méretattribútumok és lazy-load elkészült; végleges képkonverzió/WebP-átadás még nyitott.
+- [x] M22.10 A meglévő média és fallback, méretattribútumok és lazy-load elkészült; a hibás `public/storage` kiszolgálás helyett a public disk `/media` útvonala működik, stagingen a kiválasztott termékképek 200 `image/webp` választ adnak, placeholder nélkül.
 - [x] M22.11 A főoldali termékadatok eager loadingot használnak, a kategóriakép-ajánlás egy aggregált lekérdezésre került, az ármentes publikus állapot és a változatlan `PricingService`/kosárfolyamat ellenőrzött.
 - [x] M22.12 Az autocomplete, linkek, gyors kosárba helyezés, mobilmenü, natív JS/Alpine és modal nélküli toast elkészült; Bootstrap/jQuery nem került vissza.
 - [x] M22.13 A főoldalról kikerült a régi `product-box`, `category-box`, homepage-scroller és Bootstrap utility használat; a 390/768/1440 px mérések nem mutattak túlcsordulást.
@@ -881,9 +881,9 @@ Stagingen bemutatható eredmény: a Laravel főoldal szerkezete, tartalma, kárt
 - [x] M22.K1 A M22 célteszt bekerült, a CI teljes PHPUnit/Vite/lint/cache/diff ellenőrzése sikeres; publikus ármentesség, partnerár és kosár regresszióját a célteszt és korábbi szerződések védik.
 - [x] M22.K2 A főoldali adatforrások, média-fallback, cache/rollback és tartalmi hiányállapotok dokumentálva; nincs új kötelező környezeti változó.
 - [x] M22.K3 Csak a főoldali Laravel/JS/CSS, M22 célteszt és checklist változott az utolsó csomagban; a referencia ZIP és `.codex-inspect` kimaradt.
-- [x] M22.K4 Önálló commit `eac912d`, `develop` push és a meglévő [39032098085](https://github.com/sykolos/eb-webshop/actions/runs/39032098085) verify/deploy sikeres; külön deploykapcsoló vagy új stagingtitok nem készült.
+- [x] M22.K4 Önálló commitok `5132a26` és `a094171`, `develop` push és a meglévő [39033613954](https://github.com/sykolos/eb-webshop/actions/runs/39033613954) verify/deploy sikeres; külön deploykapcsoló vagy új stagingtitok nem készült.
 - [ ] M22.K5 Stagingen 390/768/1440 px vizuális összevetés, vendég/partner navigáció, konzol, accessibility-fa, képek, kereső és kosár-visszajelzés ellenőrzött; nincs nyitott blokkoló hiba.
-- [x] M22.K6 A checklistben a tényleges SHA, workflow, staging URL, p95 mérés, ismert tartalmi korlátok és következő pont rögzítve.
+- [x] M22.K6 A checklistben a tényleges SHA, workflow, staging URL, p95 mérés, média-ellenőrzés, ismert tartalmi korlátok és következő pont rögzítve.
 
 ## Oldalak és vizuális elfogadás nyilvántartása
 
@@ -1360,8 +1360,18 @@ Kiadási bejegyzéshez szükséges részletek:
 - Staging QA: `https://ebtest.dekor26.hu/?qa=51b5f37`; 390/768/1440 px-en nincs vízszintes túlcsordulás, a mobilmenü megnyílik, az autocomplete 5 találatot ad és `aria-expanded=true` állapotot jelez, a konzolban nem volt error/warning. A v6 bundle ténylegesen betöltődött. Üzleti adatot nem módosítottam.
 - Deploy: az első `677af28` kihelyezését a régi `pages.home` deploy-preflight ellenőrzés állította meg; a `65a1d7d` erre célzottan javított, workflow [39031553993](https://github.com/sykolos/eb-webshop/actions/runs/39031553993) verify/deploy sikeres. Az autocomplete korrekció `51b5f37`, workflow [39031793905](https://github.com/sykolos/eb-webshop/actions/runs/39031793905) verify/deploy sikeres.
 - Mérés: a kihelyezett N+1-javítás után 20 publikus staging kérésből p95 440,3 ms, medián 366 ms, maximum 536,9 ms; ez a korábbi N+1 kiadás 507,5 ms p95 értékénél jobb, az M21 394 ms baseline-jánál mérsékelten magasabb.
-- Nyitott: M22.10 végleges képoptimalizálás/WebP-átadás, M22.14 üzleti tartalomátadás és M22.17 partnerfiókos élő staging átvétel. Kódteszt, vendég/admin ellenőrzés, autocomplete, mobilmenü és p95 mérés megvan; valódi rendelést nem indítottam.
+- Nyitott: M22.14 üzleti tartalomátadás és M22.17 partnerfiókos élő staging átvétel. Kódteszt, vendég/admin ellenőrzés, autocomplete, mobilmenü és p95 mérés megvan; valódi rendelést nem indítottam.
 - Következő: partnerfiókos staging átvétel, majd M22 K5-K6 lezárása; a végleges tartalomátadás külön üzleti inputként marad.
+
+### 2026-10-17: M22 publikus médiaútvonal stagingen ellenőrizve
+
+- Az üzleti képek a staging public diszken elérhetők voltak, de a `public/storage` Apache symlink URL-jei 404-et adtak; a Laravel `Storage::url()` most a külön `/media/{path}` útvonalat használja.
+- Elkészült a biztonságos `PublicMediaController`: csak a `public` diszkről, path traversal kizárásával és cache-elhető stream válasszal szolgál ki fájlt. A runtime képek nem kerülnek Gitbe vagy release-csomagba; a deploy továbbra is megőrzi a távoli storage-t.
+- Ellenőrzés: `PublicMediaTest`, `M22HomepageTest`, `DeploymentPackageTest` együtt 6 teszt / 41 assertion zöld; teljes helyi PHPUnit 122 tesztig futott, az egyetlen helyi eltérés az M14 GD-képgenerálási tesztje, mert a PHP CLI-ben nincs GD; a CI workflow ezt a bővítményt telepíti.
+- Deploy: `a094171049bca622e80a967fe0a1179dbcf30c79`, GitHub Actions [run 39033613954](https://github.com/sykolos/eb-webshop/actions/runs/39033613954), verify/deploy sikeres; nincs új secret vagy deploykapcsoló.
+- Staging QA: a négy ellenőrzött termékkép `200 image/webp`, a főoldalon 8 `/media/...` kép, 0 `/storage/...` hivatkozás és 0 placeholder; böngészőben minden média `complete=true`, természetes méretet adott, vízszintes túlcsordulás és error/warning konzolbejegyzés nem volt.
+- Nyitott: M22.14 végleges hero/banner és jogilag jóváhagyott üzleti tartalom; M22.17 partneri kedvenc/kosár végigpróba; éles deploy és éles adatpróba továbbra sincs.
+- Következő: M22.14 üzleti input lezárása, majd a partneri staging átvétel és a M22 záró vizuális/működési QA.
 
 ### Következő munkamenet sablonja
 
