@@ -27,10 +27,11 @@ class PagesController extends Controller
     {
         $highlighted = RecommendedProduct::query()->orderBy('sort_order')->orderBy('id')->with([
             'product' => function ($query) {
-                $query->published()->select('id', 'title', 'serial_number', 'price', 'unit_id', 'image', 'slug', 'availability_status');
+                $query->published()->select('id', 'title', 'serial_number', 'price', 'unit_id', 'category_id', 'image', 'slug', 'availability_status');
             },
             'product.product_unit:id,id,measure',
-            'product.media'
+            'product.media',
+            'product.category:id,name'
         ])->get();
 
         $recommend = new ProductRecommend();
@@ -53,7 +54,7 @@ class PagesController extends Controller
                 dd("HIBA: $i. terméknek nincs ID-je", $product->toArray());
             }
         }
-        return view('pages.home', compact('highlighted', 'latestProducts', 'topCategories', 'banners', 'activeOffers'));
+        return view('pages.home-v6', compact('highlighted', 'latestProducts', 'topCategories', 'banners', 'activeOffers'));
     }
 
     public function offers(OfferService $offers, PricingService $pricing)

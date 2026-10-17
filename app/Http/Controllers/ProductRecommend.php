@@ -63,8 +63,8 @@ class ProductRecommend extends Controller
     
     public function latestProductsRaw()
     {
-        return \App\Models\Products::published()->with(['product_unit:id,id,measure', 'media'])
-            ->select('id', 'title', 'serial_number', 'price', 'unit_id', 'image', 'slug', 'availability_status', 'created_at')
+        return \App\Models\Products::published()->with(['product_unit:id,id,measure', 'media', 'category:id,name'])
+            ->select('id', 'title', 'serial_number', 'price', 'unit_id', 'category_id', 'image', 'slug', 'availability_status', 'created_at')
             ->orderByDesc('created_at')
             ->take(10)
             ->get();
