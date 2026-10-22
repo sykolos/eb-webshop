@@ -905,7 +905,7 @@ Stagingen bemutatható eredmény: a publikus webshop, termék, keresés, kosár 
 - [x] M23.K1 Az érintett tesztek, Blade cache, Vite build, lint/diff és publikus ár-/kosárregressziók sikeresek; teljes PHPUnit: 123 teszt, 561 assertion, 2 skip. Az auth visszatérési út céltesztje: 5 teszt, 30 assertion.
 - [x] M23.K2 Nincs migráció vagy új környezeti előfeltétel; a meglévő árképzés, elérhetőség, csomagolás és kosár API változatlan.
 - [x] M23.K3 Csak a közös publikus layout, webshop/termék/kosár, auth, kapcsolat/információs nézetek, v6 assetek, célteszt és checklist kerül a kiadásba.
-- [x] M23.K4 Kódcommitok `afd0a39`, `dd10153` és `69ff777`, checklist commit `c35795d`; `develop` push és a meglévő staging workflow sikeres, Actions run `39752394330`.
+- [x] M23.K4 Kódcommitok `afd0a39`, `dd10153`, `69ff777` és `4a6e1ec`; a közös oldalhéj/listanézet kiadás `develop` ágra került, a meglévő staging workflow `39767636383` verify/deploy eredménye sikeres.
 - [ ] M23.K5 A kiadott SHA stagingen 390/768/1440 px nézetben, vendég és partneri útvonalon ellenőrzött; nincs blokkoló vizuális vagy működési hiba.
 - [x] M23.K6 A checklist aktuális állapota, tényleges SHA, workflow, staging HTTP/HTML bizonyíték és következő M23.05 feladat rögzítve; screenshotos vizuális QA külön M23.K5 alatt nyitva maradt.
 
@@ -1424,9 +1424,15 @@ Kiadási bejegyzéshez szükséges részletek:
 - Helyi ellenőrzés: `php artisan view:cache`, `npm run build`, `php artisan route:list --json`, `git diff --check` sikeres. A teljes PHPUnit ezen a gépen nem futtatható, mert a PHP CLI-ben hiányzik a `pdo_sqlite` driver; emiatt a tesztek 96 hibája környezeti `could not find driver`, nem alkalmazásassertion-hiba. A korábbi CI baseline továbbra is 123 teszt / 561 assertion / 2 skip.
 - M23.K5 staging vizuális ellenőrzés még nyitott, mert ebben a munkamenetben nem volt elérhető böngészőautomatizálás; commit és `develop` staging deploy után a partneri QA a következő kötelező lépés.
 
+### 2026-10-22: M23 közös v6 UI staging kiadás
+
+- Kiadott commit: `4a6e1ec22964a3e4e89240f520263269a0f57f21`; a `develop` push után a [39767636383](https://github.com/sykolos/eb-webshop/actions/runs/39767636383) workflow verify/deploy sikeres.
+- A master/app/shop/account/admin layoutok közös v6 shellt használnak. A webshopban a kártyás és lista nézet választható; a lista natív JS-es keresést, kategóriaszűrést, lapozást, mennyiségszámítást és meglévő kosárvégpontot használ.
+- Staging HTTP/HTML ellenőrzés: `/`, `/shop`, `/shop?view=quick`, `/contact`, `/info/szallitas`, `/login`, `/register` HTTP 200; mindenhol home-v6 fejléc, régi navbar/Bootstrap/jQuery jelölés nélkül. Vendég webshop/lista HTML-ben nincs `final_price` vagy nem nulla `data-price`; a látható „Gyorsrendelés” felirat nincs jelen. `/cart` és `/checkout` auth nélkül 302 `/login`.
+- Helyi ellenőrzés: Blade cache, Vite build, route-list és diff-check sikeres. CI verify teljes PHPUnit/build/deploy kapuja sikeres. A böngészőképes 390/768/1440 px vizuális átvétel és admin/partner bejelentkezett képernyő QA még nyitott, mert a CUA böngésző ebben a munkamenetben nem volt elérhető.
+- Következő konkrét feladat: M23.05 maradék checkout- és partnerfiók-belső komponenseinek tisztítása, majd M23.K5 képernyős staging QA.
+
 ### Következő munkamenet sablonja
-
-
 
 - Dátum / aktív mérföldkő:
 - Elkészült feladatazonosítók:
