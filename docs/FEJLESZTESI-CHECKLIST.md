@@ -10,7 +10,7 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 | Aktív mérföldkő | M23: Közös v6 publikus layout és webshop UI, STAGINGEN |
 | Következő fejlesztési feladat | M23.K5 staging vizuális ellenőrzése 390/768/1440 px-en; az auth, kapcsolat és információs aloldalak v6 átvezetése elkészült, M23.05-ben a gyorsrendelés, checkout és partnerfiók maradék belső nézetei következnek |
 | Alkalmazásfejlesztés ebből a checklistből | M01-M20 stagingen ellenőrzött; M21 frontend-kivezetés, natív kosár/kereső/navigáció, security headerek, health endpointok, integritás- és kapacitásjelentés, valamint átadási dokumentáció elkészült; külön chat nem része a rendszernek |
-| Utolsó igazolt staging kiadás | `a094171049bca622e80a967fe0a1179dbcf30c79`, GitHub Actions [run 39033613954](https://github.com/sykolos/eb-webshop/actions/runs/39033613954): publikus média `/media` útvonalra állítása, céltesztek és verify/deploy sikeres |
+| Utolsó igazolt staging kiadás | `c35795d19f95e7214113154665e9662992e6adad`, GitHub Actions [run 39751987368](https://github.com/sykolos/eb-webshop/actions/runs/39751987368): auth, kapcsolat/információs aloldal és route-javítás, verify/deploy sikeres |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
@@ -903,9 +903,9 @@ Stagingen bemutatható eredmény: a publikus webshop, termék, keresés, kosár 
 - [x] M23.K1 Az érintett tesztek, Blade cache, Vite build, lint/diff és publikus ár-/kosárregressziók sikeresek; teljes PHPUnit: 123 teszt, 561 assertion, 2 skip. Az auth visszatérési út céltesztje: 5 teszt, 30 assertion.
 - [x] M23.K2 Nincs migráció vagy új környezeti előfeltétel; a meglévő árképzés, elérhetőség, csomagolás és kosár API változatlan.
 - [x] M23.K3 Csak a közös publikus layout, webshop/termék/kosár, auth, kapcsolat/információs nézetek, v6 assetek, célteszt és checklist kerül a kiadásba.
-- [ ] M23.K4 Önálló kódcommit `afd0a39` elkészült; a develop push és a meglévő staging workflow ennek a munkamenetnek a kiadási lépése.
+- [x] M23.K4 Kódcommitok `afd0a39` és `dd10153`, checklist commit `c35795d`; `develop` push és a meglévő staging workflow sikeres, Actions run `39751987368`.
 - [ ] M23.K5 A kiadott SHA stagingen 390/768/1440 px nézetben, vendég és partneri útvonalon ellenőrzött; nincs blokkoló vizuális vagy működési hiba.
-- [ ] M23.K6 A checklist aktuális állapota, tényleges SHA, workflow, staging bizonyíték és következő M23.05 feladat rögzítve.
+- [x] M23.K6 A checklist aktuális állapota, tényleges SHA, workflow, staging HTTP/HTML bizonyíték és következő M23.05 feladat rögzítve; screenshotos vizuális QA külön M23.K5 alatt nyitva maradt.
 
 ## Oldalak és vizuális elfogadás nyilvántartása
 
@@ -1411,7 +1411,8 @@ Kiadási bejegyzéshez szükséges részletek:
 - A belépés `return_to` útvonala a kosár/termékfolyamatot támogatja, de csak helyi `/...` útvonalra enged átirányítást; külső URL-t a teszt ellenőriz.
 - Helyi ellenőrzés: `npm run build`, `php artisan view:cache`, `git diff --check`, teljes PHPUnit 123 teszt / 561 assertion / 2 skip; M10 auth célteszt 5 / 30.
 - Kódcommitok: `afd0a39` és a staging előtti route-javítás `dd10153`. Nincs migráció vagy új környezeti előfeltétel. A develop push és staging workflow a következő kiadási lépés.
-- Következő: `M23.K4` develop push és staging HTTP/HTML ellenőrzés, majd `M23.K5` vizuális ellenőrzés és a gyorsrendelés/checkout/partnerfiók maradék belső nézetei.
+- Kiadás: `c35795d19f95e7214113154665e9662992e6adad`, Actions `39751987368`, verify/deploy sikeres. Stagingen a kapcsolat, információs oldalak és auth útvonalak HTTP 200-asak; a közös home-v6 markup jelen van, a régi navbar és login-form markup nincs.
+- Következő: `M23.K5` 390/768/1440 px vizuális és partneri élő ellenőrzés, majd a gyorsrendelés/checkout/partnerfiók maradék belső nézetei.
 
 ### Következő munkamenet sablonja
 
