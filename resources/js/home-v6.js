@@ -1,6 +1,7 @@
 import Alpine from '@alpinejs/csp';
 import '../css/v6.css';
 import '../css/home-v6.css';
+import './cart';
 import './tracking';
 
 window.Alpine = Alpine;

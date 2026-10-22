@@ -1,70 +1,15 @@
-@extends('layouts.master')
-@section('title','Keresés eredmény')
+@extends('layouts.public-v6')
+@section('title', 'Keresési eredmények')
 @section('content')
-<main class="homepage">
-    
-    <section class="products">
-    <div class="container w-100">
-            <div class="row mt-5 w-100">
-              <div class="col-lg-3">
-                <div class="sidebar-item card sidebar-search-card my-3">
-                  <h4 class="card-header bg-dark text-white" id="">
-                    Keresés
-                  </h4>
-                  <div>
-                    @include('pages.components.shop.search')
-                  </div>
-                  {{-- <div id="" class="">
-                    <div class="card-body">
-                      <input type="text" class="form-control" id="">
-                    </div>
-                  </div> --}}
-                </div>
-                  <div class="sidebar-item card sidebar-category-card my-3">
-                      <h4 class="card-header bg-dark text-white" id="">
-                        Kategóriák
-                      </h4>
-                      <div id="" class="">
-                        <div class="card-body mx-3">
-                          <ul class="list-unstyled">
-                            <li><a href="{{route('orderpage')}}" class="text-dark">Összes Termék</a></li>
-                            @foreach($categories as $category)
-                              <li><a href="{{route('orderpage',['category'=>$category->name])}}" class="text-dark ">{{$category->name}}</a></li>
-                            @endforeach
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="sidebar-item card sidebar-search-card my-3">
-                      <h4 class="card-header bg-dark text-white" id="">
-                        Szűrők
-                      </h4>
-                      <div id="" class="">
-                        <div class="card-body">
-                        </div>
-                      </div>
-                    </div>
-                    
-              </div>
-        <div class="col-lg-9">
-            <header class="d-sm-flex align-items-center border-bottom mb-4 pb-3">
-              <strong class="d-block py-2 ">Keresésett termék '{{request()->input('query')}}'</strong> 
-              </strong>
-              <span class="mx-2">Összesen {{$products->count()}} találat </span>
-              <div class="ms-auto">
-              </div>
-              </header>
-                    <div class="products-row w-100">
-                        @foreach($products as $product)
-                            <x-product-box :product='$product'/>
-                        @endforeach
-                    </div>
-                       
+<section class="shop-v6-page">
+    <header class="shop-v6-intro"><div class="v6-container"><nav class="shop-v6-breadcrumbs" aria-label="Morzsamenü"><a href="{{ route('home') }}">Főoldal</a><span aria-hidden="true">/</span><span aria-current="page">Keresés</span></nav><p class="v6-eyebrow">ElectroBusiness katalógus</p><h1>Keresési eredmények</h1><p>{{ $products->total() }} találat a „{{ request('query') }}” keresésre.</p></div></header>
+    <div class="v6-container shop-v6-content">
+        @if($products->count())
+            <div class="shop-v6-product-grid">@foreach($products as $product)@include('components.home-v6.catalog-card', ['product' => $product])@endforeach</div>
+            <nav class="shop-v6-pagination" aria-label="Keresési oldalak">{{ $products->appends(request()->query())->links() }}</nav>
+        @else
+            <div class="shop-v6-empty"><span class="shop-v6-empty__mark" aria-hidden="true">?</span><h2>Nincs találat</h2><p>Próbáljon másik kifejezést vagy cikkszámot.</p><a class="v6-button v6-button--outline" href="{{ route('orderpage') }}">Vissza a webshophoz</a></div>
+        @endif
     </div>
-    </div>
-    </div>
-    
 </section>
-    
-</main>
 @endsection

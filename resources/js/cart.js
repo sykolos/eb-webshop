@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const setCount = (count) => {
-        document.querySelectorAll('.cart-badge, #cart-count').forEach((badge) => {
+        document.querySelectorAll('.cart-badge, #cart-count, [data-home-cart-count]').forEach((badge) => {
             badge.textContent = String(count);
         });
     };

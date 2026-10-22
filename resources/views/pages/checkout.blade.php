@@ -1,4 +1,4 @@
-@extends('layouts.master')
+@extends('layouts.public-v6')
 @section('title', 'Rendelés véglegesítése')
 @section('content')
 

@@ -23,7 +23,12 @@
         <div class="home-v6-actions">
             @auth
                 <a href="{{ route('account') }}" class="home-v6-account-action"><small>Partnerfiók</small><strong>Fiókom</strong></a>
-                <a href="{{ route('cart') }}" class="home-v6-cart-action"><small>Kosár</small><strong><span data-home-cart-count>{{ auth()->user()->cart?->items()->sum('quantity') ?? 0 }}</span> tétel</strong></a>
+                <a id="cart-icon-container" href="{{ route('cart') }}" class="home-v6-cart-action"
+                    data-count-url="{{ route('cart.count') }}"
+                    data-update-url="{{ route('cart.update') }}"
+                    data-remove-url="{{ route('cart.remove') }}">
+                    <small>Kosár</small><strong><span data-home-cart-count>{{ auth()->user()->cart?->items()->sum('quantity') ?? 0 }}</span> tétel</strong>
+                </a>
             @else
                 <a href="{{ route('login') }}" class="home-v6-account-action"><small>Partnerfiók</small><strong>Belépés</strong></a>
                 <a href="{{ route('register') }}" class="home-v6-cart-action"><small>Új partner</small><strong>Regisztráció</strong></a>

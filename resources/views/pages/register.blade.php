@@ -1,4 +1,4 @@
-@extends('layouts.master')
+@extends('layouts.public-v6')
 @section('title','Partnerfiók igénylése')
 @section('content')
 <section class="login-page">

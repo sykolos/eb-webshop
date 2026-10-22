@@ -1,4 +1,4 @@
-@extends('layouts.home-v6')
+@extends('layouts.public-v6')
 @section('title', 'Villamossági alapanyagok szakembereknek')
 @section('content')
 @php($hero = $banners->active('hero'))
