@@ -15,7 +15,7 @@
         <div>
             <h2>Információk</h2>
             <a href="{{ route('info', ['slug' => 'szallitas']) }}">Szállítás és fizetés</a>
-            <a href="{{ route('info', ['slug' => 'gyik']) }}">Gyakori kérdések</a>
+            <a href="{{ route('gyik') }}">Gyakori kérdések</a>
             <a href="{{ route('info', ['slug' => 'katalogus']) }}">Katalógus</a>
             <a href="{{ route('aszf') }}">ÁSZF</a>
             <a href="{{ route('adatkezelesi-nyilatkozat') }}">Adatkezelés</a>

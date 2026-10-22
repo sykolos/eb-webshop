@@ -46,7 +46,7 @@
                     </label>
                 </div>
                 <label class="auth-v6-field--full" for="message">Megjegyzés<textarea id="message" name="message" rows="3">{{ old('message') }}</textarea></label>
-                <label class="auth-v6-check auth-v6-check--top"><input type="checkbox" required> Elolvastam az <a href="{{ route('info', 'adatkezeles') }}">adatkezelési tájékoztatót</a>.</label>
+                <label class="auth-v6-check auth-v6-check--top"><input type="checkbox" required> Elolvastam az <a href="{{ route('adatkezelesi-nyilatkozat') }}">adatkezelési tájékoztatót</a>.</label>
                 <button class="v6-button v6-button--primary auth-v6-submit" type="submit">Partnerkérelem beküldése</button>
             </form>
             <p class="auth-v6-footer-link">Már van partnerfiókod? <a href="{{ route('login', $returnTo ? ['return_to' => $returnTo] : []) }}">Belépés</a></p>
