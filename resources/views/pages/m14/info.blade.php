@@ -1,4 +1,4 @@
-@extends('layouts.v6.shop')
+@extends('layouts.public-v6')
 @php
     $titles = ['szallitas' => 'Szállítás és fizetés', 'fizetes' => 'Fizetési információk', 'gyik' => 'Gyakori kérdések', 'katalogus' => 'Katalógus és dokumentumok', 'impresszum' => 'Impresszum', 'aszf' => 'Általános Szerződési Feltételek', 'adatkezeles' => 'Adatkezelési tájékoztató', 'elallas' => 'Elállás és ügyintézés'];
 @endphp

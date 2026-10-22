@@ -66,7 +66,7 @@
                         </form>
                     </div>
                 @else
-                    <div class="product-v6-gate"><h2>Partnerár és vásárlás belépés után</h2><p>A katalógus szabadon böngészhető. A személyre szabott árak és a kosár használata partnerfiókhoz kötött.</p><a class="v6-button v6-button--dark" href="{{ route('login') }}">Partner belépés</a></div>
+                    <div class="product-v6-gate"><h2>Partnerár és vásárlás belépés után</h2><p>A katalógus szabadon böngészhető. A személyre szabott árak és a kosár használata partnerfiókhoz kötött.</p><a class="v6-button v6-button--dark" href="{{ route('login', ['return_to' => request()->getRequestUri()]) }}">Partner belépés</a></div>
                 @endauth
             </div>
         </article>

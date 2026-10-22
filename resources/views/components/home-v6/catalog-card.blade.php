@@ -58,7 +58,7 @@
                     <span class="shop-v6-product-card__unavailable">Nem rendelhető</span>
                 @endif
             @else
-                <a class="v6-button v6-button--outline v6-button--small" href="{{ route('login') }}">Belépés</a>
+                <a class="v6-button v6-button--outline v6-button--small" href="{{ route('login', ['return_to' => request()->getRequestUri()]) }}">Belépés</a>
             @endauth
         </div>
     </div>

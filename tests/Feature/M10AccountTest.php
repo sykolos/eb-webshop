@@ -63,6 +63,25 @@ class M10AccountTest extends TestCase
         $this->assertGuest();
     }
 
+    public function test_login_can_return_to_a_local_page_without_open_redirect(): void
+    {
+        $this->withoutVite();
+        $user = User::factory()->create(['account_status' => 'active']);
+
+        $this->post(route('login.submit'), [
+            'email' => $user->email,
+            'password' => 'password',
+            'return_to' => '/cart',
+        ])->assertRedirect('/cart');
+
+        $this->post(route('logout'))->assertRedirect();
+        $this->post(route('login.submit'), [
+            'email' => $user->email,
+            'password' => 'password',
+            'return_to' => 'https://example.test/cart',
+        ])->assertRedirect('/');
+    }
+
     public function test_account_addresses_have_one_default_and_are_private(): void
     {
         $owner = User::factory()->create();

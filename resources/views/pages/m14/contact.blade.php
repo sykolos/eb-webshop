@@ -1,4 +1,4 @@
-@extends('layouts.v6.shop')
+@extends('layouts.public-v6')
 @section('title', 'Kapcsolat')
 @section('content')
 <div class="v6-container v6-container--narrow v6-m14-page">

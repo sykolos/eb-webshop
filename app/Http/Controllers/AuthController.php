@@ -98,7 +98,7 @@ class AuthController extends Controller
     //login user
 
     public function postlogin(LoginRequest $request, AuditLogger $audit){
-        $details = $request->validated();
+        $details = $request->safe()->only(['email', 'password']);
         //login
         // login "remember me" opcióval
         $remember = $request->has('remember');
@@ -128,6 +128,11 @@ class AuthController extends Controller
                 $request->session()->forget(config('two_factor.verified_session_key'));
 
                 return redirect()->route('admin.2fa.challenge');
+            }
+
+            $returnTo = $request->input('return_to');
+            if (is_string($returnTo) && str_starts_with($returnTo, '/') && !str_starts_with($returnTo, '//')) {
+                return redirect($returnTo);
             }
 
             return redirect()->intended('/');
