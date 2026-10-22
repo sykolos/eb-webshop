@@ -32,6 +32,7 @@
             @endif
             <form class="auth-v6-form auth-v6-form--registration" action="{{ route('register.submit') }}" method="post">
                 @csrf
+                @if($returnTo)<input type="hidden" name="return_to" value="{{ $returnTo }}">@endif
                 <div class="auth-v6-form-grid">
                     <label for="name">Kapcsolattartó neve<input type="text" id="name" name="name" value="{{ old('name') }}" autocomplete="name" required></label>
                     <label for="email">E-mail-cím<input type="email" id="email" name="email" value="{{ old('email') }}" autocomplete="email" required></label>

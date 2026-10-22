@@ -31,7 +31,8 @@ class M10AccountTest extends TestCase
             'vatnumber' => '12345678-1-42',
             'password' => 'strong-password',
             'password_confirmation' => 'strong-password',
-        ])->assertRedirect(route('login'));
+            'return_to' => '/cart',
+        ])->assertRedirect(route('login', ['return_to' => '/cart']));
 
         $user = User::where('email', $email)->firstOrFail();
         $this->assertSame('pending', $user->account_status);

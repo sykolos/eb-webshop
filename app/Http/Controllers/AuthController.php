@@ -80,7 +80,13 @@ class AuthController extends Controller
             ]);
         });
 
-        return redirect()->route('login')->with('status', 'A partnerkérelmed beérkezett. Jóváhagyás után emailben vagy a megadott adatokkal tudsz belépni.');
+        $loginParameters = [];
+        $returnTo = $request->input('return_to');
+        if (is_string($returnTo) && str_starts_with($returnTo, '/') && !str_starts_with($returnTo, '//')) {
+            $loginParameters['return_to'] = $returnTo;
+        }
+
+        return redirect()->route('login', $loginParameters)->with('status', 'A partnerkérelmed beérkezett. Jóváhagyás után emailben vagy a megadott adatokkal tudsz belépni.');
     }
     //logout
     public function postlogout(Request $request, AuditLogger $audit){
