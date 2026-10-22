@@ -7,8 +7,8 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 
 | Mező | Aktuális érték |
 | --- | --- |
-| Aktív mérföldkő | M23: Közös v6 publikus layout és webshop UI, KIADÁSRA KÉSZ |
-| Következő fejlesztési feladat | M23 staging ellenőrzése 390/768/1440 px-en; ezután M23.05 a gyorsrendelés, checkout, belépés, regisztráció és partnerfiók belső felületeinek teljes v6 átvezetése |
+| Aktív mérföldkő | M23: Közös v6 publikus layout és webshop UI, STAGINGEN |
+| Következő fejlesztési feladat | M23.K5 staging vizuális ellenőrzése 390/768/1440 px-en; ezután M23.05 a gyorsrendelés, checkout, belépés, regisztráció és partnerfiók belső felületeinek teljes v6 átvezetése |
 | Alkalmazásfejlesztés ebből a checklistből | M01-M20 stagingen ellenőrzött; M21 frontend-kivezetés, natív kosár/kereső/navigáció, security headerek, health endpointok, integritás- és kapacitásjelentés, valamint átadási dokumentáció elkészült; külön chat nem része a rendszernek |
 | Utolsó igazolt staging kiadás | `a094171049bca622e80a967fe0a1179dbcf30c79`, GitHub Actions [run 39033613954](https://github.com/sykolos/eb-webshop/actions/runs/39033613954): publikus média `/media` útvonalra állítása, céltesztek és verify/deploy sikeres |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
@@ -903,7 +903,7 @@ Stagingen bemutatható eredmény: a publikus webshop, termék, keresés, kosár 
 - [x] M23.K1 Az érintett tesztek, Blade cache, Vite build, lint/diff és publikus ár-/kosárregressziók sikeresek; teljes PHPUnit: 122 teszt, 556 assertion, 2 skip.
 - [x] M23.K2 Nincs migráció vagy új környezeti előfeltétel; a meglévő árképzés, elérhetőség, csomagolás és kosár API változatlan.
 - [x] M23.K3 Csak a közös publikus layout, webshop/termék/kosár nézetek, v6 assetek és checklist kerül a kiadásba.
-- [ ] M23.K4 Önálló commit, `develop` push és a meglévő staging workflow sikeres.
+- [x] M23.K4 Önálló commit `1683b5e`, `develop` push és a meglévő staging workflow sikeres; Actions run `39743208060`.
 - [ ] M23.K5 A kiadott SHA stagingen 390/768/1440 px nézetben, vendég és partneri útvonalon ellenőrzött; nincs blokkoló vizuális vagy működési hiba.
 - [ ] M23.K6 A checklist aktuális állapota, tényleges SHA, workflow, staging bizonyíték és következő M23.05 feladat rögzítve.
 
@@ -977,14 +977,15 @@ Kiadási bejegyzéshez szükséges részletek:
 
 ## Folytatási napló
 
-### 2026-10-22: M23 közös publikus layout és webshop UI helyi kiadásra kész
+### 2026-10-22: M23 közös publikus layout és webshop UI stagingen
 
 - Elkészült a `public-v6` közös publikus layout; a főoldal, webshop, termék, keresés, kosár, belépés, regisztráció és checkout ugyanazt a főoldali v6 fejlécet, keresőt, navigációt és láblécet használja.
 - A katalógus régi Bootstrap-rácsa és `product-box` kártyája helyett v6 szűrőpanel, kategóriafa, rendezés, lapozás és új partnerár-/elérhetőség-/kosárkártya készült. A termékoldal és kosár új v6 nézetet kapott; az árképzés, kiszerelés, elérhetőség és meglévő végpontok változatlanok.
 - A közös home JavaScript a meglévő kosár AJAX-frissítő modult is betölti; a v6 fejléc kosárszámlálója mennyiségmódosítás és törlés után is frissül.
 - Ellenőrzés: `npm run build` sikeres; `php artisan view:cache` sikeres; `git diff --check` sikeres; teljes PHPUnit explicit helyi GD/SQLite bővítménnyel: 122 teszt, 556 assertion, 2 skip, OK. Az első PHP-utólagos futás GD nélkül csak környezeti hibával állt meg, a GD betöltésével zöld lett.
-- Nincs migráció, új környezeti változó, árképzési vagy adatmodell-változás. A staging push és a 390/768/1440 px böngészős ellenőrzés még hátravan.
-- Következő: M23.K4 develop push/staging deploy, majd M23.K5 staging vizuális és partneri ellenőrzés; utána M23.05 a gyorsrendelés, checkout, belépés, regisztráció és partnerfiók belső Bootstrap-maradványainak v6 átvezetése.
+- Nincs migráció, új környezeti változó, árképzési vagy adatmodell-változás. `develop` push és staging deploy sikeres: commit `1683b5e`, Actions run `39743208060`.
+- Staging HTTP/HTML ellenőrzés: `/`, `/shop`, `/products/299`, `/cart`, `/login`, `/register`, `/checkout` mind HTTP 200; a webshopban 12 `shop-v6-product-card`, 0 régi `product-box`, az új home-v6 CSS asset 200 és a publikus médiaútvonalak működnek. A CUA böngészőfelület ebben a futásban nem volt elérhető, ezért a 390/768/1440 screenshot- és partneri élő kosárpróba nyitva maradt.
+- Következő: M23.K5 staging vizuális és partneri ellenőrzés; utána M23.05 a gyorsrendelés, checkout, belépés, regisztráció és partnerfiók belső Bootstrap-maradványainak v6 átvezetése.
 
 ### 2026-10-13: checklist létrehozása
 
