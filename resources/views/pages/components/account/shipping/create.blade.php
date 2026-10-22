@@ -1,15 +1,15 @@
 @extends('pages.account')
 @section('title','Új szállítási cím hozzáadása')
 @section('content')
-<div class="accounts-page">
-    <div class="container-fluid">
+<div class="accounts-page account-v6-content">
+    <div class="v6-container">
         <div class="row">
             <div class="col-lg-3 col-md-4 col-sm-12">
                 @include('pages.components.account.header')
             </div>
             <div class="col-lg-9 col-md-8 col-sm-12">
-                <section class="account-modify-box">
-                    <p class="account-modify-box-title">Új szállítási cím</p>
+                <section class="account-modify-box account-v6-panel">
+                    <div class="account-v6-heading"><span class="v6-eyebrow">Partnerfiók</span><h1>Új szállítási cím</h1><p>A rendeléshez használható átvételi címet itt adhatod hozzá.</p></div>
 
                     <form action="{{ route('shipping.store') }}" method="POST">
                         @csrf
@@ -97,8 +97,8 @@
                         </div>
 
                         <div class="form-group mt-3">
-                            <button type="submit" class="btn btn-primary bg-gradient mt-3">Mentés</button>
-                            <a href="{{ route('account.modify') }}" class="btn btn-outline-secondary">Mégse</a>
+                            <button type="submit" class="v6-button v6-button--primary">Mentés</button>
+                            <a href="{{ route('account.modify') }}" class="v6-button v6-button--outline">Mégse</a>
 
                         </div>
                     </form>

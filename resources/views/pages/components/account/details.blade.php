@@ -3,15 +3,16 @@
 @extends('pages.account')
 @section('title','Rendelések')
 @section('content')
-<div class="accounts-page bg-light">
-    <div class="container-fluid">
+<div class="accounts-page account-v6-content">
+    <div class="v6-container">
         <div class="row">
             <div class="col-lg-3 col-md-4 col-sm-12">
                 @include('pages.components.account.header')
             </div>
             <div class="col-lg-9 col-md-8 col-sm-12">
-                <section class="order-details-box">    
-                    <table class="table tablestripped my-5">
+                <section class="order-details-box account-v6-panel">
+                    <div class="account-v6-heading"><span class="v6-eyebrow">Partnerfiók / Rendelések</span><h1>Rendelés részletei</h1><p>{{ $order->displayNumber() }}</p></div>
+                    <table class="account-v6-table">
                         <tbody>
                             <tr>
                                 <td>Státusz</td>
@@ -64,16 +65,16 @@
                         </tbody>
                     </table>
 
-                    <h3 class="order-details-box-title text-center mt-3 pt-2">
+                    <h2 class="order-details-box-title">
                         Rendelt Termékek
-                    </h3>
+                    </h2>
                     <br>
-                    <a href="{{route('account.getpdf',$id)}}" class="btn btn-primary">Pdf letöltése</a>
+                    <a href="{{route('account.getpdf',$id)}}" class="v6-button v6-button--primary">PDF letöltése</a>
 
                     <br><br>
                     <div class="d-none d-md-block">
                         <div class="table-responsive">
-                            <table class="table w-100">
+                            <table class="account-v6-table">
                         <thead>
                             <th>Termék neve</th>
                             <th>Mennyiség</th>
@@ -103,7 +104,7 @@
                         <div class="row">
                             @foreach ($order->items as $item)
                                 <div class="col-md-6 col-lg-4 mb-4">
-                                    <div class="product-card border rounded p-3 bg-white shadow-sm h-100">
+                                    <div class="account-v6-data-card">
                                         <p><strong>Termék:</strong> {{ $item->product_title ?: ($item->product?->title ?: 'Történeti termék') }}</p>
                                         <p><strong>Mennyiség:</strong> {{ $item->quantity }} {{ $item->unit_measure ?: ($item->product?->product_unit?->measure ?: 'db') }}</p>
                                         @unless($order->is_direct_shipping)

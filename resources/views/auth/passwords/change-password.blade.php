@@ -1,58 +1,10 @@
 @extends('layouts.master')
-@section('title','Jelszó cseréje')
+@section('title', 'Jelszó cseréje')
 @section('content')
-<div class="info-page py-5">
-    <div class="container ">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card border-0 ">
-                    <div class="card-header bg-dark text-white">{{ __('Jelszó csere') }}</div>
-
-                    <form action="{{ route('update-password') }}" method="POST">
-                        @csrf
-                        <div class="card-body">
-                            @if (session('status'))
-                                <div class="alert alert-success" role="alert">
-                                    {{ session('status') }}
-                                </div>
-                            @elseif (session('error'))
-                                <div class="alert alert-danger" role="alert">
-                                    {{ session('error') }}
-                                </div>
-                            @endif
-
-                            <div class="mb-3">
-                                <label for="oldPasswordInput" class="form-label">Régi jelszó</label>
-                                <input name="old_password" type="password" class="form-control @error('old_password') is-invalid @enderror" id="oldPasswordInput"
-                                    placeholder="Régi jelszó">
-                                @error('old_password')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
-                            <div class="mb-3">
-                                <label for="newPasswordInput" class="form-label">Új jelszó</label>
-                                <input name="new_password" type="password" class="form-control @error('new_password') is-invalid @enderror" id="newPasswordInput"
-                                    placeholder="Új jelszó ">
-                                @error('new_password')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
-                            <div class="mb-3">
-                                <label for="confirmNewPasswordInput" class="form-label">Új jelszó mégegyszer</label>
-                                <input name="new_password_confirmation" type="password" class="form-control" id="confirmNewPasswordInput"
-                                    placeholder="Új jelszó mégegyszer">
-                            </div>
-
-                        </div>
-
-                        <div class="card-footer bg-white text-center">
-                            <button class="btn btn-primary">Csere</button>
-                        </div>
-
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<section class="auth-v6-page"><div class="v6-container v6-container--narrow"><div class="auth-v6-panel auth-v6-panel--single">
+    <div class="auth-v6-heading"><span class="v6-eyebrow">Partnerfiók</span><h1>Jelszó cseréje</h1><p>A fiókod biztonsága érdekében használj egyedi, erős jelszót.</p></div>
+    @if(session('status'))<div class="auth-v6-message auth-v6-message--success" role="status">{{ session('status') }}</div>@elseif(session('error'))<div class="auth-v6-message" role="alert">{{ session('error') }}</div>@endif
+    @if($errors->any())<div class="auth-v6-message" role="alert"><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
+    <form class="auth-v6-form" action="{{ route('update-password') }}" method="POST">@csrf<label for="oldPasswordInput">Régi jelszó<input name="old_password" type="password" id="oldPasswordInput" required autocomplete="current-password"></label><label for="newPasswordInput">Új jelszó<input name="new_password" type="password" id="newPasswordInput" required autocomplete="new-password"></label><label for="confirmNewPasswordInput">Új jelszó még egyszer<input name="new_password_confirmation" type="password" id="confirmNewPasswordInput" required autocomplete="new-password"></label><button type="submit" class="v6-button v6-button--primary auth-v6-submit">Jelszó mentése</button></form>
+</div></div></section>
 @endsection

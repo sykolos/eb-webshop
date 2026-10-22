@@ -4,8 +4,8 @@
 @section('title','Adatok szerkesztése')
 @section('content')
 
-<div class="accounts-page">
-    <div class="container-fluid">
+<div class="accounts-page account-v6-content">
+    <div class="v6-container">
         <div class="row">
             <div class="col-lg-3 col-md-4 col-sm-12">
                 @include('pages.components.account.header')
@@ -18,13 +18,12 @@
                     </div>
                 @endif
 
-                <section class="account-modify-box">
-                    <p class="section-header">
-                        Felhasználó adatok módosítása
+                <section class="account-modify-box account-v6-panel">
+                    <div class="account-v6-heading"><span class="v6-eyebrow">Partnerfiók</span><h1>Felhasználói adatok módosítása</h1>
                         @if($errors->any())
-                            {!! implode('', $errors->all('<div>:message</div>')) !!}
+                            <div class="auth-v6-message" role="alert"><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>
                         @endif
-                    </p>
+                    </div>
 
                     <form action="{{ route('account.edit') }}" method="post" enctype="multipart/form-data">
                         @csrf
@@ -200,7 +199,7 @@
                         </div>
 
                         <div class="form-group text-center">
-                            <button id="update_btn" type="submit" class="btn btn-primary bg-gradient mt-3">Módosítás</button>
+                            <button id="update_btn" type="submit" class="v6-button v6-button--primary">Módosítás</button>
                         </div>
                     </form>
                     {{-- Kívül a fő formon, hogy ne rontsa meg a DOM-ot --}}

@@ -1,8 +1,8 @@
 @extends('pages.account')
 @section('title','Felhasználói adatok')
 @section('content')
-<div class="accounts-page bg-light py-4"> 
-    <div class="container-fluid">
+<div class="accounts-page account-v6-content">
+    <div class="v6-container">
         <div class="row justify-content-center">
             {{-- Bal oldali menü --}}
             <div class="col-12 col-md-4 col-lg-3 mb-4">
@@ -11,7 +11,7 @@
 
             {{-- Jobb oldali fő doboz --}}
             <div class="col-lg-9 col-md-8">
-                <div class="bg-white rounded shadow-sm p-4">
+                <div class="account-v6-panel">
                     <div class="d-flex justify-content-between align-items-center mb-4 pt-3">
                         <h2 class="section-header m-0">Felhasználó adatok</h2>                        
                     </div>
@@ -19,9 +19,9 @@
                     <div class="row gy-4">
                         {{-- Számlázási adatok --}}
                         <div class="col-12 col-md-6">
-                            <div class="border rounded p-3 bg-light">
+                            <div class="account-v6-subpanel">
                                 <h6 class="text-muted mb-3">📄 Számlázási adatok</h6>
-                                <div class="border rounded p-3 mb-3 bg-white position-relative">
+                                <div class="account-v6-data-card">
                                     <p><strong>Cégnév:</strong> {{ auth()->user()->user_invoice->company_name ?? '-' }}</p>
                                     <p><strong>Ország:</strong> {{ auth()->user()->user_invoice->country ?? '-' }}</p>
                                     <p><strong>Megye:</strong> {{ auth()->user()->user_invoice->state ?? '-' }}</p>
@@ -39,7 +39,7 @@
 
                         {{-- Kiszállítási adatok --}}
                     <div class="col-12 col-md-6">
-                        <div class="border rounded p-3 bg-light">
+                        <div class="account-v6-subpanel">
                             <h6 class="text-muted mb-3">🚚 Kiszállítási címek</h6>
 
                             {{-- Select mező --}}
@@ -60,7 +60,7 @@
                             {{-- Kártyák --}}
                             @forelse(auth()->user()->user_shipping ?? collect() as $shipping)
                                 <div 
-                                    class="shipping-card border rounded p-3 mb-3 bg-white position-relative" 
+                                    class="shipping-card account-v6-data-card"
                                     id="shipping-{{ $shipping->id }}" style="{{ $loop->first ? '' : 'display: none;' }}">
                                     
 
@@ -84,12 +84,12 @@
                     </div>
                     </div>
                     <div class="text-center mt-4">
-                        <a class="btn btn-primary btn-lg px-4 me-sm-3 bg-gradient" href="{{ route('account.modify') }}">Adatok szerkesztése</a>
+                        <a class="v6-button v6-button--primary" href="{{ route('account.modify') }}">Adatok szerkesztése</a>
                     </div>
 
                     <div class="row g-3 mt-4">
                         <div class="col-lg-7">
-                            <div class="border rounded p-3">
+                            <div class="account-v6-subpanel">
                                 <div class="d-flex justify-content-between align-items-center mb-2"><h3 class="h5 mb-0">Legutóbbi rendelések</h3><a href="{{ route('account.orders') }}">Összes rendelés</a></div>
                                 @forelse($recentOrders as $order)
                                     <div class="d-flex justify-content-between border-top py-2"><span>{{ $order->displayNumber() }}</span><span>{{ $order->status }}</span></div>
@@ -97,7 +97,7 @@
                             </div>
                         </div>
                         <div class="col-lg-5">
-                            <div class="border rounded p-3"><div class="d-flex justify-content-between align-items-center mb-2"><h3 class="h5 mb-0">Kedvencek</h3><a href="{{ route('account.favorites') }}">Megnyitás</a></div><p class="mb-0">Mentett termékek: <strong>{{ $favoriteProducts->count() }}</strong></p></div>
+                            <div class="account-v6-subpanel"><div class="d-flex justify-content-between align-items-center mb-2"><h3 class="h5 mb-0">Kedvencek</h3><a href="{{ route('account.favorites') }}">Megnyitás</a></div><p class="mb-0">Mentett termékek: <strong>{{ $favoriteProducts->count() }}</strong></p></div>
                         </div>
                     </div>
                 </div> {{-- fehér doboz vége --}}
