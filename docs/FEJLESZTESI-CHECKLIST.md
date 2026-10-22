@@ -1,6 +1,6 @@
 # Electrobusiness fejlesztési checklist
 
-Frissítve: 2026-10-17. Ez a megvalósítás és a folytatás elsődleges, Gitben verziózandó munkalistája.
+Frissítve: 2026-10-22. Ez a megvalósítás és a folytatás elsődleges, Gitben verziózandó munkalistája.
 Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés esetén a frissebb felhasználói döntés és ez a checklist irányadó.
 
 ## Aktuális állapot és folytatás
@@ -8,14 +8,14 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 | Mező | Aktuális érték |
 | --- | --- |
 | Aktív mérföldkő | M23: Közös v6 publikus layout és webshop UI, STAGINGEN |
-| Következő fejlesztési feladat | M23.K5 staging vizuális ellenőrzése 390/768/1440 px-en; ezután M23.05 a gyorsrendelés, checkout, belépés, regisztráció és partnerfiók belső felületeinek teljes v6 átvezetése |
+| Következő fejlesztési feladat | M23.K5 staging vizuális ellenőrzése 390/768/1440 px-en; az auth, kapcsolat és információs aloldalak v6 átvezetése elkészült, M23.05-ben a gyorsrendelés, checkout és partnerfiók maradék belső nézetei következnek |
 | Alkalmazásfejlesztés ebből a checklistből | M01-M20 stagingen ellenőrzött; M21 frontend-kivezetés, natív kosár/kereső/navigáció, security headerek, health endpointok, integritás- és kapacitásjelentés, valamint átadási dokumentáció elkészült; külön chat nem része a rendszernek |
 | Utolsó igazolt staging kiadás | `a094171049bca622e80a967fe0a1179dbcf30c79`, GitHub Actions [run 39033613954](https://github.com/sykolos/eb-webshop/actions/runs/39033613954): publikus média `/media` útvonalra állítása, céltesztek és verify/deploy sikeres |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D11 szolgáltató; D12 későbbre halasztva |
-| Mostani változtatás | M22 v6 főoldal Laravel/Blade + v6 CSS + natív JS/Alpine alapon; a publikus storage média a hibás Apache symlink helyett Laravel `/media/{path}` útvonalon, a public disk URL-je és az érintett nézetek átvezetve. M23-ban ugyanez a publikus keret kerül a webshop, termék, keresés, kosár és checkout nézetekre; a meglévő ár-, elérhetőség-, mennyiség- és kosárlogika változatlan marad. |
+| Mostani változtatás | M22 v6 főoldal Laravel/Blade + v6 CSS + natív JS/Alpine alapon; a publikus storage média a hibás Apache symlink helyett Laravel `/media/{path}` útvonalon működik. M23-ban ugyanez a keret került a webshop, termék, keresés, kosár, kapcsolat, információs oldalak, belépés és regisztráció nézeteire; a meglévő ár-, elérhetőség-, mennyiség-, jogosultság- és kosárlogika változatlan marad. |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -895,15 +895,15 @@ Stagingen bemutatható eredmény: a publikus webshop, termék, keresés, kosár 
 - [x] M23.02 A webshop katalógus régi Bootstrap-rácsa és `product-box` megjelenítése kivezetve; új reszponzív szűrő, kategóriafa, rendezés, lapozás és partnerár-mentes vendégállapot készült.
 - [x] M23.03 Az új katalógus- és termékoldali kártya megőrzi a publikus médiafallbacket, elérhetőségi státuszt, kiszerelést, partnerárat, kedvencet és kosárba helyezést; a meglévő végpontok és `PricingService` változatlanok.
 - [x] M23.04 A kosár új v6 táblás megjelenítést kapott; mennyiségmódosítás, törlés, nettó összeg és elérhetetlenségi figyelmeztetés a meglévő AJAX végpontokon maradt, a fejléc kosárszámlálója frissül.
-- [ ] M23.05 A gyorsrendelés, checkout, belépés, regisztráció és partnerfiók tartalmi felületeinek teljes v6 komponens-átvezetése; az új közös keret már él, a régi belső Bootstrap-osztályok maradékai még eltávolítandók.
+- [ ] M23.05 A gyorsrendelés, checkout, belépés, regisztráció, kapcsolat/információs oldalak és partnerfiók tartalmi felületeinek teljes v6 komponens-átvezetése; a belépés, regisztráció, kapcsolat és információs oldalak elkészültek, a gyorsrendelés, checkout és partnerfiók maradék belső Bootstrap-osztályai még eltávolítandók.
 - [ ] M23.06 A publikus oldalak 390/768/1440 px vizuális staging-összevetése és partneri kosár/checkout végigpróba; képek, konzol, fókusz, hosszú terméknevek és ármentes vendég HTML ellenőrzése.
 
 ### M23 kiadási kapuk
 
-- [x] M23.K1 Az érintett tesztek, Blade cache, Vite build, lint/diff és publikus ár-/kosárregressziók sikeresek; teljes PHPUnit: 122 teszt, 556 assertion, 2 skip.
+- [x] M23.K1 Az érintett tesztek, Blade cache, Vite build, lint/diff és publikus ár-/kosárregressziók sikeresek; teljes PHPUnit: 123 teszt, 561 assertion, 2 skip. Az auth visszatérési út céltesztje: 5 teszt, 30 assertion.
 - [x] M23.K2 Nincs migráció vagy új környezeti előfeltétel; a meglévő árképzés, elérhetőség, csomagolás és kosár API változatlan.
-- [x] M23.K3 Csak a közös publikus layout, webshop/termék/kosár nézetek, v6 assetek és checklist kerül a kiadásba.
-- [x] M23.K4 Önálló commit `1683b5e`, `develop` push és a meglévő staging workflow sikeres; Actions run `39743208060`.
+- [x] M23.K3 Csak a közös publikus layout, webshop/termék/kosár, auth, kapcsolat/információs nézetek, v6 assetek, célteszt és checklist kerül a kiadásba.
+- [ ] M23.K4 Önálló kódcommit `afd0a39` elkészült; a develop push és a meglévő staging workflow ennek a munkamenetnek a kiadási lépése.
 - [ ] M23.K5 A kiadott SHA stagingen 390/768/1440 px nézetben, vendég és partneri útvonalon ellenőrzött; nincs blokkoló vizuális vagy működési hiba.
 - [ ] M23.K6 A checklist aktuális állapota, tényleges SHA, workflow, staging bizonyíték és következő M23.05 feladat rögzítve.
 
@@ -1405,7 +1405,17 @@ Kiadási bejegyzéshez szükséges részletek:
 - Nyitott: M22.14 végleges hero/banner és jogilag jóváhagyott üzleti tartalom; M22.17 partneri kedvenc/kosár végigpróba; éles deploy és éles adatpróba továbbra sincs.
 - Következő: M22.14 üzleti input lezárása, majd a partneri staging átvétel és a M22 záró vizuális/működési QA.
 
+### 2026-10-22: M23 auth és információs aloldalak v6 átvezetése
+
+- A kapcsolat és információs oldalak a `public-v6` főoldali fejlécet, navigációt és láblécet használják. A ZIP szerinti kétoszlopos partner-belépés/regisztráció elkészült valódi Laravel formokkal, CSRF-fel, hibajelzésekkel, jelszómutatóval és partnerkérelem-mezőkkel.
+- A belépés `return_to` útvonala a kosár/termékfolyamatot támogatja, de csak helyi `/...` útvonalra enged átirányítást; külső URL-t a teszt ellenőriz.
+- Helyi ellenőrzés: `npm run build`, `php artisan view:cache`, `git diff --check`, teljes PHPUnit 123 teszt / 561 assertion / 2 skip; M10 auth célteszt 5 / 30.
+- Kódcommit: `afd0a39`. Nincs migráció vagy új környezeti előfeltétel. A develop push és staging workflow a következő kiadási lépés.
+- Következő: `M23.K4` develop push és staging HTTP/HTML ellenőrzés, majd `M23.K5` vizuális ellenőrzés és a gyorsrendelés/checkout/partnerfiók maradék belső nézetei.
+
 ### Következő munkamenet sablonja
+
+
 
 - Dátum / aktív mérföldkő:
 - Elkészült feladatazonosítók:
