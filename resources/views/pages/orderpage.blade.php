@@ -23,7 +23,7 @@
                     <h1>{{ $activeCategory?->name ?? (request('search') ? 'Keresési eredmények' : 'Termékek') }}</h1>
                     <p>Keressen cikkszám vagy terméknév alapján, és lássa egy helyen a partnerárat, a kiszerelést és az aktuális elérhetőséget.</p>
                 </div>
-                <a class="v6-button v6-button--outline" href="{{ route('quickorder') }}">Gyorsrendelés</a>
+                <div class="shop-v6-view-note">Kétféle terméknézet közül választhat</div>
             </div>
         </div>
     </header>
@@ -41,8 +41,8 @@
                         @endforeach
                     @else<input type="hidden" name="{{ $key }}" value="{{ $value }}">@endif
                 @endforeach
-                <button type="submit" name="view" value="normal" class="{{ $viewMode === 'quick' ? '' : 'is-active' }}">Katalógus</button>
-                <button type="submit" name="view" value="quick" class="{{ $viewMode === 'quick' ? 'is-active' : '' }}">Gyorsnézet</button>
+                <button type="submit" name="view" value="normal" class="{{ $viewMode === 'quick' ? '' : 'is-active' }}">Kártyás nézet</button>
+                    <button type="submit" name="view" value="quick" class="{{ $viewMode === 'quick' ? 'is-active' : '' }}">Lista nézet</button>
             </form>
         </div>
 

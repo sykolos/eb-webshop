@@ -12,7 +12,7 @@
 <body class="home-v6-body">
     <a class="v6-skip-link" href="#main-content">Ugrás a tartalomhoz</a>
     @include('components.home-v6.header', ['headerCategories' => $topCategories ?? collect()])
-    <main id="main-content">@yield('content')</main>
+    <main id="main-content" class="legacy-v6-page">@yield('content')</main>
     @include('components.home-v6.footer')
     @include('components.consent')
     <button class="eb-consent-settings" type="button" data-consent-settings>Cookie beállítások</button>

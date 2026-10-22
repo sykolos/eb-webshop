@@ -342,6 +342,34 @@ body.v6-body a { color: inherit; }
 .v6-empty { display: grid; gap: 6px; padding: 30px; text-align: center; color: var(--eb-muted); }
 .v6-empty strong { color: var(--eb-ink); }
 
+/* Legacy admin screens share the v6 shell while their forms are migrated. */
+.v6-admin-main > .container, .v6-admin-main > .container-fluid { width: 100%; max-width: var(--eb-container); margin-inline: 0; }
+.v6-admin-main .row { display: flex; flex-wrap: wrap; gap: 18px; align-items: start; }
+.v6-admin-main [class*="col-"] { min-width: 0; flex: 1 1 280px; }
+.v6-admin-main .col-12 { flex-basis: 100%; }
+.v6-admin-main .card, .v6-admin-main .bg-white, .v6-admin-main .table-responsive, .v6-admin-main section { border: 1px solid var(--eb-line); border-radius: var(--eb-radius); background: var(--eb-white); box-shadow: 0 5px 18px rgba(20, 24, 29, .05); }
+.v6-admin-main .card, .v6-admin-main section { padding: 22px; }
+.v6-admin-main .table-responsive { overflow-x: auto; }
+.v6-admin-main .table { width: 100%; border-collapse: collapse; }
+.v6-admin-main .table th, .v6-admin-main .table td { padding: 12px; border-bottom: 1px solid var(--eb-line); text-align: left; vertical-align: middle; }
+.v6-admin-main .table th { color: var(--eb-muted); font-size: 11px; text-transform: uppercase; }
+.v6-admin-main .form-control, .v6-admin-main .form-select, .v6-admin-main input:not([type="checkbox"]):not([type="radio"]), .v6-admin-main select, .v6-admin-main textarea { width: 100%; min-height: 42px; padding: 9px 11px; border: 1px solid var(--eb-line); border-radius: 5px; background: #fff; color: var(--eb-ink); font: inherit; }
+.v6-admin-main label { display: grid; gap: 6px; color: var(--eb-ink); font-size: 13px; font-weight: 700; }
+.v6-admin-main .btn { display: inline-flex; min-height: 40px; align-items: center; justify-content: center; padding: 9px 14px; border: 1px solid var(--eb-graphite); border-radius: 5px; background: var(--eb-graphite); color: #fff; font: inherit; font-weight: 700; text-decoration: none; cursor: pointer; }
+.v6-admin-main .btn-primary { border-color: var(--eb-red); background: var(--eb-red); }
+.v6-admin-main .btn-outline-primary, .v6-admin-main .btn-outline-secondary { background: #fff; color: var(--eb-ink); }
+.v6-admin-main .btn-danger, .v6-admin-main .btn-outline-danger { border-color: #b42318; background: #fff; color: #b42318; }
+.v6-admin-main .alert { margin-bottom: 16px; padding: 12px 14px; border-left: 3px solid var(--eb-red); background: #fff6f6; }
+.v6-admin-main .d-flex { display: flex; }
+.v6-admin-main .justify-content-between { justify-content: space-between; }
+.v6-admin-main .align-items-center { align-items: center; }
+.v6-admin-main .gap-2 { gap: 8px; }
+
+@media (max-width: 640px) {
+    .v6-admin-main { padding-inline: 12px; }
+    .v6-admin-main .card, .v6-admin-main section { padding: 16px; }
+}
+
 :focus-visible { outline: 3px solid rgba(230, 0, 0, .35); outline-offset: 3px; }
 
 @media (max-width: 1024px) {

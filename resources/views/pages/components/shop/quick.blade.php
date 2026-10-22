@@ -1,39 +1,22 @@
-<section class="col-12 quick-order-page" aria-label="Gyorsrendelés">
-<div class="quick-order-intro mb-4">
-    <p class="eyebrow mb-2">Gyorsrendelés</p>
-    <h2 class="h3 mb-2">Cikkszám alapján gyorsabban</h2>
-    <p class="text-muted mb-0">Keressen egy vagy több terméket, adja meg a csomagszámot, majd tegye a kosárba.</p>
-</div>
-<div class="card quick-search-panel p-4 mb-4">
-    <div class="row g-3 align-items-end">
-        <div class="col-md-6">
-            <label for="quick-search" class="form-label fw-bold text-white">Keresés</label>
-            <input type="text" id="quick-search" class="form-control" placeholder="Pl. kábelcsatorna...">
-        </div>
-
-        <div class="col-md-6">
-            <label for="quick-category" class="form-label fw-bold text-white">Kategória</label>
-            <select id="quick-category" class="form-select">
-                <option value="">Összes kategória</option>
-                <option value="latest"> Új termékeink</option>
-                <option value="highlighted"> Kiemelt termékeink</option>
-                @foreach($categories as $cat)
-                    <option value="{{ $cat->id }}">{{ str_repeat('— ', min((int) ($cat->tree_level ?? 0), 5)) }}{{ $cat->name }}</option>
-                @endforeach
-            </select>
-        </div>
+<section class="shop-v6-list-view" aria-label="Lista nézet">
+    <div class="shop-v6-list-intro">
+        <span class="v6-eyebrow">LISTA NÉZET</span>
+        <h2>Termékek áttekinthető listában.</h2>
+        <p>Keressen cikkszám vagy terméknév alapján, adja meg a szükséges mennyiséget, és tegye a terméket közvetlenül a kosárba.</p>
     </div>
-</div>
-<div id="quick-spinner" class="text-center mt-4 d-none">
-    <div class="spinner-border text-dark" role="status">
-        <span class="visually-hidden">Betöltés...</span>
+    <div class="shop-v6-list-filters">
+        <label for="quick-search">Keresés<input type="search" id="quick-search" placeholder="Cikkszám vagy terméknév"></label>
+        <label for="quick-category">Kategória<select id="quick-category">
+            <option value="">Összes kategória</option>
+            <option value="latest">Új termékek</option>
+            <option value="highlighted">Kiemelt termékek</option>
+            @foreach($categories as $cat)<option value="{{ $cat->id }}">{{ str_repeat('— ', min((int) ($cat->tree_level ?? 0), 5)) }}{{ $cat->name }}</option>@endforeach
+        </select></label>
     </div>
-</div>
-<div id="quick-info" class="mb-3 text-muted small"></div>
-<div id="quick-cart-status" class="small text-success mb-3" role="status" aria-live="polite"></div>
-<div id="quick-products-wrapper" class="d-grid gap-3"></div>
-
-
+    <div id="quick-spinner" class="shop-v6-list-loading" hidden aria-live="polite">Terméklista betöltése…</div>
+    <div id="quick-info" class="shop-v6-list-info"></div>
+    <div id="quick-cart-status" class="shop-v6-alert" role="status" aria-live="polite" hidden></div>
+    <div id="quick-products-wrapper" class="shop-v6-list-items"></div>
 </section>
 <script>
 const quickSearch = document.getElementById('quick-search');
@@ -43,9 +26,17 @@ const quickSpinner = document.getElementById('quick-spinner');
 const quickInfo = document.getElementById('quick-info');
 const quickStatus = document.getElementById('quick-cart-status');
 const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
-
+const updateListCardPrice = (card) => {
+    const input = card?.querySelector('.quick-quantity');
+    const output = card?.querySelector('.calculated-price');
+    if (!input || !output) return;
+    const quantity = Math.max(1, Number.parseInt(input.value, 10) || 1);
+    const price = Number(card.dataset.price || 0);
+    const multiplier = Number(card.dataset.multiplier || 1);
+    output.textContent = (quantity * multiplier * price).toLocaleString('hu-HU') + ' Ft';
+};
 const loadQuickProducts = async (url = "{{ route('shop.quick.products') }}") => {
-    quickSpinner?.classList.remove('d-none');
+    quickSpinner?.removeAttribute('hidden');
     const endpoint = new URL(url, window.location.origin);
     if (endpoint.pathname.endsWith('/quick/products')) {
         endpoint.searchParams.set('search', quickSearch?.value || '');
@@ -53,49 +44,44 @@ const loadQuickProducts = async (url = "{{ route('shop.quick.products') }}") => 
     }
     try {
         const response = await fetch(endpoint, {headers: {Accept: 'application/json'}});
+        if (!response.ok) throw new Error();
         const data = await response.json();
         if (quickProducts) quickProducts.innerHTML = data.html || '';
         if (quickInfo) quickInfo.textContent = data.info || '';
+        quickProducts?.querySelectorAll('.quick-list-item').forEach(updateListCardPrice);
     } finally {
-        quickSpinner?.classList.add('d-none');
+        quickSpinner?.setAttribute('hidden', '');
     }
 };
-
 let quickTimeout;
-[quickSearch, quickCategory].forEach((field) => field?.addEventListener('input', () => {
+[quickSearch, quickCategory].forEach((field) => field?.addEventListener(field === quickCategory ? 'change' : 'input', () => {
     clearTimeout(quickTimeout);
-    quickTimeout = setTimeout(() => loadQuickProducts(), 400);
+    quickTimeout = setTimeout(() => loadQuickProducts(), 300);
 }));
-
+quickProducts?.addEventListener('input', (event) => {
+    const card = event.target.closest('.quick-list-item');
+    if (card && event.target.matches('.quick-quantity')) updateListCardPrice(card);
+});
 quickProducts?.addEventListener('click', async (event) => {
-    const pageLink = event.target.closest('.pagination a');
+    const pageLink = event.target.closest('.shop-v6-pagination a');
     const button = event.target.closest('.add-to-cart');
-    if (pageLink) {
-        event.preventDefault();
-        await loadQuickProducts(pageLink.href);
-        return;
-    }
+    if (pageLink) { event.preventDefault(); await loadQuickProducts(pageLink.href); return; }
     if (!button) return;
     event.preventDefault();
-    const card = button.closest('.card');
-    const originalText = button.innerHTML;
+    const card = button.closest('.quick-list-item');
+    const originalText = button.textContent;
     button.disabled = true;
-    button.textContent = 'Mentés...';
+    button.textContent = 'Mentés…';
     try {
-        const response = await fetch(button.dataset.url, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8', 'X-CSRF-TOKEN': csrf, Accept: 'application/json'},
-            body: new URLSearchParams({_token: csrf || '', quantity: card?.querySelector('.quick-quantity')?.value || '1'}),
-        });
+        const response = await fetch(button.dataset.url, {method: 'POST', headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8', 'X-CSRF-TOKEN': csrf, Accept: 'application/json'}, body: new URLSearchParams({_token: csrf || '', quantity: card?.querySelector('.quick-quantity')?.value || '1'})});
         if (!response.ok) throw new Error();
-        if (quickStatus) quickStatus.textContent = 'A termék a kosárba került.';
+        if (quickStatus) { quickStatus.textContent = 'A termék a kosárba került.'; quickStatus.hidden = false; }
         window.updateCartCount?.();
     } catch {
-        if (quickStatus) quickStatus.textContent = 'Hiba történt a kosárba helyezés során.';
+        if (quickStatus) { quickStatus.textContent = 'Hiba történt a kosárba helyezés során.'; quickStatus.hidden = false; }
     } finally {
-        setTimeout(() => { button.disabled = false; button.innerHTML = originalText; }, 1500);
+        window.setTimeout(() => { button.disabled = false; button.textContent = originalText; }, 1200);
     }
 });
-
 loadQuickProducts().catch(() => { if (quickInfo) quickInfo.textContent = 'A terméklista nem tölthető be.'; });
 </script>

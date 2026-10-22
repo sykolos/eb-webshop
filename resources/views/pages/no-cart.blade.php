@@ -1,16 +1,12 @@
 @extends('layouts.master')
 @section('title','Hiányzó adatok!')
 @section('content')
-
-<div class="row justify-content-center align-items-center page-header-title">
-    <div class="col-md-6 text-center mb-5">
-        <h2 class="heading-section section-header "></h2>
-    </div>
-</div>
-<section class="page-success">
-    <div class="container">
-        <h1>Kosár megtekintéséhez és rendeléshez</h1>
-        <h2>Töltsd ki az adataidat és hitelesítsd az email-címedet!</h2>
+<section class="status-v6-page">
+    <div class="v6-container v6-container--narrow">
+        <span class="v6-eyebrow">A fiók aktiválása szükséges</span>
+        <h1>Kosár és rendelés</h1>
+        <p class="status-v6-page__lead">A kosár megtekintéséhez és a rendelés leadásához töltsd ki az adataidat, majd hitelesítsd az email-címedet.</p>
+        <a href="{{ route('account') }}" class="v6-button v6-button--primary">Fiókom megnyitása</a>
     </div>
 </section>
 @endsection

@@ -1,18 +1,13 @@
 @extends('layouts.master')
 @section('title','Sikeres Rendelés!')
 @section('content')
-
-<div class="row justify-content-center align-items-center page-header-title">
-    <div class="col-md-6 text-center mb-5">
-        <h2 class="heading-section section-header ">Sikeres Rendelés!</h2>
-    </div>
-</div>
-<section class="page-success">
-    <div class="container">
-        <h1>Sikeres Rendelés</h1>
-        <h2>Rendelés azonosító: {{$order->displayNumber()}}</h2>
-        <p>A rendelésedet rögzítettük. A visszaigazolás és a rendelés részletei a fiókodban is elérhetők.</p>
-        <a href="{{ route('account.orders') }}" class="btn btn-primary">Rendeléseim</a>
+<section class="status-v6-page">
+    <div class="v6-container v6-container--narrow">
+        <span class="v6-eyebrow">Rendelés rögzítve</span>
+        <h1>Sikeres rendelés</h1>
+        <p class="status-v6-page__lead">A rendelésedet rögzítettük. A visszaigazolás és a rendelés részletei a fiókodban is elérhetők.</p>
+        <p class="status-v6-page__number">Rendelésazonosító: <strong>{{ $order->displayNumber() }}</strong></p>
+        <a href="{{ route('account.orders') }}" class="v6-button v6-button--primary">Rendeléseim</a>
     </div>
 </section>
 @endsection

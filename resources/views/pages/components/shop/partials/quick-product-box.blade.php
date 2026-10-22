@@ -1,119 +1,35 @@
-<div class="card p-3 quick-product-box">
-    <div class="row align-items-center gx-3 gy-3 quick-box-body">
-        {{-- Bal oldal: kép + infó --}}
-        <div class="col-12 col-md d-flex align-items-start gap-3 quick-main">
-            @php
-                $imagePath = $product->image;
-                $imageUrl = ($imagePath && Storage::disk('public')->exists($imagePath))
-                    ? Storage::disk('public')->url($imagePath)
-                    : null;
-                if (!$imageUrl && $product->relationLoaded('media')) {
-                    $media = $product->media->first(fn ($item) => $item->kind === 'image' && $item->is_public && Storage::disk('public')->exists($item->path));
-                    $imageUrl = $media ? Storage::disk('public')->url($media->path) : null;
-                }
-            @endphp
-
-            {{-- Kép – csak md fölött --}}
-            <div class="d-none d-sm-block flex-shrink-0" style="width: 64px;">
-                <img src="{{ $imageUrl ?: asset('img/landscape-placeholder.svg') }}"
-                     class="img-fluid rounded border"
-                     alt="{{ $product->title }}"
-                     loading="lazy">
-            </div>
-
-            {{-- Szövegblokk --}}
-            <div class="flex-grow-1" style="min-width: 0;">
-                @php
-                    $productUrl = $product->slug ? route('product.slug', $product->slug) : route('product', $product->id);
-                @endphp
-                <h5 class="mb-1" style="white-space: normal;">
-                    <a href="{{ $productUrl }}"
-                       class="text-decoration-none text-dark"
-                       style="display: inline-block; max-width: 100%; white-space: normal; word-break: break-word; overflow-wrap: break-word; hyphens: auto;"
-                       lang="hu">
-                        {{ str_replace(chr(160), ' ', $product->title) }}
-                    </a>
-                </h5>
-
-                <div class="text-muted small mb-1" style="white-space: normal; word-break: break-word;">
-                    {{ $product->description }}
-                </div>
-
-                <div class="small mb-2">
-                    <span class="availability-badge availability-{{ $product->availability_status ?? 'in_stock' }}">
-                        {{ \App\Models\Products::AVAILABILITY_STATUSES[$product->availability_status ?? 'in_stock'] ?? 'Elérhetőség egyeztetés alatt' }}
-                    </span>
-                    <span class="text-muted ms-2">Cikkszám: {{ $product->serial_number }}</span>
-                </div>
-
-                @if($product->product_unit)
-                    <div class="d-flex align-items-center gap-3 small flex-wrap">
-                        <div>
-                            <strong>Kiszerelés:</strong>
-                            {{ $product->product_unit->unit }} ({{ $product->product_unit->quantity }}{{ $product->product_unit->measure }})
-                        </div>
-                        @auth
-                            <div class="bg-light px-2 py-1 rounded border d-inline-flex align-items-center gap-1 text-danger fs-6 fw-bold unit-price-box">
-                                <i class="bi bi-tag" aria-hidden="true"></i>
-                                Egységár: <strong class="text-dark">{{ $product->pricing['final_price'] ?? $product->getPriceForUser() }} Ft</strong>
-                            </div>
-                        @else
-                            <span class="text-muted">Partnerár és vásárlás belépés után</span>
-                        @endauth
-                    </div>
-                @endif
-            </div>
-        </div>
-
-        {{-- Jobb oldal: mennyiség + gomb --}}
-        <div class="col-12 col-md-auto d-flex flex-column align-items-end align-items-md-center text-end quick-controls gap-2">
-            @auth
-                @if($product->product_unit)
-                <div class="d-flex flex-column align-items-end align-items-md-center">
-                    <div class="input-group input-group-sm" style="max-width: 150px;">
-                        <input type="number" name="quantity"
-                               class="form-control quick-quantity"
-                               min="1" value="1" required>
-                        <span class="input-group-text">
-                            x {{ $product->product_unit->quantity }}{{ $product->product_unit->measure }}
-                        </span>
-                    </div>
-                    <div class="mt-1 text-center">
-                        <span class="fw-bold text-danger calculated-price">0 Ft</span>
-                        <span class="text-muted small">+ Áfa</span>
-                    </div>
-                </div>
-                @endif
-
-                <button class="btn btn-primary btn-lg w-100 w-md-auto bg-gradient add-to-cart"
-                        data-url="{{ route('addtocart', ['id' => $product->id, 'q' => $product->product_unit->quantity ?? 1, 'm' => $product->product_unit->measure ?? 'db']) }}"
-                        data-id="{{ $product->id }}"
-                        data-q="{{ $product->product_unit->quantity ?? 1 }}"
-                        data-m="{{ $product->product_unit->measure ?? 'db' }}"
-                        @disabled(($product->availability_status ?? 'in_stock') === 'out_of_stock')>
-                    <i class="bi bi-cart-plus" aria-hidden="true"></i> Kosárba
-                </button>
-            @else
-                <a class="btn btn-outline-dark w-100" href="{{ route('login') }}">Partner belépés</a>
-            @endauth
-        </div>
+@php
+    $imagePath = $product->image;
+    $imageUrl = ($imagePath && Storage::disk('public')->exists($imagePath))
+        ? Storage::disk('public')->url($imagePath)
+        : null;
+    if (!$imageUrl && $product->relationLoaded('media')) {
+        $media = $product->media->first(fn ($item) => $item->kind === 'image' && $item->is_public && Storage::disk('public')->exists($item->path));
+        $imageUrl = $media ? Storage::disk('public')->url($media->path) : null;
+    }
+    $productUrl = $product->slug ? route('product.slug', $product->slug) : route('product', $product->id);
+    $unitPrice = auth()->check()
+        ? ($product->pricing['final_price'] ?? $product->getPriceForUser())
+        : 0;
+@endphp
+<article class="quick-list-item" data-price="{{ (float) $unitPrice }}" data-multiplier="{{ (float) ($product->product_unit->quantity ?? 1) }}">
+    <a class="quick-list-item__image" href="{{ $productUrl }}"><img src="{{ $imageUrl ?: asset('img/landscape-placeholder.svg') }}" alt="{{ $product->title }}" loading="lazy"></a>
+    <div class="quick-list-item__body">
+        <a class="quick-list-item__title" href="{{ $productUrl }}">{{ str_replace(chr(160), ' ', $product->title) }}</a>
+        <span class="quick-list-item__meta">{{ $product->serial_number }} · {{ \App\Models\Products::AVAILABILITY_STATUSES[$product->availability_status ?? 'in_stock'] ?? 'Elérhetőség egyeztetés alatt' }}</span>
+        <p>{{ \Illuminate\Support\Str::limit($product->description, 150) }}</p>
+        @if($product->product_unit)<span class="quick-list-item__unit">Kiszerelés: {{ $product->product_unit->unit }} ({{ $product->product_unit->quantity }}{{ $product->product_unit->measure }})</span>@endif
     </div>
-</div>
-
-@auth
-<script>
-document.querySelectorAll('.quick-quantity').forEach((input) => {
-    const container = input.closest('.card');
-    const priceText = container?.querySelector('.bg-light')?.textContent || '';
-    const price = Number(priceText.replace(/[^0-9]/g, '')) || 0;
-    const multiplier = {{ $product->product_unit->quantity ?? 1 }};
-    const output = container?.querySelector('.calculated-price');
-    const updatePrice = () => {
-        const quantity = Number.parseInt(input.value, 10) || 0;
-        if (output) output.textContent = `${(quantity * multiplier * price).toLocaleString('hu-HU')} Ft`;
-    };
-    updatePrice();
-    input.addEventListener('input', updatePrice);
-});
-</script>
-@endauth
+    <div class="quick-list-item__controls">
+        @auth
+            @if($product->product_unit)
+                <label for="quick-quantity-{{ $product->id }}">Mennyiség<input id="quick-quantity-{{ $product->id }}" class="quick-quantity" type="number" min="1" value="1" inputmode="numeric"></label>
+                <strong class="calculated-price">{{ number_format((float) $unitPrice * (float) ($product->product_unit->quantity ?? 1), 0, ',', ' ') }} Ft</strong>
+            @endif
+            <button class="v6-button v6-button--primary add-to-cart" type="button" data-url="{{ route('addtocart', ['id' => $product->id, 'q' => $product->product_unit->quantity ?? 1, 'm' => $product->product_unit->measure ?? 'db']) }}" @disabled(($product->availability_status ?? 'in_stock') === 'out_of_stock')>Kosárba</button>
+        @else
+            <span class="quick-list-item__guest">Partnerár és vásárlás belépés után</span>
+            <a class="v6-button v6-button--outline" href="{{ route('login', ['return_to' => request()->getRequestUri()]) }}">Belépés</a>
+        @endauth
+    </div>
+</article>

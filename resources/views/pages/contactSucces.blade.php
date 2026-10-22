@@ -1,15 +1,12 @@
 @extends('layouts.master')
 @section('title','Sikeres üzenetküldés!')
 @section('content')
-
-<div class="row justify-content-center align-items-center page-header-title">
-    <div class="col-md-6 text-center mb-5">
-        <h2 class="heading-section section-header ">Sikeres üzenetküldés!</h2>
-    </div>
-</div>
-<section class="page-success">
-    <div class="container">
-        <h2>Hamarosan felvesszük veled a kapcsolatot a megadott email címen keresztül!</h2>
+<section class="status-v6-page">
+    <div class="v6-container v6-container--narrow">
+        <span class="v6-eyebrow">Üzenet elküldve</span>
+        <h1>Köszönjük a megkeresést</h1>
+        <p class="status-v6-page__lead">Hamarosan felvesszük veled a kapcsolatot a megadott email címen keresztül.</p>
+        <a href="{{ route('home') }}" class="v6-button v6-button--primary">Vissza a főoldalra</a>
     </div>
 </section>
 @endsection

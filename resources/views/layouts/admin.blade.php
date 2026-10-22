@@ -1,42 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="hu">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title')</title>
-    <meta name= “robots” content=noindex, nofollow”>
-    {{-- <link rel="stylesheet" href="{{asset('css/admin.css')}}"> --}}
-    @vite(['resources/js/admin.js'])
+    <meta name="robots" content="noindex, nofollow">
+    <title>@yield('title', 'Adminpanel') · Electro Business</title>
+    @vite('resources/js/v6.js')
 </head>
-<body>
-    <div class="admin-wrapper">
-         <button class="burger-menu d-lg-none" id="toggle-sidebar">
-            ☰
-        </button>
-        @include('admin.partials.nav')
-        
-        <main class="admin-main bg-light">
-            @if(session('success'))
-        <div class="alert alert-success">
-            {{session('success')}}
-        </div>
-        @endif
-        @if(session('error'))
-        <div class="alert alert-success">
-            {{session('error')}}
-        </div>
-        @endif
-        @if(session('warning'))
-        <div class="alert alert-success">
-            {{session('warning')}}
-        </div>
-        @endif
+<body class="v6-body" x-data="{ sidebarOpen: false }">
+    <div class="v6-admin-shell">
+        <aside class="v6-admin-sidebar" :class="{ 'is-open': sidebarOpen }" aria-label="Admin navigáció">
+            <a class="v6-brand" href="{{ route('adminpanel') }}"><img src="{{ asset('img/logo.svg') }}" alt=""><span>ADMINPANEL</span></a>
+            <nav>
+                <a href="{{ route('adminpanel') }}">Vezérlőpult</a>
+                <a href="{{ route('adminpanel.products') }}">Termékek</a>
+                <a href="{{ route('adminpanel.categories') }}">Kategóriák</a>
+                <a href="{{ route('adminpanel.units') }}">Mennyiségi egységek</a>
+                <a href="{{ route('adminpanel.orders') }}">Rendelések</a>
+                <a href="{{ route('adminpanel.carts') }}">Kosárfigyelés</a>
+                <a href="{{ route('adminpanel.activity') }}">Aktivitás</a>
+                <a href="{{ route('adminpanel.emails') }}">Emailközpont</a>
+                <a href="{{ route('adminpanel.automations') }}">Automatizmusok</a>
+                <a href="{{ route('adminpanel.tickets') }}">Ticketek</a>
+                <a href="{{ route('adminpanel.users') }}">Felhasználók</a>
+                <a href="{{ route('adminpanel.special_prices') }}">Külön árak</a>
+                <a href="{{ route('adminpanel.exports') }}">Exportok</a>
+                <a href="{{ route('adminpanel.banners') }}">Hero és bannerek</a>
+                <a href="{{ route('adminpanel.offers') }}">Aktuális ajánlatok</a>
+            </nav>
+            <div class="v6-admin-sidebar__bottom">
+                <a href="{{ route('home') }}">Vissza a webshophoz</a>
+                <form action="{{ route('logout') }}" method="post">@csrf<button class="v6-button v6-button--outline v6-button--small" type="submit">Kijelentkezés</button></form>
+            </div>
+        </aside>
+        <main class="v6-admin-main">
+            <div class="v6-admin-topbar">
+                <div>
+                    <button class="v6-button v6-button--outline v6-admin-mobile-toggle" type="button" x-on:click="sidebarOpen = !sidebarOpen" :aria-expanded="sidebarOpen.toString()">Menü</button>
+                    <h1>@yield('heading', 'Adminpanel')</h1>
+                </div>
+                <span class="v6-status v6-status--success">Admin</span>
+            </div>
+            @foreach(['success' => 'v6-toast', 'error' => 'v6-toast v6-toast--warning', 'warning' => 'v6-toast v6-toast--warning'] as $key => $class)
+                @if(session($key))<div class="{{ $class }}" role="status">{{ session($key) }}</div>@endif
+            @endforeach
             @yield('content')
-            
         </main>
     </div>
-    <div class="sidebar-overlay d-lg-none" id="sidebarOverlay"></div>
 </body>
 </html>

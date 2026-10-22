@@ -1,40 +1,20 @@
 <!doctype html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="hu">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
-    <title>{{ config('app.name', 'Laravel') }}</title>
-
-    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    <meta name="description" content="{{ $metaDescription ?? 'Electro Business partnerfelület.' }}">
+    <title>@yield('title', 'Electro Business')</title>
+    <link rel="icon" href="{{ asset('img/logo.png') }}">
+    @vite('resources/js/home-v6.js')
 </head>
-<body class="legacy-body">
-    <div id="app">
-        <header class="legacy-header">
-            <div class="container legacy-header__inner">
-                <a class="legacy-header__brand" href="{{ url('/') }}">{{ config('app.name', 'Laravel') }}</a>
-                <nav aria-label="{{ __('Primary navigation') }}">
-                    @guest
-                        @if (Route::has('login'))
-                            <a href="{{ route('login') }}">{{ __('Login') }}</a>
-                        @endif
-                        @if (Route::has('register'))
-                            <a href="{{ route('register') }}">{{ __('Register') }}</a>
-                        @endif
-                    @else
-                        <span>{{ Auth::user()->name }}</span>
-                        <form action="{{ route('logout') }}" method="POST" class="legacy-inline-form">
-                            @csrf
-                            <button type="submit" class="btn btn-outline-secondary">{{ __('Logout') }}</button>
-                        </form>
-                    @endguest
-                </nav>
-            </div>
-        </header>
-        <main class="py-4">@yield('content')</main>
-    </div>
+<body class="home-v6-body">
+    <a class="v6-skip-link" href="#main-content">Ugrás a tartalomhoz</a>
+    @include('components.home-v6.header', ['headerCategories' => $topCategories ?? collect()])
+    <main id="main-content" class="legacy-v6-page">@yield('content')</main>
+    @include('components.home-v6.footer')
+    @include('components.consent')
+    <button class="eb-consent-settings" type="button" data-consent-settings>Cookie beállítások</button>
 </body>
 </html>

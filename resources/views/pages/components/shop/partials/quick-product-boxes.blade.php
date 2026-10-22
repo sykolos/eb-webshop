@@ -1,13 +1,11 @@
 @if($products->isEmpty())
-    <div class="alert alert-warning text-center w-100">Nincs a keresésnek megfelelő termék.</div>
+    <div class="shop-v6-empty"><h2>Nincs találat</h2><p>A keresésnek megfelelő termék nem található.</p></div>
 @else
     @foreach($products as $product)
-        <div class="mb-3">
+        <div class="quick-list-item-wrap">
             @include('pages.components.shop.partials.quick-product-box', ['product' => $product])
         </div>
     @endforeach
 
-    <div class="d-flex justify-content-center mt-4">
-                        {{ $products->appends(request()->query())->links() }}
-                    </div>
+    <nav class="shop-v6-pagination" aria-label="Lista nézet oldalai">{{ $products->appends(request()->query())->links() }}</nav>
 @endif

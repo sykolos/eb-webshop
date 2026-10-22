@@ -1,9 +1,2 @@
-@extends('layouts.master')
-@section('title','Account Page')
-@section('content')
-
-<div class="main bg-light">    
-    
-        @yield('content')
-    </div>
-@endsection
+@extends('layouts.v6.account')
+@section('title', $title ?? 'Partnerfiók')

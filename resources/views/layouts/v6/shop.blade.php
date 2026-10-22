@@ -4,15 +4,16 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="robots" content="noindex, nofollow">
+    <meta name="description" content="{{ $metaDescription ?? 'Electro Business információs oldal.' }}">
     <title>@yield('title', 'Electro Business')</title>
-    @vite('resources/js/v6.js')
+    <link rel="icon" href="{{ asset('img/logo.png') }}">
+    @vite('resources/js/home-v6.js')
 </head>
-<body class="v6-body">
+<body class="home-v6-body">
     <a class="v6-skip-link" href="#main-content">Ugrás a tartalomhoz</a>
-    @include('components.v6.header')
-    <main id="main-content">@yield('content')</main>
-    @include('components.v6.footer')
+    @include('components.home-v6.header', ['headerCategories' => $topCategories ?? collect()])
+    <main id="main-content" class="legacy-v6-page">@yield('content')</main>
+    @include('components.home-v6.footer')
     @include('components.consent')
     <button class="eb-consent-settings" type="button" data-consent-settings>Cookie beállítások</button>
 </body>

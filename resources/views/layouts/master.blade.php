@@ -1,30 +1,19 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="hu">
 <head>
-    <meta charset="UTF-8">
-    <title>@yield('title')</title>
-    <meta name="description" content="Villanyszerelési eszközök kis és nagykereskedelme." />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <link rel="icon" type="image/x-icon" href="{{asset('img/logo.png')}}">
-    <link rel="apple-touch-icon" href="{{asset('img/logo.png')}}">
-    <link rel="shortcut icon" href="{{asset('img/logo.png')}}">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    @vite('resources/js/app.js')
-
-
+    <meta name="description" content="{{ $metaDescription ?? 'Villamossági alapanyagok szakembereknek, partnerárakkal és átlátható katalógussal.' }}">
+    <title>@yield('title', 'Electro Business')</title>
+    <link rel="icon" href="{{ asset('img/logo.png') }}">
+    @vite('resources/js/home-v6.js')
 </head>
-
-
-<body>
-    @include('layouts.partials.nav')
-    
-    <main class="page bg-light">
-        @yield('content')
-    </main>
-    @include('layouts.partials.footer')
-    @stack('scripts')
+<body class="home-v6-body">
+    <a class="v6-skip-link" href="#main-content">Ugrás a tartalomhoz</a>
+    @include('components.home-v6.header', ['headerCategories' => $topCategories ?? collect()])
+    <main id="main-content" class="legacy-v6-page">@yield('content')</main>
+    @include('components.home-v6.footer')
     @include('components.consent')
     <button class="eb-consent-settings" type="button" data-consent-settings>Cookie beállítások</button>
 </body>

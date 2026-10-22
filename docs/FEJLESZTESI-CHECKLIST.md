@@ -8,14 +8,14 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 | Mező | Aktuális érték |
 | --- | --- |
 | Aktív mérföldkő | M23: Közös v6 publikus layout és webshop UI, STAGINGEN |
-| Következő fejlesztési feladat | M23.K5 staging vizuális ellenőrzése 390/768/1440 px-en; az auth, kapcsolat és információs aloldalak v6 átvezetése elkészült, M23.05-ben a gyorsrendelés, checkout és partnerfiók maradék belső nézetei következnek |
+| Következő fejlesztési feladat | M23.05 folytatása: checkout, partnerfiók és admin régi belső nézeteinek teljes v6 komponens-átvezetése, majd M23.K5 staging vizuális ellenőrzés 390/768/1440 px-en |
 | Alkalmazásfejlesztés ebből a checklistből | M01-M20 stagingen ellenőrzött; M21 frontend-kivezetés, natív kosár/kereső/navigáció, security headerek, health endpointok, integritás- és kapacitásjelentés, valamint átadási dokumentáció elkészült; külön chat nem része a rendszernek |
 | Utolsó igazolt staging kiadás | `69ff777a36a6850b4cc40e71fb725011c11e3f8e`, GitHub Actions [run 39752394330](https://github.com/sykolos/eb-webshop/actions/runs/39752394330): auth return-to javítás, kapcsolat/információs aloldalak, verify/deploy sikeres |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D11 szolgáltató; D12 későbbre halasztva |
-| Mostani változtatás | M22 v6 főoldal Laravel/Blade + v6 CSS + natív JS/Alpine alapon; a publikus storage média a hibás Apache symlink helyett Laravel `/media/{path}` útvonalon működik. M23-ban ugyanez a keret került a webshop, termék, keresés, kosár, kapcsolat, információs oldalak, belépés és regisztráció nézeteire; a meglévő ár-, elérhetőség-, mennyiség-, jogosultság- és kosárlogika változatlan marad. |
+| Mostani változtatás | M22 v6 főoldal Laravel/Blade + v6 CSS + natív JS/Alpine alapon; a publikus storage média a hibás Apache symlink helyett Laravel `/media/{path}` útvonalon működik. M23-ban ugyanez a keret került a webshop, termék, keresés, kosár, checkout, siker-, kapcsolat-, információs-, auth-, partnerfiók- és admin layoutokra; a webshop két megjelenítési módja kártyás és lista nézet, a régi „Gyorsrendelés” felirat kivezetve. A meglévő ár-, elérhetőség-, mennyiség-, jogosultság- és kosárlogika változatlan marad. |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -113,6 +113,7 @@ A „nyitott” nem engedély automatikus üzleti szabályváltoztatásra. Techn
 | D12 | Küldési szolgáltató, feliratkozások és automatizmusok | A felhasználó későbbre hagyta; az érintett M16/M17 előtt véglegesítendő | KÉSŐBB |
 | D13 | Chat elengedve, nem része a jelenlegi rendszernek | A ticketrendszer marad az ügyfélszolgálati kommunikáció felülete. Külön chat, real-time/polling, reconnect és külső provider nem készül; új igény esetén külön döntéssel vehető fel | ELENGEDVE |
 | D14 | A már működő deploy-folyamatot kell használni új előfeltételek nélkül | Felhasználó: „nem kell bevezetni uj dolgokat ... ugy ahogy mar mukodott”. Meglévő hat SSH/path titok és opcionális ENV_DEVELOP; nincs új deploykapcsoló, environment-jóváhagyás, hostkulcstitok vagy Basic-belépő. A szerverenv nem módosul. A CI, csomagellenőrzés és adatmegőrző kódmentés megmarad; az új infrastruktúra/biztonsági előfeltételek halasztottak, nem késznek jelöltek | ELDÖNTVE, korábbi M01 aktiválási feltételeket felülírja |
+| D15 | A webshopban két terméknézet marad: kártyás és lista | A korábbi gyorsrendelési felület nem külön üzleti folyamat; a lista nézet ugyanazokat a szerveroldali ár-, csomagolás-, mennyiség-, jogosultság- és kosárszabályokat használja. A „Gyorsrendelés” látható megnevezés kivezetendő, a régi `/quick-order` útvonal csak kompatibilitási átirányításként marad | ELDÖNTVE, M23 |
 
 További kötelező különbségek: a ZIP admin- és webshopadatai részben külön demótárak; az éles rendszer közös adatbázist/árszámítást használ. A termékimport eredménye a webshopban is megjelenik. A helyi képelőnézetből tényleges feltöltés lesz. A prototípus 27%-os áfája nem igazolja minden termék adóbesorolását.
 
@@ -895,7 +896,8 @@ Stagingen bemutatható eredmény: a publikus webshop, termék, keresés, kosár 
 - [x] M23.02 A webshop katalógus régi Bootstrap-rácsa és `product-box` megjelenítése kivezetve; új reszponzív szűrő, kategóriafa, rendezés, lapozás és partnerár-mentes vendégállapot készült.
 - [x] M23.03 Az új katalógus- és termékoldali kártya megőrzi a publikus médiafallbacket, elérhetőségi státuszt, kiszerelést, partnerárat, kedvencet és kosárba helyezést; a meglévő végpontok és `PricingService` változatlanok.
 - [x] M23.04 A kosár új v6 táblás megjelenítést kapott; mennyiségmódosítás, törlés, nettó összeg és elérhetetlenségi figyelmeztetés a meglévő AJAX végpontokon maradt, a fejléc kosárszámlálója frissül.
-- [ ] M23.05 A gyorsrendelés, checkout, belépés, regisztráció, kapcsolat/információs oldalak és partnerfiók tartalmi felületeinek teljes v6 komponens-átvezetése; a belépés, regisztráció, kapcsolat és információs oldalak elkészültek, a gyorsrendelés, checkout és partnerfiók maradék belső Bootstrap-osztályai még eltávolítandók.
+- [ ] M23.05 A checkout, partnerfiók és admin régi belső nézeteinek teljes v6 komponens-átvezetése; a közös v6 shell, státuszoldalak, két webshopnézet és admin kompatibilitási réteg elkészült, a régi belső markup célzott komponensekre bontása még folyamatban.
+- [x] M23.07 A webshop nézetei kártyás/lista módban működnek; a lista nézet natív JavaScriptes betöltést, keresést, kategóriaszűrést, lapozást és kosárba helyezést használ. A vendég HTML-ben nincs partnerár; a régi gyorsrendelési felirat kikerült, `/quick-order` csak kompatibilitási átirányítás.
 - [ ] M23.06 A publikus oldalak 390/768/1440 px vizuális staging-összevetése és partneri kosár/checkout végigpróba; képek, konzol, fókusz, hosszú terméknevek és ármentes vendég HTML ellenőrzése.
 
 ### M23 kiadási kapuk
@@ -1412,7 +1414,15 @@ Kiadási bejegyzéshez szükséges részletek:
 - Helyi ellenőrzés: `npm run build`, `php artisan view:cache`, `git diff --check`, teljes PHPUnit 123 teszt / 561 assertion / 2 skip; M10 auth célteszt 5 / 30.
 - Kódcommitok: `afd0a39` és a staging előtti route-javítás `dd10153`. Nincs migráció vagy új környezeti előfeltétel. A develop push és staging workflow a következő kiadási lépés.
 - Kiadás: `69ff777a36a6850b4cc40e71fb725011c11e3f8e`, Actions `39752394330`, verify/deploy sikeres. Stagingen a kapcsolat, információs oldalak és auth útvonalak HTTP 200-asak; a közös home-v6 markup jelen van, a régi navbar és login-form markup nincs.
-- Következő: `M23.K5` 390/768/1440 px vizuális és partneri élő ellenőrzés, majd a gyorsrendelés/checkout/partnerfiók maradék belső nézetei.
+- Következő: M23.05 checkout- és partnerfiók-komponensek további tisztítása, majd `M23.K5` 390/768/1440 px vizuális és partneri ellenőrzés. A lista nézet backendje és a látható elnevezésváltás elkészült; a kompatibilitási útvonal szándékosan megmaradt.
+
+### 2026-10-22: M23 közös oldalhéj és két webshopnézet folytatás
+
+- A régi master/app/shop/account és admin layoutok most a főoldali v6 fejlécet, navigációt, láblécet, v6 admin oldalsávot és közös asset bundle-t használják. A checkout, sikeroldalak és régi admin képernyők belső elemei v6 kompatibilitási stílusokat kaptak, így nem töltődnek be Bootstrap CSS/JS függőséggel.
+- A korábbi gyorsrendelési felület most a webshop lista nézete: natív JavaScriptes keresés/kategória-szűrés, lapozás, mennyiségszámítás és meglévő kosárvégpont. A vendég lista ármentes; a partnerárat kizárólag szerveroldali bejelentkezett kontextusban számolja.
+- Javítva a lista nézet Blade futási kockázata: teljes Laravel osztálynevek használata, vendég `data-price` ármentesség és az új lapozóválasztó. A régi URL és belső `view=quick` technikai kompatibilitási azonosító maradt, látható „Gyorsrendelés” szöveg nincs.
+- Helyi ellenőrzés: `php artisan view:cache`, `npm run build`, `php artisan route:list --json`, `git diff --check` sikeres. A teljes PHPUnit ezen a gépen nem futtatható, mert a PHP CLI-ben hiányzik a `pdo_sqlite` driver; emiatt a tesztek 96 hibája környezeti `could not find driver`, nem alkalmazásassertion-hiba. A korábbi CI baseline továbbra is 123 teszt / 561 assertion / 2 skip.
+- M23.K5 staging vizuális ellenőrzés még nyitott, mert ebben a munkamenetben nem volt elérhető böngészőautomatizálás; commit és `develop` staging deploy után a partneri QA a következő kötelező lépés.
 
 ### Következő munkamenet sablonja
 
