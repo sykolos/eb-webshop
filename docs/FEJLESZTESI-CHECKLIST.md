@@ -8,9 +8,9 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 | Mező | Aktuális érték |
 | --- | --- |
 | Aktív mérföldkő | M23: Közös v6 publikus layout és webshop UI, STAGINGEN |
-| Következő fejlesztési feladat | M23.05 folytatása: checkout, partnerfiók és admin régi belső nézeteinek teljes v6 komponens-átvezetése, majd M23.K5 staging vizuális ellenőrzés 390/768/1440 px-en |
+| Következő fejlesztési feladat | M23.K5 staging vizuális ellenőrzés 390/768/1440 px-en, bejelentkezett partner/admin képernyőkkel; utána M22 tartalom- és partneri QA lezárása |
 | Alkalmazásfejlesztés ebből a checklistből | M01-M20 stagingen ellenőrzött; M21 frontend-kivezetés, natív kosár/kereső/navigáció, security headerek, health endpointok, integritás- és kapacitásjelentés, valamint átadási dokumentáció elkészült; külön chat nem része a rendszernek |
-| Utolsó igazolt staging kiadás | `69ff777a36a6850b4cc40e71fb725011c11e3f8e`, GitHub Actions [run 39752394330](https://github.com/sykolos/eb-webshop/actions/runs/39752394330): auth return-to javítás, kapcsolat/információs aloldalak, verify/deploy sikeres |
+| Utolsó igazolt staging kiadás | `b8a1c2e6905ff93e1530c7d2175a46b645ebdbb4`, GitHub Actions [run 39776748202](https://github.com/sykolos/eb-webshop/actions/runs/39776748202): checkout, auth, partnerfiók és admin v6 belső UI, verify/deploy sikeres |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
@@ -896,7 +896,7 @@ Stagingen bemutatható eredmény: a publikus webshop, termék, keresés, kosár 
 - [x] M23.02 A webshop katalógus régi Bootstrap-rácsa és `product-box` megjelenítése kivezetve; új reszponzív szűrő, kategóriafa, rendezés, lapozás és partnerár-mentes vendégállapot készült.
 - [x] M23.03 Az új katalógus- és termékoldali kártya megőrzi a publikus médiafallbacket, elérhetőségi státuszt, kiszerelést, partnerárat, kedvencet és kosárba helyezést; a meglévő végpontok és `PricingService` változatlanok.
 - [x] M23.04 A kosár új v6 táblás megjelenítést kapott; mennyiségmódosítás, törlés, nettó összeg és elérhetetlenségi figyelmeztetés a meglévő AJAX végpontokon maradt, a fejléc kosárszámlálója frissül.
-- [ ] M23.05 A checkout, partnerfiók és admin régi belső nézeteinek teljes v6 komponens-átvezetése; a közös v6 shell, státuszoldalak, két webshopnézet és admin kompatibilitási réteg elkészült, a régi belső markup célzott komponensekre bontása még folyamatban.
+- [x] M23.05 A checkout, partnerfiók, auth és admin régi belső nézetei v6 panel/form/tábla/gomb rendszerre kerültek; a meglévő űrlapnevek, végpontok, árképzés, jogosultságok és kosárfolyamat változatlanok.
 - [x] M23.07 A webshop nézetei kártyás/lista módban működnek; a lista nézet natív JavaScriptes betöltést, keresést, kategóriaszűrést, lapozást és kosárba helyezést használ. A vendég HTML-ben nincs partnerár; a régi gyorsrendelési felirat kikerült, `/quick-order` csak kompatibilitási átirányítás.
 - [ ] M23.06 A publikus oldalak 390/768/1440 px vizuális staging-összevetése és partneri kosár/checkout végigpróba; képek, konzol, fókusz, hosszú terméknevek és ármentes vendég HTML ellenőrzése.
 
@@ -1430,7 +1430,15 @@ Kiadási bejegyzéshez szükséges részletek:
 - A master/app/shop/account/admin layoutok közös v6 shellt használnak. A webshopban a kártyás és lista nézet választható; a lista natív JS-es keresést, kategóriaszűrést, lapozást, mennyiségszámítást és meglévő kosárvégpontot használ.
 - Staging HTTP/HTML ellenőrzés: `/`, `/shop`, `/shop?view=quick`, `/contact`, `/info/szallitas`, `/login`, `/register` HTTP 200; mindenhol home-v6 fejléc, régi navbar/Bootstrap/jQuery jelölés nélkül. Vendég webshop/lista HTML-ben nincs `final_price` vagy nem nulla `data-price`; a látható „Gyorsrendelés” felirat nincs jelen. `/cart` és `/checkout` auth nélkül 302 `/login`.
 - Helyi ellenőrzés: Blade cache, Vite build, route-list és diff-check sikeres. CI verify teljes PHPUnit/build/deploy kapuja sikeres. A böngészőképes 390/768/1440 px vizuális átvétel és admin/partner bejelentkezett képernyő QA még nyitott, mert a CUA böngésző ebben a munkamenetben nem volt elérhető.
-- Következő konkrét feladat: M23.05 maradék checkout- és partnerfiók-belső komponenseinek tisztítása, majd M23.K5 képernyős staging QA.
+- Következő konkrét feladat: M23.K5 képernyős staging QA 390/768/1440 px-en, bejelentkezett partner/admin útvonalakkal.
+
+### 2026-10-22: M23 belső v6 nézetek staging kiadása
+
+- Elkészült a checkout, auth/jelszó/email-ellenőrzés és partnerfiók belső v6 átállása; az admin régi oldalak közös v6 kártya-, táblázat-, űrlap- és reszponzív kompatibilitási réteget kaptak.
+- Üzleti logika nem változott: a meglévő form actionök, CSRF, `return_to`, árképzés, csomagolás, elérhetőség, kosár és jogosultságok megmaradtak. Nincs migráció vagy új környezeti előfeltétel.
+- Commit: `b8a1c2e6905ff93e1530c7d2175a46b645ebdbb4`; `develop` push után a [39776748202](https://github.com/sykolos/eb-webshop/actions/runs/39776748202) workflow verify/deploy sikeres.
+- Helyi Blade cache, Vite build és diff-check sikeres; staging HTTP/HTML: publikus oldalak 200, auth oldalak v6 panellel, `/cart` és `/checkout` auth nélkül 302 `/login`, régi navbar/Bootstrap/jQuery jelölés és „Gyorsrendelés” felirat nincs.
+- Nyitott kizárólagos átvételi kapu: bejelentkezett partner/admin képernyők 390/768/1440 px vizuális ellenőrzése, mert a CUA ebben a munkamenetben nem adott böngészőt. M22.14 végleges üzleti tartalom és M22.17 partneri élő próba külön, nem technikai blokkoló.
 
 ### Következő munkamenet sablonja
 
