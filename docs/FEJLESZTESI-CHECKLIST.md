@@ -1410,7 +1410,7 @@ Kiadási bejegyzéshez szükséges részletek:
 - A kapcsolat és információs oldalak a `public-v6` főoldali fejlécet, navigációt és láblécet használják. A ZIP szerinti kétoszlopos partner-belépés/regisztráció elkészült valódi Laravel formokkal, CSRF-fel, hibajelzésekkel, jelszómutatóval és partnerkérelem-mezőkkel.
 - A belépés `return_to` útvonala a kosár/termékfolyamatot támogatja, de csak helyi `/...` útvonalra enged átirányítást; külső URL-t a teszt ellenőriz.
 - Helyi ellenőrzés: `npm run build`, `php artisan view:cache`, `git diff --check`, teljes PHPUnit 123 teszt / 561 assertion / 2 skip; M10 auth célteszt 5 / 30.
-- Kódcommit: `afd0a39`. Nincs migráció vagy új környezeti előfeltétel. A develop push és staging workflow a következő kiadási lépés.
+- Kódcommitok: `afd0a39` és a staging előtti route-javítás `dd10153`. Nincs migráció vagy új környezeti előfeltétel. A develop push és staging workflow a következő kiadási lépés.
 - Következő: `M23.K4` develop push és staging HTTP/HTML ellenőrzés, majd `M23.K5` vizuális ellenőrzés és a gyorsrendelés/checkout/partnerfiók maradék belső nézetei.
 
 ### Következő munkamenet sablonja
