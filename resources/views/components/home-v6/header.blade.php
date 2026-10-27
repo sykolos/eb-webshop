@@ -7,8 +7,6 @@
             <a href="{{ route('register') }}">Partnerprogram</a>
             @guest
                 <a href="{{ route('admin.login') }}">Admin belépés</a>
-            @else
-                @if(auth()->user()->is_admin)<a href="{{ route('adminpanel') }}">Adminpanel</a>@endif
             @endguest
         </div>
     </div>
@@ -41,6 +39,10 @@
                 @if(auth()->user()->is_admin)
                     <a href="{{ route('adminpanel') }}" class="v6-button v6-button--primary v6-button--small home-v6-admin-action">Adminpanel</a>
                 @endif
+                <form action="{{ route('logout') }}" method="post" class="home-v6-logout-form">
+                    @csrf
+                    <button type="submit" class="v6-button v6-button--outline v6-button--small">Kijelentkezés</button>
+                </form>
             @else
                 <a href="{{ route('login') }}" class="home-v6-account-action"><small>Partnerfiók</small><strong>Belépés</strong></a>
                 <a href="{{ route('register') }}" class="home-v6-cart-action"><small>Új partner</small><strong>Regisztráció</strong></a>

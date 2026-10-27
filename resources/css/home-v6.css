@@ -21,6 +21,7 @@
 .home-v6-actions > a small { color: var(--eb-muted); font-size: 11px; }
 .home-v6-actions > a strong { font-size: 13px; }
 .home-v6-admin-action { align-self: center; }
+.home-v6-logout-form { margin: 0; }
 .home-v6-cart-action strong span { display: inline-flex; min-width: 20px; justify-content: center; color: var(--eb-red); }
 .home-v6-menu-button { display: none; }
 .home-v6-nav { border-top: 1px solid #f0f2f3; }
