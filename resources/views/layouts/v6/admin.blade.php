@@ -28,7 +28,6 @@
                 <a href="{{ route('adminpanel.exports') }}">Exportok</a>
                 <a href="{{ route('adminpanel.banners') }}">Hero és bannerek</a>
                 <a href="{{ route('adminpanel.offers') }}">Aktuális ajánlatok</a>
-                <a href="{{ route('adminpanel.design-system') }}" aria-current="page">V6 komponensek</a>
             </nav>
             <div class="v6-admin-sidebar__bottom">
                 <a href="{{ route('home') }}">Vissza a webshophoz</a>

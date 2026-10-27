@@ -15,7 +15,7 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
 | Függő üzleti döntések | D04 konkrét munkakörök, D08 végleges tartalmak, D11 szolgáltató; D12 későbbre halasztva |
-| Mostani változtatás | M22 v6 főoldal Laravel/Blade + v6 CSS + natív JS/Alpine alapon; a publikus storage média a hibás Apache symlink helyett Laravel `/media/{path}` útvonalon működik. M23-ban ugyanez a keret került a webshop, termék, keresés, kosár, checkout, siker-, kapcsolat-, információs-, auth-, partnerfiók- és admin layoutokra; a webshop két megjelenítési módja kártyás és lista nézet, a régi „Gyorsrendelés” felirat kivezetve. A meglévő ár-, elérhetőség-, mennyiség-, jogosultság- és kosárlogika változatlan marad. |
+| Mostani változtatás | M22 v6 főoldal Laravel/Blade + v6 CSS + natív JS/Alpine alapon; a publikus storage média a hibás Apache symlink helyett Laravel `/media/{path}` útvonalon működik. M23-ban ugyanez a keret került a webshop, termék, keresés, kosár, checkout, siker-, kapcsolat-, információs-, auth- és partnerfiók layoutokra; az admin saját meglévő adminstruktúráján marad. A webshop két megjelenítési módja kártyás és lista nézet, a régi „Gyorsrendelés” felirat kivezetve. A meglévő ár-, elérhetőség-, mennyiség-, jogosultság- és kosárlogika változatlan marad; a kosár hozzáadás után előnézeti panellel, az ajánlatok kiemelt blokkban jelennek meg. |
 
 ### Kezelési szabályok a következő munkamenetekhez
 
@@ -114,6 +114,7 @@ A „nyitott” nem engedély automatikus üzleti szabályváltoztatásra. Techn
 | D13 | Chat elengedve, nem része a jelenlegi rendszernek | A ticketrendszer marad az ügyfélszolgálati kommunikáció felülete. Külön chat, real-time/polling, reconnect és külső provider nem készül; új igény esetén külön döntéssel vehető fel | ELENGEDVE |
 | D14 | A már működő deploy-folyamatot kell használni új előfeltételek nélkül | Felhasználó: „nem kell bevezetni uj dolgokat ... ugy ahogy mar mukodott”. Meglévő hat SSH/path titok és opcionális ENV_DEVELOP; nincs új deploykapcsoló, environment-jóváhagyás, hostkulcstitok vagy Basic-belépő. A szerverenv nem módosul. A CI, csomagellenőrzés és adatmegőrző kódmentés megmarad; az új infrastruktúra/biztonsági előfeltételek halasztottak, nem késznek jelöltek | ELDÖNTVE, korábbi M01 aktiválási feltételeket felülírja |
 | D15 | A webshopban két terméknézet marad: kártyás és lista | A korábbi gyorsrendelési felület nem külön üzleti folyamat; a lista nézet ugyanazokat a szerveroldali ár-, csomagolás-, mennyiség-, jogosultság- és kosárszabályokat használja. A „Gyorsrendelés” látható megnevezés kivezetendő, a régi `/quick-order` útvonal csak kompatibilitási átirányításként marad | ELDÖNTVE, M23 |
+| D16 | Az admin felületnek nincs szüksége külön V6 komponensbemutatóra | A működő adminstruktúra és üzleti menüpontok maradnak; a „V6 komponensek” admin menüpont kivezetve, a publikus webshop/fiók v6 átállítása ettől függetlenül folytatódik | ELDÖNTVE, M23 |
 
 További kötelező különbségek: a ZIP admin- és webshopadatai részben külön demótárak; az éles rendszer közös adatbázist/árszámítást használ. A termékimport eredménye a webshopban is megjelenik. A helyi képelőnézetből tényleges feltöltés lesz. A prototípus 27%-os áfája nem igazolja minden termék adóbesorolását.
 
@@ -896,8 +897,9 @@ Stagingen bemutatható eredmény: a publikus webshop, termék, keresés, kosár 
 - [x] M23.02 A webshop katalógus régi Bootstrap-rácsa és `product-box` megjelenítése kivezetve; új reszponzív szűrő, kategóriafa, rendezés, lapozás és partnerár-mentes vendégállapot készült.
 - [x] M23.03 Az új katalógus- és termékoldali kártya megőrzi a publikus médiafallbacket, elérhetőségi státuszt, kiszerelést, partnerárat, kedvencet és kosárba helyezést; a meglévő végpontok és `PricingService` változatlanok.
 - [x] M23.04 A kosár új v6 táblás megjelenítést kapott; mennyiségmódosítás, törlés, nettó összeg és elérhetetlenségi figyelmeztetés a meglévő AJAX végpontokon maradt, a fejléc kosárszámlálója frissül.
-- [x] M23.05 A checkout, partnerfiók, auth és admin régi belső nézetei v6 panel/form/tábla/gomb rendszerre kerültek; a meglévő űrlapnevek, végpontok, árképzés, jogosultságok és kosárfolyamat változatlanok.
+- [x] M23.05 A checkout, partnerfiók és auth belső nézetei v6 panel/form/tábla/gomb rendszerre kerültek; a meglévő űrlapnevek, végpontok, árképzés, jogosultságok és kosárfolyamat változatlanok. Az admin saját működő struktúráján maradt, a külön V6 komponensmenü kikerült.
 - [x] M23.07 A webshop nézetei kártyás/lista módban működnek; a lista nézet natív JavaScriptes betöltést, keresést, kategóriaszűrést, lapozást és kosárba helyezést használ. A vendég HTML-ben nincs partnerár; a régi gyorsrendelési felirat kikerült, `/quick-order` csak kompatibilitási átirányítás.
+- [x] M23.08 A partner a kosárba helyezés után látható, nem blokkoló kosár-előnézetet kap mennyiség- és törlésvezérlőkkel; létrejött a megtalálható `/adminpanel/login` belépési útvonal és az adminpanel hivatkozás; a kiemelt ajánlatok főoldali és ajánlati oldali megjelenése hangsúlyosabb lett.
 - [ ] M23.06 A publikus oldalak 390/768/1440 px vizuális staging-összevetése és partneri kosár/checkout végigpróba; képek, konzol, fókusz, hosszú terméknevek és ármentes vendég HTML ellenőrzése.
 
 ### M23 kiadási kapuk

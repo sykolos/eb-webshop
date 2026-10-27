@@ -1,15 +1,16 @@
 @if(count($lines) > 0)
-    <ul class="list-group list-group-flush">
+    <div class="home-v6-cart-preview__heading"><strong>Kosár előnézete</strong><span>{{ count($lines) }} tétel</span></div>
+    <ul class="home-v6-cart-preview__items">
         @foreach($lines as $line)
             @php
                 $product = $line['product'];
                 $quote = $line['quote'];
                 $item = $line['item'];
             @endphp
-            <li class="list-group-item">
-                <div class="d-flex justify-content-between align-items-start gap-2">
-                    <div class="flex-grow-1">
-                        <strong class="d-block text-truncate" style="max-width: 220px;">
+            <li>
+                <div class="home-v6-cart-preview__line">
+                    <div>
+                        <strong>
                             {{ $product?->title ?? 'Ismeretlen termék' }}
                         </strong>
                         <small>
@@ -19,26 +20,23 @@
                             @endif
                         </small>
                     </div>
-                    @if ($quote)
-                        <strong>{{ number_format($quote['line_net'], 0, ',', ' ') }} Ft</strong>
-                    @endif
+                    @if ($quote)<strong>{{ number_format($quote['line_net'], 0, ',', ' ') }} Ft</strong>@endif
                 </div>
-                <div class="input-group input-group-sm mt-2" style="max-width: 160px;">
-                    <button class="btn btn-decrease" data-key="{{ $item->id }}" aria-label="Mennyiség csökkentése">−</button>
-                    <input type="text" readonly class="form-control text-center quantity-display" value="{{ $line['quantity'] }}">
-                    <button class="btn btn-increase" data-key="{{ $item->id }}" aria-label="Mennyiség növelése">+</button>
-                    <button class="btn btn-sm btn-remove ms-2" data-key="{{ $item->id }}" aria-label="Termék törlése">×</button>
+                <div class="home-v6-cart-preview__controls">
+                    <button class="btn-decrease" type="button" data-key="{{ $item->id }}" aria-label="Mennyiség csökkentése">−</button>
+                    <span>{{ $line['quantity'] }}</span>
+                    <button class="btn-increase" type="button" data-key="{{ $item->id }}" aria-label="Mennyiség növelése">+</button>
+                    <button class="btn-remove" type="button" data-key="{{ $item->id }}" aria-label="Termék törlése">Törlés</button>
                 </div>
             </li>
         @endforeach
-        <li class="list-group-item d-flex justify-content-between border-top pt-2">
-            <strong>Összesen nettó:</strong>
-            <strong>{{ number_format($summary['net'], 0, ',', ' ') }} Ft</strong>
+        <li class="home-v6-cart-preview__total">
+            <strong>Összesen nettó</strong><strong>{{ number_format($summary['net'], 0, ',', ' ') }} Ft</strong>
         </li>
     </ul>
-    <div class="p-2 border-top text-center">
-        <a href="{{ route('cart') }}" class="btn btn-primary btn-lg px-4 bg-gradient text-white">Irány a kosárhoz</a>
+    <div class="home-v6-cart-preview__footer">
+        <a href="{{ route('cart') }}" class="v6-button v6-button--primary v6-button--small">Irány a kosárhoz</a>
     </div>
 @else
-    <p class="text-muted px-3">A kosár üres.</p>
+    <div class="home-v6-cart-preview__empty">A kosár üres.</div>
 @endif

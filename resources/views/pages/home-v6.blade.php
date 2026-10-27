@@ -55,10 +55,10 @@
 </section>
 
 @if($activeOffers->isNotEmpty())
-<section class="home-v6-section home-v6-section--white" aria-labelledby="home-offers-title">
+<section class="home-v6-section home-v6-section--offers" aria-labelledby="home-offers-title">
     <div class="v6-container">
-        <div class="home-v6-section-heading"><div><span class="v6-eyebrow">Electro Business</span><h2 id="home-offers-title">Aktuális ajánlatok</h2><p>Valós, időzített ajánlatok a meglévő partneri árképzés megtartásával.</p></div><a href="{{ route('info.offers') }}">Összes ajánlat →</a></div>
-        <div class="home-v6-offers">@foreach($activeOffers->take(3) as $offer)<a href="{{ route('info.offers') }}#ajanlat-{{ $offer->slug }}"><span>Ajánlat</span><strong>{{ $offer->title }}</strong><small>{{ $offer->summary ?: 'Részletek megnyitása' }}</small></a>@endforeach</div>
+        <div class="home-v6-section-heading"><div><span class="v6-eyebrow">KIEMELT AJÁNLATOK</span><h2 id="home-offers-title">Aktuális ajánlatok</h2><p>Az aktuális kiemelések egy helyen, a meglévő partneri árképzés változatlan megtartásával.</p></div><a href="{{ route('info.offers') }}">Összes ajánlat →</a></div>
+        <div class="home-v6-offers">@foreach($activeOffers->take(3) as $offer)<a href="{{ route('info.offers') }}#ajanlat-{{ $offer->slug }}"><span>Most kiemelve</span><strong>{{ $offer->title }}</strong><small>{{ $offer->summary ?: 'Részletek megnyitása' }}</small><b>Megnézem →</b></a>@endforeach</div>
     </div>
 </section>
 @endif

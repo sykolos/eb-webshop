@@ -117,6 +117,14 @@ Route::post('register',[AuthController::class,'postregister'])->name('register.s
 Route::post('/login',[AuthController::class,'postlogin'])->name('login.submit')->middleware(['guest', 'throttle:login']);
 Route::post('logout/',[AuthController::class,'postlogout'])->name('logout')->middleware('auth');
 
+Route::get('/adminpanel/login', function () {
+    if (auth()->check() && auth()->user()->is_admin) {
+        return redirect()->route('adminpanel');
+    }
+
+    return redirect()->route('login', ['return_to' => '/adminpanel']);
+})->name('admin.login')->middleware('guest');
+
 Route::middleware('auth')->group(function () {
     Route::get('/products/{productId}/media/{mediaId}/download', [ProductMediaController::class, 'customerDownload'])
         ->whereNumber('productId')->whereNumber('mediaId')->name('product.media.download');

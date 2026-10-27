@@ -5,6 +5,11 @@
             <a href="{{ route('contact') }}">Kapcsolat</a>
             <a href="{{ route('gyik') }}">Segítség</a>
             <a href="{{ route('register') }}">Partnerprogram</a>
+            @guest
+                <a href="{{ route('admin.login') }}">Admin belépés</a>
+            @else
+                @if(auth()->user()->is_admin)<a href="{{ route('adminpanel') }}">Adminpanel</a>@endif
+            @endguest
         </div>
     </div>
 </div>
@@ -25,10 +30,14 @@
                 <a href="{{ route('account') }}" class="home-v6-account-action"><small>Partnerfiók</small><strong>Fiókom</strong></a>
                 <a id="cart-icon-container" href="{{ route('cart') }}" class="home-v6-cart-action"
                     data-count-url="{{ route('cart.count') }}"
+                    data-preview-url="{{ route('cart.preview') }}"
                     data-update-url="{{ route('cart.update') }}"
-                    data-remove-url="{{ route('cart.remove') }}">
+                    data-remove-url="{{ route('cart.remove') }}"
+                    aria-controls="home-v6-cart-preview"
+                    aria-expanded="false">
                     <small>Kosár</small><strong><span data-home-cart-count>{{ auth()->user()->cart?->items()->sum('quantity') ?? 0 }}</span> tétel</strong>
                 </a>
+                <div id="home-v6-cart-preview" class="home-v6-cart-preview" hidden aria-live="polite"></div>
             @else
                 <a href="{{ route('login') }}" class="home-v6-account-action"><small>Partnerfiók</small><strong>Belépés</strong></a>
                 <a href="{{ route('register') }}" class="home-v6-cart-action"><small>Új partner</small><strong>Regisztráció</strong></a>
@@ -41,7 +50,7 @@
             @foreach(($headerCategories ?? collect())->take(5) as $category)
                 <a href="{{ route('orderpage', ['category' => $category->id]) }}">{{ $category->name }}</a>
             @endforeach
-            <a class="home-v6-nav__sale" href="{{ route('info.offers') }}">Akciók</a>
+            <a class="home-v6-nav__sale" href="{{ route('info.offers') }}">Kiemelt ajánlatok</a>
         </div>
     </nav>
 </header>

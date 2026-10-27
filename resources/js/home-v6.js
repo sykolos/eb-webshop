@@ -81,6 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) return;
             const data = await response.json();
             document.querySelectorAll('[data-home-cart-count]').forEach((node) => { node.textContent = data.count; });
+            window.showCartPreview?.();
             if (cartToast) {
                 cartToast.textContent = data.message || 'A termék a kosárba került.';
                 cartToast.hidden = false;

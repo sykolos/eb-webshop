@@ -2,7 +2,7 @@
 
 @section('title', 'Aktuális ajánlatok')
 @section('content')
-<div class="v6-container v6-m14-page">
+<div class="v6-container v6-m14-page m20-offers-page">
     <div class="v6-section__header"><div><span class="v6-eyebrow">AKTUÁLIS AJÁNLATOK</span><h1>Aktuális ajánlatok</h1><p>A kiemelések tájékoztató tartalmak; a partneri árakat és kedvezményeket a meglévő árképzés számolja.</p></div></div>
     @forelse($activeOffers as $offer)
         @php($banner = $offer->banners->first(fn ($item) => $item->slot === 'hero' && $item->is_published))
@@ -16,7 +16,7 @@
                     </picture>
                 </a>
             @endif
-            <div class="v6-section__header"><div><span class="v6-eyebrow">KIEMELT AJÁNLAT</span><h2>{{ $offer->title }}</h2>@if($offer->summary)<p>{{ $offer->summary }}</p>@endif</div></div>
+            <div class="v6-section__header"><div><span class="v6-eyebrow">KIEMELT AJÁNLAT</span><h2>{{ $offer->title }}</h2>@if($offer->summary)<p>{{ $offer->summary }}</p>@endif</div><span class="v6-status v6-status--success">Aktív ajánlat</span></div>
             @if($offer->displayProducts->isNotEmpty())
                 <div class="m20-offer__products">@foreach($offer->displayProducts as $product)<x-product-box :product="$product" />@endforeach</div>
             @else

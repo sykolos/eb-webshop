@@ -76,6 +76,7 @@ quickProducts?.addEventListener('click', async (event) => {
         const response = await fetch(button.dataset.url, {method: 'POST', headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8', 'X-CSRF-TOKEN': csrf, Accept: 'application/json'}, body: new URLSearchParams({_token: csrf || '', quantity: card?.querySelector('.quick-quantity')?.value || '1'})});
         if (!response.ok) throw new Error();
         if (quickStatus) { quickStatus.textContent = 'A termék a kosárba került.'; quickStatus.hidden = false; }
+        window.showCartPreview?.();
         window.updateCartCount?.();
     } catch {
         if (quickStatus) { quickStatus.textContent = 'Hiba történt a kosárba helyezés során.'; quickStatus.hidden = false; }
