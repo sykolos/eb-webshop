@@ -10,7 +10,7 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 | Aktív mérföldkő | M23: Közös v6 publikus layout és webshop UI, STAGINGEN |
 | Következő fejlesztési feladat | M23.K5 staging vizuális ellenőrzés 390/768/1440 px-en, bejelentkezett partner/admin képernyőkkel; utána M22 tartalom- és partneri QA lezárása |
 | Alkalmazásfejlesztés ebből a checklistből | M01-M20 stagingen ellenőrzött; M21 frontend-kivezetés, natív kosár/kereső/navigáció, security headerek, health endpointok, integritás- és kapacitásjelentés, valamint átadási dokumentáció elkészült; külön chat nem része a rendszernek |
-| Utolsó igazolt staging kiadás | `217deaf213e0d675117da7e4cc3aeca1f2b6c1a9`, GitHub Actions [run 40484466825](https://github.com/sykolos/eb-webshop/actions/runs/40484466825): kosár-előnézet, admin belépési útvonal, kiemelt ajánlatok és staging smoke retry, verify/deploy sikeres |
+| Utolsó igazolt staging kiadás | `48fb2a5ddeaa152b7b9fc6e8c33c15a4a8497f24`, GitHub Actions [run 40485031067](https://github.com/sykolos/eb-webshop/actions/runs/40485031067): bejelentkezett adminnál látható Adminpanel gomb, verify/deploy sikeres |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
@@ -1462,3 +1462,9 @@ Kiadási bejegyzéshez szükséges részletek:
 - Ellenőrzés: `php -l scripts/deploy/smoke.php`, Blade cache, route-list (`admin.login`), JavaScript szintaxis, Vite build és `git diff --check` sikeres. Staging HTTP: `/`, `/contact`, `/login`, `/info/akciok` 200; `/adminpanel/login` 302 a közös loginra; `/health/ready` 200, adatbázis és storage rendben.
 - Nyitott maradt M23.K5: képernyős 390/768/1440 px ellenőrzés és tényleges bejelentkezett partneri kosárkattintás ebben a munkamenetben nem futott, mert nincs elérhető böngészőautomatizálás. A kód- és staging HTTP-ellenőrzés nem helyettesíti ezt a vizuális kaput.
 - Következő konkrét feladat: M23.K5 képernyős QA elérhető böngészővel, majd M22.14/M22.17 üzleti tartalom- és partneri átvétel.
+
+### 2026-10-27: Látható adminpanel gomb admin felhasználónak
+
+- A publikus fejlécben az `is_admin` felhasználó most a kosár mellett egy jól látható, piros **Adminpanel** gombot kap, amely közvetlenül az `/adminpanel` oldalra visz. Vendég és sima partner esetén a gomb nem jelenik meg.
+- Ellenőrzés: Blade cache, Vite build, diff-check; stagingen vendég `/` és `/login` 200, a `home-v6-admin-action` marker vendég HTML-ben nem szerepel.
+- Kiadás: `48fb2a5ddeaa152b7b9fc6e8c33c15a4a8497f24`, [GitHub Actions 40485031067](https://github.com/sykolos/eb-webshop/actions/runs/40485031067) verify/deploy sikeres.
