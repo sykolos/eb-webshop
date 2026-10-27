@@ -46,7 +46,6 @@
                 <button class="v6-button v6-button--primary auth-v6-submit" type="submit">Belépés</button>
             </form>
             <p class="auth-v6-footer-link">Még nincs partnerfiókod? <a href="{{ route('register', $returnTo ? ['return_to' => $returnTo] : []) }}">Partnerregisztráció</a></p>
-            <p class="auth-v6-footer-link"><a href="{{ route('admin.login') }}">Admin belépés</a></p>
         </div>
     </div>
 </section>
