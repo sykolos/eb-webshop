@@ -10,7 +10,7 @@ Háttér és indoklás: [Átépítési terv](ATEPITESI-TERV.md). Eltérés eset�
 | Aktív mérföldkő | M23: Közös v6 publikus layout és webshop UI, STAGINGEN |
 | Következő fejlesztési feladat | M23.K5 staging vizuális ellenőrzés 390/768/1440 px-en, bejelentkezett partner/admin képernyőkkel; utána M22 tartalom- és partneri QA lezárása |
 | Alkalmazásfejlesztés ebből a checklistből | M01-M20 stagingen ellenőrzött; M21 frontend-kivezetés, natív kosár/kereső/navigáció, security headerek, health endpointok, integritás- és kapacitásjelentés, valamint átadási dokumentáció elkészült; külön chat nem része a rendszernek |
-| Utolsó igazolt staging kiadás | `b8a1c2e6905ff93e1530c7d2175a46b645ebdbb4`, GitHub Actions [run 39776748202](https://github.com/sykolos/eb-webshop/actions/runs/39776748202): checkout, auth, partnerfiók és admin v6 belső UI, verify/deploy sikeres |
+| Utolsó igazolt staging kiadás | `217deaf213e0d675117da7e4cc3aeca1f2b6c1a9`, GitHub Actions [run 40484466825](https://github.com/sykolos/eb-webshop/actions/runs/40484466825): kosár-előnézet, admin belépési útvonal, kiemelt ajánlatok és staging smoke retry, verify/deploy sikeres |
 | Aktuális munkaág a felméréskor | codex/m01-staging-foundation |
 | Meglévő workflow | D14 szerint működik: develop push -> verify -> deploy a meglévő hat SSH/path titokkal; nincs új kapcsoló vagy environment kapu |
 | Dokumentált staging cél | https://ebtest.dekor26.hu; szerveroldali állapot M01-ben ellenőrizendő |
@@ -1452,3 +1452,13 @@ Kiadási bejegyzéshez szükséges részletek:
 - Commit / develop SHA / staging futás:
 - Migráció / rollback / ismert hiba:
 - Következő konkrét feladat:
+
+### 2026-10-27: M23 kosár, admin belépés és kiemelt ajánlatok staging kiadása
+
+- A v6 publikus fejléc bejelentkezett állapotban most automatikusan megnyitja a szerveroldali kosár-előnézetet hozzáadás után. A panel mennyiségcsökkentést, -növelést, törlést és a kosár oldalára vezető gombot ad; a meglévő `CartService`, árképzés és kosárvégpontok maradtak.
+- Az admin belépés külön megtalálható `/adminpanel/login` útvonalat és közös `/login?return_to=/adminpanel` folyamatot kapott. Az admin navigációból kikerült a nem szükséges „V6 komponensek” menüpont; a működő admin üzleti nézetek és a jogosultságok nem változtak.
+- A főoldali ajánlati blokk sötét, kiemelt sávként jelenik meg, az ajánlati oldalon az aktív ajánlat külön kiemelt állapotjelzést és hangsúlyos keretet kap. Az ajánlat továbbra is tartalmi kiemelés, nem módosítja a D01 szerinti árképzést.
+- A deploy smoke ellenőrzés rövid átállási válaszhibára három próbálkozást kapott. Az első `d1c2d6e` kiadás deployja feljutott, de az egyszeri smoke ellenőrzés hibával állt meg; a `217deaf` új kiadása a [40484466825](https://github.com/sykolos/eb-webshop/actions/runs/40484466825) workflowban verify/deploy sikeres.
+- Ellenőrzés: `php -l scripts/deploy/smoke.php`, Blade cache, route-list (`admin.login`), JavaScript szintaxis, Vite build és `git diff --check` sikeres. Staging HTTP: `/`, `/contact`, `/login`, `/info/akciok` 200; `/adminpanel/login` 302 a közös loginra; `/health/ready` 200, adatbázis és storage rendben.
+- Nyitott maradt M23.K5: képernyős 390/768/1440 px ellenőrzés és tényleges bejelentkezett partneri kosárkattintás ebben a munkamenetben nem futott, mert nincs elérhető böngészőautomatizálás. A kód- és staging HTTP-ellenőrzés nem helyettesíti ezt a vizuális kaput.
+- Következő konkrét feladat: M23.K5 képernyős QA elérhető böngészővel, majd M22.14/M22.17 üzleti tartalom- és partneri átvétel.
